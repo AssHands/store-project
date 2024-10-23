@@ -18,5 +18,6 @@
 
 	<modules>
 		<module>store-user</module>
+		<module>store-common</module>
 	</modules>
 </project>
