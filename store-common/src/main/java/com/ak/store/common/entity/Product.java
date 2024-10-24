@@ -13,17 +13,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "product")
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
-    @Size(min = 3, max = 10)
-    private String name;
+    @Size(min = 5, max = 50)
+    private String title;
+
+    @NotBlank
+    @Size(min = 5, max = 150)
+    private String description;
 
     @Min(1)
-    @Max(100)
-    private int age;
+    @Max(Integer.MAX_VALUE)
+    private float price;
+
+    @ManyToOne
+    private Category categoryId;
 }
