@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:17.0-alpine
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+    ports:
+      - 5430:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8888:8080

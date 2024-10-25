@@ -1,4 +1,4 @@
-package com.ak.store.common.entity;
+package com.ak.store.common.entity.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -26,4 +26,6 @@ public class User {
     @Min(1)
     @Max(100)
     private int age;
+
+    //private Date createdAt;
 }

@@ -1,4 +1,4 @@
-package com.ak.store.common.entity;
+package com.ak.store.common.entity.cart;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

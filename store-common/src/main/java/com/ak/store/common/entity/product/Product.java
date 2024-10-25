@@ -1,4 +1,4 @@
-package com.ak.store.common.entity;
+package com.ak.store.common.entity.product;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -31,6 +31,7 @@ public class Product {
     @Max(Integer.MAX_VALUE)
     private float price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "name")
     private Category categoryId;
 }

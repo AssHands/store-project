@@ -1,7 +1,6 @@
-package com.ak.store.common.entity;
+package com.ak.store.common.entity.product;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,16 +9,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "category")
-public class Category {
+@Table(name = "property")
+public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    private Long parentId;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Category category;
 
-    private int level;
-
-    @NotBlank
     private String name;
+
+    private String value;
+
+    private int number;
 }
