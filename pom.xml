@@ -19,5 +19,6 @@
 	<modules>
 		<module>store-user</module>
 		<module>store-common</module>
-	</modules>
+        <module>store-filter-query</module>
+    </modules>
 </project>
