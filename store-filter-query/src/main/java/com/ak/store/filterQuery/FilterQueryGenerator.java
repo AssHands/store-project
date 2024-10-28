@@ -3,7 +3,9 @@ package com.ak.store.filterQuery;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FilterQueryGenerator {
@@ -12,10 +14,9 @@ public class FilterQueryGenerator {
     public static String generateQuery(String jsonString) {
 
         try {
-            // Парсинг JSON в объект JsonNode
             JsonNode rootNode = objectMapper.readTree(jsonString);
 
-            // Создание WHERE-условия для SQL-запроса
+
             Map<String, String> whereConditions = new HashMap<>();
             rootNode.fieldNames().forEachRemaining(fieldName -> {
                 JsonNode fieldValue = rootNode.path(fieldName);
@@ -29,7 +30,7 @@ public class FilterQueryGenerator {
                 if (!firstCondition) {
                     sql.append(" AND ");
                 }
-                sql.append(entry.getKey()).append(" = '").append(entry.getValue()).append("'");
+                sql.append("(").append(entry.getKey()).append(" = ").append(entry.getValue()).append(")");
                 firstCondition = false;
             }
             return sql.toString();
@@ -41,16 +42,34 @@ public class FilterQueryGenerator {
     }
 
     public static String generateQueryMap(HashMap<String, String> filters) {
-
         StringBuilder sql = new StringBuilder("SELECT * FROM product WHERE ");
         boolean firstCondition = true;
         for (Map.Entry<String, String> entry : filters.entrySet()) {
-            if (!firstCondition) {
-                sql.append(" AND ");
+            if (!firstCondition) sql.append(" AND ");
+
+
+            sql.append(entry.getKey());
+            sql.append(" = ");
+
+            List<String> a = getValidFilters(entry.getValue());
+            for(int i = 0; i < a.size(); i++) {
+                if(i != a.size() - 1) {
+                    sql.append(a.get(i)).append();
+
+                }
+
             }
-            sql.append(entry.getKey()).append(" = '").append(entry.getValue()).append("'");
+
             firstCondition = false;
+
         }
         return sql.toString();
+    }
+
+    public static List<String> getValidFilters(String string) {
+        return Arrays.stream(string.split(":"))
+                .filter(flt -> flt.matches("^[0-9]+$"))
+                .distinct()
+                .toList();
     }
 }
