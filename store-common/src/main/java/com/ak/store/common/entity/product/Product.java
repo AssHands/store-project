@@ -9,11 +9,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Map;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "product")
+@Table(name = "product_new")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +34,7 @@ public class Product {
     @Max(Integer.MAX_VALUE)
     private float price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "name")
-    private Category categoryId;
+    private int categoryId;
+
+    private String properties;
 }

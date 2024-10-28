@@ -9,18 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "property")
+@Table(name = "properties")
 public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Category category;
-
     private String name;
 
     private String value;
-
-    private int number;
 }
