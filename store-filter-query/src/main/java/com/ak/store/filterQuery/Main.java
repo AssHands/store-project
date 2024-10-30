@@ -1,18 +1,14 @@
 package com.ak.store.filterQuery;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        String str = "12:18";
+        FilterQueryGenerator filterQueryGenerator =
+                new FilterQueryGenerator("product_new", "leftEntry", "rightEntry");
 
         System.out.println(
-                FilterQueryGenerator.getValidFilters(str)
-        );
-
-        System.out.println(
-                FilterQueryGenerator.generateQuery("{\"color\": 1, \"size\": 129, \"sounds\": 16}")
+                filterQueryGenerator.generateQueryWithFilters(Map.of("name", "2:43:2", "age", "30", "city", "12:s:7"))
         );
     }
 }
