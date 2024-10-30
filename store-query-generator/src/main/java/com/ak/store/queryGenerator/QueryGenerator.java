@@ -1,17 +1,19 @@
 package com.ak.store.queryGenerator;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
-public class QueryGenerator {
-
+public class QueryGenerator <T> {
+    private Class<T> clazz;
     private final String tableName;
     private final String leftEntry;
     private final String rightEntry;
 
-    public QueryGenerator(String tableName, String leftEntry, String rightEntry) {
+    public QueryGenerator(String tableName, String leftEntry, String rightEntry, Class<T> clazz) {
         this.tableName = tableName;
         this.leftEntry = leftEntry;
         this.rightEntry = rightEntry;
+        this.clazz = clazz;
     }
 
     public QueryGenerator(String tableName) {
@@ -31,6 +33,12 @@ public class QueryGenerator {
     }
 
     public String generateQuery(String sort, int offset, int limit) {
+
+        Field[] fields = clazz.getDeclaredFields();
+        for (var f : fields) {
+            System.out.println(f.getName());
+        }
+
         StringBuilder query = new StringBuilder(generateQuery());
         query.append(generateSortCondition(sort));
         query.append(generatePaginationCondition(offset, limit));

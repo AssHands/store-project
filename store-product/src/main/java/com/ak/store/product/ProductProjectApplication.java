@@ -1,5 +1,6 @@
 package com.ak.store.product;
 
+import com.ak.store.common.dto.ProductFullDTO;
 import com.ak.store.queryGenerator.QueryGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,8 +21,9 @@ public class ProductProjectApplication {
 
     @Bean
     public QueryGenerator queryGenerator() {
-        return new QueryGenerator("product_new",
+        return new QueryGenerator<ProductFullDTO>("product_new",
                 "jsonb_extract_path_text(properties, '",
-                "')::integer");
+                "')::integer",
+                ProductFullDTO.class);
     }
 }
