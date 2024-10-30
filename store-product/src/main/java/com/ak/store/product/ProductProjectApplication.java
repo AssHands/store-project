@@ -1,6 +1,5 @@
 package com.ak.store.product;
 
-import com.ak.store.queryGenerator.FilterQueryGenerator;
 import com.ak.store.queryGenerator.QueryGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,13 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+
 @EnableJpaRepositories("com.ak.store.*")
 @ComponentScan(basePackages = {"com.ak.store.*" })
 @EntityScan("com.ak.store.*")
 @SpringBootApplication
-@EnableJpaRepositories("com.ak.store.*")
-@ComponentScan(basePackages = {"com.ak.store.*" })
-@EntityScan("com.ak.store.*")
 public class ProductProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(ProductProjectApplication.class, args);
@@ -24,7 +21,7 @@ public class ProductProjectApplication {
     @Bean
     public QueryGenerator queryGenerator() {
         return new QueryGenerator("product_new",
-                "jsonb_extract_path_text(properties,",
-                ")::integer");
+                "jsonb_extract_path_text(properties, '",
+                "')::integer");
     }
 }

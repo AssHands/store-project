@@ -1,20 +1,13 @@
 package com.ak.store.user.service;
 
 import com.ak.store.common.entity.user.User;
-import com.ak.store.common.ResponseObject.UserPageResponse;
 import com.ak.store.user.jdbc.UserDao;
 import com.ak.store.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.util.ParsingUtils;
 import org.springframework.stereotype.Service;
-
-import java.awt.print.Pageable;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service

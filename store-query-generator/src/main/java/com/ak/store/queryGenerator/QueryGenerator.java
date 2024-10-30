@@ -14,6 +14,12 @@ public class QueryGenerator {
         this.rightEntry = rightEntry;
     }
 
+    public QueryGenerator(String tableName) {
+        this.tableName = tableName;
+        this.leftEntry = "";
+        this.rightEntry = "";
+    }
+
     public String generateQuery() {
         return "SELECT * FROM " + tableName;
     }
@@ -24,21 +30,19 @@ public class QueryGenerator {
         return query.toString();
     }
 
-    public String generateQuery(String sort, int limit, int offset) {
+    public String generateQuery(String sort, int offset, int limit) {
         StringBuilder query = new StringBuilder(generateQuery());
         query.append(generateSortCondition(sort));
-        query.append(generatePaginationCondition(limit, offset));
-
+        query.append(generatePaginationCondition(offset, limit));
         return query.toString();
     }
 
-    public String generateQuery(String sort, int limit, int offset,
+    public String generateQuery(String sort, int offset, int limit,
                                 Map<String, String> filters) {
         StringBuilder query = new StringBuilder(generateQuery());
-        query.append(FilterQueryGenerator.generateQuery(leftEntry, rightEntry, filters));
+        query.append(FilterConditionGenerator.generateFilterCondition(leftEntry, rightEntry, filters));
         query.append(generateSortCondition(sort));
-        query.append(generatePaginationCondition(limit, offset));
-
+        query.append(generatePaginationCondition(offset, limit));
         return query.toString();
     }
 
@@ -46,26 +50,19 @@ public class QueryGenerator {
         StringBuilder condition = new StringBuilder(" ORDER BY ");
 
         switch (sort) {
-            case "popular" :
-                condition.append("amount_orders"); break; //TODO: need new table
-            case "priceup" :
-                condition.append("price"); break;
-            case "pricedown" :
-                condition.append("price ASC"); break;
-            case "sale" :
-                condition.append("sale"); break;
-            case "rate" :
-                condition.append("rate"); break;
-            case "newly" :
-                condition.append("created_at ASC"); break;
-            default:
-                condition.append("amount_orders"); break;
+            case "popular" -> condition.append("amount_orders"); //TODO: need solution
+            case "priceup" -> condition.append("price");
+            case "pricedown" -> condition.append("price DESC");
+            case "sale" -> condition.append("sale");
+            case "rate" -> condition.append("rate");
+            case "newly" -> condition.append("created_at ASC");
+            default -> condition.append("amount_orders");
         }
 
         return condition.toString();
     }
 
-    private String generatePaginationCondition(int limit, int offset) {
+    private String generatePaginationCondition(int offset, int limit) {
         return " LIMIT " + limit + " OFFSET " + offset;
     }
 }

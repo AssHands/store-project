@@ -1,6 +1,5 @@
 package com.ak.store.user.controller;
 
-import com.ak.store.common.ResponseObject.UserPageResponse;
 import com.ak.store.user.jdbc.UserDao;
 import com.ak.store.user.service.UserService;
 import jakarta.validation.constraints.Max;

@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-public class FilterQueryGenerator {
-    public static String generateQuery(String leftEntry, String rightEntry,
-                                       Map<String, String> filters) {
+class FilterConditionGenerator {
+    public static String generateFilterCondition(String leftEntry, String rightEntry,
+                                                 Map<String, String> filters) {
         StringBuilder sql = new StringBuilder(" WHERE ");
         boolean firstCondition = true;
 
@@ -16,7 +16,7 @@ public class FilterQueryGenerator {
                 sql.append(" AND ");
 
             sql.append(leftEntry)
-                    .append("'" + getValidKey(entry.getKey()) + "'")
+                    .append(getValidKey(entry.getKey()))
                     .append(rightEntry)
                     .append(" IN (")
                     .append(getValidValue(entry.getValue()))

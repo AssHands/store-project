@@ -1,11 +1,12 @@
 package com.ak.store.product.jdbc;
 
-import com.ak.store.common.ResponseObject.ProductResponse;
+import com.ak.store.common.dto.ProductDto;
 
 import java.util.List;
 import java.util.Map;
 
 public interface ProductDao {
-    List<ProductResponse> findAll(String sort, int limit, int offset,
-                                  Map<String, String> filters);
+    List<ProductDto> findAll(String sort, int offset, int limit,
+                             Map<String, String> filters);
+    List<ProductDto> findAll(String sort, int offset, int limit);
 }
