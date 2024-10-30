@@ -14,5 +14,5 @@
     </properties>
 
     <groupId>com.ak.store.filterQuery</groupId>
-    <artifactId>store-filter-query</artifactId>
+    <artifactId>store-query-generator</artifactId>
 </project>
