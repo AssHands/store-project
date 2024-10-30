@@ -19,7 +19,7 @@
 	<modules>
 		<module>store-user</module>
 		<module>store-common</module>
-        <module>store-filter-query</module>
+        <module>store-query-generator</module>
         <module>store-product</module>
     </modules>
 </project>

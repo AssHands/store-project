@@ -1,4 +1,4 @@
-package com.ak.store.filterQuery;
+package com.ak.store.queryGenerator;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -6,18 +6,9 @@ import java.util.stream.Collectors;
 
 
 public class FilterQueryGenerator {
-    private final String tableName;
-    private final String leftEntry;
-    private final String rightEntry;
-
-    public FilterQueryGenerator(String tableName, String leftEntry, String rightEntry) {
-        this.tableName = tableName;
-        this.leftEntry = leftEntry;
-        this.rightEntry = rightEntry;
-    }
-
-    public String generateQueryWithFilters(Map<String, String> filters) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM " + tableName + " WHERE ");
+    public static String generateQuery(String leftEntry, String rightEntry,
+                                       Map<String, String> filters) {
+        StringBuilder sql = new StringBuilder(" WHERE ");
         boolean firstCondition = true;
 
         for (Map.Entry<String, String> entry : filters.entrySet()) {
@@ -37,7 +28,7 @@ public class FilterQueryGenerator {
         return sql.toString();
     }
 
-    private String getValidValue(String value) {
+    private static String getValidValue(String value) {
         String result = Arrays.stream(value.split(":"))
                 .filter(str -> str.matches("^\\d+$"))
                 .distinct()
@@ -50,7 +41,7 @@ public class FilterQueryGenerator {
         }
     }
 
-    private String getValidKey(String key) {
+    private static String getValidKey(String key) {
         if (key.matches("^[a-zA-Z_]+$")
                 && key.length() <= 15
                 && !key.isBlank()) {

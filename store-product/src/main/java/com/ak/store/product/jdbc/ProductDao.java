@@ -6,5 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface ProductDao {
-    List<ProductResponse> a(Map<String, String> a);
+    List<ProductResponse> findAll(String sort, int limit, int offset,
+                                  Map<String, String> filters);
 }

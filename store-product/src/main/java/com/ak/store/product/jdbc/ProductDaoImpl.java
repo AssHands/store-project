@@ -1,7 +1,8 @@
 package com.ak.store.product.jdbc;
 
 import com.ak.store.common.ResponseObject.ProductResponse;
-import com.ak.store.filterQuery.FilterQueryGenerator;
+import com.ak.store.queryGenerator.FilterQueryGenerator;
+import com.ak.store.queryGenerator.QueryGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -13,17 +14,20 @@ import java.util.Map;
  public class ProductDaoImpl implements ProductDao {
 
     private final JdbcTemplate jdbcTemplate;
-    private final FilterQueryGenerator filterQueryGenerator;
+    private final QueryGenerator queryGenerator;
 
     @Autowired
-    public ProductDaoImpl(JdbcTemplate jdbcTemplate, FilterQueryGenerator filterQueryGenerator) {
+    public ProductDaoImpl(JdbcTemplate jdbcTemplate, QueryGenerator queryGenerator) {
         this.jdbcTemplate = jdbcTemplate;
-        this.filterQueryGenerator = filterQueryGenerator;
+        this.queryGenerator = queryGenerator;
     }
 
     @Override
-    public List<ProductResponse> a(Map<String, String> a) {
-        return jdbcTemplate.query(filterQueryGenerator.generateQueryWithFilters(a), new ProductMapper());
+    public List<ProductResponse> findAll(String sort, int limit, int offset,
+                                   Map<String, String> filters) {
+        System.out.println(queryGenerator.generateQuery(sort, limit, offset, filters));
+        return jdbcTemplate.query(queryGenerator.generateQuery(sort, limit, offset, filters),
+                new ProductMapper());
     }
 
 //    private String getValidatedField(String field) {
