@@ -1,7 +1,6 @@
 package com.ak.store.product.service;
 
 import com.ak.store.common.dto.ProductDTO;
-import com.ak.store.common.dto.ProductDTOk;
 import com.ak.store.product.jdbc.ProductDao;
 import com.ak.store.product.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;

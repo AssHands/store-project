@@ -1,7 +1,6 @@
 package com.ak.store.product.jdbc;
 
 import com.ak.store.common.dto.ProductDTO;
-import com.ak.store.common.dto.ProductDTOk;
 
 import java.util.List;
 import java.util.Map;
