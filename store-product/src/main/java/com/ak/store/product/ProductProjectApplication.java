@@ -21,9 +21,8 @@ public class ProductProjectApplication {
 
     @Bean
     public QueryGenerator queryGenerator() {
-        return new QueryGenerator<ProductFullDTO>("product_new",
+        return new QueryGenerator("product_new",
                 "jsonb_extract_path_text(properties, '",
-                "')::integer",
-                ProductFullDTO.class);
+                "')::integer");
     }
 }

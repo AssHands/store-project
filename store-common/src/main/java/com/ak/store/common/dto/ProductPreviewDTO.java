@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductPreviewDTO {
+public class ProductPreviewDTO extends ProductDTOk implements ProductDTO {
     private Long id;
 
     private String title;

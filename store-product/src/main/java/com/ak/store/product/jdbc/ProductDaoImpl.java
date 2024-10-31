@@ -1,11 +1,10 @@
 package com.ak.store.product.jdbc;
 
+import com.ak.store.common.dto.ProductDTO;
 import com.ak.store.common.dto.ProductFullDTO;
-import com.ak.store.common.dto.ProductPreviewDTO;
 import com.ak.store.queryGenerator.QueryGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,27 +23,28 @@ import java.util.Map;
     }
 
     @Override
-    public List<ProductFullDTO> findAll(String sort, int offset, int limit,
-                                            Map<String, String> filters) {
-        System.out.println(queryGenerator.generateQuery(sort, offset, limit, filters));
+    public List<ProductDTO> findAll(String sort, int offset, int limit,
+                                    Map<String, String> filters, Class<?> clazz) {
+        System.out.println(queryGenerator.generateQuery(sort, offset, limit, filters, clazz));
 
-        return jdbcTemplate.query(queryGenerator.generateQuery(sort, offset, limit, filters),
-                new ProductFullMapper());
+        return jdbcTemplate.query(queryGenerator.generateQuery(sort, offset, limit, filters, clazz),
+                new ProductMapper(clazz));
     }
 
     @Override
-    public List<?> findAll(String sort, int offset, int limit) {
-        System.out.println(queryGenerator.generateQuery(sort, offset, limit));
+    public List<ProductDTO> findAll(String sort, int offset, int limit,
+                                               Class<?> clazz) {
+        System.out.println(queryGenerator.generateQuery(sort, offset, limit, clazz));
 
-        return jdbcTemplate.query(queryGenerator.generateQuery(sort, offset, limit),
-                new ProductFullMapper());
+        return jdbcTemplate.query(queryGenerator.generateQuery(sort, offset, limit, clazz),
+                new ProductMapper(clazz));
     }
 
     @Override
-    public ProductFullDTO findOne(Long id) {
-        String query = "SELECT * FROM product_new WHERE id=?";
+    public ProductDTO findOneById(Long id, Class<?> clazz) {
+        String query = queryGenerator.generateQuery(clazz) + " WHERE id=?";
         System.out.println(query);
 
-        return jdbcTemplate.queryForObject(query, new ProductFullMapper(), id);
+        return jdbcTemplate.queryForObject(query, new ProductMapper(clazz), id);
     }
 }

@@ -1,15 +1,14 @@
 package com.ak.store.product.service;
 
 
-import com.ak.store.common.dto.ProductFullDTO;
-import com.ak.store.common.dto.ProductPreviewDTO;
+import com.ak.store.common.dto.ProductDTO;
 
 import java.util.List;
 import java.util.Map;
 
 public interface ProductService {
-    List<ProductFullDTO> findAll(String sort, int offset, int limit,
-                                     Map<String, String> filters);
+    List<ProductDTO> findAll(String sort, int offset, int limit,
+                             Map<String, String> filters, Class<?> clazz);
 
-    ProductFullDTO findById(Long id);
+    ProductDTO findOneById(Long id, Class<?> clazz);
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductFullDTO {
+public class ProductFullDTO extends ProductDTOk implements ProductDTO {
     private Long id;
 
     private String title;

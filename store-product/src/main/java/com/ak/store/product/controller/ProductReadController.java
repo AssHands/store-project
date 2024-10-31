@@ -1,5 +1,6 @@
 package com.ak.store.product.controller;
 
+import com.ak.store.common.dto.ProductDTO;
 import com.ak.store.common.dto.ProductFullDTO;
 import com.ak.store.common.dto.ProductPreviewDTO;
 import com.ak.store.product.jdbc.ProductDao;
@@ -29,32 +30,36 @@ public class ProductReadController {
     }
 
     @GetMapping("full")
-    public List<ProductFullDTO> getAll(@RequestParam(defaultValue = "popular") String sort,
-                                       @RequestParam(defaultValue = "0") @Min(0) int offset,
-                                       @RequestParam(defaultValue = "18") @Min(1) @Max(100) int limit,
-                                       @RequestBody(required = false) Map<String, String> filters) {
+    public List<ProductDTO> getAllFull(@RequestParam(defaultValue = "price ASC") String sort,
+                                   @RequestParam(defaultValue = "0") @Min(0) int offset,
+                                   @RequestParam(defaultValue = "18") @Min(1) @Max(100) int limit,
+                                   @RequestBody(required = false) Map<String, String> filters) {
         if (!productValidator.validate(sort)) {
-            return null;
+            return productService.findAll("price ASC", offset, limit, filters, ProductFullDTO.class);
         }
 
-        return productService.findAll(sort, offset, limit, filters);
+        return productService.findAll(sort, offset, limit, filters, ProductFullDTO.class);
     }
 
     @GetMapping("full/{id}")
-    public ProductFullDTO getById(@PathVariable("id") Long id) {
-        return productService.findById(id);
+    public ProductDTO getOneByIdFull(@PathVariable("id") Long id) {
+        return productService.findOneById(id, ProductFullDTO.class);
     }
 
     @GetMapping("preview")
-    public List<ProductPreviewDTO> getAllPreview(@RequestParam(defaultValue = "popular") String sort,
+    public List<ProductDTO> getAllPreview(@RequestParam(defaultValue = "price ASC") String sort,
                                           @RequestParam(defaultValue = "0") @Min(0) int offset,
                                           @RequestParam(defaultValue = "18") @Min(1) @Max(100) int limit,
                                           @RequestBody(required = false) Map<String, String> filters) {
         if (!productValidator.validate(sort)) {
-            return null;
+            return productService.findAll("price ASC", offset, limit, filters, ProductPreviewDTO.class);
         }
 
-        return null;
-        //return productService.findAllPreview(sort, offset, limit, filters);
+        return productService.findAll(sort, offset, limit, filters, ProductPreviewDTO.class);
+    }
+
+    @GetMapping("preview/{id}")
+    public ProductDTO getOneByIdPreview(@PathVariable("id") Long id) {
+        return productService.findOneById(id, ProductPreviewDTO.class);
     }
 }
