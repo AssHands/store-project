@@ -1,8 +1,7 @@
 package com.ak.store.product.jdbc;
 
 import com.ak.store.common.dto.ProductDTO;
-import com.ak.store.common.dto.ProductFullDTO;
-import com.ak.store.queryGenerator.QueryGenerator;
+import com.ak.store.queryGenerator.SelectQueryGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -14,37 +13,42 @@ import java.util.Map;
  public class ProductDaoImpl implements ProductDao {
 
     private final JdbcTemplate jdbcTemplate;
-    private final QueryGenerator queryGenerator;
+    private final SelectQueryGenerator selectQueryGenerator;
 
     @Autowired
-    public ProductDaoImpl(JdbcTemplate jdbcTemplate, QueryGenerator queryGenerator) {
+    public ProductDaoImpl(JdbcTemplate jdbcTemplate, SelectQueryGenerator selectQueryGenerator) {
         this.jdbcTemplate = jdbcTemplate;
-        this.queryGenerator = queryGenerator;
+        this.selectQueryGenerator = selectQueryGenerator;
     }
 
     @Override
     public List<ProductDTO> findAll(String sort, int offset, int limit,
                                     Map<String, String> filters, Class<?> clazz) {
-        System.out.println(queryGenerator.generateQuery(sort, offset, limit, filters, clazz));
+        System.out.println(selectQueryGenerator.select(sort, offset, limit, filters, clazz));
 
-        return jdbcTemplate.query(queryGenerator.generateQuery(sort, offset, limit, filters, clazz),
+        return jdbcTemplate.query(selectQueryGenerator.select(sort, offset, limit, filters, clazz),
                 new ProductMapper(clazz));
     }
 
     @Override
     public List<ProductDTO> findAll(String sort, int offset, int limit,
                                                Class<?> clazz) {
-        System.out.println(queryGenerator.generateQuery(sort, offset, limit, clazz));
+        System.out.println(selectQueryGenerator.select(sort, offset, limit, clazz));
 
-        return jdbcTemplate.query(queryGenerator.generateQuery(sort, offset, limit, clazz),
+        return jdbcTemplate.query(selectQueryGenerator.select(sort, offset, limit, clazz),
                 new ProductMapper(clazz));
     }
 
     @Override
     public ProductDTO findOneById(Long id, Class<?> clazz) {
-        String query = queryGenerator.generateQuery(clazz) + " WHERE id=?";
+        String query = selectQueryGenerator.select(clazz) + " WHERE id=?";
         System.out.println(query);
 
         return jdbcTemplate.queryForObject(query, new ProductMapper(clazz), id);
+    }
+
+    @Override
+    public ProductDTO updateOneById(Long id, Map<String, ? super Object> updatedFields) {
+        return null;
     }
 }

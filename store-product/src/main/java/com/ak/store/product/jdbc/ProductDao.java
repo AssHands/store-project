@@ -12,4 +12,6 @@ public interface ProductDao {
     List<ProductDTO> findAll(String sort, int offset, int limit, Class<?> clazz);
 
     ProductDTO findOneById(Long id, Class<?> clazz);
+
+    ProductDTO updateOneById(Long id, Map<String, ? super Object> updatedFields);
 }

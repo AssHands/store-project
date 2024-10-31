@@ -34,8 +34,8 @@ public class ProductReadController {
                                    @RequestParam(defaultValue = "0") @Min(0) int offset,
                                    @RequestParam(defaultValue = "18") @Min(1) @Max(100) int limit,
                                    @RequestBody(required = false) Map<String, String> filters) {
-        if (!productValidator.validate(sort)) {
-            return productService.findAll("price ASC", offset, limit, filters, ProductFullDTO.class);
+        if (!productValidator.validateSortAndFilters(sort, filters)) {
+            return null;
         }
 
         return productService.findAll(sort, offset, limit, filters, ProductFullDTO.class);
@@ -51,8 +51,8 @@ public class ProductReadController {
                                           @RequestParam(defaultValue = "0") @Min(0) int offset,
                                           @RequestParam(defaultValue = "18") @Min(1) @Max(100) int limit,
                                           @RequestBody(required = false) Map<String, String> filters) {
-        if (!productValidator.validate(sort)) {
-            return productService.findAll("price ASC", offset, limit, filters, ProductPreviewDTO.class);
+        if (!productValidator.validateSortAndFilters(sort, filters)) {
+            return null;
         }
 
         return productService.findAll(sort, offset, limit, filters, ProductPreviewDTO.class);
@@ -61,5 +61,10 @@ public class ProductReadController {
     @GetMapping("preview/{id}")
     public ProductDTO getOneByIdPreview(@PathVariable("id") Long id) {
         return productService.findOneById(id, ProductPreviewDTO.class);
+    }
+
+    @GetMapping("test")
+    public void test(@RequestBody Map<String, ? super Object> map) {
+
     }
 }

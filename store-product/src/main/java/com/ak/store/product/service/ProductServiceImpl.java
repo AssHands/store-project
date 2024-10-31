@@ -35,4 +35,9 @@ public class ProductServiceImpl implements ProductService {
     public ProductDTO findOneById(Long id, Class<?> clazz) {
         return productDao.findOneById(id, clazz);
     }
+
+    @Override
+    public ProductDTO updateOneById(Long id, Map<String, ? super Object> updatedFields) {
+        return productDao.updateOneById(id, updatedFields);
+    }
 }

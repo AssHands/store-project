@@ -11,4 +11,6 @@ public interface ProductService {
                              Map<String, String> filters, Class<?> clazz);
 
     ProductDTO findOneById(Long id, Class<?> clazz);
+
+    ProductDTO updateOneById(Long id, Map<String, ? super Object> updatedFields);
 }
