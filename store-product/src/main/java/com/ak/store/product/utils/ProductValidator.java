@@ -1,5 +1,7 @@
 package com.ak.store.product.utils;
 
+import com.ak.store.common.dto.ProductFullDTO;
+import org.apache.commons.text.CaseUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,9 +21,10 @@ public class ProductValidator {
     public boolean validateSort(String sort) {
         return allowsSortParams.contains(sort);
     }
+
     public boolean validateFilters(Map<String, String> filters) {
         for (var entry : filters.entrySet()) {
-            if(!isValidKey(entry.getKey()) && !isValidValue(entry.getValue())) {
+            if(!(isValidKey(entry.getKey()) && isValidValue(entry.getValue()))) {
                 return false;
             }
         }
@@ -33,13 +36,40 @@ public class ProductValidator {
         return validateSort(sort) && validateFilters(filters);
     }
 
+    public boolean validateUpdatedFields(Map<String, ? super Object> updatedFields)  {
+        String fieldName = "";
+
+        try {
+            for (var entry : updatedFields.entrySet()) {
+                fieldName = CaseUtils.toCamelCase(entry.getKey(), false, '_');
+                Class<?> type = ProductFullDTO.class.getDeclaredField(fieldName).getType();
+
+                if(Number.class.isAssignableFrom(entry.getValue().getClass())
+                && Number.class.isAssignableFrom(type)) {
+                    continue;
+                }
+
+                if(String.class.isAssignableFrom(entry.getValue().getClass())
+                && String.class.isAssignableFrom(type)) {
+                    continue;
+                }
+
+                throw new RuntimeException("Invalid type for field " + fieldName);
+            }
+
+            return true;
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException("Unknown filed " + fieldName);
+        }
+    }
+
     private boolean isValidValue(String value) {
          return Arrays.stream(value.split(":"))
                 .allMatch(str -> str.matches("^\\d+$"));
     }
 
     private boolean isValidKey(String key) {
-        if (key.matches("^[a-zA-Z_]+$")
+        if (key.matches("^[a-z_]+$")
                 && key.length() <= 15
                 && !key.isBlank()) {
             return true;

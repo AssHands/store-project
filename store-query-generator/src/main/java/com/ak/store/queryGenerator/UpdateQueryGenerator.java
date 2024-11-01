@@ -13,20 +13,53 @@ public class UpdateQueryGenerator<T> {
         this.rightEntry = rightEntry;
     }
 
-    public String update(T id, Class<?> clazz, Map<String, ?> updatedFields) {
+    public String update(T id, Map<String, ? super Object> updatedFields) {
+        StringBuilder query = new StringBuilder();
 
-        return null;
+        query.append(generateUpdateCondition());
+        query.append(generateSetCondition(updatedFields));
+        query.append(generateWhereCondition(id));
+
+        return query.toString();
     }
 
     private String generateUpdateCondition() {
         return "UPDATE " + tableName;
     }
 
-    private String generateSetCondition(Class<?> clazz, Map<String, ?> updatedFields) {
+    private String generateSetCondition(Map<String, ? super Object> updatedFields) {
         StringBuilder query = new StringBuilder(" SET ");
 
-        //updatedFields.
-        return null;
+        boolean firstCondition = true;
+        for(var entry : updatedFields.entrySet()) {
+
+            if (!firstCondition)
+                query.append(", ");
+
+            query.append(entry.getKey());
+            query.append(" = ");
+
+            boolean isNum = !Number.class.isAssignableFrom(entry.getValue().getClass());
+            if(!isNum) {
+                query.append(entry.getValue());
+            } else {
+                query.append("'" + entry.getValue() + "'");
+            }
+
+            firstCondition = false;
+        }
+
+        return query.toString();
     }
 
+    private String generateWhereCondition(T id) {
+        StringBuilder query = new StringBuilder(" WHERE id = "); //todo: make id name template
+        if(Number.class.isAssignableFrom(id.getClass())) {
+            query.append(id);
+        } else {
+            query.append("'" + id + "'");
+        }
+
+        return query.toString();
+    }
 }

@@ -6,10 +6,16 @@ import com.ak.store.common.dto.ProductPreviewDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.util.ParsingUtils;
 import org.springframework.jdbc.core.RowMapper;
 
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ProductMapper implements RowMapper<ProductDTO> {
 
@@ -21,13 +27,12 @@ public class ProductMapper implements RowMapper<ProductDTO> {
 
     @Override
     public ProductDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
-        
         if(clazz.equals(ProductPreviewDTO.class)) {
             return new ProductPreviewDTO(rs.getLong("id"),
                     rs.getString("title"),
                     rs.getFloat("price"),
                     rs.getInt("category_id"));
-            
+
         } else if(clazz.equals(ProductFullDTO.class)) {
             try {
                 ObjectMapper mapper = new ObjectMapper();

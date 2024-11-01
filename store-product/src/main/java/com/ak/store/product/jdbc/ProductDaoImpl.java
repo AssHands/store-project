@@ -2,6 +2,7 @@ package com.ak.store.product.jdbc;
 
 import com.ak.store.common.dto.ProductDTO;
 import com.ak.store.queryGenerator.SelectQueryGenerator;
+import com.ak.store.queryGenerator.UpdateQueryGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -14,11 +15,14 @@ import java.util.Map;
 
     private final JdbcTemplate jdbcTemplate;
     private final SelectQueryGenerator selectQueryGenerator;
+    private final UpdateQueryGenerator<Long> updateQueryGenerator;
 
     @Autowired
-    public ProductDaoImpl(JdbcTemplate jdbcTemplate, SelectQueryGenerator selectQueryGenerator) {
+    public ProductDaoImpl(JdbcTemplate jdbcTemplate, SelectQueryGenerator selectQueryGenerator,
+                          UpdateQueryGenerator<Long> updateQueryGenerator) {
         this.jdbcTemplate = jdbcTemplate;
         this.selectQueryGenerator = selectQueryGenerator;
+        this.updateQueryGenerator = updateQueryGenerator;
     }
 
     @Override
@@ -49,6 +53,8 @@ import java.util.Map;
 
     @Override
     public ProductDTO updateOneById(Long id, Map<String, ? super Object> updatedFields) {
+        System.out.println(updateQueryGenerator.update(id, updatedFields));
+        jdbcTemplate.update(updateQueryGenerator.update(id, updatedFields));
         return null;
     }
 }

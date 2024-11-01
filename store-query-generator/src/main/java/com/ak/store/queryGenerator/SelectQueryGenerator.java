@@ -85,23 +85,28 @@ public class SelectQueryGenerator {
     }
 
     private String generateFilterCondition(Map<String, String> filters) {
-        StringBuilder sql = new StringBuilder(" WHERE ");
+        StringBuilder query = new StringBuilder(" WHERE ");
         boolean firstCondition = true;
 
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             if (!firstCondition)
-                sql.append(" AND ");
+                query.append(" AND ");
 
-            sql.append(leftEntry)
-                    .append(QueryFilterValidator.getValidKey(entry.getKey()))
+            query.append(leftEntry)
+                    .append(entry.getKey())
                     .append(rightEntry)
                     .append(" IN (")
-                    .append(QueryFilterValidator.getValidValue(entry.getValue()))
+                    .append(getSplitValue(entry.getValue()))
                     .append(")");
 
             firstCondition = false;
         }
+        return query.toString();
+    }
 
-        return sql.toString();
+    private String getSplitValue(String value) {
+        return Arrays.stream(value.split(":"))
+                .distinct()
+                .collect(Collectors.joining(", "));
     }
 }

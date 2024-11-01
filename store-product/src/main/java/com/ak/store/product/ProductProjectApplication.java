@@ -1,6 +1,7 @@
 package com.ak.store.product;
 
 import com.ak.store.queryGenerator.SelectQueryGenerator;
+import com.ak.store.queryGenerator.UpdateQueryGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -19,9 +20,16 @@ public class ProductProjectApplication {
     }
 
     @Bean
-    public SelectQueryGenerator queryGenerator() {
+    public SelectQueryGenerator selectQueryGenerator() {
         return new SelectQueryGenerator("product_new",
                 "jsonb_extract_path_text(properties, '",
                 "')::integer");
+    }
+
+    @Bean
+    public UpdateQueryGenerator<Long> updateQueryGenerator() {
+        return new UpdateQueryGenerator<>("product_new",
+                "",
+                "");
     }
 }

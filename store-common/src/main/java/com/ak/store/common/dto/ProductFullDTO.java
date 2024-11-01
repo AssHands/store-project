@@ -16,7 +16,7 @@ public class ProductFullDTO implements ProductDTO {
 
     private String description;
 
-    private float price;
+    private Float price;
 
     private int categoryId;
 

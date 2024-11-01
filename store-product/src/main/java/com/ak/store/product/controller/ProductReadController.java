@@ -65,6 +65,6 @@ public class ProductReadController {
 
     @GetMapping("test")
     public void test(@RequestBody Map<String, ? super Object> map) {
-
+        System.out.println(productValidator.validateUpdatedFields(map));
     }
 }
