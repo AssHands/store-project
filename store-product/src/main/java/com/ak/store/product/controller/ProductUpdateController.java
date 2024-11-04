@@ -1,6 +1,7 @@
 package com.ak.store.product.controller;
 
 import com.ak.store.common.dto.ProductDTO;
+import com.ak.store.common.payload.ProductPayload;
 import com.ak.store.product.service.ProductService;
 import com.ak.store.product.utils.ProductValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +24,10 @@ public class ProductUpdateController {
 
     @PatchMapping("{id}")
     public ProductDTO updateOneById(@PathVariable("id") Long id,
-                                    @RequestBody Map<String, ? super Object> updatedFields) {
+                                    @RequestBody ProductPayload productPayload) {
+        System.out.println(productPayload.toString());
 
-        if(!productValidator.validateUpdatedFields(updatedFields)) {
-            return null;
-        }
-
-        productService.updateOneById(id, updatedFields);
+        productService.updateOneById(id, productPayload);
         return null;
     }
 }

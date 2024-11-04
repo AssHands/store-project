@@ -1,5 +1,7 @@
 package com.ak.store.queryGenerator;
 
+import com.ak.store.common.payload.ProductPayload;
+
 import java.util.Map;
 
 public class UpdateQueryGenerator<T> {
@@ -19,6 +21,16 @@ public class UpdateQueryGenerator<T> {
         query.append(generateUpdateCondition());
         query.append(generateSetCondition(updatedFields));
         query.append(generateWhereCondition(id));
+
+        return query.toString();
+    }
+
+    public String update(T id, ProductPayload productPayload) {
+        StringBuilder query = new StringBuilder();
+
+//        query.append(generateUpdateCondition());
+//        query.append(generateSetCondition(updatedFields));
+//        query.append(generateWhereCondition(id));
 
         return query.toString();
     }
@@ -58,6 +70,41 @@ public class UpdateQueryGenerator<T> {
             query.append(id);
         } else {
             query.append("'" + id + "'");
+        }
+
+        return query.toString();
+    }
+
+    private String generateSetCondition(ProductPayload productPayload) {
+        StringBuilder query = new StringBuilder(" SET ");
+        boolean firstCondition = true;
+
+        if(productPayload.getTitle() != null) {
+            if(!firstCondition) query.append(", ");
+            query.append("title = '" + productPayload + "'");
+            firstCondition = false;
+        }
+
+        if(productPayload.getDescription() != null) {
+            if(!firstCondition) query.append(", ");
+            query.append("description = '" + productPayload + "'");
+            firstCondition = false;
+        }
+
+        if(productPayload.getPrice() != null) {
+            if(!firstCondition) query.append(", ");
+            query.append("price = " + productPayload.getPrice());
+            firstCondition = false;
+        }
+
+        if(productPayload.getCategoryId() != 0) {
+            if(!firstCondition) query.append(", ");
+            query.append("category_id = " + productPayload.getCategoryId());
+            firstCondition = false;
+        }
+
+        if(productPayload.getProperties() != null) {
+
         }
 
         return query.toString();

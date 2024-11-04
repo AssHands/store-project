@@ -54,6 +54,11 @@ public class ProductValidator {
                     continue;
                 }
 
+                if(Map.class.isAssignableFrom(entry.getValue().getClass())
+                && Map.class.isAssignableFrom(type)) {
+                    continue;
+                }
+
                 throw new RuntimeException("Invalid type for field " + fieldName);
             }
 

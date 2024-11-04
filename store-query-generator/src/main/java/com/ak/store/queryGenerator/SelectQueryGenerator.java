@@ -28,7 +28,7 @@ public class SelectQueryGenerator {
         query.append(generateSortCondition(sort));
 
         return query.toString();
-    }
+    } 
 
     public String select(String sort, int offset, int limit, Class<?> clazz) {
         StringBuilder query = new StringBuilder();

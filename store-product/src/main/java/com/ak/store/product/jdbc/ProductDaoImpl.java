@@ -1,6 +1,7 @@
 package com.ak.store.product.jdbc;
 
 import com.ak.store.common.dto.ProductDTO;
+import com.ak.store.common.payload.ProductPayload;
 import com.ak.store.queryGenerator.SelectQueryGenerator;
 import com.ak.store.queryGenerator.UpdateQueryGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,5 +57,11 @@ import java.util.Map;
         System.out.println(updateQueryGenerator.update(id, updatedFields));
         jdbcTemplate.update(updateQueryGenerator.update(id, updatedFields));
         return null;
+    }
+
+    @Override
+    public ProductDTO updateOneById(Long id, ProductPayload productPayload) {
+        System.out.println(updateQueryGenerator.update(id, productPayload));
+        jdbcTemplate.update(updateQueryGenerator.update(id, productPayload));
     }
 }
