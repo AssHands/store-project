@@ -29,7 +29,7 @@ public class ProductProjectApplication {
     @Bean
     public UpdateQueryGenerator<Long> updateQueryGenerator() {
         return new UpdateQueryGenerator<>("product_new",
-                "",
-                "");
+                "jsonb_build_object(",
+                ")");
     }
 }

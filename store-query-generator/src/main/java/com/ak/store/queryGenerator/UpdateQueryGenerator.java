@@ -1,7 +1,7 @@
 package com.ak.store.queryGenerator;
 
-import com.ak.store.common.payload.ProductPayload;
-
+import org.springframework.data.util.ParsingUtils;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 public class UpdateQueryGenerator<T> {
@@ -15,22 +15,12 @@ public class UpdateQueryGenerator<T> {
         this.rightEntry = rightEntry;
     }
 
-    public String update(T id, Map<String, ? super Object> updatedFields) {
+    public <O> String update(T id, O updatedObject) {
         StringBuilder query = new StringBuilder();
 
-        query.append(generateUpdateCondition());
-        query.append(generateSetCondition(updatedFields));
-        query.append(generateWhereCondition(id));
-
-        return query.toString();
-    }
-
-    public String update(T id, ProductPayload productPayload) {
-        StringBuilder query = new StringBuilder();
-
-//        query.append(generateUpdateCondition());
-//        query.append(generateSetCondition(updatedFields));
-//        query.append(generateWhereCondition(id));
+        query.append(generateUpdateCondition())
+                .append(generateSetCondition(updatedObject))
+                .append(generateWhereCondition(id));
 
         return query.toString();
     }
@@ -39,72 +29,75 @@ public class UpdateQueryGenerator<T> {
         return "UPDATE " + tableName;
     }
 
-    private String generateSetCondition(Map<String, ? super Object> updatedFields) {
-        StringBuilder query = new StringBuilder(" SET ");
 
-        boolean firstCondition = true;
-        for(var entry : updatedFields.entrySet()) {
-
-            if (!firstCondition)
-                query.append(", ");
-
-            query.append(entry.getKey());
-            query.append(" = ");
-
-            boolean isNum = !Number.class.isAssignableFrom(entry.getValue().getClass());
-            if(!isNum) {
-                query.append(entry.getValue());
-            } else {
-                query.append("'" + entry.getValue() + "'");
-            }
-
-            firstCondition = false;
-        }
-
-        return query.toString();
-    }
 
     private String generateWhereCondition(T id) {
-        StringBuilder query = new StringBuilder(" WHERE id = "); //todo: make id name template
+        String query =" WHERE id = "; //todo: make id name template
         if(Number.class.isAssignableFrom(id.getClass())) {
-            query.append(id);
+            query += id;
         } else {
-            query.append("'" + id + "'");
+            query += "'" + id + "'";
         }
 
-        return query.toString();
+        return query;
     }
 
-    private String generateSetCondition(ProductPayload productPayload) {
+    private <O> String generateSetCondition(O updatedObject) {
         StringBuilder query = new StringBuilder(" SET ");
-        boolean firstCondition = true;
+        Class<?> clazz = updatedObject.getClass();
+        var fields = updatedObject.getClass().getDeclaredFields();
+        boolean isFirstCondition = true;
 
-        if(productPayload.getTitle() != null) {
-            if(!firstCondition) query.append(", ");
-            query.append("title = '" + productPayload + "'");
-            firstCondition = false;
-        }
+        for (int i = 0; i < fields.length; i++) {
+            String fieldName = fields[i].getName();
+            String rowName = ParsingUtils.reconcatenateCamelCase(fieldName, "_");
+            String methodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            Object result;
 
-        if(productPayload.getDescription() != null) {
-            if(!firstCondition) query.append(", ");
-            query.append("description = '" + productPayload + "'");
-            firstCondition = false;
-        }
+            try {
+                Method method = clazz.getMethod(methodName);
+                result = method.invoke(updatedObject);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
-        if(productPayload.getPrice() != null) {
-            if(!firstCondition) query.append(", ");
-            query.append("price = " + productPayload.getPrice());
-            firstCondition = false;
-        }
+            if(result == null) {
+                continue;
+            }
 
-        if(productPayload.getCategoryId() != 0) {
-            if(!firstCondition) query.append(", ");
-            query.append("category_id = " + productPayload.getCategoryId());
-            firstCondition = false;
-        }
+            if(!isFirstCondition)
+                query.append(", ");
+            query.append(rowName); //todo: need to delete if map.getValue() == null
+            query.append(" = ");
 
-        if(productPayload.getProperties() != null) {
+            if(Number.class.isAssignableFrom(fields[i].getType())) {
+                query.append(result);
 
+            } else if (Map.class.isAssignableFrom(fields[i].getType())) {
+                Map<String, ? super Object> json = (Map<String, ? super Object>) result;
+                boolean isFirstEntry = true;
+                query.append(leftEntry);
+
+                for(var entry : json.entrySet()) {
+                    if(!isFirstEntry)
+                        query.append(", ");
+
+                    query.append("'" + entry.getKey() + "', ");
+
+                    if(Number.class.isAssignableFrom(entry.getValue().getClass())) {
+                        query.append(entry.getValue());
+                    } else {
+                        query.append("'" + entry.getValue() + "'");
+                    }
+
+                    isFirstEntry = false;
+                }
+                query.append(rightEntry);
+            } else {
+                query.append("'"+ result + "'");
+            }
+
+            isFirstCondition = false;
         }
 
         return query.toString();

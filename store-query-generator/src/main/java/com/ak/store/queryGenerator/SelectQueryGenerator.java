@@ -22,52 +22,37 @@ public class SelectQueryGenerator {
     }
 
     public String select(String sort, Class<?> clazz) {
-        StringBuilder query = new StringBuilder();
 
-        query.append(generateSelectCondition(clazz));
-        query.append(generateSortCondition(sort));
-
-        return query.toString();
+        return generateSelectCondition(clazz) +
+                generateSortCondition(sort);
     } 
 
     public String select(String sort, int offset, int limit, Class<?> clazz) {
-        StringBuilder query = new StringBuilder();
 
-        query.append(generateSelectCondition(clazz));
-        query.append(generateSortCondition(sort));
-        query.append(generatePaginationCondition(offset, limit));
-
-        return query.toString();
+        return generateSelectCondition(clazz) +
+                generateSortCondition(sort) +
+                generatePaginationCondition(offset, limit);
     }
 
     public String select(String sort, int offset, int limit,
                          Map<String, String> filters, Class<?> clazz) {
-        StringBuilder query = new StringBuilder();
 
-        query.append(generateSelectCondition(clazz));
-        query.append(generateFilterCondition(filters));
-        query.append(generateSortCondition(sort));
-        query.append(generatePaginationCondition(offset, limit));
-
-        return query.toString();
+        return generateSelectCondition(clazz) +
+                generateFilterCondition(filters) +
+                generateSortCondition(sort) +
+                generatePaginationCondition(offset, limit);
     }
 
     public String select(Map<String, String> filters, Class<?> clazz) {
-        StringBuilder query = new StringBuilder();
 
-        query.append(generateSelectCondition(clazz));
-        query.append(generateFilterCondition(filters));
-
-        return query.toString();
+        return generateSelectCondition(clazz) +
+                generateFilterCondition(filters);
     }
 
     public String select(int offset, int limit, Class<?> clazz) {
-        StringBuilder query = new StringBuilder();
 
-        query.append(generateSelectCondition(clazz));
-        query.append(generatePaginationCondition(offset, limit));
-
-        return query.toString();
+        return generateSelectCondition(clazz) +
+                generatePaginationCondition(offset, limit);
     }
 
     private String generateSortCondition(String sort) {
@@ -96,7 +81,7 @@ public class SelectQueryGenerator {
                     .append(entry.getKey())
                     .append(rightEntry)
                     .append(" IN (")
-                    .append(getSplitValue(entry.getValue()))
+                    .append(getSplittedValue(entry.getValue()))
                     .append(")");
 
             firstCondition = false;
@@ -104,7 +89,7 @@ public class SelectQueryGenerator {
         return query.toString();
     }
 
-    private String getSplitValue(String value) {
+    private String getSplittedValue(String value) {
         return Arrays.stream(value.split(":"))
                 .distinct()
                 .collect(Collectors.joining(", "));

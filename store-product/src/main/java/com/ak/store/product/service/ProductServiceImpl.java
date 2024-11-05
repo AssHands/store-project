@@ -4,6 +4,7 @@ import com.ak.store.common.dto.ProductDTO;
 import com.ak.store.common.payload.ProductPayload;
 import com.ak.store.product.jdbc.ProductDao;
 import com.ak.store.product.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,12 +39,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO updateOneById(Long id, Map<String, ? super Object> updatedFields) {
-        return productDao.updateOneById(id, updatedFields);
-    }
-
-    @Override
-    public ProductDTO updateOneById(Long id, ProductPayload productPayload) {
-        return productDao.updateOneById(id, productPayload);
+    public ProductDTO updateOneById(Long id, ProductPayload updatedProduct) {
+        return productDao.updateOneById(id, updatedProduct);
     }
 }

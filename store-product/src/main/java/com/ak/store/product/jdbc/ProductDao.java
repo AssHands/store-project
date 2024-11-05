@@ -14,6 +14,5 @@ public interface ProductDao {
 
     ProductDTO findOneById(Long id, Class<?> clazz);
 
-    ProductDTO updateOneById(Long id, Map<String, ? super Object> updatedFields);
-    ProductDTO updateOneById(Long id, ProductPayload productPayload);
+    ProductDTO updateOneById(Long id, ProductPayload updatedProduct);
 }

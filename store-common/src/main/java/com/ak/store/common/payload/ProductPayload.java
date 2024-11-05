@@ -16,7 +16,7 @@ public class ProductPayload {
 
     private Float price;
 
-    private int categoryId;
+    private Integer categoryId;
 
     private Map<String, String> properties;
 }
