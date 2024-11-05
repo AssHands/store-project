@@ -15,4 +15,6 @@ public interface ProductDao {
     ProductDTO findOneById(Long id, Class<?> clazz);
 
     ProductDTO updateOneById(Long id, ProductPayload updatedProduct);
+
+    boolean deleteOneById(Long id);
 }

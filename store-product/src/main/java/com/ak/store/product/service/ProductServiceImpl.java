@@ -42,4 +42,9 @@ public class ProductServiceImpl implements ProductService {
     public ProductDTO updateOneById(Long id, ProductPayload updatedProduct) {
         return productDao.updateOneById(id, updatedProduct);
     }
+
+    @Override
+    public boolean deleteOneById(Long id) {
+        return productDao.deleteOneById(id);
+    }
 }

@@ -44,7 +44,6 @@ public class UpdateQueryGenerator<T> {
 
     private <O> String generateSetCondition(O updatedObject) {
         StringBuilder query = new StringBuilder(" SET ");
-        Class<?> clazz = updatedObject.getClass();
         var fields = updatedObject.getClass().getDeclaredFields();
         boolean isFirstCondition = true;
 
@@ -55,7 +54,7 @@ public class UpdateQueryGenerator<T> {
             Object result;
 
             try {
-                Method method = clazz.getMethod(methodName);
+                Method method = updatedObject.getClass().getMethod(methodName);
                 result = method.invoke(updatedObject);
             } catch (Exception e) {
                 throw new RuntimeException(e);

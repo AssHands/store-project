@@ -59,4 +59,10 @@ import java.util.Map;
         jdbcTemplate.update(updateQueryGenerator.update(id, updatedProduct));
         return findOneById(id, ProductFullDTO.class);
     }
+
+    @Override
+    public boolean deleteOneById(Long id) {
+        String query = "DELETE FROM product_new WHERE id=?";
+        return jdbcTemplate.update(query, id) == 1;
+    }
 }

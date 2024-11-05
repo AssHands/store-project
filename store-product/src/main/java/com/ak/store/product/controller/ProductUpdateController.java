@@ -18,25 +18,17 @@ public class ProductUpdateController {
 
     private final ProductService productService;
     private final ProductValidator productValidator;
-    private final UpdateQueryGenerator<Long> updateQueryGenerator;
 
 
     @Autowired
-    public ProductUpdateController(ProductService productService, ProductValidator productValidator, UpdateQueryGenerator<Long> updateQueryGenerator) {
+    public ProductUpdateController(ProductService productService, ProductValidator productValidator) {
         this.productService = productService;
         this.productValidator = productValidator;
-        this.updateQueryGenerator = updateQueryGenerator;
     }
 
     @PatchMapping("{id}")
     public ProductDTO updateOneById(@PathVariable("id") Long id,
                                     @RequestBody ProductPayload updatedProduct) {
         return productService.updateOneById(id, updatedProduct);
-    }
-
-    @PatchMapping("{id}/properties")
-    public ProductDTO updateOneById(@PathVariable("id") Long id,
-                                    @RequestBody Map<String, String> properties) {
-        return null;
     }
 }
