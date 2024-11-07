@@ -14,12 +14,10 @@ import java.util.Map;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductDao productDao;
-    private final ProductRepository productRepository;
 
     @Autowired
-    public ProductServiceImpl(ProductDao productDao, ProductRepository productRepository) {
+    public ProductServiceImpl(ProductDao productDao) {
         this.productDao = productDao;
-        this.productRepository = productRepository;
     }
 
     @Override
