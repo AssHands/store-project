@@ -81,7 +81,7 @@ public class SelectQueryGenerator {
                     .append(entry.getKey())
                     .append(rightEntry)
                     .append(" IN (")
-                    .append(getSplittedValue(entry.getValue()))
+                    .append(getSplitValue(entry.getValue()))
                     .append(")");
 
             firstCondition = false;
@@ -89,7 +89,7 @@ public class SelectQueryGenerator {
         return query.toString();
     }
 
-    private String getSplittedValue(String value) {
+    private String getSplitValue(String value) {
         return Arrays.stream(value.split(":"))
                 .distinct()
                 .collect(Collectors.joining(", "));
