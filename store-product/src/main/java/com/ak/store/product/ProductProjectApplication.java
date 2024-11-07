@@ -1,5 +1,6 @@
 package com.ak.store.product;
 
+import com.ak.store.common.entity.product.Product;
 import com.ak.store.queryGenerator.SelectQueryGenerator;
 import com.ak.store.queryGenerator.UpdateQueryGenerator;
 import org.springframework.boot.SpringApplication;
@@ -21,9 +22,7 @@ public class ProductProjectApplication {
 
     @Bean
     public SelectQueryGenerator selectQueryGenerator() {
-        return new SelectQueryGenerator("product_new",
-                "jsonb_extract_path_text(properties, '",
-                "')::integer");
+        return new SelectQueryGenerator("product_new", ":", Product.class);
     }
 
     @Bean

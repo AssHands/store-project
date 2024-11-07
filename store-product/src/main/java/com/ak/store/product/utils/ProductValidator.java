@@ -23,6 +23,10 @@ public class ProductValidator {
     }
 
     public boolean validateFilters(Map<String, String> filters) {
+        if(filters == null) {
+            return true;
+        }
+
         for (var entry : filters.entrySet()) {
             if(!(isValidKey(entry.getKey()) && isValidValue(entry.getValue()))) {
                 return false;

@@ -15,8 +15,6 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "product_new")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,5 +34,5 @@ public class Product {
 
     private int categoryId;
 
-    private String properties;
+    private Map<String, String> properties;
 }

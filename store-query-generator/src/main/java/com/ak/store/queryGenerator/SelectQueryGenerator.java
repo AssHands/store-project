@@ -2,19 +2,29 @@ package com.ak.store.queryGenerator;
 
 import org.springframework.data.util.ParsingUtils;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SelectQueryGenerator {
     private final String tableName;
-    private final String leftEntry;
-    private final String rightEntry;
+    private final String separatorSymbol;
+    private final Class<?> type;
+    private final String mapFieldName;
 
-    public SelectQueryGenerator(String tableName, String leftEntry, String rightEntry) {
+    public SelectQueryGenerator(String tableName, String separatorSymbol, Class<?> type) {
         this.tableName = tableName;
-        this.leftEntry = leftEntry;
-        this.rightEntry = rightEntry;
+        this.separatorSymbol = separatorSymbol;
+        this.type = type;
+        this.mapFieldName = getNameMapField();
+    }
+
+    public SelectQueryGenerator(String separatorSymbol, Class<?> type) {
+        this.separatorSymbol = separatorSymbol;
+        this.type = type;
+        this.tableName = getNameClass();
+        this.mapFieldName = getNameMapField();
     }
 
     public String select(Class<?> clazz) {
@@ -38,7 +48,7 @@ public class SelectQueryGenerator {
                          Map<String, String> filters, Class<?> clazz) {
 
         return generateSelectCondition(clazz) +
-                generateFilterCondition(filters) +
+                generateFilterCondition(filters, clazz) +
                 generateSortCondition(sort) +
                 generatePaginationCondition(offset, limit);
     }
@@ -46,7 +56,7 @@ public class SelectQueryGenerator {
     public String select(Map<String, String> filters, Class<?> clazz) {
 
         return generateSelectCondition(clazz) +
-                generateFilterCondition(filters);
+                generateFilterCondition(filters, clazz);
     }
 
     public String select(int offset, int limit, Class<?> clazz) {
@@ -69,7 +79,7 @@ public class SelectQueryGenerator {
                 .collect(Collectors.joining(", ")) + " FROM " + tableName;
     }
 
-    private String generateFilterCondition(Map<String, String> filters) {
+    private String generateFilterCondition(Map<String, String> filters, Class<?> clazz) {
         StringBuilder query = new StringBuilder(" WHERE ");
         boolean firstCondition = true;
 
@@ -77,11 +87,12 @@ public class SelectQueryGenerator {
             if (!firstCondition)
                 query.append(" AND ");
 
-            query.append(leftEntry)
+            query.append("jsonb_extract_path_text(")
+                    .append(mapFieldName)
+                    .append(", '")
                     .append(entry.getKey())
-                    .append(rightEntry)
-                    .append(" IN (")
-                    .append(getSplitValue(entry.getValue()))
+                    .append("')::integer IN (")
+                    .append(getSeparatedValue(entry.getValue()))
                     .append(")");
 
             firstCondition = false;
@@ -89,9 +100,20 @@ public class SelectQueryGenerator {
         return query.toString();
     }
 
-    private String getSplitValue(String value) {
-        return Arrays.stream(value.split(":"))
+    private String getSeparatedValue(String value) {
+        return Arrays.stream(value.split(separatorSymbol))
                 .distinct()
                 .collect(Collectors.joining(", "));
+    }
+
+    private String getNameMapField() {
+        return Arrays.stream(type.getDeclaredFields())
+                .filter(field -> Map.class.isAssignableFrom(field.getType()))
+                .map(Field::getName)
+                .findFirst().orElseThrow(() -> new RuntimeException("Did not find any fields with type Map"));
+    }
+
+    private String getNameClass() {
+        return type.getSimpleName().toLowerCase();
     }
 }
