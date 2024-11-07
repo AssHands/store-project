@@ -17,11 +17,11 @@ import java.util.Map;
 
     private final JdbcTemplate jdbcTemplate;
     private final SelectQueryGenerator selectQueryGenerator;
-    private final UpdateQueryGenerator<Long> updateQueryGenerator;
+    private final UpdateQueryGenerator updateQueryGenerator;
 
     @Autowired
     public ProductDaoImpl(JdbcTemplate jdbcTemplate, SelectQueryGenerator selectQueryGenerator,
-                          UpdateQueryGenerator<Long> updateQueryGenerator) {
+                          UpdateQueryGenerator updateQueryGenerator) {
         this.jdbcTemplate = jdbcTemplate;
         this.selectQueryGenerator = selectQueryGenerator;
         this.updateQueryGenerator = updateQueryGenerator;

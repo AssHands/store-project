@@ -4,18 +4,14 @@ import org.springframework.data.util.ParsingUtils;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public class UpdateQueryGenerator<T> {
+public class UpdateQueryGenerator {
     private final String tableName;
-    private final String leftEntry;
-    private final String rightEntry;
 
-    public UpdateQueryGenerator(String tableName, String leftEntry, String rightEntry) {
+    public UpdateQueryGenerator(String tableName) {
         this.tableName = tableName;
-        this.leftEntry = leftEntry;
-        this.rightEntry = rightEntry;
     }
 
-    public <O> String update(T id, O updatedObject) {
+    public <ID, T> String update(ID id, T updatedObject) {
         StringBuilder query = new StringBuilder();
 
         query.append(generateUpdateCondition())
@@ -31,7 +27,7 @@ public class UpdateQueryGenerator<T> {
 
 
 
-    private String generateWhereCondition(T id) {
+    private <ID> String generateWhereCondition(ID id) {
         String query =" WHERE id = "; //todo: make id name template
         if(Number.class.isAssignableFrom(id.getClass())) {
             query += id;
@@ -42,7 +38,7 @@ public class UpdateQueryGenerator<T> {
         return query;
     }
 
-    private <O> String generateSetCondition(O updatedObject) {
+    private <T> String generateSetCondition(T updatedObject) {
         StringBuilder query = new StringBuilder(" SET ");
         var fields = updatedObject.getClass().getDeclaredFields();
         boolean isFirstCondition = true;
@@ -66,7 +62,7 @@ public class UpdateQueryGenerator<T> {
 
             if(!isFirstCondition)
                 query.append(", ");
-            query.append(rowName); //todo: need to delete if map.getValue() == null
+            query.append(rowName); //todo: need to set null if map.getValue() = null
             query.append(" = ");
 
             if(Number.class.isAssignableFrom(fields[i].getType())) {
@@ -75,7 +71,7 @@ public class UpdateQueryGenerator<T> {
             } else if (Map.class.isAssignableFrom(fields[i].getType())) {
                 Map<String, ? super Object> json = (Map<String, ? super Object>) result;
                 boolean isFirstEntry = true;
-                query.append(leftEntry);
+                query.append("jsonb_build_object(");
 
                 for(var entry : json.entrySet()) {
                     if(!isFirstEntry)
@@ -91,7 +87,7 @@ public class UpdateQueryGenerator<T> {
 
                     isFirstEntry = false;
                 }
-                query.append(rightEntry);
+                query.append(")");
             } else {
                 query.append("'"+ result + "'");
             }

@@ -48,7 +48,7 @@ public class SelectQueryGenerator {
                          Map<String, String> filters, Class<?> clazz) {
 
         return generateSelectCondition(clazz) +
-                generateFilterCondition(filters, clazz) +
+                generateFilterCondition(filters) +
                 generateSortCondition(sort) +
                 generatePaginationCondition(offset, limit);
     }
@@ -56,7 +56,7 @@ public class SelectQueryGenerator {
     public String select(Map<String, String> filters, Class<?> clazz) {
 
         return generateSelectCondition(clazz) +
-                generateFilterCondition(filters, clazz);
+                generateFilterCondition(filters);
     }
 
     public String select(int offset, int limit, Class<?> clazz) {
@@ -79,7 +79,7 @@ public class SelectQueryGenerator {
                 .collect(Collectors.joining(", ")) + " FROM " + tableName;
     }
 
-    private String generateFilterCondition(Map<String, String> filters, Class<?> clazz) {
+    private String generateFilterCondition(Map<String, String> filters) {
         StringBuilder query = new StringBuilder(" WHERE ");
         boolean firstCondition = true;
 
@@ -92,7 +92,7 @@ public class SelectQueryGenerator {
                     .append(", '")
                     .append(entry.getKey())
                     .append("')::integer IN (")
-                    .append(getSeparatedValue(entry.getValue()))
+                    .append(getSeparatedFilters(entry.getValue()))
                     .append(")");
 
             firstCondition = false;
@@ -100,7 +100,7 @@ public class SelectQueryGenerator {
         return query.toString();
     }
 
-    private String getSeparatedValue(String value) {
+    private String getSeparatedFilters(String value) {
         return Arrays.stream(value.split(separatorSymbol))
                 .distinct()
                 .collect(Collectors.joining(", "));

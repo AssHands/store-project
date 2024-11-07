@@ -34,7 +34,7 @@ public class ProductReadController {
                                    @RequestParam(defaultValue = "0") @Min(0) int offset,
                                    @RequestParam(defaultValue = "18") @Min(1) @Max(100) int limit,
                                    @RequestBody(required = false) Map<String, String> filters) {
-        if (!productValidator.validateSortAndFilters(sort, filters)) {
+        if (productValidator.validateSortAndFilters(sort, filters)) {
             return null;
         }
 
@@ -51,7 +51,7 @@ public class ProductReadController {
                                           @RequestParam(defaultValue = "0") @Min(0) int offset,
                                           @RequestParam(defaultValue = "18") @Min(1) @Max(100) int limit,
                                           @RequestBody(required = false) Map<String, String> filters) {
-        if (!productValidator.validateSortAndFilters(sort, filters)) {
+        if (productValidator.validateSortAndFilters(sort, filters)) {
             return null;
         }
 

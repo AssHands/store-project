@@ -1,6 +1,7 @@
 package com.ak.store.product.utils;
 
 import com.ak.store.common.dto.ProductFullDTO;
+import com.ak.store.common.payload.ProductPayload;
 import org.apache.commons.text.CaseUtils;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +38,7 @@ public class ProductValidator {
     }
 
     public boolean validateSortAndFilters(String sort, Map<String, String> filters) {
-        return validateSort(sort) && validateFilters(filters);
+        return !validateSort(sort) || !validateFilters(filters);
     }
 
     public boolean validateUpdatedFields(Map<String, ? super Object> updatedFields)  {
