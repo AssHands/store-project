@@ -1,16 +1,23 @@
 package com.ak.store.product.controller;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import com.ak.store.common.dto.search.RequestPayload;
 import com.ak.store.common.dto.ProductDTO;
 import com.ak.store.common.dto.ProductFullDTO;
 import com.ak.store.common.dto.ProductPreviewDTO;
 import com.ak.store.product.jdbc.ProductDao;
+import com.ak.store.product.service.EsService;
 import com.ak.store.product.service.ProductService;
+import com.ak.store.product.test.ProductRepoES;
 import com.ak.store.product.utils.ProductValidator;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -21,12 +28,18 @@ public class ProductReadController {
     private final ProductService productService;
     private final ProductDao productDao;
     private final ProductValidator productValidator;
+    private final ProductRepoES productRepoES;
+
+    private final EsService esService;
 
     @Autowired
-    public ProductReadController(ProductService userService, ProductDao userDao, ProductValidator productValidator) {
+    public ProductReadController(ProductService userService, ProductDao userDao, ProductValidator productValidator,
+                                 ProductRepoES productRepoES, EsService esService) {
         this.productService = userService;
         this.productDao = userDao;
         this.productValidator = productValidator;
+        this.productRepoES = productRepoES;
+        this.esService = esService;
     }
 
     @GetMapping("full")
@@ -64,7 +77,8 @@ public class ProductReadController {
     }
 
     @GetMapping("test")
-    public void test(@RequestBody Map<String, ? super Object> map) {
-        System.out.println(productValidator.validateUpdatedFields(map));
+    public void test(@RequestBody @Valid RequestPayload requestPayload) throws IOException {
+        System.out.println(requestPayload);
+        esService.getAllDocument(requestPayload);
     }
 }

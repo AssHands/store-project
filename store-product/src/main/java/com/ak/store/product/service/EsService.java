@@ -8,61 +8,28 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
-import com.ak.store.common.dto.search.RequestPayload;
 import com.ak.store.common.document.ProductDocument;
-import com.ak.store.common.dto.ProductDTO;
-import com.ak.store.common.payload.ProductPayload;
-import com.ak.store.product.jdbc.ProductDao;
-import com.ak.store.product.test.ProductRepo;
+import com.ak.store.common.dto.search.NumericFilter;
+import com.ak.store.common.dto.search.RequestPayload;
+import com.ak.store.common.dto.search.TextFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 
 @Service
-public class ProductServiceImpl implements ProductService {
+public class EsService {
 
-    private final ProductDao productDao;
-    private final ProductRepo productRepo;
     private final ElasticsearchClient esClient;
 
     @Autowired
-    public ProductServiceImpl(ProductDao productDao, ProductRepo productRepo, ElasticsearchClient esClient) {
-        this.productDao = productDao;
-        this.productRepo = productRepo;
+    public EsService(ElasticsearchClient esClient) {
         this.esClient = esClient;
     }
 
-    @Override
-    public List<ProductDTO> findAll(String sort, int offset, int limit,
-                                    Map<String, String> filters, Class<?> clazz) {
-        if(filters == null) {
-            return productDao.findAll(sort, offset, limit, clazz);
-        }
-        return productDao.findAll(sort, offset, limit, filters, clazz);
-    }
-
-    @Override
-    public ProductDTO findOneById(Long id, Class<?> clazz) {
-        return productDao.findOneById(id, clazz);
-    }
-
-    @Override
-    public ProductDTO updateOneById(Long id, ProductPayload updatedProduct) {
-        return productDao.updateOneById(id, updatedProduct);
-    }
-
-    @Override
-    public boolean deleteOneById(Long id) {
-        return productDao.deleteOneById(id);
-    }
-
-    @Override
-    public void test(RequestPayload requestPayload) throws IOException {
+    public void getAllDocument(RequestPayload requestPayload) throws IOException {
         List<Query> filters = new ArrayList<>();
 
         if(requestPayload.getPriceTo() != 0) {
@@ -75,48 +42,72 @@ public class ProductServiceImpl implements ProductService {
 
         if(requestPayload.getCategoryId() != null) {
             filters.add(TermQuery.of(t -> t
-                    .field("category_id")
-                    .value(requestPayload.getCategoryId()))
+                            .field("category_id")
+                            .value(requestPayload.getCategoryId()))
                     ._toQuery());
         }
 
+        if(requestPayload.getNumericFilters() != null)
+            filters.addAll(getNumericFilters(requestPayload.getNumericFilters()));
+
+        if(requestPayload.getTextFilters() != null)
+            filters.addAll(getTextFilters(requestPayload.getTextFilters()));
+
+        SearchRequest searchRequest = getSearchRequest(requestPayload,
+                getSearchQuery(filters, requestPayload.getText()));
+
+        SearchResponse<ProductDocument> response = esClient.search(searchRequest, ProductDocument.class);
+
+        List<Hit<ProductDocument>> hits = response.hits().hits();
+        for (Hit<ProductDocument> hit: hits) {
+            System.out.println(hit.source());
+        }
+    }
+
+    private List<Query> getNumericFilters(List<NumericFilter> numericFilters) {
         List<RangeQuery> rangeList = new ArrayList<>();
-        for(var category : requestPayload.getNumericFilters()) {
-            for (var numericValue : category.getValues()) {
-                if (numericValue.getFrom() != null && numericValue.getTo() != null) {
-                    rangeList.add(RangeQuery.of(r -> r
-                            .field("characteristics.numeric_value")
-                            .gte(JsonData.of(numericValue.getFrom()))
-                            .lte(JsonData.of(numericValue.getTo()))));
-                }
+        List<Query> filters = new ArrayList<>();
+
+        for(var numericFilter : numericFilters) {
+            for (var numericValue : numericFilter.getValues()) {
+                rangeList.add(RangeQuery.of(r -> r
+                        .field("characteristics.numeric_value")
+                        .gte(JsonData.of(numericValue.getFrom()))
+                        .lte(JsonData.of(numericValue.getTo()))));
             }
 
             filters.add(NestedQuery.of(n -> n
                     .path("characteristics")
                     .query(q -> q
-                            .bool(b -> {
-                                b.must(m -> m
+                            .bool(bool -> {
+                                bool.must(m -> m
                                         .term(t -> t
                                                 .field("characteristics.characteristic_id")
-                                                .value(category.getCharacteristicId())));
+                                                .value(numericFilter.getCharacteristicId())));
 
                                 for (RangeQuery rangeQuery : rangeList)
-                                    b.should(s -> s.range(rangeQuery));
+                                    bool.should(s -> s.range(rangeQuery));
 
-                                b.minimumShouldMatch("1");
-                                return b;
-                            })
-                    ))._toQuery());
+                                bool.minimumShouldMatch("1");
+                                return bool;
+                            })))
+                    ._toQuery());
         }
 
-        for(var category : requestPayload.getTextFilters()) {
-            List<FieldValue> textValuesList = new ArrayList<>();
-            for(var textValue : category.getValues()) {
-                textValuesList.add(FieldValue.of(textValue));
+        return filters;
+    }
+
+    private List<Query> getTextFilters(List<TextFilter> textFilters) {
+        List<Query> filters = new ArrayList<>();
+
+        for(var textFilter : textFilters) {
+            List<FieldValue> textValueList = new ArrayList<>();
+            for(var textValue : textFilter.getValues()) {
+                textValueList.add(FieldValue.of(textValue));
             }
 
-            TermsQueryField textValues = TermsQueryField.of(tf -> tf.value(textValuesList));
-            if(!textValuesList.isEmpty()) {
+            TermsQueryField termsValues = TermsQueryField.of(t -> t.value(textValueList));
+            if(!textValueList.isEmpty()) {
                 filters.add(NestedQuery.of(n -> n
                                 .path("characteristics")
                                 .query(q -> q
@@ -124,27 +115,37 @@ public class ProductServiceImpl implements ProductService {
                                                 .must(m -> m
                                                         .term(t -> t
                                                                 .field("characteristics.characteristic_id")
-                                                                .value(category.getCharacteristicId())))
+                                                                .value(textFilter.getCharacteristicId())))
                                                 .must(m -> m
                                                         .terms(t -> t
                                                                 .field("characteristics.text_value")
-                                                                .terms(textValues))))))
+                                                                .terms(termsValues))))))
                         ._toQuery());
             }
         }
 
-        BoolQuery filtersAndFullTextSearch = BoolQuery.of(b -> b
-                .filter(filters)
-                .should(s -> s
-                        .match(m -> m
-                                .field("title")
-                                .query(requestPayload.getText()))));
+        return filters;
+    }
 
-        SearchRequest searchRequest;
+    private BoolQuery getSearchQuery(List<Query> filters, String fullTextSearch) {
+        MatchQuery matchQuerySearch = MatchQuery.of(m -> m.field("title").query(fullTextSearch));
+        if(filters == null || filters.isEmpty()) {
+            return BoolQuery.of(b -> b
+                    .should(s -> s
+                            .match(matchQuerySearch)));
+        } else {
+            return BoolQuery.of(b -> b
+                    .filter(filters)
+                    .should(s -> s
+                            .match(matchQuerySearch)));
+        }
+    }
+
+    private SearchRequest getSearchRequest(RequestPayload requestPayload, BoolQuery searchQuery) {
         if (requestPayload.getSearchAfter() == null) {
-            searchRequest = SearchRequest.of(sr -> sr
+             return SearchRequest.of(sr -> sr
                     .index("product")
-                    .query(q -> q.bool(filtersAndFullTextSearch))
+                    .query(q -> q.bool(searchQuery))
                     .size((requestPayload.getLimit() == 0) ? 20 : requestPayload.getLimit())
                     .sort(s -> s.field(sort -> {
                         if(requestPayload.getSort() == null) {
@@ -162,9 +163,9 @@ public class ProductServiceImpl implements ProductService {
                         return  sort;
                     })));
         } else {
-            searchRequest = SearchRequest.of(sr -> sr
+             return SearchRequest.of(sr -> sr
                     .index("product")
-                    .query(q -> q.bool(filtersAndFullTextSearch))
+                     .query(q -> q.bool(searchQuery))
                     .size((requestPayload.getLimit() == 0) ? 20 : requestPayload.getLimit())
                     .searchAfter(search -> {
                         for (var obj : requestPayload.getSearchAfter()) {
@@ -187,12 +188,6 @@ public class ProductServiceImpl implements ProductService {
                         }
                         return  sort;
                     })));
-        }
-
-        SearchResponse<ProductDocument> response = esClient.search(searchRequest, ProductDocument.class);
-        List<Hit<ProductDocument>> hits = response.hits().hits();
-        for (Hit<ProductDocument> hit: hits) {
-            System.out.println(hit.source());
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.ak.store.queryGenerator;
 
 import com.ak.store.common.dto.ProductFullDTO;
-import com.ak.store.common.entity.product.Product;
+import com.ak.store.common.bentity.product.Product;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,9 +1,11 @@
 package com.ak.store.product.service;
 
 
+import com.ak.store.common.dto.search.RequestPayload;
 import com.ak.store.common.dto.ProductDTO;
 import com.ak.store.common.payload.ProductPayload;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,4 +18,6 @@ public interface ProductService {
     ProductDTO updateOneById(Long id, ProductPayload updatedProduct);
 
     boolean deleteOneById(Long id);
+
+    public void test(RequestPayload requestPayload) throws IOException;
 }

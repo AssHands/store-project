@@ -1,0 +1,21 @@
+services:
+  elasticsearch:
+    container_name: elasticsearch
+    image: elasticsearch:7.17.25
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=elastic_pass
+      - xpack.security.enabled=true
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+  kibana:
+    image: kibana:7.17.25
+    restart: always
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=elastic_pass
+    ports:
+      - 5601:5601
