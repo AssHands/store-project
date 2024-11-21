@@ -11,6 +11,7 @@ import co.elastic.clients.json.JsonData;
 import com.ak.store.common.document.ProductDocument;
 import com.ak.store.common.dto.search.NumericFilter;
 import com.ak.store.common.dto.search.RequestPayload;
+import com.ak.store.common.dto.search.Sort;
 import com.ak.store.common.dto.search.TextFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,9 +31,14 @@ public class EsService {
     }
 
     public void getAllDocument(RequestPayload requestPayload) throws IOException {
+//        QueryBuilders.queryString()
+//                .query(fullTextSearch)
+//                .fuzziness("3")
+//                .build();
+
         List<Query> filters = new ArrayList<>();
 
-        if(requestPayload.getPriceTo() != 0) {
+        if (requestPayload.getPriceTo() != 0) {
             filters.add(RangeQuery.of(r -> r
                             .field("price")
                             .gte(JsonData.of(requestPayload.getPriceFrom()))
@@ -40,17 +46,17 @@ public class EsService {
                     ._toQuery());
         }
 
-        if(requestPayload.getCategoryId() != null) {
+        if (requestPayload.getCategoryId() != null) {
             filters.add(TermQuery.of(t -> t
                             .field("category_id")
                             .value(requestPayload.getCategoryId()))
                     ._toQuery());
         }
 
-        if(requestPayload.getNumericFilters() != null)
+        if (requestPayload.getNumericFilters() != null)
             filters.addAll(getNumericFilters(requestPayload.getNumericFilters()));
 
-        if(requestPayload.getTextFilters() != null)
+        if (requestPayload.getTextFilters() != null)
             filters.addAll(getTextFilters(requestPayload.getTextFilters()));
 
         SearchRequest searchRequest = getSearchRequest(requestPayload,
@@ -59,7 +65,7 @@ public class EsService {
         SearchResponse<ProductDocument> response = esClient.search(searchRequest, ProductDocument.class);
 
         List<Hit<ProductDocument>> hits = response.hits().hits();
-        for (Hit<ProductDocument> hit: hits) {
+        for (Hit<ProductDocument> hit : hits) {
             System.out.println(hit.source());
         }
     }
@@ -68,7 +74,7 @@ public class EsService {
         List<RangeQuery> rangeList = new ArrayList<>();
         List<Query> filters = new ArrayList<>();
 
-        for(var numericFilter : numericFilters) {
+        for (var numericFilter : numericFilters) {
             for (var numericValue : numericFilter.getValues()) {
                 rangeList.add(RangeQuery.of(r -> r
                         .field("characteristics.numeric_value")
@@ -77,20 +83,20 @@ public class EsService {
             }
 
             filters.add(NestedQuery.of(n -> n
-                    .path("characteristics")
-                    .query(q -> q
-                            .bool(bool -> {
-                                bool.must(m -> m
-                                        .term(t -> t
-                                                .field("characteristics.characteristic_id")
-                                                .value(numericFilter.getCharacteristicId())));
+                            .path("characteristics")
+                            .query(q -> q
+                                    .bool(bool -> {
+                                        bool.must(m -> m
+                                                .term(t -> t
+                                                        .field("characteristics.characteristic_id")
+                                                        .value(numericFilter.getCharacteristicId())));
 
-                                for (RangeQuery rangeQuery : rangeList)
-                                    bool.should(s -> s.range(rangeQuery));
+                                        for (RangeQuery rangeQuery : rangeList)
+                                            bool.should(s -> s.range(rangeQuery));
 
-                                bool.minimumShouldMatch("1");
-                                return bool;
-                            })))
+                                        bool.minimumShouldMatch("1");
+                                        return bool;
+                                    })))
                     ._toQuery());
         }
 
@@ -100,14 +106,14 @@ public class EsService {
     private List<Query> getTextFilters(List<TextFilter> textFilters) {
         List<Query> filters = new ArrayList<>();
 
-        for(var textFilter : textFilters) {
+        for (var textFilter : textFilters) {
             List<FieldValue> textValueList = new ArrayList<>();
-            for(var textValue : textFilter.getValues()) {
+            for (var textValue : textFilter.getValues()) {
                 textValueList.add(FieldValue.of(textValue));
             }
 
-            TermsQueryField termsValues = TermsQueryField.of(t -> t.value(textValueList));
-            if(!textValueList.isEmpty()) {
+            TermsQueryField termsQuery = TermsQueryField.of(t -> t.value(textValueList));
+            if (!textValueList.isEmpty()) {
                 filters.add(NestedQuery.of(n -> n
                                 .path("characteristics")
                                 .query(q -> q
@@ -119,7 +125,7 @@ public class EsService {
                                                 .must(m -> m
                                                         .terms(t -> t
                                                                 .field("characteristics.text_value")
-                                                                .terms(termsValues))))))
+                                                                .terms(termsQuery))))))
                         ._toQuery());
             }
         }
@@ -128,66 +134,53 @@ public class EsService {
     }
 
     private BoolQuery getSearchQuery(List<Query> filters, String fullTextSearch) {
-        MatchQuery matchQuerySearch = MatchQuery.of(m -> m.field("title").query(fullTextSearch));
-        if(filters == null || filters.isEmpty()) {
-            return BoolQuery.of(b -> b
-                    .should(s -> s
-                            .match(matchQuerySearch)));
-        } else {
-            return BoolQuery.of(b -> b
-                    .filter(filters)
-                    .should(s -> s
-                            .match(matchQuerySearch)));
-        }
+        return BoolQuery.of(b -> {
+            if (filters != null && !filters.isEmpty())
+                b.filter(filters);
+
+            b.should(s -> s
+                    .match(m -> m
+                            .field("title")
+                            .query(fullTextSearch)
+                            .boost(2f)
+                            .fuzziness("AUTO")));
+
+            b.should(s -> s
+                    .match(m -> m
+                            .field("title")
+                            .query(fullTextSearch)
+                            .boost(0.5f)
+                            .fuzziness("AUTO")));
+
+            return b;
+        });
     }
 
     private SearchRequest getSearchRequest(RequestPayload requestPayload, BoolQuery searchQuery) {
-        if (requestPayload.getSearchAfter() == null) {
-             return SearchRequest.of(sr -> sr
+        return SearchRequest.of(sr -> {
+            sr
                     .index("product")
                     .query(q -> q.bool(searchQuery))
-                    .size((requestPayload.getLimit() == 0) ? 20 : requestPayload.getLimit())
-                    .sort(s -> s.field(sort -> {
-                        if(requestPayload.getSort() == null) {
-                            sort.field("amount_sales").order(SortOrder.Desc); //POPULAR
-                            return  sort;
-                        }
+                    .size((requestPayload.getLimit() == 0) ? 20 : requestPayload.getLimit());
 
-                        switch (requestPayload.getSort()) {
+            if (requestPayload.getSearchAfter() != null) {
+                sr.searchAfter(sa -> sa
+                        .anyValue(JsonData.of(requestPayload.getSearchAfter()))); //todo: make stream
+            }
+
+            sr
+                    .sort(s -> s.field(sort -> {
+                        switch (requestPayload.getSort()) { //todo: check for null value
                             case PRICE_UP -> sort.field("price");
                             case PRICE_DOWN -> sort.field("price").order(SortOrder.Desc);
                             case RATING -> sort.field("grade").order(SortOrder.Desc)
                                     .field("amount_reviews").order(SortOrder.Desc);
                             default -> sort.field("amount_sales").order(SortOrder.Desc); //POPULAR
                         }
-                        return  sort;
-                    })));
-        } else {
-             return SearchRequest.of(sr -> sr
-                    .index("product")
-                     .query(q -> q.bool(searchQuery))
-                    .size((requestPayload.getLimit() == 0) ? 20 : requestPayload.getLimit())
-                    .searchAfter(search -> {
-                        for (var obj : requestPayload.getSearchAfter()) {
-                            search.anyValue(JsonData.of(obj));
-                        }
-                        return search;
-                    })
-                    .sort(s -> s.field(sort -> {
-                        if(requestPayload.getSort() == null) {
-                            sort.field("amount_sales").order(SortOrder.Desc); //POPULAR
-                            return  sort;
-                        }
+                        return sort;
+                    }));
 
-                        switch (requestPayload.getSort()) {
-                            case PRICE_UP -> sort.field("price");
-                            case PRICE_DOWN -> sort.field("price").order(SortOrder.Desc);
-                            case RATING -> sort.field("grade").order(SortOrder.Desc)
-                                    .field("amount_reviews").order(SortOrder.Desc);
-                            default -> sort.field("amount_sales").order(SortOrder.Desc); //POPULAR
-                        }
-                        return  sort;
-                    })));
-        }
+            return sr;
+        });
     }
 }

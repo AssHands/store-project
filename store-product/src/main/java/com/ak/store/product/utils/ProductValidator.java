@@ -16,7 +16,7 @@ public class ProductValidator {
     List<String> allowsSortParams;
 
     public ProductValidator() {
-        allowsSortParams = new ArrayList<>(List.of("amount_orders", "price ASC", "price DESC", "sale", "rate", "created_at ASC"));
+        allowsSortParams = new ArrayList<>(List.of("price ASC", "price DESC", "sale", "rate", "created_at ASC"));
     }
 
     public boolean validateSort(String sort) {

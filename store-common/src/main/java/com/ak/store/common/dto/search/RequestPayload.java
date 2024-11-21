@@ -43,7 +43,7 @@ public class RequestPayload {
     private Filter filters;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
-    private Sort sort;
+    private Sort sort = Sort.POPULAR;
 
     public List<NumericFilter> getNumericFilters() {
         if(filters == null) {
