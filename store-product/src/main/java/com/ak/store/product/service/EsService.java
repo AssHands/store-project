@@ -163,10 +163,14 @@ public class EsService {
                     .query(q -> q.bool(searchQuery))
                     .size((requestPayload.getLimit() == 0) ? 20 : requestPayload.getLimit());
 
-            if (requestPayload.getSearchAfter() != null) {
-                sr.searchAfter(sa -> sa
-                        .anyValue(JsonData.of(requestPayload.getSearchAfter()))); //todo: make stream
-            }
+//            if (requestPayload.getSearchAfter() != null) { //todo: can i delete this check?
+//                for (var searchAfter : requestPayload.getSearchAfter()) {
+//                    sr.searchAfter(sa -> sa.anyValue(JsonData.of(searchAfter)));
+//                }
+//            }
+            
+            requestPayload.getSearchAfter().forEach(val -> //todo: need a check for null value?
+                    sr.searchAfter(sa -> sa.anyValue(JsonData.of(val))));
 
             sr
                     .sort(s -> s.field(sort -> {
