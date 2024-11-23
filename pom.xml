@@ -19,7 +19,6 @@
 	<modules>
 		<module>store-user</module>
 		<module>store-common</module>
-        <module>store-query-generator</module>
-        <module>store-product</module>
+        <module>store-catalogue</module>
     </modules>
 </project>

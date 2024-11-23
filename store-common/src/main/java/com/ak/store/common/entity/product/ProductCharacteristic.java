@@ -1,7 +1,6 @@
 package com.ak.store.common.entity.product;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,14 +9,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "category")
-public class Category {
+@Table(name = "product_characteristic")
+public class ProductCharacteristic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long parentId;
+    @ManyToOne
+    private Product Product;
 
-    @NotBlank
-    private String name;
+    @ManyToOne
+    private Characteristic characteristic;
+
+    private String textValue;
+
+    private int numericValue;
 }

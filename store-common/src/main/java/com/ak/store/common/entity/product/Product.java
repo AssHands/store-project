@@ -7,13 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "product")
 public class Product {
+    @Id
     @NotNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
@@ -25,10 +28,25 @@ public class Product {
     private String description;
 
     @Min(1)
-    @Max(Integer.MAX_VALUE)
+    @Max(10_000_000)
     private float price;
 
-    private int categoryId;
+    //@Column(name = "category_id")
+    @ManyToOne
+    private Category category;
 
-    private Map<String, String> properties;
+    @Min(0)
+    @Max(Integer.MAX_VALUE)
+    private int amountSales;
+
+    @Min(0)
+    @Max(Integer.MAX_VALUE)
+    private int amountReview;
+
+    @Min(1)
+    @Max(5)
+    private float grade;
+
+    @OneToMany
+    private List<ProductCharacteristic> characteristics;
 }

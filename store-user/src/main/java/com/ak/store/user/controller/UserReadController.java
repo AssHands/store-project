@@ -22,13 +22,13 @@ public class UserReadController {
         this.userDao = userDao;
     }
 
-    @GetMapping
-    public ResponseEntity<UserPageResponse> getAll(@RequestParam(defaultValue = "0") @Min(0) int offset,
-                                                   @RequestParam(defaultValue = "10") @Min(1) @Max(100) int limit,
-                                                   @RequestParam(defaultValue = "createdAt") String sortField,
-                                                   @RequestParam(defaultValue = "DESC") String direction) {
-
-        return new ResponseEntity<>(userService.findAll(offset, limit, sortField, direction),
-                HttpStatus.FOUND);
-    }
+//    @GetMapping
+//    public ResponseEntity<UserPageResponse> getAll(@RequestParam(defaultValue = "0") @Min(0) int offset,
+//                                                   @RequestParam(defaultValue = "10") @Min(1) @Max(100) int limit,
+//                                                   @RequestParam(defaultValue = "createdAt") String sortField,
+//                                                   @RequestParam(defaultValue = "DESC") String direction) {
+//
+//        return new ResponseEntity<>(userService.findAll(offset, limit, sortField, direction),
+//                HttpStatus.FOUND);
+//    }
 }
