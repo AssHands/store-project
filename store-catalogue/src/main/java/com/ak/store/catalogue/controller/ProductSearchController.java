@@ -1,8 +1,8 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.service.ProductService;
-import com.ak.store.common.Response.ProductResponse;
-import com.ak.store.common.payload.search.RequestPayload;
+import com.ak.store.common.payload.product.ProductSearchResponse;
+import com.ak.store.common.payload.search.ProductSearchRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +22,8 @@ public class ProductSearchController {
     }
 
     @GetMapping("search")
-    public ProductResponse test(@RequestBody @Valid RequestPayload requestPayload) {
-        System.out.println(requestPayload);
-        return productService.findAllBySearch(requestPayload);
+    public ProductSearchResponse test(@RequestBody @Valid ProductSearchRequest productSearchRequest) {
+        System.out.println(productSearchRequest);
+        return productService.findAllBySearch(productSearchRequest);
     }
 }

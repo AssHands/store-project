@@ -8,11 +8,11 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
-import com.ak.store.common.document.product.ProductDocument;
+import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.common.payload.search.nested.NumericFilter;
-import com.ak.store.common.payload.search.RequestPayload;
+import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.payload.search.nested.TextFilter;
-import com.ak.store.common.ProductServicePayload;
+import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,32 +31,32 @@ public class EsService {
         this.esClient = esClient;
     }
 
-    public ProductServicePayload findAllDocument(RequestPayload requestPayload) {
+    public ElasticSearchResult findAll(ProductSearchRequest productSearchRequest) {
         List<Query> filters = new ArrayList<>();
 
-        if (requestPayload.getPriceTo() != 0) {
+        if (productSearchRequest.getPriceTo() != 0) {
             filters.add(RangeQuery.of(r -> r
                             .field("price")
-                            .gte(JsonData.of(requestPayload.getPriceFrom()))
-                            .lte(JsonData.of(requestPayload.getPriceTo())))
+                            .gte(JsonData.of(productSearchRequest.getPriceFrom()))
+                            .lte(JsonData.of(productSearchRequest.getPriceTo())))
                     ._toQuery());
         }
 
-        if (requestPayload.getCategoryId() != null) {
+        if (productSearchRequest.getCategoryId() != null) {
             filters.add(TermQuery.of(t -> t
                             .field("category_id")
-                            .value(requestPayload.getCategoryId()))
+                            .value(productSearchRequest.getCategoryId()))
                     ._toQuery());
         }
 
-        if (requestPayload.getNumericFilters() != null)
-            filters.addAll(getNumericFilters(requestPayload.getNumericFilters()));
+        if (productSearchRequest.getNumericFilters() != null)
+            filters.addAll(getNumericFilters(productSearchRequest.getNumericFilters()));
 
-        if (requestPayload.getTextFilters() != null)
-            filters.addAll(getTextFilters(requestPayload.getTextFilters()));
+        if (productSearchRequest.getTextFilters() != null)
+            filters.addAll(getTextFilters(productSearchRequest.getTextFilters()));
 
-        SearchRequest searchRequest = getSearchRequest(requestPayload,
-                getSearchQuery(filters, requestPayload.getText()));
+        SearchRequest searchRequest = getSearchRequest(productSearchRequest,
+                getSearchQuery(filters, productSearchRequest.getText()));
 
         SearchResponse<ProductDocument> response;
 
@@ -66,24 +66,31 @@ public class EsService {
             throw new RuntimeException("Failed to get response from ElasticSearch server");
         }
 
-        ProductServicePayload productServicePayload = new ProductServicePayload();
+        ElasticSearchResult elasticSearchResult = new ElasticSearchResult();
         List<Hit<ProductDocument>> productHits = response.hits().hits();
 
-        productServicePayload.setIds(productHits.stream()
+        System.out.println(searchRequest);
+        response.hits().hits().forEach(System.out::println);
+
+        if(productHits.size() == 0) {
+            return null;
+        }
+
+        elasticSearchResult.setIds(productHits
+                .stream()
                 .filter(doc -> doc.source() != null)
                 .map(Hit::source)
                 .map(ProductDocument::getId)
                 .toList());
 
-        productServicePayload.setSearchAfter(
-                productHits.get(productHits.size() - 1).sort().stream()
+        elasticSearchResult.setSearchAfter(
+                productHits.get(productHits.size() - 1).sort()
+                        .stream()
                         .map(FieldValue::_get)
                         .toList());
 
-        System.out.println(searchRequest);
-        response.hits().hits().forEach(System.out::println);
 
-        return productServicePayload;
+        return elasticSearchResult;
     }
 
     private String getFuzziness(String word) {
@@ -126,19 +133,19 @@ public class EsService {
         });
     }
 
-    private SearchRequest getSearchRequest(RequestPayload requestPayload, BoolQuery searchQuery) {
+    private SearchRequest getSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")
                     .query(q -> q.bool(searchQuery))
-                    .size((requestPayload.getLimit() == 0) ? 20 : requestPayload.getLimit());
+                    .size((productSearchRequest.getLimit() == 0) ? 20 : productSearchRequest.getLimit());
 
-            if (requestPayload.getSearchAfter() != null && !requestPayload.getSearchAfter().isEmpty()) {
-                requestPayload.getSearchAfter().forEach(val ->
+            if (productSearchRequest.getSearchAfter() != null && !productSearchRequest.getSearchAfter().isEmpty()) {
+                productSearchRequest.getSearchAfter().forEach(val ->
                         sr.searchAfter(sa -> sa.anyValue(JsonData.of(val))));
             }
 
-            switch (requestPayload.getSort()) {
+            switch (productSearchRequest.getSort()) {
                 case PRICE_UP -> {
                     sr.sort(s -> s.field(sort -> sort.field("price")));
                 }

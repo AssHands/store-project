@@ -1,4 +1,4 @@
-package com.ak.store.common.Response;
+package com.ak.store.common.payload.product;
 
 import com.ak.store.common.dto.product.ProductDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,8 +11,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductResponse {
-    @JsonProperty("search_after") //todo: doesnt work
+public class ProductSearchResponse {
+    @JsonProperty("search_after")
     private List<Object> searchAfter;
 
     private List<ProductDTO> content;

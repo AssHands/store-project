@@ -1,4 +1,4 @@
-package com.ak.store.common.entity.product;
+package com.ak.store.catalogue.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -31,22 +31,20 @@ public class Product {
     @Max(10_000_000)
     private float price;
 
-    //@Column(name = "category_id")
-    @ManyToOne
-    private Category category;
+//  @Column(name = "category_id")
+//  @ManyToOne
+    private Long categoryId;
+
+//    @Min(0)
+//    private int amountSales;
 
     @Min(0)
-    @Max(Integer.MAX_VALUE)
-    private int amountSales;
-
-    @Min(0)
-    @Max(Integer.MAX_VALUE)
-    private int amountReview;
+    private int amountReviews;
 
     @Min(1)
     @Max(5)
     private float grade;
 
-    @OneToMany
-    private List<ProductCharacteristic> characteristics;
+//    @OneToMany
+//    private List<ProductCharacteristic> characteristics;
 }

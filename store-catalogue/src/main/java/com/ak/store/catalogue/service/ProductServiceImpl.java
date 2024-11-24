@@ -1,9 +1,11 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.model.entity.Product;
+import com.ak.store.catalogue.utils.ProductMapper;
 import com.ak.store.common.dto.product.ProductDTO;
-import com.ak.store.common.Response.ProductResponse;
-import com.ak.store.common.payload.search.RequestPayload;
-import com.ak.store.common.ProductServicePayload;
+import com.ak.store.common.payload.product.ProductSearchResponse;
+import com.ak.store.common.payload.search.ProductSearchRequest;
+import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.catalogue.jdbc.ProductDao;
 import com.ak.store.catalogue.test.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,38 +18,55 @@ public class ProductServiceImpl implements ProductService {
     private final ProductDao productDao;
     private final ProductRepo productRepo;
     private final EsService esService;
+    private final ProductMapper productMapper;
 
     @Autowired
-    public ProductServiceImpl(ProductDao productDao, ProductRepo productRepo, EsService esService) {
+    public ProductServiceImpl(ProductDao productDao, ProductRepo productRepo, EsService esService, ProductMapper productMapper) {
         this.productDao = productDao;
         this.productRepo = productRepo;
         this.esService = esService;
+        this.productMapper = productMapper;
     }
 
     @Override
     public ProductDTO findOneById(Long id) {
-        ProductDTO productDTO = productDao.findOneById(id);
+        Product product = productDao.findOneById(id);
 
-        if(productDTO == null) {
+        if(product == null) {
             throw new RuntimeException("No Products found by id");
         }
 
-        return productDTO;
+        return productMapper.mapToDTO(product);
     }
 
     @Override
-    public ProductResponse findAllBySearch(RequestPayload requestPayload) {
-        ProductServicePayload productServicePayload = esService.findAllDocument(requestPayload);
+    public boolean deleteOneById(Long id) {
+        if(productDao.deleteOneById(id)) {
+            return true;
+        }
+        return false;
+    }
 
-        if(productServicePayload.getIds().isEmpty()) {
+    @Override
+    public ProductSearchResponse findAllBySearch(ProductSearchRequest productSearchRequest) {
+        ElasticSearchResult elasticSearchResult = esService.findAll(productSearchRequest);
+
+        if(elasticSearchResult == null) {
             throw new RuntimeException("No documents found");
         }
 
-        ProductResponse productResponse = new ProductResponse();
+        ProductSearchResponse productSearchResponse = new ProductSearchResponse();
 
-        productResponse.setContent(productDao.findAllByIds(productServicePayload.getIds()));
-        productResponse.setSearchAfter(productServicePayload.getSearchAfter());
+        productSearchResponse.setContent(
+                productDao.findAllByIds(elasticSearchResult.getIds(), productSearchRequest.getSort())
+                        .stream()
+                        .map(productMapper::mapToDTO)
+                        .toList());
 
-        return productResponse;
+        productSearchResponse.setSearchAfter(elasticSearchResult.getSearchAfter());
+
+        return productSearchResponse;
     }
+
+
 }

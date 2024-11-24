@@ -9,21 +9,28 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/products")
-public class ProductCRUDController {
+public class ProductCrudController {
 
     private final ProductService productService;
     private final ProductValidator productValidator;
 
 
     @Autowired
-    public ProductCRUDController(ProductService userService, ProductValidator productValidator) {
+    public ProductCrudController(ProductService userService, ProductValidator productValidator) {
         this.productService = userService;
         this.productValidator = productValidator;
     }
 
-
-    @GetMapping("get/{id}")
-    public ProductDTO getOneByIdPreview(@PathVariable("id") Long id) {
+    @GetMapping("product/{id}")
+    public ProductDTO getOneById(@PathVariable("id") Long id) {
         return productService.findOneById(id);
+    }
+
+    @DeleteMapping("product/{id}")
+    public String deleteOneById(@PathVariable("id") Long id) {
+        if(productService.deleteOneById(id))
+            return "DELETED";
+
+        return "NOT DELETED";
     }
 }

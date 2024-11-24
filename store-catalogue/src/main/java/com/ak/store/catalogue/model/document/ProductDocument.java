@@ -1,4 +1,4 @@
-package com.ak.store.common.document.product;
+package com.ak.store.catalogue.model.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;

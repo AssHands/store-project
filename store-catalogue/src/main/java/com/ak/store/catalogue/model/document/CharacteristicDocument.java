@@ -1,4 +1,4 @@
-package com.ak.store.common.document.product;
+package com.ak.store.catalogue.model.document;
 
 import jakarta.persistence.Id;
 import lombok.Data;

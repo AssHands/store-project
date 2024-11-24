@@ -17,7 +17,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestPayload {
+public class ProductSearchRequest {
     @Min(1)
     @Max(100)
     private int limit = 20;
