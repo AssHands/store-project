@@ -3,6 +3,7 @@ package com.ak.store.catalogue.service;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.utils.ProductMapper;
 import com.ak.store.common.dto.product.ProductDTO;
+import com.ak.store.common.dto.search.FacetFilter;
 import com.ak.store.common.payload.product.ProductSearchResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
@@ -17,11 +18,12 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductDao productDao;
     private final ProductRepo productRepo;
-    private final EsService esService;
+    private final ElasticService esService;
     private final ProductMapper productMapper;
 
     @Autowired
-    public ProductServiceImpl(ProductDao productDao, ProductRepo productRepo, EsService esService, ProductMapper productMapper) {
+    public ProductServiceImpl(ProductDao productDao, ProductRepo productRepo,
+                              ElasticService esService, ProductMapper productMapper) {
         this.productDao = productDao;
         this.productRepo = productRepo;
         this.esService = esService;
@@ -68,5 +70,8 @@ public class ProductServiceImpl implements ProductService {
         return productSearchResponse;
     }
 
-
+    @Override
+    public FacetFilter facet() {
+        return esService.facet();
+    }
 }

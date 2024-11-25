@@ -1,5 +1,6 @@
-package com.ak.store.common.payload.search.nested;
+package com.ak.store.common.dto.search.nested;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +11,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Filter {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class Filters {
     @JsonProperty("numeric_filters")
     private List<NumericFilter> numericFilters;
 

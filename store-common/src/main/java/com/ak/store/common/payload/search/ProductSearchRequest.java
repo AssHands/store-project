@@ -1,9 +1,9 @@
 package com.ak.store.common.payload.search;
 
-import com.ak.store.common.payload.search.nested.Filter;
-import com.ak.store.common.payload.search.nested.NumericFilter;
-import com.ak.store.common.payload.search.nested.Sort;
-import com.ak.store.common.payload.search.nested.TextFilter;
+import com.ak.store.common.dto.search.nested.Filters;
+import com.ak.store.common.dto.search.nested.NumericFilter;
+import com.ak.store.common.dto.search.nested.Sort;
+import com.ak.store.common.dto.search.nested.TextFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
@@ -15,8 +15,8 @@ import lombok.*;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class ProductSearchRequest {
     @Min(1)
     @Max(100)
@@ -40,26 +40,20 @@ public class ProductSearchRequest {
     @JsonProperty("category_id")
     private Long categoryId;
 
-    private Filter filters;
+    private Filters filters = new Filters();
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
     private Sort sort = Sort.POPULAR;
 
     public List<NumericFilter> getNumericFilters() {
-        if(filters == null) {
-            return null;
-        }
         return filters.getNumericFilters();
     }
 
     public List<TextFilter> getTextFilters() {
-        if(filters == null) {
-            return null;
-        }
         return filters.getTextFilters();
     }
 
-    public Filter getAllFilters() {
+    public Filters getAllFilters() {
         return filters;
     }
 }

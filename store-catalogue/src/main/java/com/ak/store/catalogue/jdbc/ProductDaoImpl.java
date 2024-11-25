@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.jdbc;
 
 import com.ak.store.catalogue.model.entity.Product;
-import com.ak.store.common.payload.search.nested.Sort;
+import com.ak.store.common.dto.search.nested.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -54,7 +54,8 @@ import java.util.Map;
             case PRICE_UP -> query += "ORDER BY price";
             case PRICE_DOWN -> query += "ORDER BY price DESC";
             case RATING -> query += "ORDER BY grade DESC, amount_reviews DESC";
-            default -> query += "ORDER BY amount_sales DESC"; //POPULAR
+            default -> query += "ORDER BY price";
+            //default -> query += "ORDER BY amount_sales DESC"; //POPULAR
         }
 
         System.out.println(query);

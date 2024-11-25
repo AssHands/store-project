@@ -1,6 +1,7 @@
-package com.ak.store.common.payload.search.nested;
+package com.ak.store.common.dto.search.nested;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,11 +13,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NumericFilter {
+@JsonPropertyOrder({ "characteristicId", "values" })
+public class TextFilter {
     @JsonProperty("characteristic_id")
     private Long characteristicId;
 
     @NotNull
     @NotBlank
-    private List<NumericFilterValue> values;
+    private List<String> values;
 }

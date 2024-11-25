@@ -9,9 +9,11 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import com.ak.store.catalogue.model.document.ProductDocument;
-import com.ak.store.common.payload.search.nested.NumericFilter;
+import com.ak.store.common.dto.search.FacetFilter;
+import com.ak.store.common.dto.search.nested.Filters;
+import com.ak.store.common.dto.search.nested.NumericFilter;
 import com.ak.store.common.payload.search.ProductSearchRequest;
-import com.ak.store.common.payload.search.nested.TextFilter;
+import com.ak.store.common.dto.search.nested.TextFilter;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,13 +24,86 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-public class EsService {
+public class ElasticService {
 
     private final ElasticsearchClient esClient;
 
     @Autowired
-    public EsService(ElasticsearchClient esClient) {
+    public ElasticService(ElasticsearchClient esClient) {
         this.esClient = esClient;
+    }
+
+    public FacetFilter facet() {
+        getSearchQuery(null, "вареш");
+        var request = SearchRequest.of(sr -> sr
+                .index("product")
+                .size(0)
+                .query(q -> q.bool(getSearchQuery(null, "вареш")))
+                .aggregations("test", a -> a
+                        .nested(n -> n.path("characteristics"))
+                        .aggregations("nested_test", na -> na
+                                .terms(t -> t.field("characteristics.characteristic_id").size(100))
+                                .aggregations("text_values", text -> text
+                                        .terms(te -> te.field("characteristics.text_value").size(20)))
+                                .aggregations("numeric_values", numeric -> numeric
+                                        .range(r -> r.field("characteristics.numeric_value").ranges(re -> re.from("1").to("16")))))));
+
+        SearchResponse<Void> response;
+        try {
+            response = esClient.search(request, void.class);
+        } catch (IOException e) {
+            throw new RuntimeException("aggs error");
+        }
+
+//        System.out.println(response.aggregations().get("test").nested().aggregations().get("nested_test").sterms().buckets().array().get(0).aggregations().get("text_values").sterms().buckets().array().get(0).key().stringValue());
+//
+//        System.out.println(response.aggregations().get("test").nested().aggregations().get("nested_test").sterms().buckets().array().get(3).aggregations().get("text_values"));
+
+        var facetFilter = new FacetFilter();
+        facetFilter.setCategoryId(3);
+
+        for (var element : response.aggregations().get("test").nested().aggregations().get("nested_test").sterms().buckets().array()) {
+
+            List<String> textValues = new ArrayList<>();
+            var textFilter = new TextFilter();
+            textFilter.setCharacteristicId(Long.parseLong(element.key().stringValue()));
+
+            for(var podElement : element.aggregations().get("text_values").sterms().buckets().array()) {
+                if(podElement.docCount() != 0)
+                    textValues.add(podElement.key().stringValue());
+            }
+
+            textFilter.setValues(textValues);
+
+//            if(!textValues.isEmpty()) {
+//                textFilter.setValues(textValues);
+//                if(facetFilter.getTextFilters() == null) {
+//                    facetFilter.getFilters().setTextFilters(new ArrayList<>(List.of(textFilter)));
+//                }
+//                else
+//                    facetFilter.getTextFilters().add(textFilter);
+//            }
+        facetFilter.setFilters(new Filters(new ArrayList<>(), new ArrayList<>(List.of(textFilter))));
+        }
+
+
+        System.out.println(facetFilter);
+        return facetFilter;
+
+//        for (var element : response.aggregations().get("test").nested().aggregations().get("nested_test").sterms().buckets().array()) {
+//            for(var podElement : element.aggregations().get("numeric_values").range().buckets().array()) {
+//                if(podElement.docCount() != 0)
+//                    System.out.println(podElement.key());
+//            }
+//
+//        }
+
+//        for (var e : response.aggregations().get("text_values")) {
+//            for (var ee : e.getValue().nested().aggregations().entrySet()) {
+//                var l = ee.getValue().sterms().buckets();
+//                System.out.println(ee.getValue());
+//            }
+//        }
     }
 
     public ElasticSearchResult findAll(ProductSearchRequest productSearchRequest) {

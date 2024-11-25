@@ -1,6 +1,7 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.service.ProductService;
+import com.ak.store.common.dto.search.FacetFilter;
 import com.ak.store.common.payload.product.ProductSearchResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import jakarta.validation.Valid;
@@ -22,8 +23,13 @@ public class ProductSearchController {
     }
 
     @GetMapping("search")
-    public ProductSearchResponse test(@RequestBody @Valid ProductSearchRequest productSearchRequest) {
+    public ProductSearchResponse search(@RequestBody @Valid ProductSearchRequest productSearchRequest) {
         System.out.println(productSearchRequest);
         return productService.findAllBySearch(productSearchRequest);
+    }
+
+    @GetMapping("facet")
+    public FacetFilter facet() {
+        return productService.facet();
     }
 }

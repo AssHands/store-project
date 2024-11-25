@@ -1,4 +1,4 @@
-package com.ak.store.common.payload.search.nested;
+package com.ak.store.common.dto.search.nested;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
