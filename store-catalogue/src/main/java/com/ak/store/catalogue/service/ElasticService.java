@@ -49,6 +49,7 @@ public class ElasticService {
                                         .range(r -> r.field("characteristics.numeric_value").ranges(re -> re.from("1").to("16")))))));
 
         SearchResponse<Void> response;
+
         try {
             response = esClient.search(request, void.class);
         } catch (IOException e) {
@@ -84,6 +85,7 @@ public class ElasticService {
 //                    facetFilter.getTextFilters().add(textFilter);
 //            }
         facetFilter.setFilters(new Filters(new ArrayList<>(), new ArrayList<>(List.of(textFilter))));
+
         }
 
 
@@ -122,6 +124,14 @@ public class ElasticService {
                             .field("category_id")
                             .value(productSearchRequest.getCategoryId()))
                     ._toQuery());
+        } else {
+            Long categoryId = defineCategory(productSearchRequest.getText());
+            if(categoryId != null) {
+                filters.add(TermQuery.of(t -> t
+                                .field("category_id")
+                                .value(categoryId))
+                        ._toQuery());
+            }
         }
 
         if (productSearchRequest.getNumericFilters() != null)
@@ -164,8 +174,35 @@ public class ElasticService {
                         .map(FieldValue::_get)
                         .toList());
 
-
         return elasticSearchResult;
+    }
+
+    private Long defineCategory(String text) {
+        SearchRequest request = SearchRequest.of(sr -> sr
+                .index("product")
+                .query(q -> q.bool(getSearchQuery(null, text)))
+                .size(0)
+                .aggregations("most_frequent_category", agg -> agg
+                        .terms(t -> t
+                                .field("category_id")
+                                .size(1))));
+
+        SearchResponse<Void> response;
+
+        try {
+            response = esClient.search(request, void.class);
+        } catch (IOException e) {
+            throw new RuntimeException("defineCategory error");
+        }
+
+        var mostFrequentCategory = response.aggregations().get("most_frequent_category")
+                .lterms().buckets().array();
+
+        if(!mostFrequentCategory.isEmpty()) {
+            return Long.parseLong(mostFrequentCategory.get(0).key());
+        }
+
+        return null;
     }
 
     private String getFuzziness(String word) {

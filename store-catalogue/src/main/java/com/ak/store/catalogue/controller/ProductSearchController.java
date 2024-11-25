@@ -31,5 +31,6 @@ public class ProductSearchController {
     @GetMapping("facet")
     public FacetFilter facet() {
         return productService.facet();
+
     }
 }
