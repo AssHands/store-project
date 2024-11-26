@@ -3,6 +3,7 @@ package com.ak.store.catalogue.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.aggregations.AggregationRange;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -12,9 +13,11 @@ import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.common.dto.search.FacetFilter;
 import com.ak.store.common.dto.search.nested.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
+import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.dto.search.nested.TextFilter;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
+import com.ak.store.common.payload.search.SearchAvailableFilters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,12 +36,12 @@ public class ElasticService {
         this.esClient = esClient;
     }
 
-    public FacetFilter facet() {
-        getSearchQuery(null, "вареш");
+    public AvailableFiltersResponse findAvailableFilters(SearchAvailableFilters searchAvailableFilters) {
+
         var request = SearchRequest.of(sr -> sr
                 .index("product")
                 .size(0)
-                .query(q -> q.bool(getSearchQuery(null, "вареш")))
+                .query(q -> q.bool(getSearchQuery(null, searchAvailableFilters.getText())))
                 .aggregations("test", a -> a
                         .nested(n -> n.path("characteristics"))
                         .aggregations("nested_test", na -> na
@@ -90,7 +93,8 @@ public class ElasticService {
 
 
         System.out.println(facetFilter);
-        return facetFilter;
+
+        return null;
 
 //        for (var element : response.aggregations().get("test").nested().aggregations().get("nested_test").sterms().buckets().array()) {
 //            for(var podElement : element.aggregations().get("numeric_values").range().buckets().array()) {
@@ -243,6 +247,32 @@ public class ElasticService {
 
             return b;
         });
+    }
+
+    private SearchRequest getSearchRequest(SearchAvailableFilters searchAvailableFilters, BoolQuery searchQuery) {
+        return SearchRequest.of(sr -> {
+            sr
+                    .index("product")
+                    .query(q -> q.bool(searchQuery))
+                    .size(0)
+                    .aggregations("characteristics_aggregation", a -> a
+                            .nested(n -> n.path("characteristics"))
+                            .aggregations("characteristics_by_id", na -> na
+                                    .terms(t -> t.field("characteristics.characteristic_id").size(100))
+
+                                    .aggregations("text_values", text -> text
+                                            .terms(te -> te.field("characteristics.text_value").size(20)))
+
+                                    .aggregations("numeric_values", numeric -> numeric
+                                            .range(r -> r.field("characteristics.numeric_value")
+                                                    .ranges(getRangesByCharacteristic(1L))))));
+
+            return sr;
+        });
+    }
+
+    private List<AggregationRange> getRangesByCharacteristic(Long characteristicId) {
+        return List.of(AggregationRange.of(a -> a.from("1").to("100")));
     }
 
     private SearchRequest getSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {

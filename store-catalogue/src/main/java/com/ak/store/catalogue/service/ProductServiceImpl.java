@@ -3,12 +3,13 @@ package com.ak.store.catalogue.service;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.utils.ProductMapper;
 import com.ak.store.common.dto.product.ProductDTO;
-import com.ak.store.common.dto.search.FacetFilter;
 import com.ak.store.common.payload.product.ProductSearchResponse;
+import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.catalogue.jdbc.ProductDao;
 import com.ak.store.catalogue.test.ProductRepo;
+import com.ak.store.common.payload.search.SearchAvailableFilters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -71,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public FacetFilter facet() {
-        return esService.facet();
+    public AvailableFiltersResponse facet(SearchAvailableFilters searchAvailableFilters) {
+        return esService.findAvailableFilters(searchAvailableFilters);
     }
 }

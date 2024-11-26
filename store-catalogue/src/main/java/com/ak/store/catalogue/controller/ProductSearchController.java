@@ -3,7 +3,9 @@ package com.ak.store.catalogue.controller;
 import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.common.dto.search.FacetFilter;
 import com.ak.store.common.payload.product.ProductSearchResponse;
+import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
+import com.ak.store.common.payload.search.SearchAvailableFilters;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +31,7 @@ public class ProductSearchController {
     }
 
     @GetMapping("facet")
-    public FacetFilter facet() {
-        return productService.facet();
-
+    public AvailableFiltersResponse facet(SearchAvailableFilters searchAvailableFilters) {
+        return productService.facet(searchAvailableFilters);
     }
 }
