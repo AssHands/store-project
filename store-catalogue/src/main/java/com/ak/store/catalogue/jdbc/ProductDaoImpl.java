@@ -1,6 +1,7 @@
 package com.ak.store.catalogue.jdbc;
 
 import com.ak.store.catalogue.model.entity.Product;
+import com.ak.store.catalogue.model.entity.RangeFilter;
 import com.ak.store.common.dto.search.nested.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -25,7 +26,8 @@ import java.util.Map;
         String query = "SELECT * FROM product WHERE id=:id";
         System.out.println(query);
 
-        return namedJdbcTemplate.queryForObject(query, Map.of("id", id), new ProductDaoMapper());
+        return namedJdbcTemplate.queryForObject(query, Map.of("id", id),
+                new ProductDaoMapper());
     }
 
 //    @Override
@@ -60,6 +62,15 @@ import java.util.Map;
 
         System.out.println(query);
 
-        return namedJdbcTemplate.query(query, Map.of("ids", ids), new ProductDaoMapper());
+        return namedJdbcTemplate.query(query, Map.of("ids", ids),
+                new ProductDaoMapper());
+    }
+
+    //todo: should i create new dto or make all in one?
+    @Override
+    public List<RangeFilter> findAllRangeFilters(Long categoryId) {
+        String query = "SELECT * FROM range_filter WHERE category_id=:categoryId";
+        return namedJdbcTemplate.query(query, Map.of("categoryId", categoryId),
+                new RangeFilterDaoMapper());
     }
 }
