@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SearchAvailableFilters {
     @NotNull
-    @JsonProperty(required = true)
+    @JsonProperty(required = true, value = "category_id")
     private Long categoryId;
 
     @NotNull

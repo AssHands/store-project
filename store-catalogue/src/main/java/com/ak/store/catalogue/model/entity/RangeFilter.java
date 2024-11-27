@@ -6,9 +6,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class RangeFilter {
-    private final Long id;
-    private final Long categoryId;
-    private final Integer from;
-    private final Integer to;
+    private Long id;
+    private Long categoryId;
+    private Integer from;
+    private Integer to;
 }

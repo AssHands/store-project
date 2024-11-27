@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import com.ak.store.catalogue.model.document.ProductDocument;
+import com.ak.store.catalogue.model.entity.RangeFilter;
 import com.ak.store.common.dto.search.FacetFilter;
 import com.ak.store.common.dto.search.nested.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
@@ -52,6 +53,7 @@ public class ElasticService {
                                         .range(r -> r.field("characteristics.numeric_value").ranges(re -> re.from("1").to("16")))))));
 
         SearchResponse<Void> response;
+        System.out.println(request);
 
         try {
             response = esClient.search(request, void.class);
@@ -65,6 +67,7 @@ public class ElasticService {
 
         var facetFilter = new FacetFilter();
         facetFilter.setCategoryId(3);
+        var a = new RangeFilter(1l, 2l, 2, 3);
 
         for (var element : response.aggregations().get("test").nested().aggregations().get("nested_test").sterms().buckets().array()) {
 

@@ -31,7 +31,8 @@ public class ProductSearchController {
     }
 
     @GetMapping("facet")
-    public AvailableFiltersResponse facet(SearchAvailableFilters searchAvailableFilters) {
+    public AvailableFiltersResponse facet(@RequestBody SearchAvailableFilters searchAvailableFilters) {
+        System.out.println(searchAvailableFilters);
         return productService.facet(searchAvailableFilters);
     }
 }
