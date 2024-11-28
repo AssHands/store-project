@@ -3,17 +3,19 @@ package com.ak.store.catalogue.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationRange;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import com.ak.store.catalogue.jdbc.ProductDao;
 import com.ak.store.catalogue.model.document.ProductDocument;
-import com.ak.store.catalogue.model.entity.RangeFilter;
-import com.ak.store.common.dto.search.FacetFilter;
-import com.ak.store.common.dto.search.nested.Filters;
+import com.ak.store.catalogue.model.entity.CharacteristicFilter;
+import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
+import com.ak.store.common.dto.search.nested.NumericFilterValue;
 import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.dto.search.nested.TextFilter;
@@ -23,34 +25,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ElasticService {
 
     private final ElasticsearchClient esClient;
+    private final ProductDao productDao; //todo: move to main service
 
     @Autowired
-    public ElasticService(ElasticsearchClient esClient) {
+    public ElasticService(ElasticsearchClient esClient, ProductDao productDao) {
         this.esClient = esClient;
+        this.productDao = productDao;
     }
 
     public AvailableFiltersResponse findAvailableFilters(SearchAvailableFilters searchAvailableFilters) {
-
         var request = SearchRequest.of(sr -> sr
                 .index("product")
                 .size(0)
                 .query(q -> q.bool(getSearchQuery(null, searchAvailableFilters.getText())))
-                .aggregations("test", a -> a
-                        .nested(n -> n.path("characteristics"))
-                        .aggregations("nested_test", na -> na
-                                .terms(t -> t.field("characteristics.characteristic_id").size(100))
-                                .aggregations("text_values", text -> text
-                                        .terms(te -> te.field("characteristics.text_value").size(20)))
-                                .aggregations("numeric_values", numeric -> numeric
-                                        .range(r -> r.field("characteristics.numeric_value").ranges(re -> re.from("1").to("16")))))));
+                .aggregations(getAggregations(searchAvailableFilters.getCategoryId())));
 
         SearchResponse<Void> response;
         System.out.println(request);
@@ -61,58 +55,120 @@ public class ElasticService {
             throw new RuntimeException("aggs error");
         }
 
-//        System.out.println(response.aggregations().get("test").nested().aggregations().get("nested_test").sterms().buckets().array().get(0).aggregations().get("text_values").sterms().buckets().array().get(0).key().stringValue());
-//
-//        System.out.println(response.aggregations().get("test").nested().aggregations().get("nested_test").sterms().buckets().array().get(3).aggregations().get("text_values"));
+        Filters filters = new Filters(new ArrayList<>(), new ArrayList<>());
 
-        var facetFilter = new FacetFilter();
-        facetFilter.setCategoryId(3);
-        var a = new RangeFilter(1l, 2l, 2, 3);
+        for(var entry : response.aggregations().entrySet()) {
+            var aggs =  entry.getValue().nested().aggregations().get("filtered_aggregation").filter().aggregations();
 
-        for (var element : response.aggregations().get("test").nested().aggregations().get("nested_test").sterms().buckets().array()) {
+            if(aggs.get("text_values") != null) {
+                List<String> strs = new ArrayList<>();
+                for(var i : aggs.get("text_values").sterms().buckets().array()) {
+                    if(i.docCount() > 0)
+                        strs.add(i.key().stringValue());
+                }
 
-            List<String> textValues = new ArrayList<>();
-            var textFilter = new TextFilter();
-            textFilter.setCharacteristicId(Long.parseLong(element.key().stringValue()));
+                if(!strs.isEmpty()) {
+                    filters.getTextFilters().add(new TextFilter(Long.parseLong(entry.getKey()), strs));
+                }
 
-            for(var podElement : element.aggregations().get("text_values").sterms().buckets().array()) {
-                if(podElement.docCount() != 0)
-                    textValues.add(podElement.key().stringValue());
+            } else if(aggs.get("numeric_values") != null) {
+                List<NumericFilterValue> numericFilterValues = new ArrayList<>();
+
+                for(var i : aggs.get("numeric_values").range().buckets().array()) {
+                    if(i.docCount() > 0) {
+                        var range = new NumericFilterValue();
+
+                        if(i.from() != null)
+                            range.setFrom(i.from().intValue());
+
+                        if(i.to() != null)
+                            range.setTo(i.to().intValue());
+
+                        numericFilterValues.add(range);
+                    }
+                }
+
+                if(!numericFilterValues.isEmpty()) {
+                    filters.getNumericFilters().add(new NumericFilter(Long.parseLong(entry.getKey()), numericFilterValues));
+                }
             }
-
-            textFilter.setValues(textValues);
-
-//            if(!textValues.isEmpty()) {
-//                textFilter.setValues(textValues);
-//                if(facetFilter.getTextFilters() == null) {
-//                    facetFilter.getFilters().setTextFilters(new ArrayList<>(List.of(textFilter)));
-//                }
-//                else
-//                    facetFilter.getTextFilters().add(textFilter);
-//            }
-        facetFilter.setFilters(new Filters(new ArrayList<>(), new ArrayList<>(List.of(textFilter))));
 
         }
 
+        return new AvailableFiltersResponse(filters);
+    }
 
-        System.out.println(facetFilter);
+    private Map<String, Aggregation> getAggregations(Long categoryId) {
+        List<CharacteristicFilter> filters = productDao.findAllCharacteristicFilters(categoryId);
+        Map<String, Aggregation> aggs = new HashMap<>();
 
-        return null;
+        for(var filter : filters) {
+            if(filter.isTextFilter()) {
+                aggs.put(filter.getCharacteristicId().toString(),
+                        Aggregation.of(a -> a
+                                .nested(n -> n.path("characteristics"))
+                                .aggregations("filtered_aggregation", fa -> fa
+                                        .filter(f -> f
+                                                .term(t -> t
+                                                        .field("characteristics.characteristic_id")
+                                                        .value(filter.getCharacteristicId().toString())))
+                                        .aggregations("text_values", va -> va
+                                                .terms(t -> t
+                                                        .field("characteristics.text_value")
+                                                        .size(20))))));
 
-//        for (var element : response.aggregations().get("test").nested().aggregations().get("nested_test").sterms().buckets().array()) {
-//            for(var podElement : element.aggregations().get("numeric_values").range().buckets().array()) {
-//                if(podElement.docCount() != 0)
-//                    System.out.println(podElement.key());
-//            }
-//
-//        }
+            } else {
+                aggs.put(filter.getCharacteristicId().toString(),
+                        Aggregation.of(a -> a
+                                .nested(n -> n.path("characteristics"))
+                                .aggregations("filtered_aggregation", fa -> fa
+                                        .filter(f -> f
+                                                .term(t -> t
+                                                        .field("characteristics.characteristic_id")
+                                                        .value(filter.getCharacteristicId().toString())))
+                                        .aggregations("numeric_values", va -> va
+                                                .range(r -> r
+                                                        .field("characteristics.numeric_value")
+                                                        .ranges(getAggregationRanges(filter.getCharacteristicId(), filters)))))));
+            }
+        }
 
-//        for (var e : response.aggregations().get("text_values")) {
-//            for (var ee : e.getValue().nested().aggregations().entrySet()) {
-//                var l = ee.getValue().sterms().buckets();
-//                System.out.println(ee.getValue());
-//            }
-//        }
+        return aggs;
+    }
+
+    private List<AggregationRange> getAggregationRanges(Long characteristicId, List<CharacteristicFilter> filters) {
+        List<AggregationRange> ranges = new ArrayList<>();
+        List<CharacteristicFilter> sameCharacteristicIdFilters = new ArrayList<>();
+
+        for(var filter : filters) {
+            if(filter.getCharacteristicId().longValue() == characteristicId) {
+                sameCharacteristicIdFilters.add(filter);
+            }
+        }
+
+        for(var filter : sameCharacteristicIdFilters) {
+            ranges.add(AggregationRange.of(ar -> {
+                String key = "";
+
+                if(filter.getFrom() != null) {
+                    ar.from(filter.getFrom().toString());
+                    key += filter.getFrom();
+                } else
+                    key += "*";
+
+                if(filter.getTo() != null)  {
+                    ar.to(filter.getTo().toString());
+                    key += "-" + filter.getTo();
+                } else
+                    key += "-*";
+
+                ar.key(key);
+                return ar;
+            }));
+
+        }
+
+        return ranges;
     }
 
     public ElasticSearchResult findAll(ProductSearchRequest productSearchRequest) {
@@ -131,15 +187,16 @@ public class ElasticService {
                             .field("category_id")
                             .value(productSearchRequest.getCategoryId()))
                     ._toQuery());
-        } else {
-            Long categoryId = defineCategory(productSearchRequest.getText());
-            if(categoryId != null) {
-                filters.add(TermQuery.of(t -> t
-                                .field("category_id")
-                                .value(categoryId))
-                        ._toQuery());
-            }
         }
+//        else {
+//            Long categoryId = defineCategory(productSearchRequest.getText());
+//            if(categoryId != null) {
+//                filters.add(TermQuery.of(t -> t
+//                                .field("category_id")
+//                                .value(categoryId))
+//                        ._toQuery());
+//            }
+//        } todo: need tests
 
         if (productSearchRequest.getNumericFilters() != null)
             filters.addAll(getNumericFilters(productSearchRequest.getNumericFilters()));
@@ -189,7 +246,7 @@ public class ElasticService {
                 .index("product")
                 .query(q -> q.bool(getSearchQuery(null, text)))
                 .size(0)
-                .aggregations("most_frequent_category", agg -> agg
+                .aggregations("most_frequent_category", a -> a
                         .terms(t -> t
                                 .field("category_id")
                                 .size(1))));
@@ -234,6 +291,10 @@ public class ElasticService {
             if (filters != null && !filters.isEmpty())
                 b.filter(filters);
 
+            if(fullTextSearch == null || fullTextSearch.isBlank()) {
+                return b;
+            }
+
             String[] words = Arrays.stream(fullTextSearch.split(" "))
                     .map(word -> word.replaceAll("[^A-Za-zА-Яа-я0-9]", ""))
                     .toArray(String[]::new);
@@ -250,32 +311,6 @@ public class ElasticService {
 
             return b;
         });
-    }
-
-    private SearchRequest getSearchRequest(SearchAvailableFilters searchAvailableFilters, BoolQuery searchQuery) {
-        return SearchRequest.of(sr -> {
-            sr
-                    .index("product")
-                    .query(q -> q.bool(searchQuery))
-                    .size(0)
-                    .aggregations("characteristics_aggregation", a -> a
-                            .nested(n -> n.path("characteristics"))
-                            .aggregations("characteristics_by_id", na -> na
-                                    .terms(t -> t.field("characteristics.characteristic_id").size(100))
-
-                                    .aggregations("text_values", text -> text
-                                            .terms(te -> te.field("characteristics.text_value").size(20)))
-
-                                    .aggregations("numeric_values", numeric -> numeric
-                                            .range(r -> r.field("characteristics.numeric_value")
-                                                    .ranges(getRangesByCharacteristic(1L))))));
-
-            return sr;
-        });
-    }
-
-    private List<AggregationRange> getRangesByCharacteristic(Long characteristicId) {
-        return List.of(AggregationRange.of(a -> a.from("1").to("100")));
     }
 
     private SearchRequest getSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {

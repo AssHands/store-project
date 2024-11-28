@@ -1,6 +1,6 @@
 package com.ak.store.common.payload.search;
 
-import com.ak.store.common.dto.search.nested.Filters;
+import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
 import com.ak.store.common.dto.search.nested.Sort;
 import com.ak.store.common.dto.search.nested.TextFilter;

@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.jdbc;
 
 import com.ak.store.catalogue.model.entity.Product;
-import com.ak.store.catalogue.model.entity.RangeFilter;
+import com.ak.store.catalogue.model.entity.CharacteristicFilter;
 import com.ak.store.common.dto.search.nested.Sort;
 
 import java.util.List;
@@ -15,5 +15,5 @@ public interface ProductDao {
 
     List<Product> findAllByIds(List<Long> ids, Sort sort);
 
-    List<RangeFilter> findAllRangeFilters(Long categoryId);
+    List<CharacteristicFilter> findAllCharacteristicFilters(Long categoryId);
 }

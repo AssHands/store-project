@@ -1,7 +1,9 @@
 package com.ak.store.catalogue.jdbc;
 
+import com.ak.store.catalogue.jdbc.mapper.CharacteristicFilterDaoMapper;
+import com.ak.store.catalogue.jdbc.mapper.ProductDaoMapper;
 import com.ak.store.catalogue.model.entity.Product;
-import com.ak.store.catalogue.model.entity.RangeFilter;
+import com.ak.store.catalogue.model.entity.CharacteristicFilter;
 import com.ak.store.common.dto.search.nested.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -57,7 +59,7 @@ import java.util.Map;
             case PRICE_DOWN -> query += "ORDER BY price DESC";
             case RATING -> query += "ORDER BY grade DESC, amount_reviews DESC";
             default -> query += "ORDER BY price";
-            //default -> query += "ORDER BY amount_sales DESC"; //POPULAR
+            //default -> query += "ORDER BY amount_sales DESC"; //POPULAR todo
         }
 
         System.out.println(query);
@@ -66,11 +68,11 @@ import java.util.Map;
                 new ProductDaoMapper());
     }
 
-    //todo: should i create new dto or make all in one?
+    //todo: should i create new dao or make all in one?
     @Override
-    public List<RangeFilter> findAllRangeFilters(Long categoryId) {
-        String query = "SELECT * FROM range_filter WHERE category_id=:categoryId";
+    public List<CharacteristicFilter> findAllCharacteristicFilters(Long categoryId) {
+        String query = "SELECT * FROM characteristic_filter WHERE category_id=:categoryId";
         return namedJdbcTemplate.query(query, Map.of("categoryId", categoryId),
-                new RangeFilterDaoMapper());
+                new CharacteristicFilterDaoMapper());
     }
 }

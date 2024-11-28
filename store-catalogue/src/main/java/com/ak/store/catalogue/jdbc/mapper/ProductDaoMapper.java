@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.jdbc;
+package com.ak.store.catalogue.jdbc.mapper;
 
 import com.ak.store.catalogue.model.entity.Product;
 import org.springframework.jdbc.core.RowMapper;

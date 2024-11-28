@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RangeFilter {
+public class CharacteristicFilter {
     private Long id;
+    private Long characteristicId;
     private Long categoryId;
     private Integer from;
     private Integer to;
+    private boolean isTextFilter;
 }

@@ -1,5 +1,7 @@
-package com.ak.store.common.dto.search.nested;
+package com.ak.store.common.dto.search;
 
+import com.ak.store.common.dto.search.nested.NumericFilter;
+import com.ak.store.common.dto.search.nested.TextFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

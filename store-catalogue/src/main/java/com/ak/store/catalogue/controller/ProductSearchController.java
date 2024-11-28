@@ -1,7 +1,6 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.service.ProductService;
-import com.ak.store.common.dto.search.FacetFilter;
 import com.ak.store.common.payload.product.ProductSearchResponse;
 import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
@@ -31,7 +30,7 @@ public class ProductSearchController {
     }
 
     @GetMapping("facet")
-    public AvailableFiltersResponse facet(@RequestBody SearchAvailableFilters searchAvailableFilters) {
+    public AvailableFiltersResponse facet(@RequestBody @Valid SearchAvailableFilters searchAvailableFilters) {
         System.out.println(searchAvailableFilters);
         return productService.facet(searchAvailableFilters);
     }

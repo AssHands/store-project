@@ -2,7 +2,6 @@ package com.ak.store.catalogue.service;
 
 
 import com.ak.store.common.dto.product.ProductDTO;
-import com.ak.store.common.dto.search.FacetFilter;
 import com.ak.store.common.payload.product.ProductSearchResponse;
 import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
