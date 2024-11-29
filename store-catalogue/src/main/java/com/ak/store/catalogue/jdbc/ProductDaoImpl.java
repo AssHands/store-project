@@ -1,7 +1,8 @@
 package com.ak.store.catalogue.jdbc;
 
-import com.ak.store.catalogue.jdbc.mapper.CharacteristicFilterDaoMapper;
+import com.ak.store.catalogue.jdbc.mapper.FilterByCharacteristicDaoMapper;
 import com.ak.store.catalogue.jdbc.mapper.ProductDaoMapper;
+import com.ak.store.catalogue.model.entity.FilterByCharacteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.CharacteristicFilter;
 import com.ak.store.common.dto.search.nested.Sort;
@@ -70,9 +71,21 @@ import java.util.Map;
 
     //todo: should i create new dao or make all in one?
     @Override
-    public List<CharacteristicFilter> findAllCharacteristicFilters(Long categoryId) {
-        String query = "SELECT * FROM characteristic_filter WHERE category_id=:categoryId";
+    public List<FilterByCharacteristic> findAllCharacteristicFilters(Long categoryId) {
+        String query = """
+                       SELECT f.id, f.from_value, f.to_value, f.text_value, cf.characteristic_id, c.name
+                       FROM filters f
+                       JOIN characteristic_filter cf
+                       ON f.id = cf.filter_id
+                       JOIN category_characteristic cc
+                       ON cc.characteristic_id = cf.characteristic_id
+                       JOIN characteristic c
+                       ON c.id = cc.characteristic_id
+                       WHERE cc.category_id=:categoryId
+                       ORDER BY f.from_value
+                       """;
+
         return namedJdbcTemplate.query(query, Map.of("categoryId", categoryId),
-                new CharacteristicFilterDaoMapper());
+                new FilterByCharacteristicDaoMapper());
     }
 }

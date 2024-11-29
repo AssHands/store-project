@@ -73,6 +73,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public AvailableFiltersResponse facet(SearchAvailableFilters searchAvailableFilters) {
-        return esService.findAvailableFilters(searchAvailableFilters);
+        return esService.searchAvailableFilters(searchAvailableFilters);
     }
 }

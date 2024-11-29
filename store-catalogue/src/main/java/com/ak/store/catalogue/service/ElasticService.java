@@ -12,7 +12,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import com.ak.store.catalogue.jdbc.ProductDao;
 import com.ak.store.catalogue.model.document.ProductDocument;
-import com.ak.store.catalogue.model.entity.CharacteristicFilter;
+import com.ak.store.catalogue.model.entity.FilterByCharacteristic;
 import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
 import com.ak.store.common.dto.search.nested.NumericFilterValue;
@@ -39,7 +39,7 @@ public class ElasticService {
         this.productDao = productDao;
     }
 
-    public AvailableFiltersResponse findAvailableFilters(SearchAvailableFilters searchAvailableFilters) {
+    public AvailableFiltersResponse searchAvailableFilters(SearchAvailableFilters searchAvailableFilters) {
         var request = SearchRequest.of(sr -> sr
                 .index("product")
                 .size(0)
@@ -55,24 +55,32 @@ public class ElasticService {
             throw new RuntimeException("aggs error");
         }
 
+        return new AvailableFiltersResponse(getAvailableFilters(response));
+    }
+
+    private Filters getAvailableFilters(SearchResponse<Void> response) {
         Filters filters = new Filters(new ArrayList<>(), new ArrayList<>());
 
         for(var entry : response.aggregations().entrySet()) {
-            var aggs =  entry.getValue().nested().aggregations().get("filtered_aggregation").filter().aggregations();
+            var aggs =  entry.getValue().nested()
+                    .aggregations().get("filtered_aggregation").filter().aggregations();
 
             if(aggs.get("text_values") != null) {
-                List<String> strs = new ArrayList<>();
+                List<String> stringValues = new ArrayList<>();
+
                 for(var i : aggs.get("text_values").sterms().buckets().array()) {
                     if(i.docCount() > 0)
-                        strs.add(i.key().stringValue());
+                        stringValues.add(i.key().stringValue());
                 }
 
-                if(!strs.isEmpty()) {
-                    filters.getTextFilters().add(new TextFilter(Long.parseLong(entry.getKey()), strs));
+                if(!stringValues.isEmpty()) {
+                    Long characteristicId = Long.parseLong(entry.getKey().split("_")[0]);
+                    String characteristicName = entry.getKey().split("_")[1];
+                    filters.getTextFilters().add(new TextFilter(characteristicId, characteristicName, stringValues));
                 }
 
             } else if(aggs.get("numeric_values") != null) {
-                List<NumericFilterValue> numericFilterValues = new ArrayList<>();
+                List<NumericFilterValue> numericValues = new ArrayList<>();
 
                 for(var i : aggs.get("numeric_values").range().buckets().array()) {
                     if(i.docCount() > 0) {
@@ -84,27 +92,30 @@ public class ElasticService {
                         if(i.to() != null)
                             range.setTo(i.to().intValue());
 
-                        numericFilterValues.add(range);
+                        numericValues.add(range);
                     }
                 }
 
-                if(!numericFilterValues.isEmpty()) {
-                    filters.getNumericFilters().add(new NumericFilter(Long.parseLong(entry.getKey()), numericFilterValues));
+                if(!numericValues.isEmpty()) {
+                    Long characteristicId = Long.parseLong(entry.getKey().split("_")[0]);
+                    String characteristicName = entry.getKey().split("_")[1];
+
+                    filters.getNumericFilters().add(new NumericFilter(characteristicId,
+                            characteristicName, numericValues));
                 }
             }
-
         }
 
-        return new AvailableFiltersResponse(filters);
+        return filters;
     }
 
     private Map<String, Aggregation> getAggregations(Long categoryId) {
-        List<CharacteristicFilter> filters = productDao.findAllCharacteristicFilters(categoryId);
+        List<FilterByCharacteristic> filters = productDao.findAllCharacteristicFilters(categoryId);
         Map<String, Aggregation> aggs = new HashMap<>();
 
         for(var filter : filters) {
-            if(filter.isTextFilter()) {
-                aggs.put(filter.getCharacteristicId().toString(),
+            if(filter.getTextValue() != null) {
+                aggs.put(filter.getCharacteristicId() + "_" + filter.getName(),
                         Aggregation.of(a -> a
                                 .nested(n -> n.path("characteristics"))
                                 .aggregations("filtered_aggregation", fa -> fa
@@ -118,7 +129,7 @@ public class ElasticService {
                                                         .size(20))))));
 
             } else {
-                aggs.put(filter.getCharacteristicId().toString(),
+                aggs.put(filter.getCharacteristicId() + "_" + filter.getName(),
                         Aggregation.of(a -> a
                                 .nested(n -> n.path("characteristics"))
                                 .aggregations("filtered_aggregation", fa -> fa
@@ -136,9 +147,9 @@ public class ElasticService {
         return aggs;
     }
 
-    private List<AggregationRange> getAggregationRanges(Long characteristicId, List<CharacteristicFilter> filters) {
+    private List<AggregationRange> getAggregationRanges(Long characteristicId, List<FilterByCharacteristic> filters) {
         List<AggregationRange> ranges = new ArrayList<>();
-        List<CharacteristicFilter> sameCharacteristicIdFilters = new ArrayList<>();
+        List<FilterByCharacteristic> sameCharacteristicIdFilters = new ArrayList<>();
 
         for(var filter : filters) {
             if(filter.getCharacteristicId().longValue() == characteristicId) {
@@ -150,15 +161,15 @@ public class ElasticService {
             ranges.add(AggregationRange.of(ar -> {
                 String key = "";
 
-                if(filter.getFrom() != null) {
-                    ar.from(filter.getFrom().toString());
-                    key += filter.getFrom();
+                if(filter.getFromValue() != null) {
+                    ar.from(filter.getFromValue().toString());
+                    key += filter.getFromValue();
                 } else
                     key += "*";
 
-                if(filter.getTo() != null)  {
-                    ar.to(filter.getTo().toString());
-                    key += "-" + filter.getTo();
+                if(filter.getToValue() != null)  {
+                    ar.to(filter.getToValue().toString());
+                    key += "-" + filter.getToValue();
                 } else
                     key += "-*";
 

@@ -13,10 +13,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonPropertyOrder({ "characteristicId", "values" })
+@JsonPropertyOrder({ "characteristicId", "name","values" })
 public class NumericFilter {
     @JsonProperty("characteristic_id")
     private Long characteristicId;
+
+    private String name;
 
     @NotNull
     @NotBlank
