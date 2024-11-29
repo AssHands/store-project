@@ -74,7 +74,7 @@ import java.util.Map;
     public List<FilterByCharacteristic> findAllCharacteristicFilters(Long categoryId) {
         String query = """
                        SELECT f.id, f.from_value, f.to_value, f.text_value, cf.characteristic_id, c.name
-                       FROM filters f
+                       FROM filter f
                        JOIN characteristic_filter cf
                        ON f.id = cf.filter_id
                        JOIN category_characteristic cc
