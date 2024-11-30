@@ -1,6 +1,5 @@
 package com.ak.store.catalogue.jdbc.mapper;
 
-import com.ak.store.catalogue.model.entity.CharacteristicFilter;
 import com.ak.store.catalogue.model.entity.FilterByCharacteristic;
 import org.springframework.jdbc.core.RowMapper;
 

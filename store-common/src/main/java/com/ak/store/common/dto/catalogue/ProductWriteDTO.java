@@ -1,18 +1,15 @@
-package com.ak.store.common.dto.product;
+package com.ak.store.common.dto.catalogue;
 
+import com.ak.store.common.dto.search.Filters;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDTO {
-    private Long id;
-
+public class ProductWriteDTO {
     private String title;
 
     private String description;
@@ -22,7 +19,5 @@ public class ProductDTO {
     @JsonPropertyOrder("category_id")
     private Long categoryId;
 
-    private int amountReviews;
-
-    private float grade;
+    private Filters filters;
 }

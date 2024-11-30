@@ -1,10 +1,13 @@
 package com.ak.store.catalogue.jdbc;
 
+import com.ak.store.catalogue.jdbc.mapper.CategoryDaoMapper;
+import com.ak.store.catalogue.jdbc.mapper.CharacteristicByCategoryDaoMapper;
 import com.ak.store.catalogue.jdbc.mapper.FilterByCharacteristicDaoMapper;
 import com.ak.store.catalogue.jdbc.mapper.ProductDaoMapper;
+import com.ak.store.catalogue.model.entity.Category;
+import com.ak.store.catalogue.model.entity.CharacteristicByCategory;
 import com.ak.store.catalogue.model.entity.FilterByCharacteristic;
 import com.ak.store.catalogue.model.entity.Product;
-import com.ak.store.catalogue.model.entity.CharacteristicFilter;
 import com.ak.store.common.dto.search.nested.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -85,7 +88,45 @@ import java.util.Map;
                        ORDER BY f.from_value
                        """;
 
+        System.out.println(query);
+
         return namedJdbcTemplate.query(query, Map.of("categoryId", categoryId),
                 new FilterByCharacteristicDaoMapper());
+    }
+
+    @Override
+    public List<Category> findAllCategory() {
+        String query = "SELECT * FROM category";
+        System.out.println(query);
+
+        return namedJdbcTemplate.query(query, new CategoryDaoMapper());
+    }
+
+    @Override
+    public List<Category> findAllCategoryByName(String name) {
+        String query = "SELECT * FROM category WHERE LOWER(name) LIKE LOWER(CONCAT('%', :name, '%'))";
+        System.out.println(query);
+
+        return namedJdbcTemplate.query(query, Map.of("name", name), new CategoryDaoMapper());
+    }
+
+    @Override
+    public List<CharacteristicByCategory> findAllAvailableCharacteristic(Long categoryId) {
+        String query = """
+                       SELECT f.id, f.text_value, cf.characteristic_id, c.name
+                       FROM filter f
+                       JOIN characteristic_filter cf
+                       ON f.id = cf.filter_id
+                       JOIN category_characteristic cc
+                       ON cc.characteristic_id = cf.characteristic_id
+                       JOIN characteristic c
+                       ON c.id = cc.characteristic_id
+                       WHERE cc.category_id=:categoryId
+                       """;
+
+        System.out.println(query);
+
+        return namedJdbcTemplate.query(query, Map.of("categoryId", categoryId),
+                new CharacteristicByCategoryDaoMapper());
     }
 }

@@ -1,6 +1,6 @@
 package com.ak.store.common.payload.product;
 
-import com.ak.store.common.dto.product.ProductDTO;
+import com.ak.store.common.dto.catalogue.ProductReadDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,5 +15,5 @@ public class ProductSearchResponse {
     @JsonProperty("search_after")
     private List<Object> searchAfter;
 
-    private List<ProductDTO> content;
+    private List<ProductReadDTO> content;
 }

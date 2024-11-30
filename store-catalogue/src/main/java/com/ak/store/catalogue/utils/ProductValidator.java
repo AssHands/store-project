@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.utils;
 
-import com.ak.store.common.dto.product.ProductDTO;
+import com.ak.store.common.dto.catalogue.ProductReadDTO;
 import org.apache.commons.text.CaseUtils;
 import org.springframework.stereotype.Component;
 
@@ -46,7 +46,7 @@ public class ProductValidator {
         try {
             for (var entry : updatedFields.entrySet()) {
                 fieldName = CaseUtils.toCamelCase(entry.getKey(), false, '_');
-                Class<?> type = ProductDTO.class.getDeclaredField(fieldName).getType();
+                Class<?> type = ProductReadDTO.class.getDeclaredField(fieldName).getType();
 
                 if(Number.class.isAssignableFrom(entry.getValue().getClass())
                 && Number.class.isAssignableFrom(type)) {

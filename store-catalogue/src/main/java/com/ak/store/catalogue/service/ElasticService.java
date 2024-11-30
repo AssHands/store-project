@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import co.elastic.clients.util.NamedValue;
 import com.ak.store.catalogue.jdbc.ProductDao;
 import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.catalogue.model.entity.FilterByCharacteristic;
@@ -74,8 +75,8 @@ public class ElasticService {
                 }
 
                 if(!stringValues.isEmpty()) {
-                    Long characteristicId = Long.parseLong(entry.getKey().split("_")[0]);
-                    String characteristicName = entry.getKey().split("_")[1];
+                    Long characteristicId = Long.parseLong(entry.getKey().split("__")[0]);
+                    String characteristicName = entry.getKey().split("__")[1];
                     filters.getTextFilters().add(new TextFilter(characteristicId, characteristicName, stringValues));
                 }
 
@@ -97,8 +98,8 @@ public class ElasticService {
                 }
 
                 if(!numericValues.isEmpty()) {
-                    Long characteristicId = Long.parseLong(entry.getKey().split("_")[0]);
-                    String characteristicName = entry.getKey().split("_")[1];
+                    Long characteristicId = Long.parseLong(entry.getKey().split("__")[0]);
+                    String characteristicName = entry.getKey().split("__")[1];
 
                     filters.getNumericFilters().add(new NumericFilter(characteristicId,
                             characteristicName, numericValues));
@@ -115,7 +116,7 @@ public class ElasticService {
 
         for(var filter : filters) {
             if(filter.getTextValue() != null) {
-                aggs.put(filter.getCharacteristicId() + "_" + filter.getName(),
+                aggs.put(filter.getCharacteristicId() + "__" + filter.getName(),
                         Aggregation.of(a -> a
                                 .nested(n -> n.path("characteristics"))
                                 .aggregations("filtered_aggregation", fa -> fa
@@ -126,10 +127,11 @@ public class ElasticService {
                                         .aggregations("text_values", va -> va
                                                 .terms(t -> t
                                                         .field("characteristics.text_value")
-                                                        .size(20))))));
+                                                        .size(20)
+                                                        .order(NamedValue.of("_key", SortOrder.Asc)))))));
 
             } else {
-                aggs.put(filter.getCharacteristicId() + "_" + filter.getName(),
+                aggs.put(filter.getCharacteristicId() + "__" + filter.getName(),
                         Aggregation.of(a -> a
                                 .nested(n -> n.path("characteristics"))
                                 .aggregations("filtered_aggregation", fa -> fa
