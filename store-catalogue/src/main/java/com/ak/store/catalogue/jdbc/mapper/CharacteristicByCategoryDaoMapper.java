@@ -10,11 +10,6 @@ public class CharacteristicByCategoryDaoMapper implements RowMapper<Characterist
 
     @Override
     public CharacteristicByCategory mapRow(ResultSet rs, int rowNum) throws SQLException {
-        boolean isTextCharacteristic = false;
-        if(rs.getString("text_value") != null) {
-            isTextCharacteristic = true;
-        }
-
         return new CharacteristicByCategory(
                 rs.getLong("id"),
                 rs.getLong("characteristic_id"),

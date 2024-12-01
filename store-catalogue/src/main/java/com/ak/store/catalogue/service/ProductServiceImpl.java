@@ -2,10 +2,11 @@ package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.utils.CatalogueMapper;
-import com.ak.store.common.dto.catalogue.AvailableCharacteristicDTO;
-import com.ak.store.common.dto.catalogue.CategoryDTO;
-import com.ak.store.common.dto.catalogue.ProductReadDTO;
-import com.ak.store.common.payload.product.ProductSearchResponse;
+import com.ak.store.common.dto.catalogue.others.AvailableCharacteristicDTO;
+import com.ak.store.common.dto.catalogue.others.CategoryDTO;
+import com.ak.store.common.dto.catalogue.product.ProductReadDTO;
+import com.ak.store.common.payload.product.ProductWritePayload;
+import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
@@ -90,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<CategoryDTO> findAllCategoryByName(String name) {
+    public List<CategoryDTO> findAllCategory(String name) {
         return productDao.findAllCategoryByName(name).stream()
                 .map(catalogueMapper::mapToCategoryDTO)
                 .toList();
@@ -102,7 +103,13 @@ public class ProductServiceImpl implements ProductService {
                 productDao.findAllAvailableCharacteristic(categoryId));
     }
 
-    private List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) {
+    @Override
+    public boolean createOne(ProductWritePayload productPayload) {
+        productDao.createOne(productPayload);
+        return false;
+    }
+
+    private List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) { //todo: move to utils may be?
         Map<Long, CategoryDTO> categoryMap = new HashMap<>();
         List<CategoryDTO> rootCategories = new ArrayList<>();
 

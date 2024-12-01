@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NumericFilterValue {
+
     @Min(0)
     @JsonProperty(required = true)
     private Integer from;

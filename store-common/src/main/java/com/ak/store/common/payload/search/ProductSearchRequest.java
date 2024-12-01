@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -23,7 +24,7 @@ public class ProductSearchRequest {
     private int limit = 20;
 
     @JsonProperty("search_after")
-    private List<Integer> searchAfter;
+    private List<Integer> searchAfter = new ArrayList<>();
 
     @JsonProperty("price_from")
     private int priceFrom;

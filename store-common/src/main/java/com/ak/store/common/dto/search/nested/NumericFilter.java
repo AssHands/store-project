@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -15,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonPropertyOrder({ "characteristicId", "name","values" })
 public class NumericFilter {
+
     @JsonProperty("characteristic_id")
     private Long characteristicId;
 
@@ -22,5 +24,5 @@ public class NumericFilter {
 
     @NotNull
     @NotBlank
-    private List<NumericFilterValue> values;
+    private List<NumericFilterValue> values = new ArrayList<>();
 }

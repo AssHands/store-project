@@ -1,4 +1,4 @@
-package com.ak.store.common.dto.catalogue;
+package com.ak.store.common.dto.catalogue.others;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

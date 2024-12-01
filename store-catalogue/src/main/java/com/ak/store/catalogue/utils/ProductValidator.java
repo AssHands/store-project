@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.utils;
 
-import com.ak.store.common.dto.catalogue.ProductReadDTO;
+import com.ak.store.common.dto.catalogue.product.ProductReadDTO;
 import org.apache.commons.text.CaseUtils;
 import org.springframework.stereotype.Component;
 

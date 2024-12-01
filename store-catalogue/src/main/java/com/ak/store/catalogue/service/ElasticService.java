@@ -60,38 +60,38 @@ public class ElasticService {
     }
 
     private Filters getAvailableFilters(SearchResponse<Void> response) {
-        Filters filters = new Filters(new ArrayList<>(), new ArrayList<>());
+        Filters filters = new Filters();
 
         for(var entry : response.aggregations().entrySet()) {
             var aggs =  entry.getValue().nested()
                     .aggregations().get("filtered_aggregation").filter().aggregations();
 
             if(aggs.get("text_values") != null) {
-                List<String> stringValues = new ArrayList<>();
+                List<String> textValues = new ArrayList<>();
 
-                for(var i : aggs.get("text_values").sterms().buckets().array()) {
-                    if(i.docCount() > 0)
-                        stringValues.add(i.key().stringValue());
+                for(var textValue : aggs.get("text_values").sterms().buckets().array()) {
+                    if(textValue.docCount() > 0)
+                        textValues.add(textValue.key().stringValue());
                 }
 
-                if(!stringValues.isEmpty()) {
+                if(!textValues.isEmpty()) {
                     Long characteristicId = Long.parseLong(entry.getKey().split("__")[0]);
                     String characteristicName = entry.getKey().split("__")[1];
-                    filters.getTextFilters().add(new TextFilter(characteristicId, characteristicName, stringValues));
+                    filters.getTextFilters().add(new TextFilter(characteristicId, characteristicName, textValues));
                 }
 
             } else if(aggs.get("numeric_values") != null) {
                 List<NumericFilterValue> numericValues = new ArrayList<>();
 
-                for(var i : aggs.get("numeric_values").range().buckets().array()) {
-                    if(i.docCount() > 0) {
+                for(var numericValue : aggs.get("numeric_values").range().buckets().array()) {
+                    if(numericValue.docCount() > 0) {
                         var range = new NumericFilterValue();
 
-                        if(i.from() != null)
-                            range.setFrom(i.from().intValue());
+                        if(numericValue.from() != null)
+                            range.setFrom(numericValue.from().intValue());
 
-                        if(i.to() != null)
-                            range.setTo(i.to().intValue());
+                        if(numericValue.to() != null)
+                            range.setTo(numericValue.to().intValue());
 
                         numericValues.add(range);
                     }
@@ -151,17 +151,17 @@ public class ElasticService {
 
     private List<AggregationRange> getAggregationRanges(Long characteristicId, List<FilterByCharacteristic> filters) {
         List<AggregationRange> ranges = new ArrayList<>();
-        List<FilterByCharacteristic> sameCharacteristicIdFilters = new ArrayList<>();
+        List<FilterByCharacteristic> sameCharacteristicFilters = new ArrayList<>();
 
         for(var filter : filters) {
             if(filter.getCharacteristicId().longValue() == characteristicId) {
-                sameCharacteristicIdFilters.add(filter);
+                sameCharacteristicFilters.add(filter);
             }
         }
 
-        for(var filter : sameCharacteristicIdFilters) {
+        for(var filter : sameCharacteristicFilters) {
             ranges.add(AggregationRange.of(ar -> {
-                String key = "";
+                String key = ""; //todo: probably useless
 
                 if(filter.getFromValue() != null) {
                     ar.from(filter.getFromValue().toString());
@@ -211,10 +211,10 @@ public class ElasticService {
 //            }
 //        } todo: need tests
 
-        if (productSearchRequest.getNumericFilters() != null)
+        if (!productSearchRequest.getNumericFilters().isEmpty())
             filters.addAll(getNumericFilters(productSearchRequest.getNumericFilters()));
 
-        if (productSearchRequest.getTextFilters() != null)
+        if (!productSearchRequest.getTextFilters().isEmpty())
             filters.addAll(getTextFilters(productSearchRequest.getTextFilters()));
 
         SearchRequest searchRequest = getSearchRequest(productSearchRequest,
@@ -301,7 +301,7 @@ public class ElasticService {
 
     private BoolQuery getSearchQuery(List<Query> filters, String fullTextSearch) {
         return BoolQuery.of(b -> {
-            if (filters != null && !filters.isEmpty())
+            if (!filters.isEmpty())
                 b.filter(filters);
 
             if(fullTextSearch == null || fullTextSearch.isBlank()) {
@@ -333,7 +333,7 @@ public class ElasticService {
                     .query(q -> q.bool(searchQuery))
                     .size((productSearchRequest.getLimit() == 0) ? 20 : productSearchRequest.getLimit());
 
-            if (productSearchRequest.getSearchAfter() != null && !productSearchRequest.getSearchAfter().isEmpty()) {
+            if (!productSearchRequest.getSearchAfter().isEmpty()) {
                 productSearchRequest.getSearchAfter().forEach(val ->
                         sr.searchAfter(sa -> sa.anyValue(JsonData.of(val))));
             }

@@ -8,16 +8,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_EMPTY) //todo: it works?
 public class Filters {
     @JsonProperty("numeric_filters")
-    private List<NumericFilter> numericFilters;
+    //@JsonInclude(JsonInclude.Include.NON_EMPTY) todo: check for errors if list will be initialized
+    private List<NumericFilter> numericFilters = new ArrayList<>();
 
     @JsonProperty("text_filters")
-    private List<TextFilter> textFilters;
+    private List<TextFilter> textFilters = new ArrayList<>();
 }

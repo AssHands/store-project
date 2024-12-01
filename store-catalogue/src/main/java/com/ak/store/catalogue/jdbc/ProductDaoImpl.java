@@ -8,11 +8,17 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CharacteristicByCategory;
 import com.ak.store.catalogue.model.entity.FilterByCharacteristic;
 import com.ak.store.catalogue.model.entity.Product;
+import com.ak.store.common.dto.catalogue.others.CharacteristicsWriteDTO;
+import com.ak.store.common.dto.catalogue.others.nested.NumericCharacteristic;
+import com.ak.store.common.dto.catalogue.others.nested.TextCharacteristic;
+import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
 import com.ak.store.common.dto.search.nested.Sort;
+import com.ak.store.common.payload.product.ProductWritePayload;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Map;
 
@@ -48,10 +54,7 @@ import java.util.Map;
         String query = "DELETE FROM product WHERE id=?";
         int amountDeleted = namedJdbcTemplate.update(query, Map.of("id", id));
 
-        if(amountDeleted != 0)
-            return true;
-
-        return false;
+        return amountDeleted != 0;
     }
 
     @Override
@@ -65,7 +68,6 @@ import java.util.Map;
             default -> query += "ORDER BY price";
             //default -> query += "ORDER BY amount_sales DESC"; //POPULAR todo
         }
-
         System.out.println(query);
 
         return namedJdbcTemplate.query(query, Map.of("ids", ids),
@@ -87,7 +89,6 @@ import java.util.Map;
                        WHERE cc.category_id=:categoryId
                        ORDER BY f.from_value
                        """;
-
         System.out.println(query);
 
         return namedJdbcTemplate.query(query, Map.of("categoryId", categoryId),
@@ -122,11 +123,75 @@ import java.util.Map;
                        JOIN characteristic c
                        ON c.id = cc.characteristic_id
                        WHERE cc.category_id=:categoryId
-                       """;
-
+                      """;
         System.out.println(query);
 
         return namedJdbcTemplate.query(query, Map.of("categoryId", categoryId),
                 new CharacteristicByCategoryDaoMapper());
+    }
+
+    @Override
+    @Transactional //todo: check how it works
+    public boolean createOne(ProductWritePayload productPayload) {
+        Long id = createProduct(productPayload.getProductWriteDTO());
+        createProductCharacteristics(id, productPayload.getCharacteristicsWriteDTO());
+
+        return true;
+    }
+
+    private Long createProduct(ProductWriteDTO productDTO) {
+        String queryCreateProduct = """
+                       INSERT INTO product (title, description, price, category_id)
+                       VALUES(:title, :description, :price, :categoryId)
+                       RETURNING id
+                       """;
+        System.out.println(queryCreateProduct);
+
+        return namedJdbcTemplate.queryForObject(queryCreateProduct,
+                Map.of("title", productDTO.getTitle(),
+                        "description", productDTO.getDescription(),
+                        "price", productDTO.getPrice(),
+                        "categoryId", productDTO.getCategoryId()),
+                Long.class);
+    }
+
+    private void createProductCharacteristics(Long productId, CharacteristicsWriteDTO characteristicsDTO) {
+        String queryCharacteristic = """
+                        INSERT INTO product_characteristic (product_id, characteristic_id, text_value, numeric_value)
+                        VALUES (:productId, :characteristicId,
+                                CASE WHEN :isText THEN :value ELSE NULL END,
+                                CASE WHEN :isNumeric THEN CAST(:value AS INTEGER) ELSE NULL END)
+                        """;
+        System.out.println(queryCharacteristic);
+
+        List<TextCharacteristic> textCharacteristics = characteristicsDTO.getTextCharacteristics();
+        List<NumericCharacteristic> numericCharacteristics = characteristicsDTO.getNumericCharacteristics();
+
+        MapSqlParameterSource[] batchParams =
+                new MapSqlParameterSource[textCharacteristics.size() + numericCharacteristics.size()];
+
+        int index = 0;
+
+        for (TextCharacteristic characteristic : textCharacteristics) {
+            MapSqlParameterSource params = new MapSqlParameterSource();
+            params.addValue("productId", productId);
+            params.addValue("characteristicId", characteristic.getCharacteristicId());
+            params.addValue("isText", true);
+            params.addValue("isNumeric", false);
+            params.addValue("value", characteristic.getValue());
+            batchParams[index++] = params;
+        }
+
+        for (NumericCharacteristic characteristic : numericCharacteristics) {
+            MapSqlParameterSource params = new MapSqlParameterSource();
+            params.addValue("productId", productId);
+            params.addValue("characteristicId", characteristic.getCharacteristicId());
+            params.addValue("isText", false);
+            params.addValue("isNumeric", true);
+            params.addValue("value", characteristic.getValue());
+            batchParams[index++] = params;
+        }
+
+        namedJdbcTemplate.batchUpdate(queryCharacteristic, batchParams);
     }
 }

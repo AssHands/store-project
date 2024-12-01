@@ -1,6 +1,6 @@
-package com.ak.store.common.dto.catalogue;
+package com.ak.store.common.dto.catalogue.product;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,9 +17,10 @@ public class ProductReadDTO {
 
     private Float price;
 
-    @JsonPropertyOrder("category_id")
+    @JsonProperty("category_id")
     private Long categoryId;
 
+    @JsonProperty("amount_reviews")
     private int amountReviews;
 
     private float grade;
