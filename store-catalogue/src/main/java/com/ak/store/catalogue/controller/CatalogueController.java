@@ -11,7 +11,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -45,6 +47,15 @@ public class CatalogueController {
     public ProductWriteDTO createOneProduct(@RequestBody @Valid ProductWritePayload productPayload) {
         System.out.println(productPayload);
         productService.createOne(productPayload);
+        return null;
+    }
+
+    @PatchMapping("products/{id}")
+    public ProductWriteDTO updateOneProduct(@RequestBody @Valid ProductWritePayload productPayload,
+                                            @PathVariable("id") Long productId) {
+
+        System.out.println(productPayload);
+        productService.updateOne(productPayload, productId);
         return null;
     }
 

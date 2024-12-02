@@ -25,4 +25,5 @@ public interface ProductDao {
     List<CharacteristicByCategory> findAllAvailableCharacteristic(Long categoryId);
 
     boolean createOne(ProductWritePayload productPayload);
+    boolean updateOne(ProductWritePayload productPayload, Long productId);
 }

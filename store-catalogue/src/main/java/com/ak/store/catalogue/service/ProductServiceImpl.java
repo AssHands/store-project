@@ -109,6 +109,13 @@ public class ProductServiceImpl implements ProductService {
         return false;
     }
 
+    @Override
+    public boolean updateOne(ProductWritePayload productPayload, Long productId) {
+        productDao.updateOne(productPayload, productId);
+        return true;
+    }
+
+
     private List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) { //todo: move to utils may be?
         Map<Long, CategoryDTO> categoryMap = new HashMap<>();
         List<CategoryDTO> rootCategories = new ArrayList<>();

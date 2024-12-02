@@ -16,4 +16,6 @@ public class Characteristic {
     private Long id;
 
     private String name;
+
+    private boolean isText;
 }
