@@ -1,9 +1,9 @@
 package com.ak.store.catalogue.utils;
 
-import com.ak.store.catalogue.model.entity.ne.Category;
-import com.ak.store.catalogue.model.entity.ne.Characteristic;
-import com.ak.store.catalogue.model.entity.ne.Product;
-import com.ak.store.catalogue.model.entity.ne.TextValue;
+import com.ak.store.catalogue.model.entity.Category;
+import com.ak.store.catalogue.model.entity.Characteristic;
+import com.ak.store.catalogue.model.entity.Product;
+import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.common.dto.catalogue.product.*;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import org.modelmapper.ModelMapper;
@@ -21,10 +21,6 @@ public class CatalogueMapper {
         this.modelMapper = modelMapper;
     }
 
-    public ProductFullReadDTO mapToProductReadDTO(com.ak.store.catalogue.model.entity.Product product) {
-        return modelMapper.map(product, ProductFullReadDTO.class);
-    }
-
     public Product mapToProduct(ProductWritePayload productWritePayload) {
         ProductWriteDTO productWriteDTO = productWritePayload.getProduct();
         Product product = modelMapper.map(productWriteDTO, Product.class);
@@ -37,11 +33,11 @@ public class CatalogueMapper {
         return product;
     }
 
-    public ProductViewReadDTO mapToProductViewReadDTO(com.ak.store.catalogue.model.entity.ne.Product product) {
+    public ProductViewReadDTO mapToProductViewReadDTO(Product product) {
         return modelMapper.map(product, ProductViewReadDTO.class);
     }
 
-    public ProductFullReadDTO mapToProductFullReadDTO(com.ak.store.catalogue.model.entity.ne.Product product) {
+    public ProductFullReadDTO mapToProductFullReadDTO(Product product) {
         return modelMapper.map(product, ProductFullReadDTO.class);
     }
 

@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.utils;
 
-import com.ak.store.catalogue.model.entity.ne.Characteristic;
+import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.common.dto.catalogue.product.CharacteristicWriteDTO;
 import org.springframework.stereotype.Component;
 

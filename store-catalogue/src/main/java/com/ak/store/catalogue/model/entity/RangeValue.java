@@ -3,23 +3,24 @@ package com.ak.store.catalogue.model.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class ProductCharacteristic {
+@NoArgsConstructor
+@Entity
+@EqualsAndHashCode(of = { "fromValue", "toValue" })
+@Table(name = "range_value")
+public class RangeValue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private Product Product;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Characteristic characteristic;
 
-    private String textValue;
+    private Integer fromValue;
 
-    private int numericValue;
+    private Integer toValue;
 }

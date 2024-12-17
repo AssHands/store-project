@@ -1,9 +1,9 @@
 package com.ak.store.catalogue.service;
 
-import com.ak.store.catalogue.model.entity.ne.Category;
-import com.ak.store.catalogue.model.entity.ne.Characteristic;
-import com.ak.store.catalogue.model.entity.ne.Product;
-import com.ak.store.catalogue.model.entity.ne.relation.ProductCharacteristic;
+import com.ak.store.catalogue.model.entity.Category;
+import com.ak.store.catalogue.model.entity.Characteristic;
+import com.ak.store.catalogue.model.entity.Product;
+import com.ak.store.catalogue.model.entity.relation.ProductCharacteristic;
 import com.ak.store.catalogue.repository.*;
 import com.ak.store.catalogue.utils.CatalogueMapper;
 import com.ak.store.catalogue.utils.CatalogueValidator;
@@ -31,7 +31,6 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductDao productDao;
     private final ProductRepo productRepo;
-    private final TextValueRepo textValueRepo;
     private final ElasticService esService;
     private final CatalogueMapper catalogueMapper;
     private final ProductCharacteristicRepo productCharacteristicRepo;
@@ -43,13 +42,12 @@ public class ProductServiceImpl implements ProductService {
     private int BATCH_SIZE;
 
     @Autowired
-    public ProductServiceImpl(ProductDao productDao, ProductRepo productRepo,
-                              TextValueRepo textValueRepo, ElasticService esService, CatalogueMapper catalogueMapper,
-                              ProductCharacteristicRepo productCharacteristicRepo, CharacteristicRepo characteristicRepo,
-                              CategoryRepo categoryRepo, CatalogueValidator catalogueValidator) {
+    public ProductServiceImpl(ProductDao productDao, ProductRepo productRepo, ElasticService esService,
+                              CatalogueMapper catalogueMapper, ProductCharacteristicRepo productCharacteristicRepo,
+                              CharacteristicRepo characteristicRepo, CategoryRepo categoryRepo,
+                              CatalogueValidator catalogueValidator) {
         this.productDao = productDao;
         this.productRepo = productRepo;
-        this.textValueRepo = textValueRepo;
         this.esService = esService;
         this.catalogueMapper = catalogueMapper;
         this.productCharacteristicRepo = productCharacteristicRepo;
@@ -60,12 +58,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductFullReadDTO findOneById(Long id) {
-        return null;
+        return catalogueMapper.mapToProductFullReadDTO(
+                productRepo.findById(id).orElseThrow(() -> new RuntimeException("Not found")));
     }
 
     @Override
     public boolean deleteOneById(Long id) {
-        return false;
+        productRepo.deleteById(id);
+        return true;
     }
 
     @Override
@@ -79,9 +79,8 @@ public class ProductServiceImpl implements ProductService {
         ProductSearchResponse productSearchResponse = new ProductSearchResponse();
 
         productSearchResponse.setContent(
-                productDao.findAllByIds(elasticSearchResult.getIds(), productSearchRequest.getSort())
-                        .stream()
-                        .map(catalogueMapper::mapToProductReadDTO)
+                 productRepo.findAllViewByIdIn(elasticSearchResult.getIds()).stream() //todo: make SORT
+                        .map(catalogueMapper::mapToProductViewReadDTO)
                         .toList());
 
         productSearchResponse.setSearchAfter(elasticSearchResult.getSearchAfter());

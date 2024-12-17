@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.model.entity;
+package com.ak.store.catalogue.model.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

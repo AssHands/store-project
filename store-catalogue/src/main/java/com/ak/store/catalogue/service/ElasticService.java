@@ -13,7 +13,8 @@ import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
 import com.ak.store.catalogue.jdbc.ProductDao;
 import com.ak.store.catalogue.model.document.ProductDocument;
-import com.ak.store.catalogue.model.entity.FilterByCharacteristic;
+import com.ak.store.catalogue.model.entity.Characteristic;
+import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
 import com.ak.store.common.dto.search.nested.NumericFilterValue;
@@ -32,12 +33,14 @@ import java.util.*;
 public class ElasticService {
 
     private final ElasticsearchClient esClient;
-    private final ProductDao productDao; //todo: move to main service
+    private final ProductDao productDao;
+    private final CharacteristicRepo characteristicRepo;
 
     @Autowired
-    public ElasticService(ElasticsearchClient esClient, ProductDao productDao) {
+    public ElasticService(ElasticsearchClient esClient, ProductDao productDao, CharacteristicRepo characteristicRepo) {
         this.esClient = esClient;
         this.productDao = productDao;
+        this.characteristicRepo = characteristicRepo;
     }
 
     public AvailableFiltersResponse searchAvailableFilters(SearchAvailableFilters searchAvailableFilters) {
@@ -111,67 +114,61 @@ public class ElasticService {
     }
 
     private Map<String, Aggregation> getAggregations(Long categoryId) {
-        List<FilterByCharacteristic> filters = productDao.findAllCharacteristicFilters(categoryId);
+        List<Characteristic> filters = characteristicRepo.findAllValuesByCategoryId(categoryId);
+
         Map<String, Aggregation> aggs = new HashMap<>();
 
         for(var filter : filters) {
-            if(filter.getTextValue() != null) {
-                aggs.put(filter.getCharacteristicId() + "__" + filter.getName(),
+            if(!filter.getTextValues().isEmpty()) {
+                aggs.put(filter.getId() + "__" + filter.getName(),
                         Aggregation.of(a -> a
                                 .nested(n -> n.path("characteristics"))
                                 .aggregations("filtered_aggregation", fa -> fa
                                         .filter(f -> f
                                                 .term(t -> t
                                                         .field("characteristics.characteristic_id")
-                                                        .value(filter.getCharacteristicId().toString())))
+                                                        .value(filter.getId().toString())))
                                         .aggregations("text_values", va -> va
                                                 .terms(t -> t
                                                         .field("characteristics.text_value")
                                                         .size(20)
                                                         .order(NamedValue.of("_key", SortOrder.Asc)))))));
 
-            } else {
-                aggs.put(filter.getCharacteristicId() + "__" + filter.getName(),
+            } else if(!filter.getRangeValues().isEmpty()) {
+                aggs.put(filter.getId() + "__" + filter.getName(),
                         Aggregation.of(a -> a
                                 .nested(n -> n.path("characteristics"))
                                 .aggregations("filtered_aggregation", fa -> fa
                                         .filter(f -> f
                                                 .term(t -> t
                                                         .field("characteristics.characteristic_id")
-                                                        .value(filter.getCharacteristicId().toString())))
+                                                        .value(filter.getId().toString())))
                                         .aggregations("numeric_values", va -> va
                                                 .range(r -> r
                                                         .field("characteristics.numeric_value")
-                                                        .ranges(getAggregationRanges(filter.getCharacteristicId(), filters)))))));
+                                                        .ranges(getAggregationRanges(filter)))))));
             }
         }
 
         return aggs;
     }
 
-    private List<AggregationRange> getAggregationRanges(Long characteristicId, List<FilterByCharacteristic> filters) {
+    private List<AggregationRange> getAggregationRanges(Characteristic filter) {
         List<AggregationRange> ranges = new ArrayList<>();
-        List<FilterByCharacteristic> sameCharacteristicFilters = new ArrayList<>();
 
-        for(var filter : filters) {
-            if(filter.getCharacteristicId().longValue() == characteristicId) {
-                sameCharacteristicFilters.add(filter);
-            }
-        }
-
-        for(var filter : sameCharacteristicFilters) {
+        for(var rangeValue : filter.getRangeValues()) {
             ranges.add(AggregationRange.of(ar -> {
                 String key = ""; //todo: probably useless
 
-                if(filter.getFromValue() != null) {
-                    ar.from(filter.getFromValue().toString());
-                    key += filter.getFromValue();
+                if(rangeValue.getFromValue() != null) {
+                    ar.from(rangeValue.getFromValue().toString());
+                    key += rangeValue.getFromValue();
                 } else
                     key += "*";
 
-                if(filter.getToValue() != null)  {
-                    ar.to(filter.getToValue().toString());
-                    key += "-" + filter.getToValue();
+                if(rangeValue.getToValue() != null)  {
+                    ar.to(rangeValue.getToValue().toString());
+                    key += "-" + rangeValue.getToValue();
                 } else
                     key += "-*";
 
@@ -301,7 +298,7 @@ public class ElasticService {
 
     private BoolQuery getSearchQuery(List<Query> filters, String fullTextSearch) {
         return BoolQuery.of(b -> {
-            if (!filters.isEmpty())
+            if (filters != null && !filters.isEmpty())
                 b.filter(filters);
 
             if(fullTextSearch == null || fullTextSearch.isBlank()) {

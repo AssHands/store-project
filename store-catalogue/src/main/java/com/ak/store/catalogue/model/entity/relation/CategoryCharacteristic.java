@@ -1,7 +1,7 @@
-package com.ak.store.catalogue.model.entity.ne.relation;
+package com.ak.store.catalogue.model.entity.relation;
 
-import com.ak.store.catalogue.model.entity.ne.Category;
-import com.ak.store.catalogue.model.entity.ne.Characteristic;
+import com.ak.store.catalogue.model.entity.Category;
+import com.ak.store.catalogue.model.entity.Characteristic;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

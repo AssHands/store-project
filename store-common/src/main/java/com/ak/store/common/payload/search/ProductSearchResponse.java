@@ -1,6 +1,7 @@
 package com.ak.store.common.payload.search;
 
 import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
+import com.ak.store.common.dto.catalogue.product.ProductViewReadDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -19,5 +20,5 @@ public class ProductSearchResponse {
 
     private List<Object> searchAfter;
 
-    private List<ProductFullReadDTO> content;
+    private List<ProductViewReadDTO> content;
 }

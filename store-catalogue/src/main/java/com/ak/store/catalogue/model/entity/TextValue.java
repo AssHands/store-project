@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.model.entity.ne;
+package com.ak.store.catalogue.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

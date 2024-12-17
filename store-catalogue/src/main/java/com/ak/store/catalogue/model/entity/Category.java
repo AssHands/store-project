@@ -1,6 +1,6 @@
-package com.ak.store.catalogue.model.entity.ne;
+package com.ak.store.catalogue.model.entity;
 
-import com.ak.store.catalogue.model.entity.ne.relation.CategoryCharacteristic;
+import com.ak.store.catalogue.model.entity.relation.CategoryCharacteristic;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

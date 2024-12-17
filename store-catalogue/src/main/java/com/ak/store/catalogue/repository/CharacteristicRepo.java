@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.repository;
 
-import com.ak.store.catalogue.model.entity.ne.Characteristic;
+import com.ak.store.catalogue.model.entity.Characteristic;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
