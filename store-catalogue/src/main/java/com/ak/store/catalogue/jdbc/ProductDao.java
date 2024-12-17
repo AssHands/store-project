@@ -1,7 +1,6 @@
 package com.ak.store.catalogue.jdbc;
 
 import com.ak.store.catalogue.model.entity.*;
-import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
 import com.ak.store.common.dto.search.nested.Sort;
 import com.ak.store.common.payload.product.ProductWritePayload;
 
@@ -18,9 +17,9 @@ public interface ProductDao {
 
     List<FilterByCharacteristic> findAllCharacteristicFilters(Long categoryId);
 
-    List<Category> findAllCategory();
+    List<Categoryy> findAllCategory();
 
-    List<Category> findAllCategoryByName(String name);
+    List<Categoryy> findAllCategoryByName(String name);
 
     List<CharacteristicByCategory> findAllAvailableCharacteristic(Long categoryId);
 

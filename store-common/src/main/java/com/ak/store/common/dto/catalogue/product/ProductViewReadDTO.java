@@ -1,14 +1,20 @@
 package com.ak.store.common.dto.catalogue.product;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductReadDTO {
+@Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class ProductViewReadDTO {
     private Long id;
 
     private String title;
@@ -17,10 +23,6 @@ public class ProductReadDTO {
 
     private Float price;
 
-    @JsonProperty("category_id")
-    private Long categoryId;
-
-    @JsonProperty("amount_reviews")
     private int amountReviews;
 
     private float grade;

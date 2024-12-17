@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "category")
-public class Category {
+public class Categoryy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

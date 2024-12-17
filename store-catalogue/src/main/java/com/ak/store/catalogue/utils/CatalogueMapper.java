@@ -1,19 +1,16 @@
 package com.ak.store.catalogue.utils;
 
-import com.ak.store.catalogue.model.entity.Category;
-import com.ak.store.catalogue.model.entity.CharacteristicByCategory;
-import com.ak.store.catalogue.model.entity.Product;
-import com.ak.store.common.dto.catalogue.others.AvailableCharacteristicDTO;
-import com.ak.store.common.dto.catalogue.others.CategoryDTO;
-import com.ak.store.common.dto.catalogue.product.ProductReadDTO;
+import com.ak.store.catalogue.model.entity.ne.Category;
+import com.ak.store.catalogue.model.entity.ne.Characteristic;
+import com.ak.store.catalogue.model.entity.ne.Product;
+import com.ak.store.catalogue.model.entity.ne.TextValue;
+import com.ak.store.common.dto.catalogue.product.*;
+import com.ak.store.common.payload.product.ProductWritePayload;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class CatalogueMapper {
@@ -24,36 +21,47 @@ public class CatalogueMapper {
         this.modelMapper = modelMapper;
     }
 
-    public ProductReadDTO mapToProductSearchDTO(Product product) {
-        return modelMapper.map(product, ProductReadDTO.class);
+    public ProductFullReadDTO mapToProductReadDTO(com.ak.store.catalogue.model.entity.Product product) {
+        return modelMapper.map(product, ProductFullReadDTO.class);
+    }
+
+    public Product mapToProduct(ProductWritePayload productWritePayload) {
+        ProductWriteDTO productWriteDTO = productWritePayload.getProduct();
+        Product product = modelMapper.map(productWriteDTO, Product.class);
+        product.setGrade(2);
+        product.setCategory(
+                Category.builder()
+                        .id(productWriteDTO.getCategoryId())
+                        .build());
+
+        return product;
+    }
+
+    public ProductViewReadDTO mapToProductViewReadDTO(com.ak.store.catalogue.model.entity.ne.Product product) {
+        return modelMapper.map(product, ProductViewReadDTO.class);
+    }
+
+    public ProductFullReadDTO mapToProductFullReadDTO(com.ak.store.catalogue.model.entity.ne.Product product) {
+        return modelMapper.map(product, ProductFullReadDTO.class);
+    }
+
+    public AvailableFilterValuesDTO mapToAvailableFilterValuesDTO(Characteristic characteristic) {
+        List<String> textValues = characteristic.getTextValues().stream().map(TextValue::getTextValue).toList();
+        characteristic.setTextValues(null);
+        var characteristicDTO = modelMapper.map(characteristic, AvailableFilterValuesDTO.class);
+        characteristicDTO.setTextValues(textValues);
+        return characteristicDTO;
     }
 
     public CategoryDTO mapToCategoryDTO(Category category) {
         return modelMapper.map(category, CategoryDTO.class);
     }
 
-    public List<AvailableCharacteristicDTO> mapToAvailableCharacteristicDTO(List<CharacteristicByCategory> characteristics) {
-        Map<Long, AvailableCharacteristicDTO> uniqCharacteristics = new HashMap<>();
-
-        for(var characteristic : characteristics) {
-            List<String> textValues = new ArrayList<>();
-
-            if(characteristic.getTextValue() != null) {
-                for(var textCharacteristic : characteristics) {
-                    if(textCharacteristic.getCharacteristicId().equals(characteristic.getCharacteristicId())) {
-                        textValues.add(textCharacteristic.getTextValue());
-                    }
-                }
-                uniqCharacteristics.put(characteristic.getCharacteristicId(),
-                        new AvailableCharacteristicDTO(characteristic.getCharacteristicId(),
-                                characteristic.getName(), textValues));
-
-            } else {
-                uniqCharacteristics.put(characteristic.getCharacteristicId(),
-                        new AvailableCharacteristicDTO(characteristic.getCharacteristicId(), characteristic.getName()));
-            }
-        }
-
-        return new ArrayList<>(uniqCharacteristics.values());
+    public AvailableCharacteristicValuesDTO mapToAvailableCharacteristicValuesDTO(Characteristic characteristic) {
+        List<String> textValues = characteristic.getTextValues().stream().map(TextValue::getTextValue).toList();
+        characteristic.setTextValues(null);
+        var characteristicDTO = modelMapper.map(characteristic, AvailableCharacteristicValuesDTO.class);
+        characteristicDTO.setTextValues(textValues);
+        return characteristicDTO;
     }
 }

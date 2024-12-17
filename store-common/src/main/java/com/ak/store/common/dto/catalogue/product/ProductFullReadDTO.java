@@ -1,23 +1,36 @@
-package com.ak.store.common.payload.search;
+package com.ak.store.common.dto.catalogue.product;
 
-import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductSearchResponse {
+public class ProductFullReadDTO {
+    private Long id;
 
-    private List<Object> searchAfter;
+    private String title;
 
-    private List<ProductFullReadDTO> content;
+    private String description;
+
+    private Float price;
+
+    private int amountReviews;
+
+    private float grade;
+
+    private CategoryDTO category;
+    
+    private List<ProductCharacteristicDTO> characteristics = new ArrayList<>();
 }

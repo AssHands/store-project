@@ -1,9 +1,9 @@
 package com.ak.store.catalogue.service;
 
 
-import com.ak.store.common.dto.catalogue.others.AvailableCharacteristicDTO;
-import com.ak.store.common.dto.catalogue.others.CategoryDTO;
-import com.ak.store.common.dto.catalogue.product.ProductReadDTO;
+import com.ak.store.common.dto.catalogue.product.AvailableCharacteristicValuesDTO;
+import com.ak.store.common.dto.catalogue.product.CategoryDTO;
+import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.AvailableFiltersResponse;
@@ -13,7 +13,7 @@ import com.ak.store.common.payload.search.SearchAvailableFilters;
 import java.util.List;
 
 public interface ProductService {
-    ProductReadDTO findOneById(Long id);
+    ProductFullReadDTO findOneById(Long id);
 
     //ProductDTO updateOneById(Long id, ProductPayload updatedProduct);
 
@@ -27,9 +27,10 @@ public interface ProductService {
 
     List<CategoryDTO> findAllCategory(String name);
 
-    List<AvailableCharacteristicDTO> findAllAvailableCharacteristic(Long categoryId);
+    List<AvailableCharacteristicValuesDTO> findAllAvailableCharacteristic(Long categoryId);
 
-    boolean createOne(ProductWritePayload productPayload);
+    boolean createOneProduct(ProductWritePayload productPayload);
+    boolean createAllProduct(List<ProductWritePayload> productPayloads);
 
-    boolean updateOne(ProductWritePayload productPayload, Long productId);
+    boolean updateOneProduct(ProductWritePayload productPayload, Long productId);
 }

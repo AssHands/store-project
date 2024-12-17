@@ -4,11 +4,10 @@ import com.ak.store.catalogue.jdbc.mapper.CategoryDaoMapper;
 import com.ak.store.catalogue.jdbc.mapper.CharacteristicByCategoryDaoMapper;
 import com.ak.store.catalogue.jdbc.mapper.FilterByCharacteristicDaoMapper;
 import com.ak.store.catalogue.jdbc.mapper.ProductDaoMapper;
-import com.ak.store.catalogue.model.entity.Category;
+import com.ak.store.catalogue.model.entity.Categoryy;
 import com.ak.store.catalogue.model.entity.CharacteristicByCategory;
 import com.ak.store.catalogue.model.entity.FilterByCharacteristic;
-import com.ak.store.catalogue.model.entity.Product;
-import com.ak.store.common.dto.catalogue.others.CharacteristicsWriteDTO;
+import com.ak.store.catalogue.model.entity.Product;;
 import com.ak.store.common.dto.catalogue.others.nested.NumericCharacteristic;
 import com.ak.store.common.dto.catalogue.others.nested.TextCharacteristic;
 import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
@@ -20,13 +19,12 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.LinkOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Component //todo: difference between component and repository annotations
  public class ProductDaoImpl implements ProductDao {
 
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
@@ -37,7 +35,7 @@ import java.util.Map;
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
-    @Override
+
     public Product findOneById(Long id) {
         String query = "SELECT * FROM product WHERE id=:id";
 
@@ -53,7 +51,6 @@ import java.util.Map;
 //        return findOneById(id, ProductDTO.class);
 //    }
 
-    @Override
     public boolean deleteOneById(Long id) {
         String query = "DELETE FROM product WHERE id=?";
         int amountDeleted = namedJdbcTemplate.update(query, Map.of("id", id));
@@ -61,7 +58,7 @@ import java.util.Map;
         return amountDeleted != 0;
     }
 
-    @Override
+
     public List<Product> findAllByIds(List<Long> ids, Sort sort) {
         String query = "SELECT * FROM product WHERE id IN (:ids) ";
 
@@ -79,7 +76,7 @@ import java.util.Map;
     }
 
     //todo: should i create new dao or make all in one?
-    @Override
+
     public List<FilterByCharacteristic> findAllCharacteristicFilters(Long categoryId) {
         String query = """
                        SELECT f.id, f.from_value, f.to_value, f.text_value, cf.characteristic_id, c.name
@@ -99,35 +96,35 @@ import java.util.Map;
                 new FilterByCharacteristicDaoMapper());
     }
 
-    @Override
-    public List<Category> findAllCategory() {
+
+    public List<Categoryy> findAllCategory() {
         String query = "SELECT * FROM category";
 
         System.out.println(query);
         return namedJdbcTemplate.query(query, new CategoryDaoMapper());
     }
 
-    @Override
-    public List<Category> findAllCategoryByName(String name) {
+
+    public List<Categoryy> findAllCategoryByName(String name) {
         String query = "SELECT * FROM category WHERE LOWER(name) LIKE LOWER(CONCAT('%', :name, '%'))";
 
         System.out.println(query);
         return namedJdbcTemplate.query(query, Map.of("name", name), new CategoryDaoMapper());
     }
 
-    @Override
+
     public List<CharacteristicByCategory> findAllAvailableCharacteristic(Long categoryId) {
         String query = """
                        SELECT f.id, f.text_value, cf.characteristic_id, c.name
                        FROM filter f
                        JOIN characteristic_filter cf
-                       ON f.id = cf.filter_id
+                         ON f.id = cf.filter_id
                        JOIN category_characteristic cc
-                       ON cc.characteristic_id = cf.characteristic_id
+                         ON cc.characteristic_id = cf.characteristic_id
                        JOIN characteristic c
-                       ON c.id = cc.characteristic_id
+                         ON c.id = cc.characteristic_id
                        WHERE cc.category_id=:categoryId
-                      """;
+                       """;
 
         System.out.println(query);
         return namedJdbcTemplate.query(query, Map.of("categoryId", categoryId),
@@ -135,23 +132,33 @@ import java.util.Map;
     }
 
     @Override
-    @Transactional //todo: check how it works
     public boolean createOne(ProductWritePayload productPayload) {
-        Long id = createProduct(productPayload.getProductWriteDTO());
-        createProductCharacteristics(productPayload.getCreateCharacteristics(), id);
-
-        return true;
+        return false;
     }
 
     @Override
-    @Transactional
     public boolean updateOne(ProductWritePayload productPayload, Long productId) {
-        updateProduct(productPayload.getProductWriteDTO(), productId);
-        updateProductCharacteristics(productPayload.getUpdateCharacteristics(), productId);
-        deleteProductCharacteristics(productPayload.getDeleteCharacteristics(), productId);
-        createProductCharacteristics(productPayload.getCreateCharacteristics(), productId);
-        return true;
+        return false;
     }
+
+//    @Override
+//    @Transactional //todo: check how it works
+//    public boolean createOne(ProductWritePayload productPayload) {
+//        Long id = createProduct(productPayload.getProduct());
+//        createProductCharacteristics(productPayload.getCreateCharacteristics(), id);
+//
+//        return true;
+//    }
+
+//    @Override
+//    @Transactional
+//    public boolean updateOne(ProductWritePayload productPayload, Long productId) {
+//        updateProduct(productPayload.getProduct(), productId);
+//        updateProductCharacteristics(productPayload.getUpdateCharacteristics(), productId);
+//        deleteProductCharacteristics(productPayload.getDeleteCharacteristics(), productId);
+//        createProductCharacteristics(productPayload.getCreateCharacteristics(), productId);
+//        return true;
+//    }
 
     private void updateProduct(ProductWriteDTO productDTO, Long productId) {
         StringBuilder query = new StringBuilder("UPDATE product SET ");
@@ -188,71 +195,71 @@ import java.util.Map;
         namedJdbcTemplate.update(query.toString(), params);
     }
 
-    private void deleteProductCharacteristics(CharacteristicsWriteDTO characteristicsDTO, Long productId) {
-        String query = """
-                DELETE FROM product_characteristic
-                WHERE product_id = :productId and characteristic_id IN (:ids)
-                """;
-
-        List<Long> ids = new ArrayList<>();
-
-        for (var characteristic : characteristicsDTO.getTextCharacteristics()) {
-            ids.add(characteristic.getCharacteristicId());
-        }
-
-        for (var characteristic : characteristicsDTO.getNumericCharacteristics()) {
-            ids.add(characteristic.getCharacteristicId());
-        }
-
-        if(ids.isEmpty())
-            return;
-
-        System.out.println(query);
-        namedJdbcTemplate.update(query, Map.of("productId", productId, "ids", ids));
-    }
-
-    private void updateProductCharacteristics(CharacteristicsWriteDTO characteristicsDTO, Long productId) {
-        String query = """
-                        UPDATE product_characteristic
-                        SET text_value = CASE WHEN :isText THEN :value ELSE NULL END,
-                        numeric_value = CASE WHEN NOT isText THEN CAST(:value AS INTEGER) ELSE NULL END
-                        WHERE product_id = :productId AND characteristic_id = :characteristicId
-                        """;
-
-        List<TextCharacteristic> textCharacteristics = characteristicsDTO.getTextCharacteristics();
-        List<NumericCharacteristic> numericCharacteristics = characteristicsDTO.getNumericCharacteristics();
-        int batchSize = textCharacteristics.size() + numericCharacteristics.size();
-
-        if(batchSize == 0)
-            return;
-
-        MapSqlParameterSource[] batchParams = new MapSqlParameterSource[batchSize];
-
-        int index = 0;
-
-        for (TextCharacteristic characteristic : textCharacteristics) {
-            MapSqlParameterSource params = new MapSqlParameterSource();
-            params.addValue("productId", productId);
-            params.addValue("characteristicId", characteristic.getCharacteristicId());
-            params.addValue("isText", true);
-            params.addValue("isNumeric", false);
-            params.addValue("value", characteristic.getValue());
-            batchParams[index++] = params;
-        }
-
-        for (NumericCharacteristic characteristic : numericCharacteristics) {
-            MapSqlParameterSource params = new MapSqlParameterSource();
-            params.addValue("productId", productId);
-            params.addValue("characteristicId", characteristic.getCharacteristicId());
-            params.addValue("isText", false);
-            params.addValue("isNumeric", true);
-            params.addValue("value", characteristic.getValue());
-            batchParams[index++] = params;
-        }
-
-        System.out.println(query);
-        namedJdbcTemplate.batchUpdate(query, batchParams);
-    }
+//    private void deleteProductCharacteristics(CharacteristicsWriteDTO characteristicsDTO, Long productId) {
+//        String query = """
+//                DELETE FROM product_characteristic
+//                WHERE product_id = :productId and characteristic_id IN (:ids)
+//                """;
+//
+//        List<Long> ids = new ArrayList<>();
+//
+//        for (var characteristic : characteristicsDTO.getTextCharacteristics()) {
+//            ids.add(characteristic.getCharacteristicId());
+//        }
+//
+//        for (var characteristic : characteristicsDTO.getNumericCharacteristics()) {
+//            ids.add(characteristic.getCharacteristicId());
+//        }
+//
+//        if(ids.isEmpty())
+//            return;
+//
+//        System.out.println(query);
+//        namedJdbcTemplate.update(query, Map.of("productId", productId, "ids", ids));
+//    }
+//
+//    private void updateProductCharacteristics(CharacteristicsWriteDTO characteristicsDTO, Long productId) {
+//        String query = """
+//                        UPDATE product_characteristic
+//                        SET text_value = CASE WHEN :isText THEN :value ELSE NULL END,
+//                        numeric_value = CASE WHEN NOT isText THEN CAST(:value AS INTEGER) ELSE NULL END
+//                        WHERE product_id = :productId AND characteristic_id = :characteristicId
+//                        """;
+//
+//        List<TextCharacteristic> textCharacteristics = characteristicsDTO.getTextCharacteristics();
+//        List<NumericCharacteristic> numericCharacteristics = characteristicsDTO.getNumericCharacteristics();
+//        int batchSize = textCharacteristics.size() + numericCharacteristics.size();
+//
+//        if(batchSize == 0)
+//            return;
+//
+//        MapSqlParameterSource[] batchParams = new MapSqlParameterSource[batchSize];
+//
+//        int index = 0;
+//
+//        for (TextCharacteristic characteristic : textCharacteristics) {
+//            MapSqlParameterSource params = new MapSqlParameterSource();
+//            params.addValue("productId", productId);
+//            params.addValue("characteristicId", characteristic.getCharacteristicId());
+//            params.addValue("isText", true);
+//            params.addValue("isNumeric", false);
+//            params.addValue("value", characteristic.getValue());
+//            batchParams[index++] = params;
+//        }
+//
+//        for (NumericCharacteristic characteristic : numericCharacteristics) {
+//            MapSqlParameterSource params = new MapSqlParameterSource();
+//            params.addValue("productId", productId);
+//            params.addValue("characteristicId", characteristic.getCharacteristicId());
+//            params.addValue("isText", false);
+//            params.addValue("isNumeric", true);
+//            params.addValue("value", characteristic.getValue());
+//            batchParams[index++] = params;
+//        }
+//
+//        System.out.println(query);
+//        namedJdbcTemplate.batchUpdate(query, batchParams);
+//    }
 
     private Long createProduct(ProductWriteDTO productDTO) {
         String query = """
@@ -270,46 +277,46 @@ import java.util.Map;
                 Long.class);
     }
 
-    private void createProductCharacteristics(CharacteristicsWriteDTO characteristicsDTO, Long productId) {
-        String query = """
-                        INSERT INTO product_characteristic (product_id, characteristic_id, text_value, numeric_value)
-                        VALUES (:productId, :characteristicId,
-                                CASE WHEN :isText THEN :value ELSE NULL END,
-                                CASE WHEN :isNumeric THEN CAST(:value AS INTEGER) ELSE NULL END)
-                        """;
-
-        List<TextCharacteristic> textCharacteristics = characteristicsDTO.getTextCharacteristics();
-        List<NumericCharacteristic> numericCharacteristics = characteristicsDTO.getNumericCharacteristics();
-        int batchSize = textCharacteristics.size() + numericCharacteristics.size();
-
-        if(batchSize == 0)
-            return;
-
-        MapSqlParameterSource[] batchParams = new MapSqlParameterSource[batchSize];
-
-        int index = 0;
-
-        for (TextCharacteristic characteristic : textCharacteristics) {
-            MapSqlParameterSource params = new MapSqlParameterSource();
-            params.addValue("productId", productId);
-            params.addValue("characteristicId", characteristic.getCharacteristicId());
-            params.addValue("isText", true);
-            params.addValue("isNumeric", false);
-            params.addValue("value", characteristic.getValue());
-            batchParams[index++] = params;
-        }
-
-        for (NumericCharacteristic characteristic : numericCharacteristics) {
-            MapSqlParameterSource params = new MapSqlParameterSource();
-            params.addValue("productId", productId);
-            params.addValue("characteristicId", characteristic.getCharacteristicId());
-            params.addValue("isText", false);
-            params.addValue("isNumeric", true);
-            params.addValue("value", characteristic.getValue());
-            batchParams[index++] = params;
-        }
-
-        System.out.println(query);
-        namedJdbcTemplate.batchUpdate(query, batchParams);
-    }
+//    private void createProductCharacteristics(CharacteristicsWriteDTO characteristicsDTO, Long productId) {
+//        String query = """
+//                        INSERT INTO product_characteristic (product_id, characteristic_id, text_value, numeric_value)
+//                        VALUES (:productId, :characteristicId,
+//                                CASE WHEN :isText THEN :value ELSE NULL END,
+//                                CASE WHEN :isNumeric THEN CAST(:value AS INTEGER) ELSE NULL END)
+//                        """;
+//
+//        List<TextCharacteristic> textCharacteristics = characteristicsDTO.getTextCharacteristics();
+//        List<NumericCharacteristic> numericCharacteristics = characteristicsDTO.getNumericCharacteristics();
+//        int batchSize = textCharacteristics.size() + numericCharacteristics.size();
+//
+//        if(batchSize == 0)
+//            return;
+//
+//        MapSqlParameterSource[] batchParams = new MapSqlParameterSource[batchSize];
+//
+//        int index = 0;
+//
+//        for (TextCharacteristic characteristic : textCharacteristics) {
+//            MapSqlParameterSource params = new MapSqlParameterSource();
+//            params.addValue("productId", productId);
+//            params.addValue("characteristicId", characteristic.getCharacteristicId());
+//            params.addValue("isText", true);
+//            params.addValue("isNumeric", false);
+//            params.addValue("value", characteristic.getValue());
+//            batchParams[index++] = params;
+//        }
+//
+//        for (NumericCharacteristic characteristic : numericCharacteristics) {
+//            MapSqlParameterSource params = new MapSqlParameterSource();
+//            params.addValue("productId", productId);
+//            params.addValue("characteristicId", characteristic.getCharacteristicId());
+//            params.addValue("isText", false);
+//            params.addValue("isNumeric", true);
+//            params.addValue("value", characteristic.getValue());
+//            batchParams[index++] = params;
+//        }
+//
+//        System.out.println(query);
+//        namedJdbcTemplate.batchUpdate(query, batchParams);
+//    }
 }

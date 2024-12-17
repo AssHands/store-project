@@ -10,10 +10,6 @@ public class CharacteristicByCategoryDaoMapper implements RowMapper<Characterist
 
     @Override
     public CharacteristicByCategory mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new CharacteristicByCategory(
-                rs.getLong("id"),
-                rs.getLong("characteristic_id"),
-                rs.getString("name"),
-                rs.getString("text_value"));
+        return null;
     }
 }

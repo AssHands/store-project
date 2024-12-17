@@ -1,28 +1,27 @@
 package com.ak.store.common.dto.catalogue.product;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductWriteDTO {
-    @NotNull
-    @NotBlank
+    private Long id;
+
     private String title;
 
-    @NotNull
-    @NotBlank
     private String description;
 
-    @NotNull
     private Float price;
 
-    @JsonProperty("category_id")
-    @NotNull
     private Long categoryId;
 }

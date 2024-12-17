@@ -1,10 +1,8 @@
-package com.ak.store.common.dto.search.nested;
+package com.ak.store.common.dto.catalogue.product;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,13 +12,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class NumericFilterValue {
+public class ProductCharacteristicDTO {
+    private Long characteristicId;
 
-    @Min(0)
-    @JsonProperty(required = true)
-    private Integer from;
+    private String characteristicName;
 
-    @Min(0)
-    @JsonProperty(required = true)
-    private Integer to;
+    private Integer numericValue;
+
+    private String textValue;
 }

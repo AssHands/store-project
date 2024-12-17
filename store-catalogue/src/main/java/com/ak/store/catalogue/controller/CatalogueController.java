@@ -1,19 +1,19 @@
 package com.ak.store.catalogue.controller;
 
-import com.ak.store.common.dto.catalogue.others.AvailableCharacteristicDTO;
-import com.ak.store.common.dto.catalogue.others.CategoryDTO;
-import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
-import com.ak.store.common.dto.catalogue.product.ProductReadDTO;
+import com.ak.store.catalogue.repository.CategoryRepo;
+import com.ak.store.catalogue.repository.CharacteristicRepo;
+import com.ak.store.catalogue.repository.ProductRepo;
+import com.ak.store.catalogue.utils.CatalogueMapper;
+import com.ak.store.common.dto.catalogue.product.AvailableCharacteristicValuesDTO;
+import com.ak.store.common.dto.catalogue.product.*;
 import com.ak.store.catalogue.service.ProductService;
-import com.ak.store.catalogue.utils.ProductValidator;
+import com.ak.store.catalogue.utils.CatalogueValidator;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @RestController
@@ -21,17 +21,26 @@ import java.util.Map;
 public class CatalogueController {
 
     private final ProductService productService;
-    private final ProductValidator productValidator;
+    private final CatalogueValidator catalogueValidator;
+    private final ProductRepo productRepo;
+    private final CategoryRepo categoryRepo;
+    private final CharacteristicRepo characteristicRepo;
+
+    private final CatalogueMapper catalogueMapper;
 
 
     @Autowired
-    public CatalogueController(ProductService userService, ProductValidator productValidator) {
+    public CatalogueController(ProductService userService, CatalogueValidator catalogueValidator, ProductRepo productRepo, CategoryRepo categoryRepo, CharacteristicRepo characteristicRepo, CatalogueMapper catalogueMapper) {
         this.productService = userService;
-        this.productValidator = productValidator;
+        this.catalogueValidator = catalogueValidator;
+        this.productRepo = productRepo;
+        this.categoryRepo = categoryRepo;
+        this.characteristicRepo = characteristicRepo;
+        this.catalogueMapper = catalogueMapper;
     }
 
     @GetMapping("products/{id}")
-    public ProductReadDTO getOneProductById(@PathVariable("id") Long id) {
+    public ProductFullReadDTO getOneProductById(@PathVariable("id") Long id) {
         return productService.findOneById(id);
     }
 
@@ -45,17 +54,19 @@ public class CatalogueController {
 
     @PostMapping("products")
     public ProductWriteDTO createOneProduct(@RequestBody @Valid ProductWritePayload productPayload) {
-        System.out.println(productPayload);
-        productService.createOne(productPayload);
+        productService.createOneProduct(productPayload);
+        return null;
+    }
+    @PostMapping("products/t")
+    public ProductWriteDTO createAllProduct(@RequestBody @Valid List<ProductWritePayload> productPayloads) {
+        productService.createAllProduct(productPayloads);
         return null;
     }
 
     @PatchMapping("products/{id}")
     public ProductWriteDTO updateOneProduct(@RequestBody @Valid ProductWritePayload productPayload,
                                             @PathVariable("id") Long productId) {
-
-        System.out.println(productPayload);
-        productService.updateOne(productPayload, productId);
+        productService.updateOneProduct(productPayload, productId);
         return null;
     }
 
@@ -68,7 +79,22 @@ public class CatalogueController {
     }
 
     @GetMapping("characteristics")
-    public List<AvailableCharacteristicDTO> getAllAvailableCharacteristic(@RequestParam Long categoryId) {
+    public List<AvailableCharacteristicValuesDTO> getAllAvailableCharacteristic(@RequestParam Long categoryId) {
         return productService.findAllAvailableCharacteristic(categoryId);
+    }
+
+    @GetMapping("test")
+    public Object test() {
+        var a = productRepo.findAll().stream().map(catalogueMapper::mapToProductFullReadDTO).toList();
+
+        return a;
+    }
+
+    @GetMapping("testy")
+    public Object testy() {
+        //var a = productRepo.findAllById(List.of(2L, 26L, 31L, 0L)).stream().map(catalogueMapper::mapToProductViewReadDTO);
+        var a = characteristicRepo.findAllValuesByCategoryId(2L).stream().map(catalogueMapper::mapToAvailableFilterValuesDTO).toList();
+
+        return a;
     }
 }

@@ -1,27 +1,28 @@
 package com.ak.store.common.payload.product;
 
-import com.ak.store.common.dto.catalogue.others.CharacteristicsWriteDTO;
+import com.ak.store.common.dto.catalogue.product.CharacteristicWriteDTO;
 import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductWritePayload {
-    @JsonProperty("product")
-    ProductWriteDTO productWriteDTO = new ProductWriteDTO();
+    ProductWriteDTO product = new ProductWriteDTO();
 
-    @JsonProperty("create_characteristics")
-    CharacteristicsWriteDTO createCharacteristics = new CharacteristicsWriteDTO();
+    List<CharacteristicWriteDTO> createCharacteristics = new ArrayList<>();
 
-    @JsonProperty("update_characteristics")
-    CharacteristicsWriteDTO updateCharacteristics = new CharacteristicsWriteDTO();
+    List<CharacteristicWriteDTO> updateCharacteristics = new ArrayList<>();
 
-    @JsonProperty("delete_characteristics")
-    CharacteristicsWriteDTO deleteCharacteristics = new CharacteristicsWriteDTO();
+    List<CharacteristicWriteDTO> deleteCharacteristics = new ArrayList<>();
 }
