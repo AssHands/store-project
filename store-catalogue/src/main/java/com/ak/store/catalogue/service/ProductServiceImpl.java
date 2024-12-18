@@ -226,8 +226,7 @@ public class ProductServiceImpl implements ProductService {
                     .map(pc -> pc.getCharacteristic().getId())
                     .toList();
 
-            List<Long> creatingCharacteristicIds =
-                    updatedCharacteristics.stream()
+            List<Long> creatingCharacteristicIds = updatedCharacteristics.stream()
                             .map(CharacteristicWriteDTO::getId)
                             .toList();
 
