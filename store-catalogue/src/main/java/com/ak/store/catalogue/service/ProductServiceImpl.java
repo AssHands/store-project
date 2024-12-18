@@ -7,10 +7,7 @@ import com.ak.store.catalogue.model.entity.relation.ProductCharacteristic;
 import com.ak.store.catalogue.repository.*;
 import com.ak.store.catalogue.utils.CatalogueMapper;
 import com.ak.store.catalogue.utils.CatalogueValidator;
-import com.ak.store.common.dto.catalogue.product.AvailableCharacteristicValuesDTO;
-import com.ak.store.common.dto.catalogue.product.CategoryDTO;
-import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
-import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
+import com.ak.store.common.dto.catalogue.product.*;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.AvailableFiltersResponse;
@@ -18,9 +15,11 @@ import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.catalogue.jdbc.ProductDao;
 import com.ak.store.common.payload.search.SearchAvailableFilters;
+import jakarta.persistence.Transient;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -118,51 +117,52 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public boolean createOneProduct(ProductWritePayload productPayload) {
-        Product createdProduct = catalogueMapper.mapToProduct(productPayload);
+    public void createOneProduct(ProductWritePayload productPayload) {
+        if(productPayload.getProduct().getCategoryId() == null) {
+            throw new RuntimeException("category_id is null");
+        }
 
-        List<Characteristic> availableCharacteristics =
-                characteristicRepo.findTextValuesByCategoryId(createdProduct.getCategory().getId());
-        createProductCharacteristics(createdProduct, productPayload, availableCharacteristics);
+        Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
+
+        catalogueValidator.validateCharacteristics(productPayload.getCreateCharacteristics(), createdProduct.getCategory().getId());
+
+        List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
+        createProductCharacteristics(createdProduct, productCharacteristics,
+                productPayload.getCreateCharacteristics(), true);
 
         productRepo.save(createdProduct);
-        return false;
+        productCharacteristicRepo.saveAll(productCharacteristics);
     }
 
     @Override
     @Transactional
-    public boolean createAllProduct(List<ProductWritePayload> productPayloads) {
+    public void createAllProduct(List<ProductWritePayload> productPayloads) {
         List<Product> products = new ArrayList<>();
+        List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
         for(var payload : productPayloads) {
-            Product createdProduct = catalogueMapper.mapToProduct(payload);
-
-            List<Characteristic> availableCharacteristics =
-                    characteristicRepo.findTextValuesByCategoryId(createdProduct.getCategory().getId());
-            createProductCharacteristics(createdProduct, payload, availableCharacteristics);
-
-            products.add(createdProduct);
-        }
-
-        int fromIndex = 0;
-        for (int i = 0; i < productPayloads.size(); i++) {
-            if(i % (BATCH_SIZE - 1) == 0 && i != 0) {
-                productRepo.saveAllAndFlush(products.subList(fromIndex, i));
-                fromIndex = i;
+            if(payload.getProduct().getCategoryId() == null) {
+                throw new RuntimeException("category_id is null");
             }
+
+            Product createdProduct = catalogueMapper.mapToProduct(payload.getProduct());
+            products.add(createdProduct);
+
+            catalogueValidator.validateCharacteristics(
+                    payload.getCreateCharacteristics(), createdProduct.getCategory().getId());
+
+            createProductCharacteristics(createdProduct, productCharacteristics,
+                    payload.getCreateCharacteristics(), true);
         }
 
-        if(fromIndex + 1 != productPayloads.size() || productPayloads.size() == 1)
-            productRepo.saveAllAndFlush(products.subList(fromIndex, products.size()));
-
-        return true;
+        productRepo.saveAll(products);
+        productCharacteristicRepo.saveAll(productCharacteristics);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public boolean updateOneProduct(ProductWritePayload productPayload, Long productId) {
         Product updatedProduct = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Not found"));
         ProductWriteDTO productDTO = productPayload.getProduct();
-
 
         if(productDTO.getTitle() != null) {
             updatedProduct.setTitle(productDTO.getTitle());
@@ -188,95 +188,28 @@ public class ProductServiceImpl implements ProductService {
             updatedProduct.getCharacteristics().clear();
         }
 
-        List<Characteristic> availableCharacteristics = new ArrayList<>();
-
-        if(!productPayload.getCreateCharacteristics().isEmpty()
-                || (!productPayload.getUpdateCharacteristics().isEmpty() && !isNewCategory)) {
-            availableCharacteristics = characteristicRepo.findTextValuesByCategoryId(updatedProduct.getCategory().getId());
-        }
+        List<ProductCharacteristic> productCharacteristics = updatedProduct.getCharacteristics();
 
         if(!productPayload.getCreateCharacteristics().isEmpty()) {
-            createProductCharacteristics(updatedProduct, productPayload, availableCharacteristics);
+            createProductCharacteristics(updatedProduct, productCharacteristics,
+                    productPayload.getCreateCharacteristics(), isNewCategory);
         }
 
         if(!productPayload.getUpdateCharacteristics().isEmpty() && !isNewCategory) {
-            updateProductCharacteristics(updatedProduct, productPayload, availableCharacteristics);
+            updateProductCharacteristics(updatedProduct, productCharacteristics,
+                    productPayload.getUpdateCharacteristics());
         }
 
         if(!productPayload.getDeleteCharacteristics().isEmpty() && !isNewCategory) {
-            deleteProductCharacteristics(updatedProduct, productPayload);
+            deleteProductCharacteristics(productCharacteristics, productPayload.getDeleteCharacteristics());
         }
 
         productRepo.save(updatedProduct);
+        productCharacteristicRepo.saveAll(productCharacteristics);
         return true;
     }
 
-    private void createProductCharacteristics(Product product, ProductWritePayload productPayload,
-                                              List<Characteristic> availableCharacteristics) {
-        List<ProductCharacteristic> createdCharacteristics = new ArrayList<>();
-        for(var characteristic : productPayload.getCreateCharacteristics()) {
-            int index = findCharacteristicIndex(availableCharacteristics, characteristic.getCharacteristicId());
-            int productCharacteristicIndex = findProductCharacteristicIndex(
-                    product.getCharacteristics(), characteristic.getCharacteristicId());
-
-            if(productCharacteristicIndex != -1) {
-                throw new RuntimeException("Characteristic with id=%s already exists"
-                        .formatted(characteristic.getCharacteristicId()));
-            }
-
-            if(index == -1) {
-                throw new RuntimeException("Characteristic with id=%s is not available"
-                        .formatted(characteristic.getCharacteristicId()));
-            }
-
-            catalogueValidator.validateCharacteristic(availableCharacteristics.get(index), characteristic);
-
-            createdCharacteristics.add(
-                    ProductCharacteristic.builder()
-                            .product(product)
-                            .characteristic(
-                                    Characteristic.builder()
-                                            .id(characteristic.getCharacteristicId())
-                                            .build())
-                            .numericValue(characteristic.getNumericValue())
-                            .textValue(characteristic.getTextValue())
-                            .build());
-        }
-
-        product.addCharacteristics(createdCharacteristics);
-    }
-
-    private void updateProductCharacteristics(Product product, ProductWritePayload productPayload,
-                                              List<Characteristic> availableCharacteristics) {
-        for(var characteristic : productPayload.getUpdateCharacteristics()) {
-            int updatedIndex = findProductCharacteristicIndex(product.getCharacteristics(), characteristic.getCharacteristicId());
-            int availableIndex = findCharacteristicIndex(availableCharacteristics, characteristic.getCharacteristicId());
-
-            catalogueValidator.validateCharacteristic(availableCharacteristics.get(availableIndex), characteristic);
-            if(updatedIndex == -1) {
-                throw new RuntimeException("Characteristic for update with id=%s doesn't exist"
-                        .formatted(characteristic.getCharacteristicId()));
-            }
-
-            product.getCharacteristics().get(updatedIndex).setTextValue(characteristic.getTextValue());
-            product.getCharacteristics().get(updatedIndex).setNumericValue(characteristic.getNumericValue());
-
-        }
-    }
-
-    private void deleteProductCharacteristics(Product product, ProductWritePayload productPayload) {
-        for(var characteristic : productPayload.getDeleteCharacteristics()) {
-            int index = findProductCharacteristicIndex(product.getCharacteristics(), characteristic.getCharacteristicId());
-            if (index == -1) {
-                throw new RuntimeException("Characteristic for delete with id=%s doesn't exist"
-                        .formatted(characteristic.getCharacteristicId()));
-            }
-
-            product.getCharacteristics().remove(index);
-        }
-    }
-
-    private int findProductCharacteristicIndex(List<ProductCharacteristic> characteristics, Long id) {
+    private int findCharacteristicIndexById(List<ProductCharacteristic> characteristics, Long id) {
         for (int i = 0; i < characteristics.size(); i++) {
             if(characteristics.get(i).getCharacteristic().getId().equals(id))
                 return i;
@@ -284,12 +217,57 @@ public class ProductServiceImpl implements ProductService {
         return -1;
     }
 
-    private int findCharacteristicIndex(List<Characteristic> availableList,Long characteristicId) {
-        for(int i = 0; i < availableList.size(); i++) {
-            if(availableList.get(i).getId().equals(characteristicId))
-                return i;
+    private void createProductCharacteristics(Product updatedProduct, List<ProductCharacteristic> productCharacteristics,
+                                              Set<CharacteristicWriteDTO> updatedCharacteristics, boolean isNewCategory) {
+        catalogueValidator.validateCharacteristics(updatedCharacteristics, updatedProduct.getCategory().getId());
+
+        if(!isNewCategory) {
+            List<Long> existingCharacteristicIds = new ArrayList<>();
+            for(var characteristic : updatedProduct.getCharacteristics()) {
+                existingCharacteristicIds.add(characteristic.getCharacteristic().getId());
+            }
+
+            List<Long> creatingCharacteristicIds = new ArrayList<>();
+            for(var characteristic : updatedCharacteristics) {
+                creatingCharacteristicIds.add(characteristic.getId());
+            }
+
+            Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
+                    .filter(existingCharacteristicIds::contains)
+                    .findFirst();
+
+            if(notUniqCharacteristicId.isPresent()) {
+                throw new RuntimeException("Characteristic with id=%s already exists"
+                        .formatted(notUniqCharacteristicId.get()));
+            }
         }
-        return -1;
+
+        productCharacteristics.addAll(updatedCharacteristics.stream()
+                .map(characteristic -> catalogueMapper.mapToProductCharacteristic(characteristic, updatedProduct))
+                .toList());
+    }
+
+    private void updateProductCharacteristics(Product updatedProduct, List<ProductCharacteristic> productCharacteristics,
+                                              Set<CharacteristicWriteDTO> updatedCharacteristics) {
+        catalogueValidator.validateCharacteristics(updatedCharacteristics, updatedProduct.getCategory().getId());
+
+        for(var characteristic : updatedCharacteristics) {
+            int index = findCharacteristicIndexById(productCharacteristics, characteristic.getId());
+            if(index != -1) {
+                productCharacteristics.get(index).setTextValue(characteristic.getTextValue());
+                productCharacteristics.get(index).setNumericValue(characteristic.getNumericValue());
+            }
+        }
+    }
+
+    private void deleteProductCharacteristics(List<ProductCharacteristic> productCharacteristics,
+                                              Set<CharacteristicWriteDTO> updatedCharacteristics) {
+        for(var characteristic : updatedCharacteristics) {
+            int index = findCharacteristicIndexById(productCharacteristics, characteristic.getId());
+            if(index != -1) {
+                productCharacteristics.remove(index);
+            }
+        }
     }
 
     private List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) { //todo: move to utils may be?

@@ -29,8 +29,8 @@ public interface ProductService {
 
     List<AvailableCharacteristicValuesDTO> findAllAvailableCharacteristic(Long categoryId);
 
-    boolean createOneProduct(ProductWritePayload productPayload);
-    boolean createAllProduct(List<ProductWritePayload> productPayloads);
+    void createOneProduct(ProductWritePayload productPayload);
+    void createAllProduct(List<ProductWritePayload> productPayloads);
 
     boolean updateOneProduct(ProductWritePayload productPayload, Long productId);
 }

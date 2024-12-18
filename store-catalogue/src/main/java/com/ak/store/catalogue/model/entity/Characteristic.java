@@ -20,7 +20,6 @@ public class Characteristic {
 
     private String name;
 
-    @Column(name = "is_text")
     private boolean isText;
 
     @OneToMany(mappedBy = "characteristic")

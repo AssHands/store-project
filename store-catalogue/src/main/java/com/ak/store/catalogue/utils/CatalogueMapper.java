@@ -4,8 +4,8 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.TextValue;
+import com.ak.store.catalogue.model.entity.relation.ProductCharacteristic;
 import com.ak.store.common.dto.catalogue.product.*;
-import com.ak.store.common.payload.product.ProductWritePayload;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,8 +21,7 @@ public class CatalogueMapper {
         this.modelMapper = modelMapper;
     }
 
-    public Product mapToProduct(ProductWritePayload productWritePayload) {
-        ProductWriteDTO productWriteDTO = productWritePayload.getProduct();
+    public Product mapToProduct(ProductWriteDTO productWriteDTO) {
         Product product = modelMapper.map(productWriteDTO, Product.class);
         product.setGrade(2);
         product.setCategory(
@@ -47,6 +46,14 @@ public class CatalogueMapper {
         var characteristicDTO = modelMapper.map(characteristic, AvailableFilterValuesDTO.class);
         characteristicDTO.setTextValues(textValues);
         return characteristicDTO;
+    }
+
+    public ProductCharacteristic mapToProductCharacteristic(CharacteristicWriteDTO characteristicWriteDTO, Product product) {
+        var productCharacteristic = ProductCharacteristic.builder().numericValue(characteristicWriteDTO.getNumericValue()).textValue(characteristicWriteDTO.getTextValue()).build();
+
+        productCharacteristic.setProduct(product);
+        productCharacteristic.setCharacteristic(Characteristic.builder().id(characteristicWriteDTO.getId()).build());
+        return productCharacteristic;
     }
 
     public CategoryDTO mapToCategoryDTO(Category category) {

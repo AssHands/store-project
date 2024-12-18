@@ -9,8 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -20,9 +20,9 @@ import java.util.List;
 public class ProductWritePayload {
     ProductWriteDTO product = new ProductWriteDTO();
 
-    List<CharacteristicWriteDTO> createCharacteristics = new ArrayList<>();
+    Set<CharacteristicWriteDTO> createCharacteristics = new HashSet<>();
 
-    List<CharacteristicWriteDTO> updateCharacteristics = new ArrayList<>();
+    Set<CharacteristicWriteDTO> updateCharacteristics = new HashSet<>();
 
-    List<CharacteristicWriteDTO> deleteCharacteristics = new ArrayList<>();
+    Set<CharacteristicWriteDTO> deleteCharacteristics = new HashSet<>();
 }
