@@ -222,15 +222,14 @@ public class ProductServiceImpl implements ProductService {
         catalogueValidator.validateCharacteristics(updatedCharacteristics, updatedProduct.getCategory().getId());
 
         if(!isNewCategory) {
-            List<Long> existingCharacteristicIds = new ArrayList<>();
-            for(var characteristic : updatedProduct.getCharacteristics()) {
-                existingCharacteristicIds.add(characteristic.getCharacteristic().getId());
-            }
+            List<Long> existingCharacteristicIds = updatedProduct.getCharacteristics().stream()
+                    .map(pc -> pc.getCharacteristic().getId())
+                    .toList();
 
-            List<Long> creatingCharacteristicIds = new ArrayList<>();
-            for(var characteristic : updatedCharacteristics) {
-                creatingCharacteristicIds.add(characteristic.getId());
-            }
+            List<Long> creatingCharacteristicIds =
+                    updatedCharacteristics.stream()
+                            .map(CharacteristicWriteDTO::getId)
+                            .toList();
 
             Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
                     .filter(existingCharacteristicIds::contains)
