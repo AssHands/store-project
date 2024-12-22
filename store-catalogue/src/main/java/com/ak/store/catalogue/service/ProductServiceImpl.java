@@ -268,7 +268,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    private List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) { //todo: move to utils may be?
+    private List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) { //todo: move to utils?
         Map<Long, CategoryDTO> categoryMap = new HashMap<>();
         List<CategoryDTO> rootCategories = new ArrayList<>();
 

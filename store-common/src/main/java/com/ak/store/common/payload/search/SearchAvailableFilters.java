@@ -1,5 +1,8 @@
 package com.ak.store.common.payload.search;
 
+import com.ak.store.common.dto.search.Filters;
+import com.ak.store.common.dto.search.nested.NumericFilter;
+import com.ak.store.common.dto.search.nested.TextFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -9,6 +12,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,8 +25,13 @@ public class SearchAvailableFilters {
     @JsonProperty(required = true)
     private Long categoryId;
 
-    @NotNull
-    @NotBlank
-    @JsonProperty(required = true)
-    private String text;
+    private Filters filters = new Filters();
+
+    public List<NumericFilter> getNumericFilters() {
+        return filters.getNumericFilters();
+    }
+
+    public List<TextFilter> getTextFilters() {
+        return filters.getTextFilters();
+    }
 }

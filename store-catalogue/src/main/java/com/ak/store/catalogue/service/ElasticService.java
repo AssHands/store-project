@@ -11,7 +11,6 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
-import com.ak.store.catalogue.jdbc.ProductDao;
 import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
@@ -26,6 +25,8 @@ import com.ak.store.common.payload.search.SearchAvailableFilters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+
 import java.io.IOException;
 import java.util.*;
 
@@ -33,13 +34,11 @@ import java.util.*;
 public class ElasticService {
 
     private final ElasticsearchClient esClient;
-    private final ProductDao productDao;
     private final CharacteristicRepo characteristicRepo;
 
     @Autowired
-    public ElasticService(ElasticsearchClient esClient, ProductDao productDao, CharacteristicRepo characteristicRepo) {
+    public ElasticService(ElasticsearchClient esClient, CharacteristicRepo characteristicRepo) {
         this.esClient = esClient;
-        this.productDao = productDao;
         this.characteristicRepo = characteristicRepo;
     }
 
@@ -47,8 +46,7 @@ public class ElasticService {
         var request = SearchRequest.of(sr -> sr
                 .index("product")
                 .size(0)
-                .query(q -> q.bool(getSearchQuery(null, searchAvailableFilters.getText())))
-                .aggregations(getAggregations(searchAvailableFilters.getCategoryId())));
+                .aggregations(getAggregations(searchAvailableFilters)));
 
         SearchResponse<Void> response;
         System.out.println(request);
@@ -59,7 +57,8 @@ public class ElasticService {
             throw new RuntimeException("aggs error");
         }
 
-        return new AvailableFiltersResponse(getAvailableFilters(response));
+        return null;
+        //return new AvailableFiltersResponse(getAvailableFilters(response));
     }
 
     private Filters getAvailableFilters(SearchResponse<Void> response) {
@@ -113,44 +112,61 @@ public class ElasticService {
         return filters;
     }
 
-    private Map<String, Aggregation> getAggregations(Long categoryId) {
-        List<Characteristic> filters = characteristicRepo.findAllValuesByCategoryId(categoryId);
-
+    private Map<String, Aggregation> getAggregations(SearchAvailableFilters searchAvailableFilters) {
+        List<Characteristic> filters = characteristicRepo.findAllValuesByCategoryId(searchAvailableFilters.getCategoryId());
         Map<String, Aggregation> aggs = new HashMap<>();
 
         for(var filter : filters) {
-            if(!filter.getTextValues().isEmpty()) {
-                aggs.put(filter.getId() + "__" + filter.getName(),
-                        Aggregation.of(a -> a
-                                .nested(n -> n.path("characteristics"))
-                                .aggregations("filtered_aggregation", fa -> fa
-                                        .filter(f -> f
-                                                .term(t -> t
-                                                        .field("characteristics.characteristic_id")
-                                                        .value(filter.getId().toString())))
-                                        .aggregations("text_values", va -> va
-                                                .terms(t -> t
-                                                        .field("characteristics.text_value")
-                                                        .size(20)
-                                                        .order(NamedValue.of("_key", SortOrder.Asc)))))));
+            List<Query> availableFilters = new ArrayList<>();
+            if(!searchAvailableFilters.getTextFilters().isEmpty()) {
+                availableFilters.addAll(makeTextFilters(
+                        searchAvailableFilters.getTextFilters(), filter.getId()));
+            }
 
-            } else if(!filter.getRangeValues().isEmpty()) {
+            if(!searchAvailableFilters.getNumericFilters().isEmpty()) {
+                availableFilters.addAll(makeNumericFilters(
+                        searchAvailableFilters.getNumericFilters(), filter.getId()));
+            }
+
+            if(availableFilters.isEmpty()) {
+                aggs.put(filter.getId() + "__" + filter.getName(), makeAggregation(filter));
+            } else {
                 aggs.put(filter.getId() + "__" + filter.getName(),
-                        Aggregation.of(a -> a
-                                .nested(n -> n.path("characteristics"))
-                                .aggregations("filtered_aggregation", fa -> fa
-                                        .filter(f -> f
-                                                .term(t -> t
-                                                        .field("characteristics.characteristic_id")
-                                                        .value(filter.getId().toString())))
-                                        .aggregations("numeric_values", va -> va
-                                                .range(r -> r
-                                                        .field("characteristics.numeric_value")
-                                                        .ranges(getAggregationRanges(filter)))))));
+                        Aggregation.of(a -> {
+                            a.filter(f -> f.bool(b -> b.filter(availableFilters)));
+                            a.aggregations("1", makeAggregation(filter));
+                            return a;
+                        }));
             }
         }
 
         return aggs;
+    }
+
+    private Aggregation makeAggregation(Characteristic filter) {
+        return Aggregation.of(a -> a
+                .nested(n -> n.path("characteristics"))
+                .aggregations("2", fa -> {
+                    fa.filter(f -> f
+                            .term(t -> t
+                                    .field("characteristics.characteristic_id")
+                                    .value(filter.getId())));
+
+                    if(filter.isText()) {
+                        fa.aggregations("text_values", tv -> tv
+                                .terms(t -> t
+                                        .field("characteristics.text_value")
+                                        .size(20)
+                                        .order(NamedValue.of("_key", SortOrder.Asc))));
+                    } else {
+                        fa.aggregations("numeric_values", nv -> nv
+                                .range(r -> r
+                                        .field("characteristics.numeric_value")
+                                        .ranges(getAggregationRanges(filter))));
+                    }
+
+                    return fa;
+                }));
     }
 
     private List<AggregationRange> getAggregationRanges(Characteristic filter) {
@@ -209,13 +225,13 @@ public class ElasticService {
 //        } todo: need tests
 
         if (!productSearchRequest.getNumericFilters().isEmpty())
-            filters.addAll(getNumericFilters(productSearchRequest.getNumericFilters()));
+            filters.addAll(makeNumericFilters(productSearchRequest.getNumericFilters(), null));
 
         if (!productSearchRequest.getTextFilters().isEmpty())
-            filters.addAll(getTextFilters(productSearchRequest.getTextFilters()));
+            filters.addAll(makeTextFilters(productSearchRequest.getTextFilters(), null));
 
-        SearchRequest searchRequest = getSearchRequest(productSearchRequest,
-                getSearchQuery(filters, productSearchRequest.getText()));
+        SearchRequest searchRequest = makeSearchRequest(productSearchRequest,
+                makeSearchQuery(filters, productSearchRequest.getText()));
 
         SearchResponse<ProductDocument> response;
 
@@ -254,7 +270,7 @@ public class ElasticService {
     private Long defineCategory(String text) {
         SearchRequest request = SearchRequest.of(sr -> sr
                 .index("product")
-                .query(q -> q.bool(getSearchQuery(null, text)))
+                .query(q -> q.bool(makeSearchQuery(null, text)))
                 .size(0)
                 .aggregations("most_frequent_category", a -> a
                         .terms(t -> t
@@ -296,7 +312,7 @@ public class ElasticService {
         return "3";
     }
 
-    private BoolQuery getSearchQuery(List<Query> filters, String fullTextSearch) {
+    private BoolQuery makeSearchQuery(List<Query> filters, String fullTextSearch) {
         return BoolQuery.of(b -> {
             if (filters != null && !filters.isEmpty())
                 b.filter(filters);
@@ -323,7 +339,7 @@ public class ElasticService {
         });
     }
 
-    private SearchRequest getSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {
+    private SearchRequest makeSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")
@@ -355,11 +371,15 @@ public class ElasticService {
         });
     }
 
-    private List<Query> getNumericFilters(List<NumericFilter> numericFilters) {
+    private List<Query> makeNumericFilters(List<NumericFilter> numericFilters, Long currentCharacteristicId) {
         List<RangeQuery> rangeList = new ArrayList<>();
         List<Query> filters = new ArrayList<>();
 
         for (var numericFilter : numericFilters) {
+            if(numericFilter.getCharacteristicId() != null
+                    && numericFilter.getCharacteristicId().equals(currentCharacteristicId))
+                continue;
+
             for (var numericValue : numericFilter.getValues()) {
                 rangeList.add(RangeQuery.of(r -> r
                         .field("characteristics.numeric_value")
@@ -388,10 +408,14 @@ public class ElasticService {
         return filters;
     }
 
-    private List<Query> getTextFilters(List<TextFilter> textFilters) {
+    private List<Query> makeTextFilters(List<TextFilter> textFilters, Long currentCharacteristicId) {
         List<Query> filters = new ArrayList<>();
 
         for (var textFilter : textFilters) {
+            if(textFilter.getCharacteristicId() != null
+                    && textFilter.getCharacteristicId().equals(currentCharacteristicId))
+                continue;
+
             List<FieldValue> textValueList = new ArrayList<>();
             for (var textValue : textFilter.getValues()) {
                 textValueList.add(FieldValue.of(textValue));
