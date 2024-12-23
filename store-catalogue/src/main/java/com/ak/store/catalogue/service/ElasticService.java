@@ -1,8 +1,10 @@
 package com.ak.store.catalogue.service;
 
+import ch.qos.logback.core.util.StringUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationRange;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
@@ -56,55 +58,84 @@ public class ElasticService {
         } catch (IOException e) {
             throw new RuntimeException("aggs error");
         }
-
-        return null;
-        //return new AvailableFiltersResponse(getAvailableFilters(response));
+        return new AvailableFiltersResponse(getAvailableFilters(response));
     }
 
     private Filters getAvailableFilters(SearchResponse<Void> response) {
         Filters filters = new Filters();
 
-        for(var entry : response.aggregations().entrySet()) {
-            var aggs =  entry.getValue().nested()
-                    .aggregations().get("filtered_aggregation").filter().aggregations();
+        for(var allAggs : response.aggregations().entrySet()) {
+            Long characteristicId = Long.parseLong(allAggs.getKey().split("__")[0]);
+            String characteristicName = allAggs.getKey().split("__")[1];
 
-            if(aggs.get("text_values") != null) {
-                List<String> textValues = new ArrayList<>();
+            if(allAggs.getValue().isFilter()) {
+                for(var entry1 : allAggs.getValue().filter().aggregations().get("1").nested().aggregations().entrySet()) {
+                    for(var entry2 : entry1.getValue().filter().aggregations().entrySet()) {
+                        if(entry2.getValue().isRange()) {
+                            List<NumericFilterValue> rangeValues = new ArrayList<>();
 
-                for(var textValue : aggs.get("text_values").sterms().buckets().array()) {
-                    if(textValue.docCount() > 0)
-                        textValues.add(textValue.key().stringValue());
-                }
+                            for(var agg : entry2.getValue().range().buckets().array()) {
+                                if(agg.docCount() == 0) continue;
+                                rangeValues.add(NumericFilterValue.builder()
+                                        .from(agg.from().intValue())
+                                        .to(agg.to().intValue())
+                                        .build());
+                            }
 
-                if(!textValues.isEmpty()) {
-                    Long characteristicId = Long.parseLong(entry.getKey().split("__")[0]);
-                    String characteristicName = entry.getKey().split("__")[1];
-                    filters.getTextFilters().add(new TextFilter(characteristicId, characteristicName, textValues));
-                }
+                            if(rangeValues.isEmpty()) continue;
+                            filters.getNumericFilters().add(NumericFilter.builder()
+                                    .characteristicId(characteristicId)
+                                    .name(characteristicName)
+                                    .values(rangeValues)
+                                    .build());
+                        }
 
-            } else if(aggs.get("numeric_values") != null) {
-                List<NumericFilterValue> numericValues = new ArrayList<>();
+                        if(entry2.getValue().isSterms()) {
+                            List<String> textValues = new ArrayList<>();
+                            for(var c : entry2.getValue().sterms().buckets().array()) {
+                                textValues.add(c.key().stringValue());
+                            }
 
-                for(var numericValue : aggs.get("numeric_values").range().buckets().array()) {
-                    if(numericValue.docCount() > 0) {
-                        var range = new NumericFilterValue();
-
-                        if(numericValue.from() != null)
-                            range.setFrom(numericValue.from().intValue());
-
-                        if(numericValue.to() != null)
-                            range.setTo(numericValue.to().intValue());
-
-                        numericValues.add(range);
+                            if(textValues.isEmpty()) continue;
+                            filters.getTextFilters().add(TextFilter.builder()
+                                    .characteristicId(characteristicId)
+                                    .name(characteristicName)
+                                    .values(textValues)
+                                    .build());
+                        }
                     }
                 }
+                continue;
+            }
 
-                if(!numericValues.isEmpty()) {
-                    Long characteristicId = Long.parseLong(entry.getKey().split("__")[0]);
-                    String characteristicName = entry.getKey().split("__")[1];
-
-                    filters.getNumericFilters().add(new NumericFilter(characteristicId,
-                            characteristicName, numericValues));
+            for (var entry : allAggs.getValue().nested().aggregations().get("2").filter().aggregations().entrySet()) {
+                if(entry.getValue().isRange()) {
+                    List<NumericFilterValue> rangeValues = new ArrayList<>();
+                    for(var agg : entry.getValue().range().buckets().array()) {
+                        if(agg.docCount() == 0) continue;
+                        rangeValues.add(NumericFilterValue.builder()
+                                .from(agg.from().intValue())
+                                .to(agg.to().intValue())
+                                .build());
+                    }
+                    if(rangeValues.isEmpty()) continue;
+                    filters.getNumericFilters().add(NumericFilter.builder()
+                            .characteristicId(characteristicId)
+                            .name(characteristicName)
+                            .values(rangeValues)
+                            .build());
+                }
+                if(entry.getValue().isSterms()) {
+                    List<String> textValues = new ArrayList<>();
+                    for(var b : entry.getValue().sterms().buckets().array()) {
+                        textValues.add(b.key().stringValue());
+                    }
+                    if(textValues.isEmpty()) continue;
+                    filters.getTextFilters().add(TextFilter.builder()
+                            .characteristicId(characteristicId)
+                            .name(characteristicName)
+                            .values(textValues)
+                            .build());
                 }
             }
         }
@@ -174,21 +205,12 @@ public class ElasticService {
 
         for(var rangeValue : filter.getRangeValues()) {
             ranges.add(AggregationRange.of(ar -> {
-                String key = ""; //todo: probably useless
 
-                if(rangeValue.getFromValue() != null) {
+                if(rangeValue.getFromValue() != null)
                     ar.from(rangeValue.getFromValue().toString());
-                    key += rangeValue.getFromValue();
-                } else
-                    key += "*";
-
-                if(rangeValue.getToValue() != null)  {
+                if(rangeValue.getToValue() != null)
                     ar.to(rangeValue.getToValue().toString());
-                    key += "-" + rangeValue.getToValue();
-                } else
-                    key += "-*";
 
-                ar.key(key);
                 return ar;
             }));
 

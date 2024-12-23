@@ -19,7 +19,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class AvailableFiltersResponse {
-    Filters filters = new Filters();
+    private Filters filters = new Filters();
 
     @JsonIgnore
     public List<NumericFilter> getNumericFilters() {
