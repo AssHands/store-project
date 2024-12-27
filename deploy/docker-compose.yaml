@@ -28,16 +28,26 @@ services:
     restart: always
     depends_on:
       - elasticsearch
-    environment:
-      - XPACK_MANAGEMENT_ELASTICSEARCH_HOSTS=http://elasticsearch2222222222:9200
-      - XPACK_MANAGEMENT_ELASTICSEARCH_USERNAME=elastic
-      - XPACK_MANAGEMENT_ELASTICSEARCH_PASSWORD=elastic_pass
     volumes:
-      - ./logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml
-      - ./logstash/pipelines/pipeline.conf:/usr/share/logstash/config/pipelines/pipeline.conf
+      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/pipeline.conf:/usr/share/logstash/config/pipeline.conf
       - ./logstash/postgresql-driver.jar:/usr/share/logstash/jars/postgresql-driver.jar
     ports:
       - 9600:9600
       - 9700:9700
       - 5044:5044
       - 5046:5046
+
+  postgres:
+    image: postgres:17.0-alpine
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+    ports:
+      - 5430:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8888:8080
