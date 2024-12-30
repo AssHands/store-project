@@ -3,6 +3,7 @@ package com.ak.store.catalogue.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationRange;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
@@ -75,51 +76,20 @@ public class ElasticService {
         for(var allAggs : response.aggregations().entrySet()) {
             Long characteristicId = Long.parseLong(allAggs.getKey().split("__")[0]);
             String characteristicName = allAggs.getKey().split("__")[1];
+            Set <Map.Entry<String, Aggregate>> entrySet = null;
 
             if(allAggs.getValue().isFilter()) {
-                for(var entry1 : allAggs.getValue().filter().aggregations().get("1").nested().aggregations().entrySet()) {
-                    System.out.println(allAggs.getValue().filter().aggregations().get("1").nested().aggregations().size());
-                    for(var entry2 : entry1.getValue().filter().aggregations().entrySet()) {
-                        if(entry2.getValue().isRange()) {
-                            List<NumericFilterValue> rangeValues = new ArrayList<>();
-
-                            for(var agg : entry2.getValue().range().buckets().array()) {
-                                if(agg.docCount() == 0) continue;
-                                rangeValues.add(NumericFilterValue.builder()
-                                        .from(agg.from().intValue())
-                                        .to(agg.to().intValue())
-                                        .build());
-                            }
-
-                            if(rangeValues.isEmpty()) continue;
-                            filters.getNumericFilters().add(NumericFilter.builder()
-                                    .id(characteristicId)
-                                    .name(characteristicName)
-                                    .values(rangeValues)
-                                    .build());
-                        }
-
-                        if(entry2.getValue().isSterms()) {
-                            List<String> textValues = new ArrayList<>();
-                            for(var c : entry2.getValue().sterms().buckets().array()) {
-                                textValues.add(c.key().stringValue());
-                            }
-
-                            if(textValues.isEmpty()) continue;
-                            filters.getTextFilters().add(TextFilter.builder()
-                                    .id(characteristicId)
-                                    .name(characteristicName)
-                                    .values(textValues)
-                                    .build());
-                        }
-                    }
-                }
-                continue;
+                entrySet = allAggs.getValue().filter().aggregations().get("1").nested().
+                        aggregations().entrySet().iterator().next().getValue().filter().aggregations().entrySet();
             }
 
-            for (var entry : allAggs.getValue().nested().aggregations().get("2").filter().aggregations().entrySet()) {
+            if(entrySet == null)
+                entrySet = allAggs.getValue().nested().aggregations().get("2").filter().aggregations().entrySet();
+
+            for (var entry : entrySet) {
                 if(entry.getValue().isRange()) {
                     List<NumericFilterValue> rangeValues = new ArrayList<>();
+
                     for(var agg : entry.getValue().range().buckets().array()) {
                         if(agg.docCount() == 0) continue;
                         rangeValues.add(NumericFilterValue.builder()
@@ -136,8 +106,8 @@ public class ElasticService {
                 }
                 if(entry.getValue().isSterms()) {
                     List<String> textValues = new ArrayList<>();
-                    for(var b : entry.getValue().sterms().buckets().array()) {
-                        textValues.add(b.key().stringValue());
+                    for(var agg : entry.getValue().sterms().buckets().array()) {
+                        textValues.add(agg.key().stringValue());
                     }
                     if(textValues.isEmpty()) continue;
                     filters.getTextFilters().add(TextFilter.builder()
