@@ -1,8 +1,8 @@
 package com.ak.store.catalogue.controller;
 
-import com.ak.store.common.dto.catalogue.product.AvailableCharacteristicValuesDTO;
 import com.ak.store.common.dto.catalogue.product.*;
 import com.ak.store.catalogue.service.ProductService;
+import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ public class CatalogueController {
     }
 
     @GetMapping("characteristics")
-    public List<AvailableCharacteristicValuesDTO> getAllAvailableCharacteristic(@RequestParam Long categoryId) {
+    public Filters getAllAvailableCharacteristic(@RequestParam Long categoryId) {
         return productService.findAllAvailableCharacteristic(categoryId);
     }
 }

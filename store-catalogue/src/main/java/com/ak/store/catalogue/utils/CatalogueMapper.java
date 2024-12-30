@@ -6,6 +6,9 @@ import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.model.entity.relation.ProductCharacteristic;
 import com.ak.store.common.dto.catalogue.product.*;
+import com.ak.store.common.dto.search.Filters;
+import com.ak.store.common.dto.search.nested.NumericFilter;
+import com.ak.store.common.dto.search.nested.TextFilter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -56,11 +59,30 @@ public class CatalogueMapper {
         return modelMapper.map(category, CategoryDTO.class);
     }
 
-    public AvailableCharacteristicValuesDTO mapToAvailableCharacteristicValuesDTO(Characteristic characteristic) {
-        List<String> textValues = characteristic.getTextValues().stream().map(TextValue::getTextValue).toList();
-//        characteristic.setTextValues(null); todo
-        var characteristicDTO = modelMapper.map(characteristic, AvailableCharacteristicValuesDTO.class);
-        characteristicDTO.setTextValues(textValues);
-        return characteristicDTO;
+    public Filters mapToFilters(List<Characteristic> characteristics) {
+        Filters filters = new Filters();
+        List<TextFilter> textFilters = new ArrayList<>();
+        List<NumericFilter> numericFilters = new ArrayList<>();
+
+        for(var characteristic : characteristics) {
+            if(characteristic.isText()) {
+                textFilters.add(TextFilter.builder()
+                        .id(characteristic.getId())
+                        .name(characteristic.getName())
+                        .values(characteristic.getTextValues().stream()
+                                .map(TextValue::getTextValue)
+                                .toList())
+                        .build());
+            } else {
+                numericFilters.add(NumericFilter.builder()
+                        .id(characteristic.getId())
+                        .name(characteristic.getName())
+                        .build());
+            }
+        }
+
+        filters.setTextFilters(textFilters);
+        filters.setNumericFilters(numericFilters);
+        return filters;
     }
 }

@@ -1,9 +1,9 @@
 package com.ak.store.catalogue.service;
 
 
-import com.ak.store.common.dto.catalogue.product.AvailableCharacteristicValuesDTO;
 import com.ak.store.common.dto.catalogue.product.CategoryDTO;
 import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
+import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.AvailableFiltersResponse;
@@ -27,7 +27,7 @@ public interface ProductService {
 
     List<CategoryDTO> findAllCategory(String name);
 
-    List<AvailableCharacteristicValuesDTO> findAllAvailableCharacteristic(Long categoryId);
+    Filters findAllAvailableCharacteristic(Long categoryId);
 
     void createOneProduct(ProductWritePayload productPayload);
     void createAllProduct(List<ProductWritePayload> productPayloads);

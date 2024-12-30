@@ -7,6 +7,7 @@ import com.ak.store.catalogue.repository.*;
 import com.ak.store.catalogue.utils.CatalogueMapper;
 import com.ak.store.catalogue.utils.CatalogueValidator;
 import com.ak.store.common.dto.catalogue.product.*;
+import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.AvailableFiltersResponse;
@@ -106,10 +107,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<AvailableCharacteristicValuesDTO> findAllAvailableCharacteristic(Long categoryId) {
-        return characteristicRepo.findTextValuesByCategoryId(categoryId).stream()
-                .map(catalogueMapper::mapToAvailableCharacteristicValuesDTO)
-                .toList();
+    public Filters findAllAvailableCharacteristic(Long categoryId) {
+        return catalogueMapper.mapToFilters(characteristicRepo.findTextValuesByCategoryId(categoryId));
     }
 
     @Override
