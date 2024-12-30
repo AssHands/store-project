@@ -1,5 +1,7 @@
 package com.ak.store.catalogue.utils;
 
+import com.ak.store.catalogue.model.document.ProductCharacteristicDocument;
+import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
@@ -84,5 +86,22 @@ public class CatalogueMapper {
         filters.setTextFilters(textFilters);
         filters.setNumericFilters(numericFilters);
         return filters;
+    }
+
+    public ProductDocument mapToProductDocument(Product product) {
+        ProductDocument productDocument = modelMapper.map(product, ProductDocument.class);
+        productDocument.getCharacteristics().clear(); //todo
+        List<ProductCharacteristicDocument> characteristicDocuments = new ArrayList<>();
+
+        for(var characteristic : product.getCharacteristics()) {
+            characteristicDocuments.add(ProductCharacteristicDocument.builder()
+                    .id(characteristic.getCharacteristic().getId())
+                    .numericValue(characteristic.getNumericValue())
+                    .textValue(characteristic.getTextValue())
+                    .build());
+        }
+
+        productDocument.setCharacteristics(characteristicDocuments);
+        return productDocument;
     }
 }

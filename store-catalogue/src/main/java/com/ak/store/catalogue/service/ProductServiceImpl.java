@@ -10,23 +10,21 @@ import com.ak.store.common.dto.catalogue.product.*;
 import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
-import com.ak.store.common.payload.search.AvailableFiltersResponse;
+import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
-import com.ak.store.catalogue.jdbc.ProductDao;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 
 @Service
 public class ProductServiceImpl implements ProductService {
-
-    private final ProductDao productDao;
     private final ProductRepo productRepo;
     private final ElasticService esService;
     private final CatalogueMapper catalogueMapper;
@@ -35,15 +33,10 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepo categoryRepo;
     private final CatalogueValidator catalogueValidator;
 
-    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
-    private int BATCH_SIZE;
-
     @Autowired
-    public ProductServiceImpl(ProductDao productDao, ProductRepo productRepo, ElasticService esService,
-                              CatalogueMapper catalogueMapper, ProductCharacteristicRepo productCharacteristicRepo,
-                              CharacteristicRepo characteristicRepo, CategoryRepo categoryRepo,
-                              CatalogueValidator catalogueValidator) {
-        this.productDao = productDao;
+    public ProductServiceImpl(ProductRepo productRepo, ElasticService esService,CatalogueMapper catalogueMapper,
+                              ProductCharacteristicRepo productCharacteristicRepo,CharacteristicRepo characteristicRepo,
+                              CategoryRepo categoryRepo, CatalogueValidator catalogueValidator) {
         this.productRepo = productRepo;
         this.esService = esService;
         this.catalogueMapper = catalogueMapper;
@@ -86,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public AvailableFiltersResponse facet(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+    public SearchAvailableFiltersResponse facet(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         return esService.searchAvailableFilters(searchAvailableFiltersRequest);
     }
 
@@ -120,19 +113,25 @@ public class ProductServiceImpl implements ProductService {
 
         Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
 
-        List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
+        List<ProductCharacteristic> productCharacteristics = createdProduct.getCharacteristics();
         createProductCharacteristics(createdProduct, productCharacteristics,
                 productPayload.getCreateCharacteristics(), true);
 
         productRepo.save(createdProduct);
         productCharacteristicRepo.saveAll(productCharacteristics);
+
+        try {
+            esService.createOneProduct(catalogueMapper.mapToProductDocument(createdProduct));
+        } catch (IOException e) {
+            throw new RuntimeException("index document error");
+        }
     }
 
     @Override
     @Transactional
     public void createAllProduct(List<ProductWritePayload> productPayloads) {
         List<Product> products = new ArrayList<>();
-        List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
+        List<ProductCharacteristic> productCharacteristics = new ArrayList<>(); //todo: DON'T DO LIKE THIS! do -> product.getCharacteristics()
         for(var payload : productPayloads) {
             if(payload.getProduct().getCategoryId() == null) {
                 throw new RuntimeException("category_id is null");

@@ -6,7 +6,7 @@ import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
 import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
-import com.ak.store.common.payload.search.AvailableFiltersResponse;
+import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 
@@ -21,7 +21,7 @@ public interface ProductService {
 
     ProductSearchResponse findAllBySearch(ProductSearchRequest productSearchRequest);
 
-    AvailableFiltersResponse facet(SearchAvailableFiltersRequest searchAvailableFiltersRequest);
+    SearchAvailableFiltersResponse facet(SearchAvailableFiltersRequest searchAvailableFiltersRequest);
 
     List<CategoryDTO> findAllCategory();
 

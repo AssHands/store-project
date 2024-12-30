@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationRange;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -17,7 +18,7 @@ import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
 import com.ak.store.common.dto.search.nested.NumericFilterValue;
-import com.ak.store.common.payload.search.AvailableFiltersResponse;
+import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.dto.search.nested.TextFilter;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
@@ -42,7 +43,16 @@ public class ElasticService {
         this.characteristicRepo = characteristicRepo;
     }
 
-    public AvailableFiltersResponse searchAvailableFilters(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+    public void createOneProduct(ProductDocument productDocument) throws IOException {
+        var request = IndexRequest.of(i -> i
+                 .index("product")
+                 .id(productDocument.getId().toString())
+                 .document(productDocument));
+
+        esClient.index(request);
+    }
+
+    public SearchAvailableFiltersResponse searchAvailableFilters(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         var request = SearchRequest.of(sr -> sr
                 .index("product")
                 .size(0)
@@ -56,7 +66,7 @@ public class ElasticService {
         } catch (IOException e) {
             throw new RuntimeException("aggs error");
         }
-        return new AvailableFiltersResponse(getAvailableFilters(response));
+        return new SearchAvailableFiltersResponse(getAvailableFilters(response));
     }
 
     private Filters getAvailableFilters(SearchResponse<Void> response) {
@@ -68,6 +78,7 @@ public class ElasticService {
 
             if(allAggs.getValue().isFilter()) {
                 for(var entry1 : allAggs.getValue().filter().aggregations().get("1").nested().aggregations().entrySet()) {
+                    System.out.println(allAggs.getValue().filter().aggregations().get("1").nested().aggregations().size());
                     for(var entry2 : entry1.getValue().filter().aggregations().entrySet()) {
                         if(entry2.getValue().isRange()) {
                             List<NumericFilterValue> rangeValues = new ArrayList<>();
@@ -178,7 +189,7 @@ public class ElasticService {
                 .aggregations("2", fa -> {
                     fa.filter(f -> f
                             .term(t -> t
-                                    .field("characteristics.characteristic_id")
+                                    .field("characteristics.id")
                                     .value(filter.getId())));
 
                     if(filter.isText()) {
@@ -413,7 +424,7 @@ public class ElasticService {
                                     .bool(bool -> {
                                         bool.must(m -> m
                                                 .term(t -> t
-                                                        .field("characteristics.characteristic_id")
+                                                        .field("characteristics.id")
                                                         .value(numericFilter.getId())));
 
                                         for (RangeQuery rangeQuery : rangeList)
@@ -449,7 +460,7 @@ public class ElasticService {
                                         .bool(b -> b
                                                 .must(m -> m
                                                         .term(t -> t
-                                                                .field("characteristics.characteristic_id")
+                                                                .field("characteristics.id")
                                                                 .value(textFilter.getId())))
                                                 .must(m -> m
                                                         .terms(t -> t

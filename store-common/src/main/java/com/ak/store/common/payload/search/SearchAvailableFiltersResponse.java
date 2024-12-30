@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class AvailableFiltersResponse {
+public class SearchAvailableFiltersResponse {
     private Filters filters = new Filters();
 
     @JsonIgnore

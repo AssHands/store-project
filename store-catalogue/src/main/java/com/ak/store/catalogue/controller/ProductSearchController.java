@@ -2,7 +2,7 @@ package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.common.payload.search.ProductSearchResponse;
-import com.ak.store.common.payload.search.AvailableFiltersResponse;
+import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import jakarta.validation.Valid;
@@ -30,7 +30,7 @@ public class ProductSearchController {
     }
 
     @GetMapping("filters")
-    public AvailableFiltersResponse searchAllAvailableFilter(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+    public SearchAvailableFiltersResponse searchAllAvailableFilter(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         System.out.println(searchAvailableFiltersRequest);
         return productService.facet(searchAvailableFiltersRequest);
     }
