@@ -40,20 +40,16 @@ public class CatalogueMapper {
         return modelMapper.map(product, ProductFullReadDTO.class);
     }
 
-    public AvailableFilterValuesDTO mapToAvailableFilterValuesDTO(Characteristic characteristic) {
-        List<String> textValues = characteristic.getTextValues().stream().map(TextValue::getTextValue).toList();
-        characteristic.setTextValues(null);
-        var characteristicDTO = modelMapper.map(characteristic, AvailableFilterValuesDTO.class);
-        characteristicDTO.setTextValues(textValues);
-        return characteristicDTO;
-    }
 
-    public ProductCharacteristic mapToProductCharacteristic(CharacteristicWriteDTO characteristicWriteDTO, Product product) {
-        var productCharacteristic = ProductCharacteristic.builder().numericValue(characteristicWriteDTO.getNumericValue()).textValue(characteristicWriteDTO.getTextValue()).build();
-
-        productCharacteristic.setProduct(product);
-        productCharacteristic.setCharacteristic(Characteristic.builder().id(characteristicWriteDTO.getId()).build());
-        return productCharacteristic;
+    public ProductCharacteristic mapToProductCharacteristic(ProductCharacteristicDTO productCharacteristicDTO, Product product) {
+        return ProductCharacteristic.builder()
+                .numericValue(productCharacteristicDTO.getNumericValue())
+                .textValue(productCharacteristicDTO.getTextValue())
+                .product(product)
+                .characteristic(Characteristic.builder()
+                        .id(productCharacteristicDTO.getId())
+                        .build())
+                .build();
     }
 
     public CategoryDTO mapToCategoryDTO(Category category) {
@@ -62,7 +58,7 @@ public class CatalogueMapper {
 
     public AvailableCharacteristicValuesDTO mapToAvailableCharacteristicValuesDTO(Characteristic characteristic) {
         List<String> textValues = characteristic.getTextValues().stream().map(TextValue::getTextValue).toList();
-        characteristic.setTextValues(null);
+//        characteristic.setTextValues(null); todo
         var characteristicDTO = modelMapper.map(characteristic, AvailableCharacteristicValuesDTO.class);
         characteristicDTO.setTextValues(textValues);
         return characteristicDTO;

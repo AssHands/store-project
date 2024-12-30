@@ -17,7 +17,7 @@ import java.util.List;
 public class Product {
     @Id
     @GeneratedValue(generator = "p_gen", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "p_gen",sequenceName = "product_id_seq", allocationSize = 20)
+    @SequenceGenerator(name = "p_gen",sequenceName = "product_id_seq", allocationSize = 1)
     private Long id;
 
     @NotBlank

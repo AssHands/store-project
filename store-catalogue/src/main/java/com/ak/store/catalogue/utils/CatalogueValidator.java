@@ -3,11 +3,10 @@ package com.ak.store.catalogue.utils;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
-import com.ak.store.common.dto.catalogue.product.CharacteristicWriteDTO;
+import com.ak.store.common.dto.catalogue.product.ProductCharacteristicDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -21,7 +20,7 @@ public class CatalogueValidator {
     }
 
     public boolean validateCharacteristic(Characteristic availableCharacteristic,
-                                          CharacteristicWriteDTO characteristicDTO) {
+                                          ProductCharacteristicDTO characteristicDTO) {
         if(characteristicDTO.getTextValue() != null) {
             if(characteristicDTO.getNumericValue() != null) {
                 throw new RuntimeException("Characteristic with id=%s has both text value and numeric value"
@@ -57,7 +56,7 @@ public class CatalogueValidator {
         return true;
     }
 
-    public void validateCharacteristics(Iterable<CharacteristicWriteDTO> characteristics, Long categoryId) {
+    public void validateCharacteristics(Iterable<ProductCharacteristicDTO> characteristics, Long categoryId) {
         var availableMap = characteristicRepo.findTextValuesByCategoryId(categoryId).stream()
                 .collect(Collectors.toMap(
                         Characteristic::getId,

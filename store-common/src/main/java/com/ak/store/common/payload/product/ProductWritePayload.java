@@ -1,6 +1,6 @@
 package com.ak.store.common.payload.product;
 
-import com.ak.store.common.dto.catalogue.product.CharacteristicWriteDTO;
+import com.ak.store.common.dto.catalogue.product.ProductCharacteristicDTO;
 import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -20,9 +20,9 @@ import java.util.Set;
 public class ProductWritePayload {
     ProductWriteDTO product = new ProductWriteDTO();
 
-    Set<CharacteristicWriteDTO> createCharacteristics = new HashSet<>();
+    Set<ProductCharacteristicDTO> createCharacteristics = new HashSet<>();
 
-    Set<CharacteristicWriteDTO> updateCharacteristics = new HashSet<>();
+    Set<ProductCharacteristicDTO> updateCharacteristics = new HashSet<>();
 
-    Set<CharacteristicWriteDTO> deleteCharacteristics = new HashSet<>();
+    Set<ProductCharacteristicDTO> deleteCharacteristics = new HashSet<>();
 }

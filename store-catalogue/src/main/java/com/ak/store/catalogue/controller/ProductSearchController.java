@@ -4,7 +4,7 @@ import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
-import com.ak.store.common.payload.search.SearchAvailableFilters;
+import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +30,8 @@ public class ProductSearchController {
     }
 
     @GetMapping("filters")
-    public AvailableFiltersResponse searchAllAvailableFilter(@RequestBody @Valid SearchAvailableFilters searchAvailableFilters) {
-        System.out.println(searchAvailableFilters);
-        return productService.facet(searchAvailableFilters);
+    public AvailableFiltersResponse searchAllAvailableFilter(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+        System.out.println(searchAvailableFiltersRequest);
+        return productService.facet(searchAvailableFiltersRequest);
     }
 }

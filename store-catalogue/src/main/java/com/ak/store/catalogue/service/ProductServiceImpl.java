@@ -1,7 +1,6 @@
 package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.model.entity.Category;
-import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.relation.ProductCharacteristic;
 import com.ak.store.catalogue.repository.*;
@@ -14,12 +13,10 @@ import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.catalogue.jdbc.ProductDao;
-import com.ak.store.common.payload.search.SearchAvailableFilters;
-import jakarta.persistence.Transient;
+import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -88,8 +85,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public AvailableFiltersResponse facet(SearchAvailableFilters searchAvailableFilters) {
-        return esService.searchAvailableFilters(searchAvailableFilters);
+    public AvailableFiltersResponse facet(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+        return esService.searchAvailableFilters(searchAvailableFiltersRequest);
     }
 
     @Override
@@ -124,8 +121,6 @@ public class ProductServiceImpl implements ProductService {
 
         Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
 
-        catalogueValidator.validateCharacteristics(productPayload.getCreateCharacteristics(), createdProduct.getCategory().getId());
-
         List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
         createProductCharacteristics(createdProduct, productCharacteristics,
                 productPayload.getCreateCharacteristics(), true);
@@ -146,9 +141,6 @@ public class ProductServiceImpl implements ProductService {
 
             Product createdProduct = catalogueMapper.mapToProduct(payload.getProduct());
             products.add(createdProduct);
-
-            catalogueValidator.validateCharacteristics(
-                    payload.getCreateCharacteristics(), createdProduct.getCategory().getId());
 
             createProductCharacteristics(createdProduct, productCharacteristics,
                     payload.getCreateCharacteristics(), true);
@@ -218,7 +210,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void createProductCharacteristics(Product updatedProduct, List<ProductCharacteristic> productCharacteristics,
-                                              Set<CharacteristicWriteDTO> updatedCharacteristics, boolean isNewCategory) {
+                                              Set<ProductCharacteristicDTO> updatedCharacteristics, boolean isNewCategory) {
         catalogueValidator.validateCharacteristics(updatedCharacteristics, updatedProduct.getCategory().getId());
 
         if(!isNewCategory) {
@@ -227,7 +219,7 @@ public class ProductServiceImpl implements ProductService {
                     .toList();
 
             List<Long> creatingCharacteristicIds = updatedCharacteristics.stream()
-                            .map(CharacteristicWriteDTO::getId)
+                            .map(ProductCharacteristicDTO::getId)
                             .toList();
 
             Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
@@ -246,7 +238,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void updateProductCharacteristics(Product updatedProduct, List<ProductCharacteristic> productCharacteristics,
-                                              Set<CharacteristicWriteDTO> updatedCharacteristics) {
+                                              Set<ProductCharacteristicDTO> updatedCharacteristics) {
         catalogueValidator.validateCharacteristics(updatedCharacteristics, updatedProduct.getCategory().getId());
 
         for(var characteristic : updatedCharacteristics) {
@@ -259,7 +251,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void deleteProductCharacteristics(List<ProductCharacteristic> productCharacteristics,
-                                              Set<CharacteristicWriteDTO> updatedCharacteristics) {
+                                              Set<ProductCharacteristicDTO> updatedCharacteristics) {
         for(var characteristic : updatedCharacteristics) {
             int index = findCharacteristicIndexById(productCharacteristics, characteristic.getId());
             if(index != -1) {

@@ -16,14 +16,14 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class AvailableCharacteristicValuesDTO {
-    private Long characteristicId;
+    private Long id;
 
     private String name;
 
     private List<String> textValues = new ArrayList<>();
 
-    public AvailableCharacteristicValuesDTO(Long characteristicId, String name) {
-        this.characteristicId = characteristicId;
+    public AvailableCharacteristicValuesDTO(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 }

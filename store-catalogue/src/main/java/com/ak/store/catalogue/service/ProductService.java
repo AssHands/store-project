@@ -8,7 +8,7 @@ import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
-import com.ak.store.common.payload.search.SearchAvailableFilters;
+import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public interface ProductService {
 
     ProductSearchResponse findAllBySearch(ProductSearchRequest productSearchRequest);
 
-    AvailableFiltersResponse facet(SearchAvailableFilters searchAvailableFilters);
+    AvailableFiltersResponse facet(SearchAvailableFiltersRequest searchAvailableFiltersRequest);
 
     List<CategoryDTO> findAllCategory();
 

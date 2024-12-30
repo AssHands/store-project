@@ -16,7 +16,7 @@ import lombok.*;
 public class ProductCharacteristic {
     @Id
     @GeneratedValue(generator = "pc_gen", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "pc_gen",sequenceName = "product_characteristic_id_seq", allocationSize = 20)
+    @SequenceGenerator(name = "pc_gen",sequenceName = "product_characteristic_id_seq", allocationSize = 1)
     private Long id;
 
     @ManyToOne(cascade = CascadeType.PERSIST)

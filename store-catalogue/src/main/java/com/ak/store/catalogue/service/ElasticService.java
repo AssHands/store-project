@@ -21,7 +21,7 @@ import com.ak.store.common.payload.search.AvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.dto.search.nested.TextFilter;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
-import com.ak.store.common.payload.search.SearchAvailableFilters;
+import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,11 +42,11 @@ public class ElasticService {
         this.characteristicRepo = characteristicRepo;
     }
 
-    public AvailableFiltersResponse searchAvailableFilters(SearchAvailableFilters searchAvailableFilters) {
+    public AvailableFiltersResponse searchAvailableFilters(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         var request = SearchRequest.of(sr -> sr
                 .index("product")
                 .size(0)
-                .aggregations(getAggregations(searchAvailableFilters)));
+                .aggregations(getAggregations(searchAvailableFiltersRequest)));
 
         SearchResponse<Void> response;
         System.out.println(request);
@@ -82,7 +82,7 @@ public class ElasticService {
 
                             if(rangeValues.isEmpty()) continue;
                             filters.getNumericFilters().add(NumericFilter.builder()
-                                    .characteristicId(characteristicId)
+                                    .id(characteristicId)
                                     .name(characteristicName)
                                     .values(rangeValues)
                                     .build());
@@ -96,7 +96,7 @@ public class ElasticService {
 
                             if(textValues.isEmpty()) continue;
                             filters.getTextFilters().add(TextFilter.builder()
-                                    .characteristicId(characteristicId)
+                                    .id(characteristicId)
                                     .name(characteristicName)
                                     .values(textValues)
                                     .build());
@@ -118,7 +118,7 @@ public class ElasticService {
                     }
                     if(rangeValues.isEmpty()) continue;
                     filters.getNumericFilters().add(NumericFilter.builder()
-                            .characteristicId(characteristicId)
+                            .id(characteristicId)
                             .name(characteristicName)
                             .values(rangeValues)
                             .build());
@@ -130,7 +130,7 @@ public class ElasticService {
                     }
                     if(textValues.isEmpty()) continue;
                     filters.getTextFilters().add(TextFilter.builder()
-                            .characteristicId(characteristicId)
+                            .id(characteristicId)
                             .name(characteristicName)
                             .values(textValues)
                             .build());
@@ -141,20 +141,20 @@ public class ElasticService {
         return filters;
     }
 
-    private Map<String, Aggregation> getAggregations(SearchAvailableFilters searchAvailableFilters) {
-        List<Characteristic> filters = characteristicRepo.findAllValuesByCategoryId(searchAvailableFilters.getCategoryId());
+    private Map<String, Aggregation> getAggregations(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+        List<Characteristic> filters = characteristicRepo.findAllValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
         Map<String, Aggregation> aggs = new HashMap<>();
 
         for(var filter : filters) {
             List<Query> availableFilters = new ArrayList<>();
-            if(!searchAvailableFilters.getTextFilters().isEmpty()) {
+            if(!searchAvailableFiltersRequest.getTextFilters().isEmpty()) {
                 availableFilters.addAll(makeTextFilters(
-                        searchAvailableFilters.getTextFilters(), filter.getId()));
+                        searchAvailableFiltersRequest.getTextFilters(), filter.getId()));
             }
 
-            if(!searchAvailableFilters.getNumericFilters().isEmpty()) {
+            if(!searchAvailableFiltersRequest.getNumericFilters().isEmpty()) {
                 availableFilters.addAll(makeNumericFilters(
-                        searchAvailableFilters.getNumericFilters(), filter.getId()));
+                        searchAvailableFiltersRequest.getNumericFilters(), filter.getId()));
             }
 
             if(availableFilters.isEmpty()) {
@@ -396,8 +396,8 @@ public class ElasticService {
         List<Query> filters = new ArrayList<>();
 
         for (var numericFilter : numericFilters) {
-            if(numericFilter.getCharacteristicId() != null
-                    && numericFilter.getCharacteristicId().equals(currentCharacteristicId))
+            if(numericFilter.getId() != null
+                    && numericFilter.getId().equals(currentCharacteristicId))
                 continue;
 
             for (var numericValue : numericFilter.getValues()) {
@@ -414,7 +414,7 @@ public class ElasticService {
                                         bool.must(m -> m
                                                 .term(t -> t
                                                         .field("characteristics.characteristic_id")
-                                                        .value(numericFilter.getCharacteristicId())));
+                                                        .value(numericFilter.getId())));
 
                                         for (RangeQuery rangeQuery : rangeList)
                                             bool.should(s -> s.range(rangeQuery));
@@ -432,8 +432,8 @@ public class ElasticService {
         List<Query> filters = new ArrayList<>();
 
         for (var textFilter : textFilters) {
-            if(textFilter.getCharacteristicId() != null
-                    && textFilter.getCharacteristicId().equals(currentCharacteristicId))
+            if(textFilter.getId() != null
+                    && textFilter.getId().equals(currentCharacteristicId))
                 continue;
 
             List<FieldValue> textValueList = new ArrayList<>();
@@ -450,7 +450,7 @@ public class ElasticService {
                                                 .must(m -> m
                                                         .term(t -> t
                                                                 .field("characteristics.characteristic_id")
-                                                                .value(textFilter.getCharacteristicId())))
+                                                                .value(textFilter.getId())))
                                                 .must(m -> m
                                                         .terms(t -> t
                                                                 .field("characteristics.text_value")

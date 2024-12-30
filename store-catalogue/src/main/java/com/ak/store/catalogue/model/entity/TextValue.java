@@ -14,7 +14,7 @@ import lombok.*;
 public class TextValue {
     @Id
     @GeneratedValue(generator = "tv_gen", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "tv_gen",sequenceName = "text_value_id_seq", allocationSize = 20)
+    @SequenceGenerator(name = "tv_gen",sequenceName = "text_value_id_seq", allocationSize = 1)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
