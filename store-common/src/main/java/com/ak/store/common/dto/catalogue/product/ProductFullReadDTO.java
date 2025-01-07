@@ -24,7 +24,11 @@ public class ProductFullReadDTO {
 
     private String description;
 
-    private int price;
+    private int currentPrice;
+
+    private int fullPrice;
+
+    private int discountPercentage;
 
     private int amountReviews;
 

@@ -3,6 +3,8 @@ package com.ak.store.common.dto.catalogue.product;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +23,11 @@ public class ProductViewReadDTO {
 
     private String description;
 
-    private int price;
+    private int currentPrice;
+
+    private int fullPrice;
+
+    private int discountPercentage;
 
     private int amountReviews;
 
