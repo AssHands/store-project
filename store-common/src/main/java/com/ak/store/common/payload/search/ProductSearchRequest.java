@@ -35,9 +35,6 @@ public class ProductSearchRequest {
     @Min(0)
     private int priceTo;
 
-    @NotNull
-    @NotBlank
-    @JsonProperty(required = true)
     private String text;
 
     private Long categoryId;

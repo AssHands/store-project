@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,9 +22,15 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SearchAvailableFiltersRequest {
-    @NotNull
-    @JsonProperty(required = true)
+
     private Long categoryId;
+
+    private int priceFrom;
+
+    @Min(0)
+    private int priceTo;
+
+    private String text;
 
     private Filters filters = new Filters();
 

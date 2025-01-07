@@ -28,11 +28,8 @@ public class CatalogueController {
     }
 
     @DeleteMapping("products/{id}")
-    public String deleteOneProductById(@PathVariable("id") Long id) {
-        if(productService.deleteOneById(id))
-            return "DELETED";
-
-        return "NOT DELETED";
+    public void deleteOneProductById(@PathVariable("id") Long id) {
+        productService.deleteOneProduct(id);
     }
 
     @PostMapping("products")

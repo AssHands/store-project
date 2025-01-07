@@ -21,7 +21,7 @@ public class ProductViewReadDTO {
 
     private String description;
 
-    private Float price;
+    private int price;
 
     private int amountReviews;
 

@@ -30,7 +30,15 @@ public class Product {
 
     @Min(1)
     @Max(10_000_000)
-    private float price;
+    private int currentPrice;
+
+    @Min(1)
+    @Max(10_000_000)
+    private int fullPrice;
+
+    @Min(0)
+    @Max(99)
+    private int discountPercentage;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -44,7 +52,7 @@ public class Product {
     @Max(5)
     private float grade;
 
-    @OneToMany(mappedBy = "product", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductCharacteristic> characteristics = new ArrayList<>();
 
     public void addCharacteristics(List<ProductCharacteristic> characteristics) {

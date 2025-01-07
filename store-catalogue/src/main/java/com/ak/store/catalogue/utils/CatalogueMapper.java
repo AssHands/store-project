@@ -28,7 +28,17 @@ public class CatalogueMapper {
 
     public Product mapToProduct(ProductWriteDTO productWriteDTO) {
         Product product = modelMapper.map(productWriteDTO, Product.class);
-        product.setGrade(2);
+        product.setGrade(2); //todo: delete
+
+        if(productWriteDTO.getDiscountPercentage() == null || productWriteDTO.getDiscountPercentage() == 0) {
+            product.setDiscountPercentage(0);
+            product.setCurrentPrice(product.getFullPrice());
+        } else {
+            int discount = product.getFullPrice() * product.getDiscountPercentage() / 100;
+            int priceWithDiscount = product.getFullPrice() - discount;
+            product.setCurrentPrice(priceWithDiscount);
+        }
+
         product.setCategory(
                 Category.builder()
                         .id(productWriteDTO.getCategoryId())

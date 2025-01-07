@@ -4,5 +4,8 @@ public enum Sort {
     POPULAR,
     RATING,
     PRICE_UP,
+
+    SALE,
+
     PRICE_DOWN
 }

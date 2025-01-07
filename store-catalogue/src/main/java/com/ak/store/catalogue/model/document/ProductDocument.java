@@ -30,8 +30,13 @@ public class ProductDocument {
     @Field(type = FieldType.Text)
     private String description;
 
-    @Field(type = FieldType.Float)
-    private float price;
+    @Field(type = FieldType.Integer, name = "current_price")
+    @JsonProperty("current_price")
+    private int currentPrice;
+
+    @Field(type = FieldType.Integer, name = "discount_percentage")
+    @JsonProperty("discount_percentage")
+    private int discountPercentage;
 
     @Field(type = FieldType.Keyword, name = "category_id")
     @JsonProperty("category_id")

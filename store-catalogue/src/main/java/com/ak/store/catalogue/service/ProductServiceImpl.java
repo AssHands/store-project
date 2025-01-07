@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.relation.ProductCharacteristic;
@@ -53,12 +54,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean deleteOneById(Long id) {
-        productRepo.deleteById(id);
-        return true;
-    }
-
-    @Override
     public ProductSearchResponse findAllBySearch(ProductSearchRequest productSearchRequest) {
         ElasticSearchResult elasticSearchResult = esService.findAll(productSearchRequest);
 
@@ -106,16 +101,28 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void createOneProduct(ProductWritePayload productPayload) {
+    public void deleteOneProduct(Long id) {
+        productRepo.deleteById(id);
+
+        try {
+            esService.deleteOneProduct(id);
+        } catch (IOException e) {
+            throw new RuntimeException("delete document error");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void createOneProduct(ProductWritePayload productPayload) { //todo: when jakarta validation fail, document will index in ES anyway. FIX
         if(productPayload.getProduct().getCategoryId() == null) {
             throw new RuntimeException("category_id is null");
         }
 
         Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
 
-        List<ProductCharacteristic> productCharacteristics = createdProduct.getCharacteristics();
+        List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
         createProductCharacteristics(createdProduct, productCharacteristics,
-                productPayload.getCreateCharacteristics(), true);
+                productPayload.getCreateCharacteristics());
 
         productRepo.save(createdProduct);
         productCharacteristicRepo.saveAll(productCharacteristics);
@@ -131,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void createAllProduct(List<ProductWritePayload> productPayloads) {
         List<Product> products = new ArrayList<>();
-        List<ProductCharacteristic> productCharacteristics = new ArrayList<>(); //todo: DON'T DO LIKE THIS! do -> product.getCharacteristics()
+        List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
         for(var payload : productPayloads) {
             if(payload.getProduct().getCategoryId() == null) {
                 throw new RuntimeException("category_id is null");
@@ -141,11 +148,17 @@ public class ProductServiceImpl implements ProductService {
             products.add(createdProduct);
 
             createProductCharacteristics(createdProduct, productCharacteristics,
-                    payload.getCreateCharacteristics(), true);
+                    payload.getCreateCharacteristics());
         }
 
         productRepo.saveAll(products);
         productCharacteristicRepo.saveAll(productCharacteristics);
+
+        try {
+            esService.createAllProduct(products.stream().map(catalogueMapper::mapToProductDocument).toList());
+        } catch (IOException e) {
+            throw new RuntimeException("bulk document error");
+        }
     }
 
     @Override
@@ -162,11 +175,24 @@ public class ProductServiceImpl implements ProductService {
             updatedProduct.setDescription(productDTO.getDescription());
         }
 
-        if(productDTO.getPrice() != null) {
-            updatedProduct.setPrice(productDTO.getPrice());
+        boolean isUpdateFullPrice = false;
+        if(productDTO.getFullPrice() != null && productDTO.getFullPrice() != updatedProduct.getFullPrice()) {
+            updatedProduct.setFullPrice(productDTO.getFullPrice());
+            isUpdateFullPrice = true;
         }
 
-        boolean isNewCategory = false;
+        if(productDTO.getDiscountPercentage() != null) {
+            updatedProduct.setDiscountPercentage(productDTO.getDiscountPercentage());
+            int discount = updatedProduct.getFullPrice() * updatedProduct.getDiscountPercentage() / 100;
+            int priceWithDiscount = updatedProduct.getFullPrice() - discount;
+            updatedProduct.setCurrentPrice(priceWithDiscount);
+
+        } else if(isUpdateFullPrice) {
+            int discount = updatedProduct.getFullPrice() * updatedProduct.getDiscountPercentage() / 100;
+            int priceWithDiscount = updatedProduct.getFullPrice() - discount;
+            updatedProduct.setCurrentPrice(priceWithDiscount);
+        }
+
         if(productDTO.getCategoryId() != null
                 && !updatedProduct.getCategory().getId().equals(productDTO.getCategoryId())) {
             updatedProduct.setCategory(
@@ -174,28 +200,37 @@ public class ProductServiceImpl implements ProductService {
                             .id(productDTO.getCategoryId())
                             .build()
             );
-            isNewCategory = true;
             updatedProduct.getCharacteristics().clear();
         }
 
-        List<ProductCharacteristic> productCharacteristics = updatedProduct.getCharacteristics();
+        List<ProductCharacteristic> createProductCharacteristics = new ArrayList<>();
+        List<ProductCharacteristic> deleteProductCharacteristics = new ArrayList<>();
 
         if(!productPayload.getCreateCharacteristics().isEmpty()) {
-            createProductCharacteristics(updatedProduct, productCharacteristics,
-                    productPayload.getCreateCharacteristics(), isNewCategory);
+            createProductCharacteristics(updatedProduct, createProductCharacteristics,
+                    productPayload.getCreateCharacteristics());
         }
 
-        if(!productPayload.getUpdateCharacteristics().isEmpty() && !isNewCategory) {
-            updateProductCharacteristics(updatedProduct, productCharacteristics,
+        if(!productPayload.getUpdateCharacteristics().isEmpty()) {
+            updateProductCharacteristics(updatedProduct, createProductCharacteristics,
                     productPayload.getUpdateCharacteristics());
         }
 
-        if(!productPayload.getDeleteCharacteristics().isEmpty() && !isNewCategory) {
-            deleteProductCharacteristics(productCharacteristics, productPayload.getDeleteCharacteristics());
+        if(!productPayload.getDeleteCharacteristics().isEmpty()) {
+            deleteProductCharacteristics(updatedProduct, deleteProductCharacteristics,
+                    productPayload.getDeleteCharacteristics());
         }
 
+        productCharacteristicRepo.saveAll(createProductCharacteristics);
+        productCharacteristicRepo.deleteAll(deleteProductCharacteristics); //todo: need a check for empty collection?
         productRepo.save(updatedProduct);
-        productCharacteristicRepo.saveAll(productCharacteristics);
+
+        try {
+            esService.updateOneProduct(catalogueMapper.mapToProductDocument(updatedProduct));
+        } catch (IOException e) {
+            throw new RuntimeException("update document error");
+        }
+
         return true;
     }
 
@@ -208,17 +243,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void createProductCharacteristics(Product updatedProduct, List<ProductCharacteristic> productCharacteristics,
-                                              Set<ProductCharacteristicDTO> updatedCharacteristics, boolean isNewCategory) {
-        catalogueValidator.validateCharacteristics(updatedCharacteristics, updatedProduct.getCategory().getId());
+                                              Set<ProductCharacteristicDTO> createdCharacteristics) {
+        catalogueValidator.validateCharacteristics(createdCharacteristics, updatedProduct.getCategory().getId());
 
-        if(!isNewCategory) {
-            List<Long> existingCharacteristicIds = updatedProduct.getCharacteristics().stream()
-                    .map(pc -> pc.getCharacteristic().getId())
+        List<Long> existingCharacteristicIds = updatedProduct.getCharacteristics().stream()
+                .map(pc -> pc.getCharacteristic().getId())
+                .toList();
+
+        if(!existingCharacteristicIds.isEmpty()) {
+            List<Long> creatingCharacteristicIds = createdCharacteristics.stream()
+                    .map(ProductCharacteristicDTO::getId)
                     .toList();
-
-            List<Long> creatingCharacteristicIds = updatedCharacteristics.stream()
-                            .map(ProductCharacteristicDTO::getId)
-                            .toList();
 
             Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
                     .filter(existingCharacteristicIds::contains)
@@ -230,9 +265,12 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        productCharacteristics.addAll(updatedCharacteristics.stream()
+        List<ProductCharacteristic> list = createdCharacteristics.stream()
                 .map(characteristic -> catalogueMapper.mapToProductCharacteristic(characteristic, updatedProduct))
-                .toList());
+                .toList();
+
+        updatedProduct.addCharacteristics(list);
+        productCharacteristics.addAll(list);
     }
 
     private void updateProductCharacteristics(Product updatedProduct, List<ProductCharacteristic> productCharacteristics,
@@ -240,20 +278,22 @@ public class ProductServiceImpl implements ProductService {
         catalogueValidator.validateCharacteristics(updatedCharacteristics, updatedProduct.getCategory().getId());
 
         for(var characteristic : updatedCharacteristics) {
-            int index = findCharacteristicIndexById(productCharacteristics, characteristic.getId());
+            int index = findCharacteristicIndexById(updatedProduct.getCharacteristics(), characteristic.getId());
             if(index != -1) {
-                productCharacteristics.get(index).setTextValue(characteristic.getTextValue());
-                productCharacteristics.get(index).setNumericValue(characteristic.getNumericValue());
+                updatedProduct.getCharacteristics().get(index).setTextValue(characteristic.getTextValue());
+                updatedProduct.getCharacteristics().get(index).setNumericValue(characteristic.getNumericValue());
+                productCharacteristics.add(updatedProduct.getCharacteristics().get(index));
             }
         }
     }
 
-    private void deleteProductCharacteristics(List<ProductCharacteristic> productCharacteristics,
-                                              Set<ProductCharacteristicDTO> updatedCharacteristics) {
-        for(var characteristic : updatedCharacteristics) {
-            int index = findCharacteristicIndexById(productCharacteristics, characteristic.getId());
+    private void deleteProductCharacteristics(Product updatedProduct, List<ProductCharacteristic> productCharacteristics,
+                                              Set<ProductCharacteristicDTO> deletedCharacteristics) {
+        for(var characteristic : deletedCharacteristics) {
+            int index = findCharacteristicIndexById(updatedProduct.getCharacteristics(), characteristic.getId());
             if(index != -1) {
-                productCharacteristics.remove(index);
+                productCharacteristics.add(updatedProduct.getCharacteristics().get(index));
+                updatedProduct.getCharacteristics().remove(index);
             }
         }
     }

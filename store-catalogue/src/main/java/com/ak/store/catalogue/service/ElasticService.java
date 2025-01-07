@@ -7,9 +7,8 @@ import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationRange;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
-import co.elastic.clients.elasticsearch.core.IndexRequest;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
@@ -44,6 +43,14 @@ public class ElasticService {
         this.characteristicRepo = characteristicRepo;
     }
 
+    public void deleteOneProduct(Long id) throws IOException {
+        var request = DeleteRequest.of(d -> d
+                .index("product")
+                .id(id.toString()));
+
+        esClient.delete(request);
+    }
+
     public void createOneProduct(ProductDocument productDocument) throws IOException {
         var request = IndexRequest.of(i -> i
                  .index("product")
@@ -53,10 +60,64 @@ public class ElasticService {
         esClient.index(request);
     }
 
+    public void createAllProduct(List<ProductDocument> productDocuments) throws IOException {
+        var br = new BulkRequest.Builder();
+
+        productDocuments.forEach(product ->
+                br.operations(op -> op
+                        .index(idx -> idx
+                                .index("product")
+                                .id(product.getId().toString())
+                                .document(product))));
+
+        BulkResponse result = esClient.bulk(br.build());
+
+        if (result.errors()) {
+            for (BulkResponseItem item: result.items()) {
+                if (item.error() != null) {
+                    throw new RuntimeException("Bulk had errors\n" + item.error().reason());
+                }
+            }
+        }
+    }
+
+    public void updateOneProduct(ProductDocument productDocument) throws IOException {
+        var request = UpdateRequest.of(u -> u
+                .index("product")
+                .id(productDocument.getId().toString())
+                .doc(productDocument));
+
+        esClient.update(request, ProductDocument.class);
+    }
+
     public SearchAvailableFiltersResponse searchAvailableFilters(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+        List<Query> filters = new ArrayList<>();
+
+        if(searchAvailableFiltersRequest.getCategoryId() != null) {
+            filters.add(TermQuery.of(t -> t
+                    .field("category_id")
+                    .value(searchAvailableFiltersRequest.getCategoryId()))
+                    ._toQuery());
+        }
+
+        if (searchAvailableFiltersRequest.getPriceTo() != 0) {
+            filters.add(RangeQuery.of(r -> r
+                            .field("price")
+                            .gte(JsonData.of(searchAvailableFiltersRequest.getPriceFrom()))
+                            .lte(JsonData.of(searchAvailableFiltersRequest.getPriceTo())))
+                    ._toQuery());
+        }
+
+        if(searchAvailableFiltersRequest.getCategoryId() == null
+                && (searchAvailableFiltersRequest.getText() == null || searchAvailableFiltersRequest.getText().isBlank())) {
+            throw new RuntimeException("text and category_id are null when searching available filters");
+            //todo: move to controller validator
+        }
+
         var request = SearchRequest.of(sr -> sr
                 .index("product")
                 .size(0)
+                .query(makeSearchQuery(filters, searchAvailableFiltersRequest.getText())._toQuery())
                 .aggregations(getAggregations(searchAvailableFiltersRequest)));
 
         SearchResponse<Void> response;
@@ -70,6 +131,8 @@ public class ElasticService {
         return new SearchAvailableFiltersResponse(getAvailableFilters(response));
     }
 
+
+    //todo: move to utils class
     private Filters getAvailableFilters(SearchResponse<Void> response) {
         Filters filters = new Filters();
 
@@ -79,8 +142,8 @@ public class ElasticService {
             Set <Map.Entry<String, Aggregate>> entrySet = null;
 
             if(allAggs.getValue().isFilter()) {
-                entrySet = allAggs.getValue().filter().aggregations().get("1").nested().
-                        aggregations().entrySet().iterator().next().getValue().filter().aggregations().entrySet();
+                entrySet = allAggs.getValue().filter().aggregations().get("1").nested()
+                        .aggregations().entrySet().iterator().next().getValue().filter().aggregations().entrySet();
             }
 
             if(entrySet == null)
@@ -97,6 +160,7 @@ public class ElasticService {
                                 .to(agg.to().intValue())
                                 .build());
                     }
+
                     if(rangeValues.isEmpty()) continue;
                     filters.getNumericFilters().add(NumericFilter.builder()
                             .id(characteristicId)
@@ -104,11 +168,13 @@ public class ElasticService {
                             .values(rangeValues)
                             .build());
                 }
+
                 if(entry.getValue().isSterms()) {
                     List<String> textValues = new ArrayList<>();
                     for(var agg : entry.getValue().sterms().buckets().array()) {
                         textValues.add(agg.key().stringValue());
                     }
+
                     if(textValues.isEmpty()) continue;
                     filters.getTextFilters().add(TextFilter.builder()
                             .id(characteristicId)
@@ -123,7 +189,14 @@ public class ElasticService {
     }
 
     private Map<String, Aggregation> getAggregations(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
-        List<Characteristic> filters = characteristicRepo.findAllValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
+        List<Characteristic> filters;
+
+        if(searchAvailableFiltersRequest.getCategoryId() == null) {
+            filters = characteristicRepo.findAllValuesByCategoryId(defineCategory(searchAvailableFiltersRequest.getText())); //todo: catch error and send empty filters
+        } else {
+            filters = characteristicRepo.findAllValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
+        }
+
         Map<String, Aggregation> aggs = new HashMap<>();
 
         for(var filter : filters) {
@@ -215,15 +288,6 @@ public class ElasticService {
                             .value(productSearchRequest.getCategoryId()))
                     ._toQuery());
         }
-//        else {
-//            Long categoryId = defineCategory(productSearchRequest.getText());
-//            if(categoryId != null) {
-//                filters.add(TermQuery.of(t -> t
-//                                .field("category_id")
-//                                .value(categoryId))
-//                        ._toQuery());
-//            }
-//        } todo: need tests
 
         if (!productSearchRequest.getNumericFilters().isEmpty())
             filters.addAll(makeNumericFilters(productSearchRequest.getNumericFilters(), null));
@@ -268,16 +332,17 @@ public class ElasticService {
         return elasticSearchResult;
     }
 
-    private Long defineCategory(String text) {
+    private Long defineCategory(String fullTextSearch) {
         SearchRequest request = SearchRequest.of(sr -> sr
                 .index("product")
-                .query(q -> q.bool(makeSearchQuery(null, text)))
+                .query(q -> q.bool(makeSearchQuery(null, fullTextSearch)))
                 .size(0)
                 .aggregations("most_frequent_category", a -> a
                         .terms(t -> t
                                 .field("category_id")
                                 .size(1))));
 
+        System.out.println(request);
         SearchResponse<Void> response;
 
         try {
@@ -287,13 +352,13 @@ public class ElasticService {
         }
 
         var mostFrequentCategory = response.aggregations().get("most_frequent_category")
-                .lterms().buckets().array();
+                .sterms().buckets().array();
 
-        if(!mostFrequentCategory.isEmpty()) {
-            return Long.parseLong(mostFrequentCategory.get(0).key());
+        try {
+            return Long.parseLong(mostFrequentCategory.get(0).key().stringValue());
+        } catch (Exception e) {
+            throw new RuntimeException("can not define category by text");
         }
-
-        return null;
     }
 
     private String getFuzziness(String word) {

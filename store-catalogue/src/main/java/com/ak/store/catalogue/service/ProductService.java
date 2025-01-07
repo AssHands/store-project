@@ -17,7 +17,7 @@ public interface ProductService {
 
     //ProductDTO updateOneById(Long id, ProductPayload updatedProduct);
 
-    boolean deleteOneById(Long id);
+    void deleteOneProduct(Long id);
 
     ProductSearchResponse findAllBySearch(ProductSearchRequest productSearchRequest);
 

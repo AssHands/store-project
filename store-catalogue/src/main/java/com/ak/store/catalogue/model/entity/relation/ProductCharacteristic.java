@@ -19,7 +19,7 @@ public class ProductCharacteristic {
     @SequenceGenerator(name = "pc_gen",sequenceName = "product_characteristic_id_seq", allocationSize = 1)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
