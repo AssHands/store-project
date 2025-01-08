@@ -93,25 +93,28 @@ public class ElasticService {
     public SearchAvailableFiltersResponse searchAvailableFilters(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         List<Query> filters = new ArrayList<>();
 
-        if(searchAvailableFiltersRequest.getCategoryId() != null) {
-            filters.add(TermQuery.of(t -> t
-                    .field("category_id")
-                    .value(searchAvailableFiltersRequest.getCategoryId()))
-                    ._toQuery());
-        }
-
-        if (searchAvailableFiltersRequest.getPriceTo() != 0) {
-            filters.add(RangeQuery.of(r -> r
-                            .field("price")
-                            .gte(JsonData.of(searchAvailableFiltersRequest.getPriceFrom()))
-                            .lte(JsonData.of(searchAvailableFiltersRequest.getPriceTo())))
-                    ._toQuery());
-        }
-
         if(searchAvailableFiltersRequest.getCategoryId() == null
                 && (searchAvailableFiltersRequest.getText() == null || searchAvailableFiltersRequest.getText().isBlank())) {
             throw new RuntimeException("text and category_id are null when searching available filters");
             //todo: move to controller validator
+        }
+
+        if(searchAvailableFiltersRequest.getCategoryId() == null) {
+            //todo: catch error and send empty filters
+            searchAvailableFiltersRequest.setCategoryId(defineCategory(searchAvailableFiltersRequest.getText()));
+        }
+
+        filters.add(TermQuery.of(t -> t
+                        .field("category_id")
+                        .value(searchAvailableFiltersRequest.getCategoryId()))
+                ._toQuery());
+
+        if (searchAvailableFiltersRequest.getPriceTo() != 0) {
+            filters.add(RangeQuery.of(r -> r
+                            .field("current_price")
+                            .gte(JsonData.of(searchAvailableFiltersRequest.getPriceFrom()))
+                            .lte(JsonData.of(searchAvailableFiltersRequest.getPriceTo())))
+                    ._toQuery());
         }
 
         var request = SearchRequest.of(sr -> sr
@@ -128,7 +131,11 @@ public class ElasticService {
         } catch (IOException e) {
             throw new RuntimeException("aggs error");
         }
-        return new SearchAvailableFiltersResponse(getAvailableFilters(response));
+
+        return SearchAvailableFiltersResponse.builder()
+                .filters(getAvailableFilters(response))
+                .categoryId(searchAvailableFiltersRequest.getCategoryId())
+                .build();
     }
 
 
@@ -191,11 +198,7 @@ public class ElasticService {
     private Map<String, Aggregation> getAggregations(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         List<Characteristic> filters;
 
-        if(searchAvailableFiltersRequest.getCategoryId() == null) {
-            filters = characteristicRepo.findAllValuesByCategoryId(defineCategory(searchAvailableFiltersRequest.getText())); //todo: catch error and send empty filters
-        } else {
-            filters = characteristicRepo.findAllValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
-        }
+        filters = characteristicRepo.findAllValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
 
         Map<String, Aggregation> aggs = new HashMap<>();
 

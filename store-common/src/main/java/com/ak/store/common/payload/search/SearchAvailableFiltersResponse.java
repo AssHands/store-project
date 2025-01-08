@@ -17,9 +17,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SearchAvailableFiltersResponse {
+
+    private Long categoryId;
     private Filters filters = new Filters();
 
     @JsonIgnore
