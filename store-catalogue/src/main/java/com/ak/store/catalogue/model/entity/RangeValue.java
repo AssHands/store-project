@@ -1,6 +1,7 @@
 package com.ak.store.catalogue.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,7 +21,9 @@ public class RangeValue {
     @ManyToOne(fetch = FetchType.LAZY)
     private Characteristic characteristic;
 
+    @NotNull
     private Integer fromValue;
 
+    @NotNull
     private Integer toValue;
 }

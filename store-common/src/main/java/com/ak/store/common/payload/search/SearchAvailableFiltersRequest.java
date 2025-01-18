@@ -27,7 +27,7 @@ public class SearchAvailableFiltersRequest {
 
     private int priceFrom;
 
-    @Min(0)
+    @Min(1)
     private int priceTo;
 
     private String text;

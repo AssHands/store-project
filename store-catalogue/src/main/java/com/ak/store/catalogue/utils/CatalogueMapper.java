@@ -56,6 +56,7 @@ public class CatalogueMapper {
     }
 
 
+    //todo: приниимать не product, а Long productId
     public ProductCharacteristic mapToProductCharacteristic(ProductCharacteristicDTO productCharacteristicDTO, Product product) {
         return ProductCharacteristic.builder()
                 .numericValue(productCharacteristicDTO.getNumericValue())
@@ -77,7 +78,7 @@ public class CatalogueMapper {
         List<NumericFilter> numericFilters = new ArrayList<>();
 
         for(var characteristic : characteristics) {
-            if(characteristic.isText()) {
+            if(characteristic.getIsText()) {
                 textFilters.add(TextFilter.builder()
                         .id(characteristic.getId())
                         .name(characteristic.getName())
@@ -100,7 +101,7 @@ public class CatalogueMapper {
 
     public ProductDocument mapToProductDocument(Product product) {
         ProductDocument productDocument = modelMapper.map(product, ProductDocument.class);
-        productDocument.getCharacteristics().clear(); //todo
+        productDocument.getCharacteristics().clear(); //todo: хз что тут происходит, но избавиться от этого
         List<ProductCharacteristicDocument> characteristicDocuments = new ArrayList<>();
 
         for(var characteristic : product.getCharacteristics()) {

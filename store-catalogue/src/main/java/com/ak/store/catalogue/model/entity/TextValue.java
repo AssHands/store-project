@@ -1,6 +1,7 @@
 package com.ak.store.catalogue.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Data
@@ -20,5 +21,6 @@ public class TextValue {
     @ManyToOne(fetch = FetchType.LAZY)
     private Characteristic characteristic;
 
+    @NotBlank
     private String textValue;
 }

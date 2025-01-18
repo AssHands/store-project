@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.controller;
 
-import com.ak.store.catalogue.service.ProductService;
+import com.ak.store.catalogue.service.CatalogueService;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
@@ -16,22 +16,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/catalogue/products/search")
 public class ProductSearchController {
-    private final ProductService productService;
+    private final CatalogueService catalogueService;
 
     @Autowired
-    public ProductSearchController(ProductService productService) {
-        this.productService = productService;
+    public ProductSearchController(CatalogueService catalogueService) {
+        this.catalogueService = catalogueService;
     }
 
     @GetMapping
     public ProductSearchResponse searchAllProduct(@RequestBody @Valid ProductSearchRequest productSearchRequest) {
         System.out.println(productSearchRequest);
-        return productService.findAllBySearch(productSearchRequest);
+        return catalogueService.findAllProductBySearch(productSearchRequest);
     }
 
     @GetMapping("filters")
     public SearchAvailableFiltersResponse searchAllAvailableFilter(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         System.out.println(searchAvailableFiltersRequest);
-        return productService.facet(searchAvailableFiltersRequest);
+        return catalogueService.findAvailableFilters(searchAvailableFiltersRequest);
     }
 }

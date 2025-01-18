@@ -26,8 +26,6 @@ import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
-
 import java.io.IOException;
 import java.util.*;
 
@@ -43,24 +41,32 @@ public class ElasticService {
         this.characteristicRepo = characteristicRepo;
     }
 
-    public void deleteOneProduct(Long id) throws IOException {
+    public void deleteOneProduct(Long id) {
         var request = DeleteRequest.of(d -> d
                 .index("product")
                 .id(id.toString()));
 
-        esClient.delete(request);
+        try {
+            esClient.delete(request);
+        } catch (Exception e) {
+            throw new RuntimeException("delete document error");
+        }
     }
 
-    public void createOneProduct(ProductDocument productDocument) throws IOException {
+    public void createOneProduct(ProductDocument productDocument) {
         var request = IndexRequest.of(i -> i
                  .index("product")
                  .id(productDocument.getId().toString())
                  .document(productDocument));
 
-        esClient.index(request);
+        try {
+            esClient.index(request);
+        } catch (Exception e) {
+            throw new RuntimeException("index document error");
+        }
     }
 
-    public void createAllProduct(List<ProductDocument> productDocuments) throws IOException {
+    public void createAllProduct(List<ProductDocument> productDocuments) {
         var br = new BulkRequest.Builder();
 
         productDocuments.forEach(product ->
@@ -70,24 +76,34 @@ public class ElasticService {
                                 .id(product.getId().toString())
                                 .document(product))));
 
-        BulkResponse result = esClient.bulk(br.build());
+        BulkResponse result = null;
+        
+        try {
+            result = esClient.bulk(br.build());
+        } catch (Exception e) {
+            throw new RuntimeException("bulk document error");
+        }
 
         if (result.errors()) {
             for (BulkResponseItem item: result.items()) {
                 if (item.error() != null) {
-                    throw new RuntimeException("Bulk had errors\n" + item.error().reason());
+                    throw new RuntimeException("bulk had errors\n" + item.error().reason());
                 }
             }
         }
     }
 
-    public void updateOneProduct(ProductDocument productDocument) throws IOException {
+    public void updateOneProduct(ProductDocument productDocument) {
         var request = UpdateRequest.of(u -> u
                 .index("product")
                 .id(productDocument.getId().toString())
                 .doc(productDocument));
 
-        esClient.update(request, ProductDocument.class);
+        try {
+            esClient.update(request, ProductDocument.class);
+        } catch (Exception e) {
+            throw new RuntimeException("update document error");
+        }
     }
 
     public SearchAvailableFiltersResponse searchAvailableFilters(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
@@ -121,7 +137,7 @@ public class ElasticService {
                 .index("product")
                 .size(0)
                 .query(makeSearchQuery(filters, searchAvailableFiltersRequest.getText())._toQuery())
-                .aggregations(getAggregations(searchAvailableFiltersRequest)));
+                .aggregations(buildAggregations(searchAvailableFiltersRequest)));
 
         SearchResponse<Void> response;
         System.out.println(request);
@@ -133,14 +149,13 @@ public class ElasticService {
         }
 
         return SearchAvailableFiltersResponse.builder()
-                .filters(getAvailableFilters(response))
+                .filters(transformSearchFiltersResponseToFiltersDTO(response))
                 .categoryId(searchAvailableFiltersRequest.getCategoryId())
                 .build();
     }
 
-
-    //todo: move to utils class
-    private Filters getAvailableFilters(SearchResponse<Void> response) {
+    //todo: move to utils class?
+    private Filters transformSearchFiltersResponseToFiltersDTO(SearchResponse<Void> response) {
         Filters filters = new Filters();
 
         for(var allAggs : response.aggregations().entrySet()) {
@@ -195,11 +210,9 @@ public class ElasticService {
         return filters;
     }
 
-    private Map<String, Aggregation> getAggregations(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
-        List<Characteristic> filters;
-
-        filters = characteristicRepo.findAllValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
-
+    private Map<String, Aggregation> buildAggregations(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+        List<Characteristic> filters = 
+                characteristicRepo.findAllValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
         Map<String, Aggregation> aggs = new HashMap<>();
 
         for(var filter : filters) {
@@ -215,12 +228,12 @@ public class ElasticService {
             }
 
             if(availableFilters.isEmpty()) {
-                aggs.put(filter.getId() + "__" + filter.getName(), makeAggregation(filter));
+                aggs.put(filter.getId() + "__" + filter.getName(), makeNestedAggregation(filter));
             } else {
                 aggs.put(filter.getId() + "__" + filter.getName(),
                         Aggregation.of(a -> {
                             a.filter(f -> f.bool(b -> b.filter(availableFilters)));
-                            a.aggregations("1", makeAggregation(filter));
+                            a.aggregations("1", makeNestedAggregation(filter));
                             return a;
                         }));
             }
@@ -229,7 +242,7 @@ public class ElasticService {
         return aggs;
     }
 
-    private Aggregation makeAggregation(Characteristic filter) {
+    private Aggregation makeNestedAggregation(Characteristic filter) {
         return Aggregation.of(a -> a
                 .nested(n -> n.path("characteristics"))
                 .aggregations("2", fa -> {
@@ -248,14 +261,14 @@ public class ElasticService {
                         fa.aggregations("numeric_values", nv -> nv
                                 .range(r -> r
                                         .field("characteristics.numeric_value")
-                                        .ranges(getAggregationRanges(filter))));
+                                        .ranges(makeAggregationRanges(filter))));
                     }
 
                     return fa;
                 }));
     }
 
-    private List<AggregationRange> getAggregationRanges(Characteristic filter) {
+    private List<AggregationRange> makeAggregationRanges(Characteristic filter) {
         List<AggregationRange> ranges = new ArrayList<>();
 
         for(var rangeValue : filter.getRangeValues()) {
@@ -274,7 +287,7 @@ public class ElasticService {
         return ranges;
     }
 
-    public ElasticSearchResult findAll(ProductSearchRequest productSearchRequest) {
+    public ElasticSearchResult findAllProduct(ProductSearchRequest productSearchRequest) {
         List<Query> filters = new ArrayList<>();
 
         if (productSearchRequest.getPriceTo() != 0) {
@@ -298,7 +311,7 @@ public class ElasticService {
         if (!productSearchRequest.getTextFilters().isEmpty())
             filters.addAll(makeTextFilters(productSearchRequest.getTextFilters(), null));
 
-        SearchRequest searchRequest = makeSearchRequest(productSearchRequest,
+        SearchRequest searchRequest = BuildSearchRequest(productSearchRequest,
                 makeSearchQuery(filters, productSearchRequest.getText()));
 
         SearchResponse<ProductDocument> response;
@@ -408,7 +421,7 @@ public class ElasticService {
         });
     }
 
-    private SearchRequest makeSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {
+    private SearchRequest BuildSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")

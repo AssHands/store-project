@@ -18,42 +18,30 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "product")
 public class ProductDocument {
-    @Id
-    @Field(type = FieldType.Keyword)
     private Long id;
 
-    @Field(type = FieldType.Text)
     private String title;
 
-    @Field(type = FieldType.Text)
     private String description;
 
-    @Field(type = FieldType.Integer, name = "current_price")
     @JsonProperty("current_price")
     private int currentPrice;
 
-    @Field(type = FieldType.Integer, name = "discount_percentage")
     @JsonProperty("discount_percentage")
     private int discountPercentage;
 
-    @Field(type = FieldType.Keyword, name = "category_id")
     @JsonProperty("category_id")
     private Long categoryId;
 
-    @Field(type = FieldType.Integer, name = "amount_sales")
     @JsonProperty("amount_sales")
     private int amountSales;
 
-    @Field(type = FieldType.Integer, name = "amount_reviews")
     @JsonProperty("amount_reviews")
     private int amountReviews;
 
-    @Field(type = FieldType.Float)
     private float grade;
 
-    @Field(type = FieldType.Nested, includeInParent = true)
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<ProductCharacteristicDocument> characteristics;
 }

@@ -20,7 +20,7 @@ public class Product {
     @SequenceGenerator(name = "p_gen",sequenceName = "product_id_seq", allocationSize = 1)
     private Long id;
 
-    @NotBlank
+    @NotNull
     @Size(min = 5, max = 50)
     private String title;
 
@@ -40,6 +40,7 @@ public class Product {
     @Max(99)
     private int discountPercentage;
 
+    @NotNull
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
@@ -54,6 +55,9 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductCharacteristic> characteristics = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private List<ProductImage> images = new ArrayList<>();
 
     public void addCharacteristics(List<ProductCharacteristic> characteristics) {
         this.characteristics.addAll(characteristics);

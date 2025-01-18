@@ -1,8 +1,8 @@
 package com.ak.store.catalogue.service;
 
-import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Product;
+import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.catalogue.model.entity.relation.ProductCharacteristic;
 import com.ak.store.catalogue.repository.*;
 import com.ak.store.catalogue.utils.CatalogueMapper;
@@ -17,15 +17,15 @@ import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 @Service
-public class ProductServiceImpl implements ProductService {
+public class CatalogueService {
     private final ProductRepo productRepo;
     private final ElasticService esService;
     private final CatalogueMapper catalogueMapper;
@@ -33,11 +33,14 @@ public class ProductServiceImpl implements ProductService {
     private final CharacteristicRepo characteristicRepo;
     private final CategoryRepo categoryRepo;
     private final CatalogueValidator catalogueValidator;
+    private final S3Service s3Service;
+    private final ProductImageRepo productImageRepo;
 
     @Autowired
-    public ProductServiceImpl(ProductRepo productRepo, ElasticService esService,CatalogueMapper catalogueMapper,
-                              ProductCharacteristicRepo productCharacteristicRepo,CharacteristicRepo characteristicRepo,
-                              CategoryRepo categoryRepo, CatalogueValidator catalogueValidator) {
+    public CatalogueService(ProductRepo productRepo, ElasticService esService, CatalogueMapper catalogueMapper,
+                            ProductCharacteristicRepo productCharacteristicRepo, CharacteristicRepo characteristicRepo,
+                            CategoryRepo categoryRepo, CatalogueValidator catalogueValidator, S3Service s3Service,
+                            ProductImageRepo productImageRepo) {
         this.productRepo = productRepo;
         this.esService = esService;
         this.catalogueMapper = catalogueMapper;
@@ -45,17 +48,97 @@ public class ProductServiceImpl implements ProductService {
         this.characteristicRepo = characteristicRepo;
         this.categoryRepo = categoryRepo;
         this.catalogueValidator = catalogueValidator;
+        this.s3Service = s3Service;
+        this.productImageRepo = productImageRepo;
     }
 
-    @Override
-    public ProductFullReadDTO findOneById(Long id) {
+    public ProductFullReadDTO findOneProductById(Long id) {
         return catalogueMapper.mapToProductFullReadDTO(
                 productRepo.findById(id).orElseThrow(() -> new RuntimeException("Not found")));
     }
 
-    @Override
-    public ProductSearchResponse findAllBySearch(ProductSearchRequest productSearchRequest) {
-        ElasticSearchResult elasticSearchResult = esService.findAll(productSearchRequest);
+    @Transactional
+    public void saveOrUpdateAllImage(Long productId, Map<String, String> allImagePositions,
+                                     List<MultipartFile> addImages, List<String> deleteImageIndexes) {
+        List<ProductImage> productImages = productImageRepo.findAllByProductId(productId);
+        catalogueValidator.validateImages(allImagePositions, addImages, deleteImageIndexes, productImages);
+
+        List<Long> imageIdsForDelete = new ArrayList<>();
+        List<String> imageKeysForDelete = new ArrayList<>();
+
+        //set null for deleted images
+        //set null for save indexes of list
+        if(deleteImageIndexes != null && !deleteImageIndexes.isEmpty()) {
+            for (int i = 0; i < productImages.size(); i++) {
+                var index = productImages.get(i).getIndex();
+                boolean isDeleted = deleteImageIndexes.stream()
+                        .map(Integer::parseInt)
+                        .anyMatch(deletedIndex -> deletedIndex.equals(index));
+
+                if(isDeleted) {
+                    imageKeysForDelete.add(productImages.get(i).getImageKey());
+                    imageIdsForDelete.add(productImages.get(i).getId());
+                    productImages.set(i, null);
+                }
+            }
+        }
+
+        //generate keys for new images and wrap to Map<Key, Image>
+        Map<String, MultipartFile> imagesForAdd = new LinkedHashMap<>();
+        if(addImages != null && !addImages.isEmpty()) {
+            imagesForAdd = s3Service.generateImageKeys(productId, addImages);
+        }
+
+        //add new images to list
+        for(String key : imagesForAdd.keySet()) {
+            productImages.add(ProductImage.builder()
+                    .imageKey(key)
+                    .product(Product.builder()
+                            .id(productId)
+                            .build())
+                    .build());
+        }
+
+        int size = (int) productImages.stream()
+                .filter(Objects::nonNull)
+                .count();
+
+        //make new entity list to save in DB
+        //set null for easy insertion by index
+        List<ProductImage> newProductImages = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            newProductImages.add(null);
+        }
+
+        //deleting and moving images
+        for(var entry : allImagePositions.entrySet()) {
+            if(!Pattern.compile("image\\[\\d]").matcher(entry.getKey()).matches())
+                continue;
+
+            int currentPosition = Integer.parseInt(entry.getKey().replaceAll("\\D", ""));
+            int newPosition = Integer.parseInt(entry.getValue());
+
+            newProductImages.set(newPosition, productImages.get(currentPosition));
+            newProductImages.get(newPosition).setIndex(newPosition);
+        }
+
+        //delete and add images to DB
+        productImageRepo.deleteAllById(imageIdsForDelete);
+        productImageRepo.saveAll(newProductImages);
+
+        //delete images from S3
+        for(var deleteImageKey : imageKeysForDelete) {
+            s3Service.deleteOneImage(deleteImageKey);
+        }
+
+        //add images to S3
+        for(var image : imagesForAdd.entrySet()) {
+            s3Service.putOneImage(image.getValue(), image.getKey());
+        }
+    }
+
+    public ProductSearchResponse findAllProductBySearch(ProductSearchRequest productSearchRequest) {
+        ElasticSearchResult elasticSearchResult = esService.findAllProduct(productSearchRequest);
 
         if(elasticSearchResult == null) {
             throw new RuntimeException("No documents found");
@@ -73,12 +156,10 @@ public class ProductServiceImpl implements ProductService {
         return productSearchResponse;
     }
 
-    @Override
-    public SearchAvailableFiltersResponse facet(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+    public SearchAvailableFiltersResponse findAvailableFilters(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         return esService.searchAvailableFilters(searchAvailableFiltersRequest);
     }
 
-    @Override
     public List<CategoryDTO> findAllCategory() {
         List<CategoryDTO> categories = categoryRepo.findAll().stream()
                 .map(catalogueMapper::mapToCategoryDTO)
@@ -87,33 +168,34 @@ public class ProductServiceImpl implements ProductService {
         return buildCategoryTree(categories);
     }
 
-    @Override
-    public List<CategoryDTO> findAllCategory(String name) {
+    //todo: need build category tree
+    public List<CategoryDTO> findAllCategoryByName(String name) {
         return categoryRepo.findAllByNameContainingIgnoreCase(name).stream()
                 .map(catalogueMapper::mapToCategoryDTO)
                 .toList();
     }
 
-    @Override
     public Filters findAllAvailableCharacteristic(Long categoryId) {
         return catalogueMapper.mapToFilters(characteristicRepo.findTextValuesByCategoryId(categoryId));
     }
 
-    @Override
     @Transactional
     public void deleteOneProduct(Long id) {
-        productRepo.deleteById(id);
+        List<String> imageKeysForDelete = productImageRepo.findAllByProductId(id).stream()
+                .map(ProductImage::getImageKey)
+                .toList();
 
-        try {
-            esService.deleteOneProduct(id);
-        } catch (IOException e) {
-            throw new RuntimeException("delete document error");
+        productRepo.deleteById(id);
+        esService.deleteOneProduct(id);
+
+        for(var imageKey : imageKeysForDelete) {
+            s3Service.deleteOneImage(imageKey);
         }
     }
 
-    @Override
     @Transactional
-    public void createOneProduct(ProductWritePayload productPayload) { //todo: when jakarta validation fail, document will index in ES anyway. FIX
+    //todo: when jakarta validation fail, document will index in ES anyway. FIX
+    public void createOneProduct(ProductWritePayload productPayload) {
         if(productPayload.getProduct().getCategoryId() == null) {
             throw new RuntimeException("category_id is null");
         }
@@ -127,14 +209,9 @@ public class ProductServiceImpl implements ProductService {
         productRepo.save(createdProduct);
         productCharacteristicRepo.saveAll(productCharacteristics);
 
-        try {
-            esService.createOneProduct(catalogueMapper.mapToProductDocument(createdProduct));
-        } catch (IOException e) {
-            throw new RuntimeException("index document error");
-        }
+        esService.createOneProduct(catalogueMapper.mapToProductDocument(createdProduct));
     }
 
-    @Override
     @Transactional
     public void createAllProduct(List<ProductWritePayload> productPayloads) {
         List<Product> products = new ArrayList<>();
@@ -154,16 +231,11 @@ public class ProductServiceImpl implements ProductService {
         productRepo.saveAll(products);
         productCharacteristicRepo.saveAll(productCharacteristics);
 
-        try {
-            esService.createAllProduct(products.stream().map(catalogueMapper::mapToProductDocument).toList());
-        } catch (IOException e) {
-            throw new RuntimeException("bulk document error");
-        }
+        esService.createAllProduct(products.stream().map(catalogueMapper::mapToProductDocument).toList());
     }
 
-    @Override
     @Transactional
-    public boolean updateOneProduct(ProductWritePayload productPayload, Long productId) {
+    public void updateOneProduct(ProductWritePayload productPayload, Long productId) {
         Product updatedProduct = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Not found"));
         ProductWriteDTO productDTO = productPayload.getProduct();
 
@@ -225,13 +297,7 @@ public class ProductServiceImpl implements ProductService {
         productCharacteristicRepo.deleteAll(deleteProductCharacteristics); //todo: need a check for empty collection?
         productRepo.save(updatedProduct);
 
-        try {
-            esService.updateOneProduct(catalogueMapper.mapToProductDocument(updatedProduct));
-        } catch (IOException e) {
-            throw new RuntimeException("update document error");
-        }
-
-        return true;
+        esService.updateOneProduct(catalogueMapper.mapToProductDocument(updatedProduct));
     }
 
     private int findCharacteristicIndexById(List<ProductCharacteristic> characteristics, Long id) {
@@ -298,7 +364,8 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    private List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) { //todo: move to utils?
+    //todo: move to utils?
+    private List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) {
         Map<Long, CategoryDTO> categoryMap = new HashMap<>();
         List<CategoryDTO> rootCategories = new ArrayList<>();
 
