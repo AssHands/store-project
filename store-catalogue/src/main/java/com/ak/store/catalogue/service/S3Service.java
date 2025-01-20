@@ -47,8 +47,8 @@ public class S3Service {
     }
 
     public Map<String, MultipartFile> generateImageKeys(Long productId, List<MultipartFile> images) {
-        var product = productRepo.findAllViewByIdIn(List.of(productId))
-                .stream().findFirst().orElseThrow(() -> new RuntimeException("Not found"));
+        var product = productRepo.findOneViewById(productId)
+                .orElseThrow(() -> new RuntimeException("Not found"));
 
         Map<String, MultipartFile> imageKeys = new LinkedHashMap<>();
         for(var image : images) {

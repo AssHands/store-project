@@ -3,6 +3,7 @@ package com.ak.store.common.dto.catalogue.product;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,7 +35,8 @@ public class ProductFullReadDTO {
 
     private float grade;
 
+    @Valid
     private CategoryDTO category;
     
-    private List<ProductCharacteristicDTO> characteristics = new ArrayList<>();
+    private List<@Valid ProductCharacteristicDTO> characteristics = new ArrayList<>();
 }

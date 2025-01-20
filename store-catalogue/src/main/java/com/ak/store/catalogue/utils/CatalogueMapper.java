@@ -28,6 +28,7 @@ public class CatalogueMapper {
 
     public Product mapToProduct(ProductWriteDTO productWriteDTO) {
         Product product = modelMapper.map(productWriteDTO, Product.class);
+        product.setId(null);
         product.setGrade(2); //todo: delete
 
         if(productWriteDTO.getDiscountPercentage() == null || productWriteDTO.getDiscountPercentage() == 0) {

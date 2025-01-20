@@ -3,6 +3,7 @@ package com.ak.store.common.dto.catalogue.product;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,5 +26,5 @@ public class CategoryDTO {
 
     private Long parentId;
 
-    private List<CategoryDTO> childCategories = new ArrayList<>();
+    private List<@Valid CategoryDTO> childCategories = new ArrayList<>();
 }

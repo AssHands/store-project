@@ -211,8 +211,6 @@ public class CatalogueValidator {
                 existingIndexes.add(++lastIndex);
         }
 
-        System.out.println(existingIndexes);
-        System.out.println(oldPositions);
         if(!existingIndexes.containsAll(oldPositions)) {
             throw new RuntimeException("Указан некорректный индекс");
         }

@@ -4,9 +4,13 @@ import com.ak.store.catalogue.service.CatalogueService;
 import com.ak.store.common.dto.catalogue.product.*;
 import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.payload.product.ProductWritePayload;
-import jakarta.validation.Valid;
+import com.ak.store.common.validationGroup.Save;
+import com.ak.store.common.validationGroup.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,18 +39,30 @@ public class CatalogueController {
     }
 
     @PostMapping("products")
-    public ProductWriteDTO createOneProduct(@RequestBody @Valid ProductWritePayload productPayload) {
+    public ProductWriteDTO createOneProduct(@RequestBody @Validated(Save.class) ProductWritePayload productPayload) {
         catalogueService.createOneProduct(productPayload);
         return null;
     }
+
     @PostMapping("products/batch")
-    public ProductWriteDTO createAllProduct(@RequestBody @Valid List<ProductWritePayload> productPayloads) {
+    //todo: make validation for list
+    public ProductWriteDTO createAllProduct(@RequestBody List<ProductWritePayload> productPayloads) {
+
+        for(ProductWritePayload payload : productPayloads) {
+            Errors errors = new BeanPropertyBindingResult(payload, "productPayload");
+            //validator.validate(payload.getProduct(), errors, ProductWriteDTO.Save.class);
+
+            if(errors.hasErrors()){
+                //return ResponseEntity.badRequest().body(errors.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList()));
+            }
+        }
+
         catalogueService.createAllProduct(productPayloads);
         return null;
     }
 
     @PatchMapping("products/{id}")
-    public ProductWriteDTO updateOneProduct(@RequestBody @Valid ProductWritePayload productPayload,
+    public ProductWriteDTO updateOneProduct(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
                                             @PathVariable("id") Long productId) {
         catalogueService.updateOneProduct(productPayload, productId);
         return null;

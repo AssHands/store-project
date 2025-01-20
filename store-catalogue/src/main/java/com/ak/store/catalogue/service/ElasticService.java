@@ -251,7 +251,7 @@ public class ElasticService {
                                     .field("characteristics.id")
                                     .value(filter.getId())));
 
-                    if(filter.isText()) {
+                    if(filter.getIsText()) {
                         fa.aggregations("text_values", tv -> tv
                                 .terms(t -> t
                                         .field("characteristics.text_value")

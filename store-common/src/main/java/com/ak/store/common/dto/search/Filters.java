@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Filters {
 
-    private List<NumericFilter> numericFilters = new ArrayList<>();
+    private List<@Valid NumericFilter> numericFilters = new ArrayList<>();
 
-    private List<TextFilter> textFilters = new ArrayList<>();
+    private List<@Valid TextFilter> textFilters = new ArrayList<>();
 }

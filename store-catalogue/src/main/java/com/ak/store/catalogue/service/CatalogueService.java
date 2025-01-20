@@ -15,6 +15,8 @@ import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,9 @@ public class CatalogueService {
     private final CatalogueValidator catalogueValidator;
     private final S3Service s3Service;
     private final ProductImageRepo productImageRepo;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     public CatalogueService(ProductRepo productRepo, ElasticService esService, CatalogueMapper catalogueMapper,
@@ -180,6 +185,7 @@ public class CatalogueService {
     }
 
     @Transactional
+    //todo: when product doesn't exist, no errors will throw. FIX
     public void deleteOneProduct(Long id) {
         List<String> imageKeysForDelete = productImageRepo.findAllByProductId(id).stream()
                 .map(ProductImage::getImageKey)

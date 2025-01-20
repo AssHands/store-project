@@ -14,7 +14,12 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
             type = EntityGraph.EntityGraphType.LOAD)
     List<Product> findAllFullByIdIn(Collection<Long> ids);
 
+    @EntityGraph(attributePaths = { "characteristics", "characteristics.characteristic", "category"},
+            type = EntityGraph.EntityGraphType.LOAD)
+    Optional<Product> findOneFullById(Long id);
+
     List<Product> findAllViewByIdIn(Collection<Long> ids);
+    Optional<Product> findOneViewById(Long id);
 
     @NonNull
     @EntityGraph(attributePaths = { "characteristics", "characteristics.characteristic", "category"},

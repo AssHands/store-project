@@ -49,13 +49,15 @@ public class Product {
     @Column(name = "amount_reviews")
     private int amountReviews;
 
-    @Min(1)
-    @Max(5)
+    //todo: check it work
+    @DecimalMin(value = "0.1")
+    @DecimalMax(value = "5.0")
     private float grade;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductCharacteristic> characteristics = new ArrayList<>();
 
+    @Size(max = 10)
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductImage> images = new ArrayList<>();
 
