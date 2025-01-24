@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.controller;
 
+import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.service.CatalogueService;
 import com.ak.store.common.dto.catalogue.product.*;
 import com.ak.store.common.dto.search.Filters;

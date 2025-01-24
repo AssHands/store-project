@@ -4,6 +4,8 @@ import com.ak.store.catalogue.model.entity.relation.CategoryCharacteristic;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ import java.util.List;
 @ToString(exclude = { "characteristics" })
 @EqualsAndHashCode(of = { "name" })
 @Table(name = "category")
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "static-data")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -212,7 +212,7 @@ public class ElasticService {
 
     private Map<String, Aggregation> buildAggregations(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         List<Characteristic> filters = 
-                characteristicRepo.findAllValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
+                characteristicRepo.findAllWithAllValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
         Map<String, Aggregation> aggs = new HashMap<>();
 
         for(var filter : filters) {

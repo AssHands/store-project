@@ -62,7 +62,7 @@ public class CatalogueValidator {
     }
 
     public void validateCharacteristics(Iterable<ProductCharacteristicDTO> characteristics, Long categoryId) {
-        var availableMap = characteristicRepo.findTextValuesByCategoryId(categoryId).stream()
+        var availableMap = characteristicRepo.findAllWithTextValuesByCategoryId(categoryId).stream()
                 .collect(Collectors.toMap(
                         Characteristic::getId,
                         characteristic -> characteristic.getTextValues().stream().map(TextValue::getTextValue).toList()));

@@ -3,6 +3,8 @@ package com.ak.store.catalogue.model.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Data
 @AllArgsConstructor
@@ -12,6 +14,7 @@ import lombok.*;
 @Entity
 @Builder
 @Table(name = "text_value")
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "static-data")
 public class TextValue {
     @Id
     @GeneratedValue(generator = "tv_gen", strategy = GenerationType.SEQUENCE)

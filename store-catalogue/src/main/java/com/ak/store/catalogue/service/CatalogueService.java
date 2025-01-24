@@ -18,6 +18,10 @@ import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.CacheRegionStatistics;
+import org.hibernate.stat.Statistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -180,8 +184,15 @@ public class CatalogueService {
                 .toList();
     }
 
+//    Session session = entityManager.unwrap(Session.class);
+//    SessionFactory sessionFactory = session.getSessionFactory();
+//    sessionFactory.getCache();
+//    Session session = entityManager.unwrap(Session.class);
+//    Statistics statistics = session.getSessionFactory().getStatistics();
+//    CacheRegionStatistics cacheStatistics = statistics.getDomainDataRegionStatistics("static-data");
+
     public Filters findAllAvailableCharacteristic(Long categoryId) {
-        return catalogueMapper.mapToFilters(characteristicRepo.findTextValuesByCategoryId(categoryId));
+        return catalogueMapper.mapToFilters(characteristicRepo.findAllWithTextValuesByCategoryId(categoryId));
     }
 
     @Transactional

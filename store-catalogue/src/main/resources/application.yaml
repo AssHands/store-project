@@ -8,6 +8,13 @@ spring:
     show-sql: true
     properties:
       hibernate:
+        javax.cache:
+          provider: org.ehcache.jsr107.EhcacheCachingProvider
+          uri: classpath:ehcache-config.xml
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region.factory_class: jcache
         format_sql: true
         jdbc:
           batch_size: 50
@@ -17,5 +24,5 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 5MB
+      max-request-size: 50MB
