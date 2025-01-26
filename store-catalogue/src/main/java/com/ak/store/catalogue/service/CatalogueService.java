@@ -18,11 +18,9 @@ import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.stat.CacheRegionStatistics;
-import org.hibernate.stat.Statistics;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,35 +29,21 @@ import java.util.regex.Pattern;
 
 
 @Service
+@RequiredArgsConstructor
 public class CatalogueService {
     private final ProductRepo productRepo;
     private final ElasticService esService;
     private final CatalogueMapper catalogueMapper;
-    private final ProductCharacteristicRepo productCharacteristicRepo;
     private final CharacteristicRepo characteristicRepo;
     private final CategoryRepo categoryRepo;
     private final CatalogueValidator catalogueValidator;
     private final S3Service s3Service;
-    private final ProductImageRepo productImageRepo;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
-    public CatalogueService(ProductRepo productRepo, ElasticService esService, CatalogueMapper catalogueMapper,
-                            ProductCharacteristicRepo productCharacteristicRepo, CharacteristicRepo characteristicRepo,
-                            CategoryRepo categoryRepo, CatalogueValidator catalogueValidator, S3Service s3Service,
-                            ProductImageRepo productImageRepo) {
-        this.productRepo = productRepo;
-        this.esService = esService;
-        this.catalogueMapper = catalogueMapper;
-        this.productCharacteristicRepo = productCharacteristicRepo;
-        this.characteristicRepo = characteristicRepo;
-        this.categoryRepo = categoryRepo;
-        this.catalogueValidator = catalogueValidator;
-        this.s3Service = s3Service;
-        this.productImageRepo = productImageRepo;
-    }
+    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
+    private int BATCH_SIZE;
 
     public ProductFullReadDTO findOneProductById(Long id) {
         return catalogueMapper.mapToProductFullReadDTO(
@@ -69,10 +53,10 @@ public class CatalogueService {
     @Transactional
     public void saveOrUpdateAllImage(Long productId, Map<String, String> allImagePositions,
                                      List<MultipartFile> addImages, List<String> deleteImageIndexes) {
-        List<ProductImage> productImages = productImageRepo.findAllByProductId(productId);
+        Product updatedProduct = productRepo.findOneWithImagesById(productId).orElseThrow(() -> new RuntimeException("Not found"));
+        List<ProductImage> productImages = updatedProduct.getImages();
         catalogueValidator.validateImages(allImagePositions, addImages, deleteImageIndexes, productImages);
 
-        List<Long> imageIdsForDelete = new ArrayList<>();
         List<String> imageKeysForDelete = new ArrayList<>();
 
         //set null for deleted images
@@ -86,16 +70,15 @@ public class CatalogueService {
 
                 if(isDeleted) {
                     imageKeysForDelete.add(productImages.get(i).getImageKey());
-                    imageIdsForDelete.add(productImages.get(i).getId());
                     productImages.set(i, null);
                 }
             }
         }
 
-        //generate keys for new images and wrap to Map<Key, Image>
+        //generate keys for new images and wrap to Map<ImageKey, Image>
         Map<String, MultipartFile> imagesForAdd = new LinkedHashMap<>();
         if(addImages != null && !addImages.isEmpty()) {
-            imagesForAdd = s3Service.generateImageKeys(productId, addImages);
+            imagesForAdd = s3Service.generateImageKeys(updatedProduct, addImages);
         }
 
         //add new images to list
@@ -132,8 +115,9 @@ public class CatalogueService {
         }
 
         //delete and add images to DB
-        productImageRepo.deleteAllById(imageIdsForDelete);
-        productImageRepo.saveAll(newProductImages);
+        updatedProduct.getImages().clear();
+        updatedProduct.getImages().addAll(newProductImages);
+        productRepo.saveAndFlush(updatedProduct);
 
         //delete images from S3
         for(var deleteImageKey : imageKeysForDelete) {
@@ -196,64 +180,51 @@ public class CatalogueService {
     }
 
     @Transactional
-    //todo: when product doesn't exist, no errors will throw. FIX
+    //todo: when product doesn't exist, no errors will throw. MAKE IT
     public void deleteOneProduct(Long id) {
-        List<String> imageKeysForDelete = productImageRepo.findAllByProductId(id).stream()
-                .map(ProductImage::getImageKey)
-                .toList();
-
         productRepo.deleteById(id);
         esService.deleteOneProduct(id);
-
-        for(var imageKey : imageKeysForDelete) {
-            s3Service.deleteOneImage(imageKey);
-        }
     }
 
     @Transactional
-    //todo: when jakarta validation fail, document will index in ES anyway. FIX
     public void createOneProduct(ProductWritePayload productPayload) {
-        if(productPayload.getProduct().getCategoryId() == null) {
-            throw new RuntimeException("category_id is null");
-        }
-
         Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
+        createProductCharacteristics(createdProduct, productPayload.getCreateCharacteristics());
 
-        List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
-        createProductCharacteristics(createdProduct, productCharacteristics,
-                productPayload.getCreateCharacteristics());
-
-        productRepo.save(createdProduct);
-        productCharacteristicRepo.saveAll(productCharacteristics);
-
+        //flush for immediate validation, without it, data will index in ES, even when validation failed
+        productRepo.saveAndFlush(createdProduct);
         esService.createOneProduct(catalogueMapper.mapToProductDocument(createdProduct));
     }
 
     @Transactional
     public void createAllProduct(List<ProductWritePayload> productPayloads) {
         List<Product> products = new ArrayList<>();
-        List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
-        for(var payload : productPayloads) {
-            if(payload.getProduct().getCategoryId() == null) {
-                throw new RuntimeException("category_id is null");
+        for (int i = 0; i < productPayloads.size(); i++) {
+            if(i > 0 && i % BATCH_SIZE == 0) {
+                productRepo.saveAllAndFlush(products);
+                esService.createAllProduct(products.stream()
+                        .map(catalogueMapper::mapToProductDocument)
+                        .toList());
+
+                entityManager.clear();
+                products.clear();
             }
 
-            Product createdProduct = catalogueMapper.mapToProduct(payload.getProduct());
+            Product createdProduct = catalogueMapper.mapToProduct(productPayloads.get(i).getProduct());
+            createProductCharacteristics(createdProduct, productPayloads.get(i).getCreateCharacteristics());
             products.add(createdProduct);
-
-            createProductCharacteristics(createdProduct, productCharacteristics,
-                    payload.getCreateCharacteristics());
         }
 
-        productRepo.saveAll(products);
-        productCharacteristicRepo.saveAll(productCharacteristics);
-
-        esService.createAllProduct(products.stream().map(catalogueMapper::mapToProductDocument).toList());
+        //flush for immediate validation, without it, data will index in ES, even when validation failed
+        productRepo.saveAllAndFlush(products);
+        esService.createAllProduct(products.stream()
+                .map(catalogueMapper::mapToProductDocument)
+                .toList());
     }
 
     @Transactional
     public void updateOneProduct(ProductWritePayload productPayload, Long productId) {
-        Product updatedProduct = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Not found"));
+        Product updatedProduct = productRepo.findOneForUpdateById(productId).orElseThrow(() -> new RuntimeException("Not found"));
         ProductWriteDTO productDTO = productPayload.getProduct();
 
         if(productDTO.getTitle() != null) {
@@ -292,28 +263,20 @@ public class CatalogueService {
             updatedProduct.getCharacteristics().clear();
         }
 
-        List<ProductCharacteristic> createProductCharacteristics = new ArrayList<>();
-        List<ProductCharacteristic> deleteProductCharacteristics = new ArrayList<>();
-
         if(!productPayload.getCreateCharacteristics().isEmpty()) {
-            createProductCharacteristics(updatedProduct, createProductCharacteristics,
-                    productPayload.getCreateCharacteristics());
+            createProductCharacteristics(updatedProduct, productPayload.getCreateCharacteristics());
         }
 
         if(!productPayload.getUpdateCharacteristics().isEmpty()) {
-            updateProductCharacteristics(updatedProduct, createProductCharacteristics,
-                    productPayload.getUpdateCharacteristics());
+            updateProductCharacteristics(updatedProduct, productPayload.getUpdateCharacteristics());
         }
 
         if(!productPayload.getDeleteCharacteristics().isEmpty()) {
-            deleteProductCharacteristics(updatedProduct, deleteProductCharacteristics,
-                    productPayload.getDeleteCharacteristics());
+            deleteProductCharacteristics(updatedProduct, productPayload.getDeleteCharacteristics());
         }
 
-        productCharacteristicRepo.saveAll(createProductCharacteristics);
-        productCharacteristicRepo.deleteAll(deleteProductCharacteristics); //todo: need a check for empty collection?
-        productRepo.save(updatedProduct);
-
+        //flush for immediate validation, without it, data will index in ES, even when validation failed
+        productRepo.saveAndFlush(updatedProduct);
         esService.updateOneProduct(catalogueMapper.mapToProductDocument(updatedProduct));
     }
 
@@ -325,16 +288,15 @@ public class CatalogueService {
         return -1;
     }
 
-    private void createProductCharacteristics(Product updatedProduct, List<ProductCharacteristic> productCharacteristics,
-                                              Set<ProductCharacteristicDTO> createdCharacteristics) {
-        catalogueValidator.validateCharacteristics(createdCharacteristics, updatedProduct.getCategory().getId());
+    private void createProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> createCharacteristics) {
+        catalogueValidator.validateCharacteristics(createCharacteristics, updatedProduct.getCategory().getId());
 
         List<Long> existingCharacteristicIds = updatedProduct.getCharacteristics().stream()
                 .map(pc -> pc.getCharacteristic().getId())
                 .toList();
 
         if(!existingCharacteristicIds.isEmpty()) {
-            List<Long> creatingCharacteristicIds = createdCharacteristics.stream()
+            List<Long> creatingCharacteristicIds = createCharacteristics.stream()
                     .map(ProductCharacteristicDTO::getId)
                     .toList();
 
@@ -348,36 +310,29 @@ public class CatalogueService {
             }
         }
 
-        List<ProductCharacteristic> list = createdCharacteristics.stream()
-                .map(characteristic -> catalogueMapper.mapToProductCharacteristic(characteristic, updatedProduct))
+        List<ProductCharacteristic> createdCharacteristics = createCharacteristics.stream()
+                .map(c -> catalogueMapper.mapToProductCharacteristic(c, updatedProduct))
                 .toList();
 
-        updatedProduct.addCharacteristics(list);
-        productCharacteristics.addAll(list);
+        updatedProduct.addCharacteristics(createdCharacteristics);
     }
 
-    private void updateProductCharacteristics(Product updatedProduct, List<ProductCharacteristic> productCharacteristics,
-                                              Set<ProductCharacteristicDTO> updatedCharacteristics) {
-        catalogueValidator.validateCharacteristics(updatedCharacteristics, updatedProduct.getCategory().getId());
-
-        for(var characteristic : updatedCharacteristics) {
+    private void updateProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> updateCharacteristics) {
+        catalogueValidator.validateCharacteristics(updateCharacteristics, updatedProduct.getCategory().getId());
+        for(var characteristic : updateCharacteristics) {
             int index = findCharacteristicIndexById(updatedProduct.getCharacteristics(), characteristic.getId());
             if(index != -1) {
                 updatedProduct.getCharacteristics().get(index).setTextValue(characteristic.getTextValue());
                 updatedProduct.getCharacteristics().get(index).setNumericValue(characteristic.getNumericValue());
-                productCharacteristics.add(updatedProduct.getCharacteristics().get(index));
             }
         }
     }
 
-    private void deleteProductCharacteristics(Product updatedProduct, List<ProductCharacteristic> productCharacteristics,
-                                              Set<ProductCharacteristicDTO> deletedCharacteristics) {
-        for(var characteristic : deletedCharacteristics) {
+    private void deleteProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> deleteCharacteristics) {
+        for(var characteristic : deleteCharacteristics) {
             int index = findCharacteristicIndexById(updatedProduct.getCharacteristics(), characteristic.getId());
-            if(index != -1) {
-                productCharacteristics.add(updatedProduct.getCharacteristics().get(index));
+            if(index != -1)
                 updatedProduct.getCharacteristics().remove(index);
-            }
         }
     }
 

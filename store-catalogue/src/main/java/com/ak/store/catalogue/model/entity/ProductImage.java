@@ -17,7 +17,8 @@ import lombok.*;
 @Table(name = "product_image")
 public class ProductImage {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "pi_gen", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "pi_gen",sequenceName = "product_image_id_seq", allocationSize = 1)
     private Long id;
 
     @NotNull

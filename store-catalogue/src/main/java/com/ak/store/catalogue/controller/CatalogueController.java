@@ -45,8 +45,7 @@ public class CatalogueController {
         return null;
     }
 
-    @PostMapping("products/batch")
-    //todo: make validation for list
+    @PostMapping("products/batch") //todo: make validation for list
     public ProductWriteDTO createAllProduct(@RequestBody List<ProductWritePayload> productPayloads) {
 
         for(ProductWritePayload payload : productPayloads) {

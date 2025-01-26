@@ -6,6 +6,7 @@ spring:
 
   jpa:
     show-sql: true
+    open-in-view: false
     properties:
       hibernate:
         javax.cache:
@@ -19,8 +20,8 @@ spring:
         jdbc:
           batch_size: 50
         generate_statistics: true
-      order_inserts: true
-      order_updates: true
+        order_inserts: true
+        order_updates: true
 
   servlet:
     multipart:

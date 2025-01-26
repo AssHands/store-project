@@ -22,21 +22,21 @@ services:
     ports:
       - 5601:5601
 
-  logstash:
-    container_name: logstash
-    image: logstash:7.17.26
-    restart: always
-    depends_on:
-      - elasticsearch
-    volumes:
-      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ./logstash/pipeline.conf:/usr/share/logstash/config/pipeline.conf
-      - ./logstash/postgresql-driver.jar:/usr/share/logstash/jars/postgresql-driver.jar
-    ports:
-      - 9600:9600
-      - 9700:9700
-      - 5044:5044
-      - 5046:5046
+#  logstash:
+#    container_name: logstash
+#    image: logstash:7.17.26
+#    restart: always
+#    depends_on:
+#      - elasticsearch
+#    volumes:
+#      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+#      - ./logstash/pipeline.conf:/usr/share/logstash/config/pipeline.conf
+#      - ./logstash/postgresql-driver.jar:/usr/share/logstash/jars/postgresql-driver.jar
+#    ports:
+#      - 9600:9600
+#      - 9700:9700
+#      - 5044:5044
+#      - 5046:5046
 
   postgres:
     image: postgres:17.0-alpine
@@ -64,3 +64,18 @@ services:
     command: server --console-address ":9001" /export/
     volumes:
       - ./minio/data:/export
+
+#  hazelcast:
+#    image: hazelcast/hazelcast:5.5
+#    environment:
+#      - HZ_CLUSTERNAME=dev
+#    ports:
+#      - 5701:5701
+#
+#  management-center:
+#    image: hazelcast/management-center:5.5
+#    ports:
+#      - 5801:8080
+#    environment:
+#      - MC_DEFAULT_CLUSTER=dev
+#      - MC_DEFAULT_CLUSTER_MEMBERS=hazelcast:5701

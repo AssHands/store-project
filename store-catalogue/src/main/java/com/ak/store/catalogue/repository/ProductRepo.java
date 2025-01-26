@@ -10,19 +10,27 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepo extends JpaRepository<Product, Long> {
-    @EntityGraph(attributePaths = { "characteristics", "characteristics.characteristic", "category"},
-            type = EntityGraph.EntityGraphType.LOAD)
+    @EntityGraph(attributePaths = {"characteristics", "characteristics.characteristic", "category", "images"})
     List<Product> findAllFullByIdIn(Collection<Long> ids);
 
-    @EntityGraph(attributePaths = { "characteristics", "characteristics.characteristic", "category"},
-            type = EntityGraph.EntityGraphType.LOAD)
+
+    //todo: EntityGraph не тестировал
+    @EntityGraph(attributePaths = {"characteristics", "characteristics.characteristic", "category", "images"})
     Optional<Product> findOneFullById(Long id);
 
+
+    //todo: EntityGraph не тестировал
+    @EntityGraph(attributePaths = {"images"})
     List<Product> findAllViewByIdIn(Collection<Long> ids);
+
+
+    //todo: EntityGraph не тестировал
+    @EntityGraph(attributePaths = {"images"})
     Optional<Product> findOneViewById(Long id);
 
-    @NonNull
-    @EntityGraph(attributePaths = { "characteristics", "characteristics.characteristic", "category"},
-            type = EntityGraph.EntityGraphType.LOAD)
-    Optional<Product> findById(@NonNull Long id);
+    @EntityGraph(attributePaths = {"characteristics", "characteristics.characteristic", "category"})
+    Optional<Product> findOneForUpdateById(Long id);
+
+    @EntityGraph(attributePaths = {"images"})
+    Optional<Product> findOneWithImagesById(Long id);
 }

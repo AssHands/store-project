@@ -7,21 +7,21 @@
         <expiry>
             <ttl unit="hours">1</ttl>
         </expiry>
-        <heap>1000</heap>
+        <heap>2000</heap>
     </cache>
 
     <cache alias="default-query-results-region">
         <expiry>
             <ttl unit="hours">1</ttl>
         </expiry>
-        <heap>1000</heap>
+        <heap>2000</heap>
     </cache>
 
     <cache alias="default-update-timestamps-region">
         <expiry>
             <none/>
         </expiry>
-        <heap>1000</heap>
+        <heap>2000</heap>
     </cache>
 
 </config>

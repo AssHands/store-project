@@ -12,10 +12,10 @@ import java.util.List;
 
 public interface CharacteristicRepo extends JpaRepository<Characteristic, Long> {
     @QueryHints(@QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true"))
-    @EntityGraph(attributePaths = { "textValues", "rangeValues" }, type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(attributePaths = { "textValues", "rangeValues" })
     List<Characteristic> findAllWithAllValuesByCategoryId(Long categoryId);
 
     @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
-    @EntityGraph(attributePaths = { "textValues" }, type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(attributePaths = { "textValues" })
     List<Characteristic> findAllWithTextValuesByCategoryId(Long categoryId);
 }

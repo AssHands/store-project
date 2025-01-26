@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"category"})
+@ToString(exclude = {"category", "images", "characteristics"})
 @Entity
 public class Product {
     @Id
@@ -54,11 +54,11 @@ public class Product {
     @DecimalMax(value = "5.0")
     private float grade;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductCharacteristic> characteristics = new ArrayList<>();
 
-    @Size(max = 10)
-    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
 
     public void addCharacteristics(List<ProductCharacteristic> characteristics) {

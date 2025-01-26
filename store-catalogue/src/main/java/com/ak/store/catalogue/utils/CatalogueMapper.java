@@ -57,7 +57,7 @@ public class CatalogueMapper {
     }
 
 
-    //todo: приниимать не product, а Long productId
+    //method accept Product instead of productId cuz product doesn't have id when we just created it
     public ProductCharacteristic mapToProductCharacteristic(ProductCharacteristicDTO productCharacteristicDTO, Product product) {
         return ProductCharacteristic.builder()
                 .numericValue(productCharacteristicDTO.getNumericValue())

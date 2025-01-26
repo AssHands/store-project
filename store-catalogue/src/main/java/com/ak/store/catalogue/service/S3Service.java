@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.repository.ProductRepo;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,10 +47,7 @@ public class S3Service {
         s3Client.deleteObject(request);
     }
 
-    public Map<String, MultipartFile> generateImageKeys(Long productId, List<MultipartFile> images) {
-        var product = productRepo.findOneViewById(productId)
-                .orElseThrow(() -> new RuntimeException("Not found"));
-
+    public Map<String, MultipartFile> generateImageKeys(Product product, List<MultipartFile> images) {
         Map<String, MultipartFile> imageKeys = new LinkedHashMap<>();
         for(var image : images) {
             imageKeys.put("category_%s/product_%s/%s".formatted(product.getCategory().getId(),
