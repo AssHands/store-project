@@ -11,8 +11,6 @@ import org.springframework.data.jpa.repository.QueryHints;
 import java.util.List;
 
 public interface CategoryRepo extends JpaRepository<Category, Long> {
-    List<Category> findAllByNameContainingIgnoreCase(String name);
-
     @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
     @NonNull
     List<Category> findAll();

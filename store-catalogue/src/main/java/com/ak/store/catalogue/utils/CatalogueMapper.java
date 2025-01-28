@@ -28,7 +28,7 @@ public class CatalogueMapper {
 
     public Product mapToProduct(ProductWriteDTO productWriteDTO) {
         Product product = modelMapper.map(productWriteDTO, Product.class);
-        product.setId(null);
+        product.setId(null); //todo: delete
         product.setGrade(2); //todo: delete
 
         if(productWriteDTO.getDiscountPercentage() == null || productWriteDTO.getDiscountPercentage() == 0) {
@@ -57,7 +57,7 @@ public class CatalogueMapper {
     }
 
 
-    //method accept Product instead of productId cuz product doesn't have id when we just created it
+    //method required product entity instead of product id cuz product doesn't have id when we just created it, for Hibernate
     public ProductCharacteristic mapToProductCharacteristic(ProductCharacteristicDTO productCharacteristicDTO, Product product) {
         return ProductCharacteristic.builder()
                 .numericValue(productCharacteristicDTO.getNumericValue())

@@ -3,7 +3,7 @@ package com.ak.store.catalogue.controller;
 import com.ak.store.catalogue.service.CatalogueService;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
-import com.ak.store.common.payload.search.ProductSearchRequest;
+import com.ak.store.common.payload.search.SearchProductRequest;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +24,9 @@ public class ProductSearchController {
     }
 
     @GetMapping
-    public ProductSearchResponse searchAllProduct(@RequestBody @Valid ProductSearchRequest productSearchRequest) {
-        System.out.println(productSearchRequest);
-        return catalogueService.findAllProductBySearch(productSearchRequest);
+    public ProductSearchResponse searchAllProduct(@RequestBody @Valid SearchProductRequest searchProductRequest) {
+        System.out.println(searchProductRequest);
+        return catalogueService.findAllProductBySearch(searchProductRequest);
     }
 
     @GetMapping("filters")

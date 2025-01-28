@@ -1,7 +1,6 @@
 package com.ak.store.catalogue.repository;
 
 import com.ak.store.catalogue.model.entity.Product;
-import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -29,7 +28,7 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
     Optional<Product> findOneViewById(Long id);
 
     @EntityGraph(attributePaths = {"characteristics", "characteristics.characteristic", "category"})
-    Optional<Product> findOneForUpdateById(Long id);
+    Optional<Product> findOneWithCharacteristicsAndCategoryById(Long id);
 
     @EntityGraph(attributePaths = {"images"})
     Optional<Product> findOneWithImagesById(Long id);

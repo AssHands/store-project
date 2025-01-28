@@ -19,7 +19,7 @@ import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
 import com.ak.store.common.dto.search.nested.NumericFilterValue;
 import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
-import com.ak.store.common.payload.search.ProductSearchRequest;
+import com.ak.store.common.payload.search.SearchProductRequest;
 import com.ak.store.common.dto.search.nested.TextFilter;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
@@ -287,32 +287,32 @@ public class ElasticService {
         return ranges;
     }
 
-    public ElasticSearchResult findAllProduct(ProductSearchRequest productSearchRequest) {
+    public ElasticSearchResult findAllProduct(SearchProductRequest searchProductRequest) {
         List<Query> filters = new ArrayList<>();
 
-        if (productSearchRequest.getPriceTo() != 0) {
+        if (searchProductRequest.getPriceTo() != 0) {
             filters.add(RangeQuery.of(r -> r
                             .field("price")
-                            .gte(JsonData.of(productSearchRequest.getPriceFrom()))
-                            .lte(JsonData.of(productSearchRequest.getPriceTo())))
+                            .gte(JsonData.of(searchProductRequest.getPriceFrom()))
+                            .lte(JsonData.of(searchProductRequest.getPriceTo())))
                     ._toQuery());
         }
 
-        if (productSearchRequest.getCategoryId() != null) {
+        if (searchProductRequest.getCategoryId() != null) {
             filters.add(TermQuery.of(t -> t
                             .field("category_id")
-                            .value(productSearchRequest.getCategoryId()))
+                            .value(searchProductRequest.getCategoryId()))
                     ._toQuery());
         }
 
-        if (!productSearchRequest.getNumericFilters().isEmpty())
-            filters.addAll(makeNumericFilters(productSearchRequest.getNumericFilters(), null));
+        if (!searchProductRequest.getNumericFilters().isEmpty())
+            filters.addAll(makeNumericFilters(searchProductRequest.getNumericFilters(), null));
 
-        if (!productSearchRequest.getTextFilters().isEmpty())
-            filters.addAll(makeTextFilters(productSearchRequest.getTextFilters(), null));
+        if (!searchProductRequest.getTextFilters().isEmpty())
+            filters.addAll(makeTextFilters(searchProductRequest.getTextFilters(), null));
 
-        SearchRequest searchRequest = BuildSearchRequest(productSearchRequest,
-                makeSearchQuery(filters, productSearchRequest.getText()));
+        SearchRequest searchRequest = BuildSearchRequest(searchProductRequest,
+                makeSearchQuery(filters, searchProductRequest.getText()));
 
         SearchResponse<ProductDocument> response;
 
@@ -421,19 +421,19 @@ public class ElasticService {
         });
     }
 
-    private SearchRequest BuildSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {
+    private SearchRequest BuildSearchRequest(SearchProductRequest searchProductRequest, BoolQuery searchQuery) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")
                     .query(q -> q.bool(searchQuery))
-                    .size((productSearchRequest.getLimit() == 0) ? 20 : productSearchRequest.getLimit());
+                    .size((searchProductRequest.getLimit() == 0) ? 20 : searchProductRequest.getLimit());
 
-            if (!productSearchRequest.getSearchAfter().isEmpty()) {
-                productSearchRequest.getSearchAfter().forEach(val ->
+            if (!searchProductRequest.getSearchAfter().isEmpty()) {
+                searchProductRequest.getSearchAfter().forEach(val ->
                         sr.searchAfter(sa -> sa.anyValue(JsonData.of(val))));
             }
 
-            switch (productSearchRequest.getSort()) {
+            switch (searchProductRequest.getSort()) {
                 case PRICE_UP -> {
                     sr.sort(s -> s.field(sort -> sort.field("price")));
                 }

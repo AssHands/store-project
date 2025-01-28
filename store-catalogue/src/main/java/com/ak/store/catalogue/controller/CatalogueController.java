@@ -1,6 +1,5 @@
 package com.ak.store.catalogue.controller;
 
-import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.service.CatalogueService;
 import com.ak.store.common.dto.catalogue.product.*;
 import com.ak.store.common.dto.search.Filters;
@@ -30,12 +29,12 @@ public class CatalogueController {
     }
 
     @GetMapping("products/{id}")
-    public ProductFullReadDTO getOneProductById(@PathVariable("id") Long id) {
+    public ProductFullReadDTO getOneProduct(@PathVariable("id") Long id) {
         return catalogueService.findOneProductById(id);
     }
 
     @DeleteMapping("products/{id}")
-    public void deleteOneProductById(@PathVariable("id") Long id) {
+    public void deleteOneProduct(@PathVariable("id") Long id) {
         catalogueService.deleteOneProduct(id);
     }
 
@@ -44,7 +43,6 @@ public class CatalogueController {
         catalogueService.createOneProduct(productPayload);
         return null;
     }
-
     @PostMapping("products/batch") //todo: make validation for list
     public ProductWriteDTO createAllProduct(@RequestBody List<ProductWritePayload> productPayloads) {
 
@@ -69,16 +67,13 @@ public class CatalogueController {
     }
 
     @GetMapping("categories")
-    public List<CategoryDTO> getAllCategory(@RequestParam(required = false) String name) {
-        if(name != null)
-            return catalogueService.findAllCategoryByName(name);
-
+    public List<CategoryDTO> getAllCategory() {
         return catalogueService.findAllCategory();
     }
 
     @GetMapping("characteristics")
-    public Filters getAllAvailableCharacteristic(@RequestParam Long categoryId) {
-        return catalogueService.findAllAvailableCharacteristic(categoryId);
+    public Filters getAllAvailableCharacteristicByCategory(@RequestParam Long categoryId) {
+        return catalogueService.findAllAvailableCharacteristicByCategory(categoryId);
     }
 
     /**
@@ -128,10 +123,10 @@ public class CatalogueController {
      */
     @PatchMapping(value = "products/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void updateAllProductImage(@PathVariable("id") Long productId,
-                                      @RequestParam Map<String, String> allImagePositions,
+                                      @RequestParam Map<String, String> allImageIndexes,
                                       @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,
                                       @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
-        catalogueService.saveOrUpdateAllImage(productId, allImagePositions, addImages, deleteImageIndexes);
+        catalogueService.saveOrUpdateAllImage(productId, allImageIndexes, addImages, deleteImageIndexes);
     }
 
     @PatchMapping("test")

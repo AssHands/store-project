@@ -47,8 +47,21 @@ public class S3Service {
         s3Client.deleteObject(request);
     }
 
-    public Map<String, MultipartFile> generateImageKeys(Product product, List<MultipartFile> images) {
-        Map<String, MultipartFile> imageKeys = new LinkedHashMap<>();
+    public void deleteAllImage(List<String> imageKeysForDelete) {
+        for(var deleteImageKey : imageKeysForDelete) {
+            deleteOneImage(deleteImageKey);
+        }
+    }
+
+    public void putAllImage(Map<String, MultipartFile> imagesForAdd) {
+        for(var image : imagesForAdd.entrySet()) {
+            putOneImage(image.getValue(), image.getKey());
+        }
+    }
+
+    //LinkedHashMap for save order
+    public LinkedHashMap<String, MultipartFile> generateImageKeys(Product product, List<MultipartFile> images) {
+        LinkedHashMap<String, MultipartFile> imageKeys = new LinkedHashMap<>();
         for(var image : images) {
             imageKeys.put("category_%s/product_%s/%s".formatted(product.getCategory().getId(),
                     product.getId(), UUID.randomUUID() + "." + image.getContentType().split("/")[1]), image);
