@@ -1,8 +1,7 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5430/postgres
-    username: root
-    password: root
+  sql:
+    init:
+      mode: always
 
   jpa:
     show-sql: true
@@ -16,7 +15,7 @@ spring:
         #cache
         javax.cache:
           provider: org.ehcache.jsr107.EhcacheCachingProvider
-          uri: classpath:ehcache-config.xml
+          uri: classpath://ehcache-config.xml
         cache:
           use_second_level_cache: true
           use_query_cache: true

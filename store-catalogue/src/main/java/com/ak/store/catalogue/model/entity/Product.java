@@ -1,6 +1,5 @@
 package com.ak.store.catalogue.model.entity;
 
-import com.ak.store.catalogue.model.entity.relation.ProductCharacteristic;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -52,13 +51,15 @@ public class Product {
     //todo: check it work
     @DecimalMin(value = "0.1")
     @DecimalMax(value = "5.0")
-    private float grade;
+    private Float grade;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ProductCharacteristic> characteristics = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ProductImage> images = new ArrayList<>();
 
     public void addCharacteristics(List<ProductCharacteristic> characteristics) {

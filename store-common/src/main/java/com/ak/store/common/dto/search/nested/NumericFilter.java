@@ -25,6 +25,7 @@ public class NumericFilter {
 
     private String name;
 
+    @Builder.Default
     @NotEmpty
     private List<NumericFilterValue> values = new ArrayList<>();
 }

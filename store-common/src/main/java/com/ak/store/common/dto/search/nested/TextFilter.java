@@ -26,5 +26,6 @@ public class TextFilter {
     private String name;
 
     @NotEmpty
+    @Builder.Default
     private List<String> values = new ArrayList<>();
 }

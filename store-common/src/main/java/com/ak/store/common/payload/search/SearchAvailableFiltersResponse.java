@@ -23,6 +23,7 @@ import java.util.List;
 public class SearchAvailableFiltersResponse {
 
     private Long categoryId;
+    @Builder.Default
     private Filters filters = new Filters();
 
     @JsonIgnore

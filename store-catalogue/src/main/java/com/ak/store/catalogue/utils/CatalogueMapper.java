@@ -6,7 +6,7 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.TextValue;
-import com.ak.store.catalogue.model.entity.relation.ProductCharacteristic;
+import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.common.dto.catalogue.product.*;
 import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
@@ -29,7 +29,7 @@ public class CatalogueMapper {
     public Product mapToProduct(ProductWriteDTO productWriteDTO) {
         Product product = modelMapper.map(productWriteDTO, Product.class);
         product.setId(null); //todo: delete
-        product.setGrade(2); //todo: delete
+        product.setGrade(null); //todo: delete
 
         if(productWriteDTO.getDiscountPercentage() == null || productWriteDTO.getDiscountPercentage() == 0) {
             product.setDiscountPercentage(0);

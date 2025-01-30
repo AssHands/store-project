@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.model.entity.relation;
+package com.ak.store.catalogue.model.entity;
 
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
@@ -35,11 +35,4 @@ public class ProductCharacteristic {
     private Integer numericValue;
 
     private String textValue;
-
-    public ProductCharacteristic(Product product, Characteristic characteristic, Integer numericValue, String textValue) {
-        this.product = product;
-        this.characteristic = characteristic;
-        this.numericValue = numericValue;
-        this.textValue = textValue;
-    }
 }

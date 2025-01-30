@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.Validator;
+package com.ak.store.catalogue.validator;
 
 import com.ak.store.catalogue.model.entity.ProductImage;
 import org.springframework.stereotype.Component;

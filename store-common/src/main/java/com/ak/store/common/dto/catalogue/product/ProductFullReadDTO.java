@@ -37,6 +37,7 @@ public class ProductFullReadDTO {
 
     @Valid
     private CategoryDTO category;
-    
+
+    @Builder.Default
     private List<@Valid ProductCharacteristicDTO> characteristics = new ArrayList<>();
 }

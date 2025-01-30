@@ -30,10 +30,12 @@ public class Characteristic {
     private Boolean isText;
 
     @OneToMany(mappedBy = "characteristic")
+    @Builder.Default
     private Set<TextValue> textValues = new HashSet<>();
 
     @OneToMany(mappedBy = "characteristic")
     @OrderBy("fromValue")
+    @Builder.Default
     private Set<RangeValue> rangeValues = new HashSet<>();
 
     @ManyToMany
@@ -42,6 +44,7 @@ public class Characteristic {
             joinColumns = @JoinColumn(name = "characteristic_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
+    @Builder.Default
     private Set<Category> category = new HashSet<>();
 
     public Characteristic(Long id) {
