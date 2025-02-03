@@ -31,6 +31,7 @@ public class CatalogueMapper {
         product.setId(null); //todo: delete
         product.setGrade(null); //todo: delete
 
+        //todo: delete business logic from HEREEEEEE
         if(productWriteDTO.getDiscountPercentage() == null || productWriteDTO.getDiscountPercentage() == 0) {
             product.setDiscountPercentage(0);
             product.setCurrentPrice(product.getFullPrice());
@@ -40,10 +41,12 @@ public class CatalogueMapper {
             product.setCurrentPrice(priceWithDiscount);
         }
 
-        product.setCategory(
-                Category.builder()
-                        .id(productWriteDTO.getCategoryId())
-                        .build());
+        if(productWriteDTO.getCategoryId() != null) {
+            product.setCategory(
+                    Category.builder()
+                            .id(productWriteDTO.getCategoryId())
+                            .build());
+        }
 
         return product;
     }

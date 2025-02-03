@@ -5,9 +5,9 @@ import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.utils.CatalogueMapper;
+import com.ak.store.catalogue.utils.ProductUtils;
 import com.ak.store.catalogue.validator.ProductCharacteristicValidator;
 import com.ak.store.catalogue.validator.ProductImageValidator;
-import com.ak.store.common.dto.catalogue.product.ProductCharacteristicDTO;
 import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
 import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
@@ -19,13 +19,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +37,8 @@ public class ProductService {
     private final ProductCharacteristicValidator productCharacteristicValidator;
     private final ProductImageValidator productImageValidator;
     private final S3Service s3Service;
+    private final ProductUtils productUtils;
+    private final ProductCharacteristicService productCharacteristicService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -58,9 +60,9 @@ public class ProductService {
         List<ProductImage> productImages = updatedProduct.getImages();
         productImageValidator.validate(allImageIndexes, addImages, deleteImageIndexes, productImages);
 
-        List<String> imageKeysForDelete = markImagesForDelete(productImages, deleteImageIndexes);
+        List<String> imageKeysForDelete = productUtils.markImagesForDelete(productImages, deleteImageIndexes);
         //LinkedHashMap for save order
-        LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, addImages);
+        LinkedHashMap<String, MultipartFile> imagesForAdd = productUtils.prepareImagesForAdd(updatedProduct, addImages);
 
         for (String key : imagesForAdd.keySet()) {
             productImages.add(ProductImage.builder()
@@ -71,7 +73,7 @@ public class ProductService {
                     .build());
         }
 
-        List<ProductImage> newProductImages = createNewProductImagesList(productImages, allImageIndexes);
+        List<ProductImage> newProductImages = productUtils.createNewProductImagesList(productImages, allImageIndexes);
 
         //update images in DB
         updatedProduct.getImages().clear();
@@ -81,57 +83,6 @@ public class ProductService {
         //update images in S3
         s3Service.deleteAllImage(imageKeysForDelete);
         s3Service.putAllImage(imagesForAdd);
-    }
-
-    private List<String> markImagesForDelete(List<ProductImage> productImages, List<String> deleteImageIndexes) {
-        List<String> imageKeysForDelete = new ArrayList<>();
-        if (deleteImageIndexes != null && !deleteImageIndexes.isEmpty()) {
-            for (int i = 0; i < productImages.size(); i++) {
-                var index = productImages.get(i).getIndex();
-                boolean isDeleted = deleteImageIndexes.stream()
-                        .map(Integer::parseInt)
-                        .anyMatch(deletedIndex -> deletedIndex.equals(index));
-
-                if (isDeleted) {
-                    imageKeysForDelete.add(productImages.get(i).getImageKey());
-                    productImages.set(i, null);
-                }
-            }
-        }
-        return imageKeysForDelete;
-    }
-
-    private LinkedHashMap<String, MultipartFile> prepareImagesForAdd(Product updatedProduct, List<MultipartFile> addImages) {
-        //LinkedHashMap for save order
-        LinkedHashMap<String, MultipartFile> imagesForAdd = new LinkedHashMap<>();
-        if (addImages != null && !addImages.isEmpty()) {
-            imagesForAdd = s3Service.generateImageKeys(updatedProduct, addImages);
-        }
-        return imagesForAdd;
-    }
-
-    private List<ProductImage> createNewProductImagesList(List<ProductImage> productImages, Map<String, String> allImageIndexes) {
-        int finalProductImagesSize = (int) productImages.stream()
-                .filter(Objects::nonNull)
-                .count();
-
-        List<ProductImage> newProductImages = new ArrayList<>(finalProductImagesSize);
-        for (int i = 0; i < finalProductImagesSize; i++) {
-            newProductImages.add(null);
-        }
-
-        for (var entry : allImageIndexes.entrySet()) {
-            if (!Pattern.compile("image\\[\\d]").matcher(entry.getKey()).matches())
-                continue;
-
-            int currentIndex = Integer.parseInt(entry.getKey().replaceAll("\\D", ""));
-            int newIndex = Integer.parseInt(entry.getValue());
-
-            newProductImages.set(newIndex, productImages.get(currentIndex));
-            newProductImages.get(newIndex).setIndex(newIndex);
-        }
-
-        return newProductImages;
     }
 
     public ProductSearchResponse findAllProductBySearch(SearchProductRequest searchProductRequest) {
@@ -159,15 +110,28 @@ public class ProductService {
 
     @Transactional
     //todo: when product doesn't exist, no errors will throw. MAKE IT
-    public void deleteOneProduct(Long id) {
-        productRepo.deleteById(id);
-        elasticService.deleteOneProduct(id);
+    public boolean deleteOneProduct(Long id) {
+        Optional<Product> product = productRepo.findOneWithImagesById(id);
+        if(product.isPresent()) {
+            List<String> imageKeys = product.get().getImages().stream()
+                    .map(ProductImage::getImageKey)
+                    .toList();
+
+            productRepo.deleteById(id);
+            s3Service.deleteAllImage(imageKeys);
+            elasticService.deleteOneProduct(id);
+            return true;
+        }
+        return false;
     }
 
     @Transactional
     public Long createOneProduct(ProductWritePayload productPayload) {
         Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
-        createProductCharacteristics(createdProduct, productPayload.getCreateCharacteristics());
+        if(createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
+            throw new RuntimeException("category_id is null");
+        }
+        productCharacteristicService.addProductCharacteristics(createdProduct, productPayload.getCreateCharacteristics());
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
         productRepo.saveAndFlush(createdProduct);
@@ -186,12 +150,15 @@ public class ProductService {
                         .map(catalogueMapper::mapToProductDocument)
                         .toList());
 
-                entityManager.clear();
+                productRepo.clear();
                 products.clear();
             }
 
             Product createdProduct = catalogueMapper.mapToProduct(productPayloads.get(i).getProduct());
-            createProductCharacteristics(createdProduct, productPayloads.get(i).getCreateCharacteristics());
+            if(createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
+                throw new RuntimeException("one of the products does not have a defined category_id");
+            }
+            productCharacteristicService.addProductCharacteristics(createdProduct, productPayloads.get(i).getCreateCharacteristics());
             products.add(createdProduct);
         }
 
@@ -209,15 +176,15 @@ public class ProductService {
         updateProduct(updatedProduct, productPayload.getProduct());
 
         if(!productPayload.getCreateCharacteristics().isEmpty()) {
-            createProductCharacteristics(updatedProduct, productPayload.getCreateCharacteristics());
+            productCharacteristicService.addProductCharacteristics(updatedProduct, productPayload.getCreateCharacteristics());
         }
 
         if(!productPayload.getUpdateCharacteristics().isEmpty()) {
-            updateProductCharacteristics(updatedProduct, productPayload.getUpdateCharacteristics());
+            productCharacteristicService.updateProductCharacteristics(updatedProduct, productPayload.getUpdateCharacteristics());
         }
 
         if(!productPayload.getDeleteCharacteristics().isEmpty()) {
-            deleteProductCharacteristics(updatedProduct, productPayload.getDeleteCharacteristics());
+            productCharacteristicService.deleteProductCharacteristics(updatedProduct, productPayload.getDeleteCharacteristics());
         }
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
@@ -260,81 +227,6 @@ public class ProductService {
                             .build()
             );
             updatedProduct.getCharacteristics().clear();
-        }
-    }
-
-    private int findProductCharacteristicIndexById(List<ProductCharacteristic> characteristics, Long id) {
-        for (int i = 0; i < characteristics.size(); i++) {
-            if(characteristics.get(i).getCharacteristic().getId().equals(id))
-                return i;
-        }
-        return -1;
-    }
-
-    private void createProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> createCharacteristicsDTO) {
-        if(createCharacteristicsDTO.isEmpty()) {
-            return;
-        }
-
-        Map<Long, List<String>> availableCharacteristics =
-                characteristicRepo.findAllWithTextValuesByCategoryId(updatedProduct.getCategory().getId()).stream()
-                        .collect(Collectors.toMap(
-                                        Characteristic::getId,
-                                        characteristic -> characteristic.getTextValues().stream().map(TextValue::getTextValue).toList()
-                                )
-                        );
-        productCharacteristicValidator.validate(createCharacteristicsDTO, availableCharacteristics);
-
-        List<Long> existingCharacteristicIds = updatedProduct.getCharacteristics().stream()
-                .map(pc -> pc.getCharacteristic().getId())
-                .toList();
-
-        if(!existingCharacteristicIds.isEmpty()) {
-            List<Long> creatingCharacteristicIds = createCharacteristicsDTO.stream()
-                    .map(ProductCharacteristicDTO::getId)
-                    .toList();
-
-            Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
-                    .filter(existingCharacteristicIds::contains)
-                    .findFirst();
-
-            if(notUniqCharacteristicId.isPresent()) {
-                throw new RuntimeException("Characteristic with id=%s already exists"
-                        .formatted(notUniqCharacteristicId.get()));
-            }
-        }
-
-        List<ProductCharacteristic> createdCharacteristics = createCharacteristicsDTO.stream()
-                .map(c -> catalogueMapper.mapToProductCharacteristic(c, updatedProduct))
-                .toList();
-
-        updatedProduct.addCharacteristics(createdCharacteristics);
-    }
-
-    private void updateProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> updateCharacteristicsDTO) {
-        Map<Long, List<String>> availableCharacteristics =
-                characteristicRepo.findAllWithTextValuesByCategoryId(updatedProduct.getCategory().getId()).stream()
-                        .collect(Collectors.toMap(
-                                        Characteristic::getId,
-                                        characteristic -> characteristic.getTextValues().stream().map(TextValue::getTextValue).toList()
-                                )
-                        );
-        productCharacteristicValidator.validate(updateCharacteristicsDTO, availableCharacteristics);
-
-        for(var characteristic : updateCharacteristicsDTO) {
-            int index = findProductCharacteristicIndexById(updatedProduct.getCharacteristics(), characteristic.getId());
-            if(index != -1) {
-                updatedProduct.getCharacteristics().get(index).setTextValue(characteristic.getTextValue());
-                updatedProduct.getCharacteristics().get(index).setNumericValue(characteristic.getNumericValue());
-            }
-        }
-    }
-
-    private void deleteProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> deleteCharacteristicsDTO) {
-        for(var characteristic : deleteCharacteristicsDTO) {
-            int index = findProductCharacteristicIndexById(updatedProduct.getCharacteristics(), characteristic.getId());
-            if(index != -1)
-                updatedProduct.getCharacteristics().remove(index);
         }
     }
 }
