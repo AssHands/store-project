@@ -44,7 +44,6 @@ class CatalogueUtilsTest {
 
         assertThat(actualTree).isEqualTo(expectedTree);
     }
-
     @Test
     public void buildCategoryTree_withoutChildCategories() {
         List<CategoryDTO> categoryDTOList = List.of(

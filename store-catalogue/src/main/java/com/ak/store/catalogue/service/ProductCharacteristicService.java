@@ -67,6 +67,10 @@ public class ProductCharacteristicService {
     }
 
     public void updateProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> updateCharacteristicsDTO) {
+        if(updateCharacteristicsDTO.isEmpty()) {
+            return;
+        }
+
         Map<Long, List<String>> availableCharacteristics =
                 characteristicRepo.findAllWithTextValuesByCategoryId(updatedProduct.getCategory().getId()).stream()
                         .collect(Collectors.toMap(
@@ -86,6 +90,10 @@ public class ProductCharacteristicService {
     }
 
     public void deleteProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> deleteCharacteristicsDTO) {
+        if(deleteCharacteristicsDTO.isEmpty()) {
+            return;
+        }
+
         for(var characteristic : deleteCharacteristicsDTO) {
             int index = findProductCharacteristicIndexById(updatedProduct.getCharacteristics(), characteristic.getId());
             if(index != -1)

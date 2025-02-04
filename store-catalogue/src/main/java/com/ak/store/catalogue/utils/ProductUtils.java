@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ProductUtils {
 
-    S3Service s3Service;
+    private final S3Service s3Service;
 
     public List<String> markImagesForDelete(List<ProductImage> productImages, List<String> deleteImageIndexes) {
         List<String> imageKeysForDelete = new ArrayList<>();

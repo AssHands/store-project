@@ -2,11 +2,9 @@ package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.model.entity.*;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
-import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.utils.CatalogueMapper;
 import com.ak.store.catalogue.utils.ProductUtils;
-import com.ak.store.catalogue.validator.ProductCharacteristicValidator;
 import com.ak.store.catalogue.validator.ProductImageValidator;
 import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
 import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
@@ -15,12 +13,8 @@ import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.SearchProductRequest;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,29 +27,25 @@ public class ProductService {
     private final ProductRepo productRepo;
     private final ElasticService elasticService;
     private final CatalogueMapper catalogueMapper;
-    private final CharacteristicRepo characteristicRepo;
-    private final ProductCharacteristicValidator productCharacteristicValidator;
     private final ProductImageValidator productImageValidator;
     private final S3Service s3Service;
     private final ProductUtils productUtils;
     private final ProductCharacteristicService productCharacteristicService;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     private int BATCH_SIZE;
 
+    //todo: check sql statements. probably N + 1
     public ProductFullReadDTO findOneProductById(Long id) {
         return catalogueMapper.mapToProductFullReadDTO(
-                productRepo.findById(id).orElseThrow(() -> new RuntimeException("Not found")));
+                productRepo.findById(id).orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id))));
     }
 
     @Transactional
-    public void saveOrUpdateAllImage(Long productId, Map<String, String> allImageIndexes,
+    public Long saveOrUpdateAllImage(Long productId, Map<String, String> allImageIndexes,
                                      List<MultipartFile> addImages, List<String> deleteImageIndexes) {
         Product updatedProduct = productRepo.findOneWithImagesById(productId)
-                .orElseThrow(() -> new RuntimeException("Not found"));
+                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(productId)));
 
         List<ProductImage> productImages = updatedProduct.getImages();
         productImageValidator.validate(allImageIndexes, addImages, deleteImageIndexes, productImages);
@@ -83,13 +73,15 @@ public class ProductService {
         //update images in S3
         s3Service.deleteAllImage(imageKeysForDelete);
         s3Service.putAllImage(imagesForAdd);
+
+        return productId;
     }
 
     public ProductSearchResponse findAllProductBySearch(SearchProductRequest searchProductRequest) {
         ElasticSearchResult elasticSearchResult = elasticService.findAllProduct(searchProductRequest);
 
         if(elasticSearchResult == null) {
-            throw new RuntimeException("No documents found");
+            throw new RuntimeException("no documents found");
         }
 
         ProductSearchResponse productSearchResponse = new ProductSearchResponse();
@@ -170,26 +162,21 @@ public class ProductService {
     }
 
     @Transactional
-    public void updateOneProduct(ProductWritePayload productPayload, Long productId) {
-        Product updatedProduct = productRepo.findOneWithCharacteristicsAndCategoryById(productId).orElseThrow(() -> new RuntimeException("Not found"));
+    public Long updateOneProduct(ProductWritePayload productPayload, Long productId) {
+        Product updatedProduct = productRepo.findOneWithCharacteristicsAndCategoryById(productId)
+                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(productId)));
 
         updateProduct(updatedProduct, productPayload.getProduct());
 
-        if(!productPayload.getCreateCharacteristics().isEmpty()) {
-            productCharacteristicService.addProductCharacteristics(updatedProduct, productPayload.getCreateCharacteristics());
-        }
-
-        if(!productPayload.getUpdateCharacteristics().isEmpty()) {
-            productCharacteristicService.updateProductCharacteristics(updatedProduct, productPayload.getUpdateCharacteristics());
-        }
-
-        if(!productPayload.getDeleteCharacteristics().isEmpty()) {
-            productCharacteristicService.deleteProductCharacteristics(updatedProduct, productPayload.getDeleteCharacteristics());
-        }
+        productCharacteristicService.addProductCharacteristics(updatedProduct, productPayload.getCreateCharacteristics());
+        productCharacteristicService.updateProductCharacteristics(updatedProduct, productPayload.getUpdateCharacteristics());
+        productCharacteristicService.deleteProductCharacteristics(updatedProduct, productPayload.getDeleteCharacteristics());
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
         productRepo.saveAndFlush(updatedProduct);
         elasticService.updateOneProduct(catalogueMapper.mapToProductDocument(updatedProduct));
+
+        return productId;
     }
 
     private void updateProduct(Product updatedProduct, ProductWriteDTO productWriteDTO) {
@@ -201,10 +188,10 @@ public class ProductService {
             updatedProduct.setDescription(productWriteDTO.getDescription());
         }
 
-        boolean isUpdateFullPrice = false;
+        boolean isFullPriceUpdated = false;
         if(productWriteDTO.getFullPrice() != null && productWriteDTO.getFullPrice() != updatedProduct.getFullPrice()) {
             updatedProduct.setFullPrice(productWriteDTO.getFullPrice());
-            isUpdateFullPrice = true;
+            isFullPriceUpdated = true;
         }
 
         if(productWriteDTO.getDiscountPercentage() != null) {
@@ -213,7 +200,7 @@ public class ProductService {
             int priceWithDiscount = updatedProduct.getFullPrice() - discount;
             updatedProduct.setCurrentPrice(priceWithDiscount);
 
-        } else if(isUpdateFullPrice) {
+        } else if(isFullPriceUpdated) {
             int discount = updatedProduct.getFullPrice() * updatedProduct.getDiscountPercentage() / 100;
             int priceWithDiscount = updatedProduct.getFullPrice() - discount;
             updatedProduct.setCurrentPrice(priceWithDiscount);

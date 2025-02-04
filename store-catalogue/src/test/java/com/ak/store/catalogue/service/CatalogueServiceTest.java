@@ -46,12 +46,12 @@ public class CatalogueServiceTest {
         @Test
         public void findAllAvailableCharacteristicByCategory_VerifyMethodCallsAndReturnValue() {
             long CharacteristicId = 1L;
+            Filters expectedFilters = mock(Filters.class);
             List<Characteristic> characteristicList = List.of(
                     mock(Characteristic.class),
                     mock(Characteristic.class),
                     mock(Characteristic.class)
             );
-            Filters expectedFilters = mock(Filters.class);
 
             when(characteristicRepo.findAllWithTextValuesByCategoryId(CharacteristicId)).thenReturn(characteristicList);
             when(catalogueMapper.mapToFilters(characteristicList)).thenReturn(expectedFilters);
@@ -66,8 +66,8 @@ public class CatalogueServiceTest {
         @Test
         public void findAllAvailableCharacteristicByCategory_VerifyMethodCallsAndReturnValue_emptyCollection() {
             long CharacteristicId = 1L;
-            List<Characteristic> characteristicList = Collections.emptyList();
             Filters expectedFilters = mock(Filters.class);
+            List<Characteristic> characteristicList = Collections.emptyList();
 
             when(characteristicRepo.findAllWithTextValuesByCategoryId(CharacteristicId)).thenReturn(characteristicList);
             when(catalogueMapper.mapToFilters(characteristicList)).thenReturn(expectedFilters);
@@ -95,7 +95,6 @@ public class CatalogueServiceTest {
                     mock(CategoryDTO.class),
                     mock(CategoryDTO.class)
             );
-
 
             when(categoryRepo.findAll()).thenReturn(categoryList);
             when(catalogueUtils.buildCategoryTree(any())).thenReturn(expectedCategoryList);

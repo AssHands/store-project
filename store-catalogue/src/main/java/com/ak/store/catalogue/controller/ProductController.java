@@ -11,6 +11,7 @@ import com.ak.store.common.payload.search.SearchProductRequest;
 import com.ak.store.common.validationGroup.Save;
 import com.ak.store.common.validationGroup.Update;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -111,11 +112,13 @@ public class ProductController {
      * a[1] <br>
      * e[2] <br>
      */
+    //todo: validate data in controller
     @PatchMapping(value = "{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void updateAllProductImage(@PathVariable("id") Long productId,
                                       @RequestParam Map<String, String> allImageIndexes,
                                       @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,
                                       @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
+
         productService.saveOrUpdateAllImage(productId, allImageIndexes, addImages, deleteImageIndexes);
     }
 

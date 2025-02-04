@@ -35,7 +35,7 @@ public class ProductImageValidator {
         validateNewImageIndexes(allImageIndexes, expectedSize);
     }
 
-    private void validateOldImageIndexes(List<String> deleteImageIndexes, List<MultipartFile> addImages,
+    protected void validateOldImageIndexes(List<String> deleteImageIndexes, List<MultipartFile> addImages,
                                          List<ProductImage> productImages, List<Integer> oldImageIndexes) {
         List<Integer> existingImageIndexes = new ArrayList<>();
         if(deleteImageIndexes != null) {
@@ -57,7 +57,7 @@ public class ProductImageValidator {
         }
     }
 
-    private void validateKeysAndValues(Map<String, String> Fields) {
+    protected void validateKeysAndValues(Map<String, String> Fields) {
         boolean isUnknownKey = Fields.keySet().stream()
                 .filter(k -> !Pattern.compile("image\\[\\d]").matcher(k).matches())
                 .anyMatch(k -> !Pattern.compile("delete_images").matcher(k).matches());
@@ -72,7 +72,7 @@ public class ProductImageValidator {
             throw new RuntimeException("значение некорректно");
     }
 
-    private void validateNewImageIndexes(Map<String, String> allImageIndexes, int expectedSize) {
+    protected void validateNewImageIndexes(Map<String, String> allImageIndexes, int expectedSize) {
         List<Integer> newImageIndexes = allImageIndexes.entrySet().stream()
                 .filter(e -> Pattern.compile("image\\[\\d]").matcher(e.getKey()).matches())
                 .map(e -> Integer.parseInt(e.getValue()))
@@ -91,7 +91,7 @@ public class ProductImageValidator {
         }
     }
 
-    private void validateDeleteImageIndexes(List<String> deleteImageIndexes, List<Integer> oldImageIndexes,
+    protected void validateDeleteImageIndexes(List<String> deleteImageIndexes, List<Integer> oldImageIndexes,
                                             List<ProductImage> productImages) {
         if(deleteImageIndexes != null) {
             boolean isSpecifyDeletedIndex = oldImageIndexes.stream()
