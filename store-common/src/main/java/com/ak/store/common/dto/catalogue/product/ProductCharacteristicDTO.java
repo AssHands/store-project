@@ -19,8 +19,6 @@ public class ProductCharacteristicDTO {
     @NotBlank
     private String name;
 
-    //todo: сделать кастомные аннотации,
-    // которые проверяют если numeric value == null, то text value не должно быть null. и наоборот
     private Integer numericValue;
 
     private String textValue;

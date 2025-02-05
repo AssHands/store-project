@@ -20,7 +20,7 @@ public class ProductImageValidator {
             expectedSize -= deleteImageIndexes.size();
 
         if(expectedSize > 9)
-            throw new RuntimeException("Индекс больше 9");
+            throw new RuntimeException("индекс больше 9");
 
         validateKeysAndValues(allImageIndexes);
 
@@ -35,9 +35,14 @@ public class ProductImageValidator {
         validateNewImageIndexes(allImageIndexes, expectedSize);
     }
 
-    protected void validateOldImageIndexes(List<String> deleteImageIndexes, List<MultipartFile> addImages,
+    private void validateOldImageIndexes(List<String> deleteImageIndexes, List<MultipartFile> addImages,
                                          List<ProductImage> productImages, List<Integer> oldImageIndexes) {
         List<Integer> existingImageIndexes = new ArrayList<>();
+        int lastIndex = productImages.stream()
+                .map(ProductImage::getIndex)
+                .max(Integer::compareTo)
+                .orElse(-1);
+
         if(deleteImageIndexes != null) {
             existingImageIndexes.addAll(productImages.stream()
                     .map(ProductImage::getIndex)
@@ -47,23 +52,22 @@ public class ProductImageValidator {
         }
 
         if(addImages != null) {
-            int lastIndex = existingImageIndexes.isEmpty() ? -1 : existingImageIndexes.get(existingImageIndexes.size() - 1);
             for(var newImage : addImages)
                 existingImageIndexes.add(++lastIndex);
         }
 
         if(!existingImageIndexes.containsAll(oldImageIndexes)) {
-            throw new RuntimeException("Указан некорректный индекс");
+            throw new RuntimeException("указан некорректный индекс");
         }
     }
 
-    protected void validateKeysAndValues(Map<String, String> Fields) {
+    private void validateKeysAndValues(Map<String, String> Fields) {
         boolean isUnknownKey = Fields.keySet().stream()
                 .filter(k -> !Pattern.compile("image\\[\\d]").matcher(k).matches())
                 .anyMatch(k -> !Pattern.compile("delete_images").matcher(k).matches());
 
         if(isUnknownKey)
-            throw new RuntimeException("Неизвестное поле");
+            throw new RuntimeException("неизвестное поле");
 
         boolean isIncorrectValue = Fields.values().stream()
                 .anyMatch(v -> !Pattern.compile("\\d").matcher(v).matches());
@@ -72,7 +76,7 @@ public class ProductImageValidator {
             throw new RuntimeException("значение некорректно");
     }
 
-    protected void validateNewImageIndexes(Map<String, String> allImageIndexes, int expectedSize) {
+    private void validateNewImageIndexes(Map<String, String> allImageIndexes, int expectedSize) {
         List<Integer> newImageIndexes = allImageIndexes.entrySet().stream()
                 .filter(e -> Pattern.compile("image\\[\\d]").matcher(e.getKey()).matches())
                 .map(e -> Integer.parseInt(e.getValue()))
@@ -80,32 +84,32 @@ public class ProductImageValidator {
                 .toList();
 
         if(expectedSize != newImageIndexes.size())
-            throw new RuntimeException("Неверное кол-во индексов");
+            throw new RuntimeException("неверное кол-во индексов");
 
         if(expectedSize != 0 && newImageIndexes.get(0) != 0)
-            throw new RuntimeException("Нет нулевого индекса");
+            throw new RuntimeException("нет нулевого индекса");
 
         for (int i = 0; i < newImageIndexes.size() - 1; i++) {
             if(newImageIndexes.get(i) + 1 != newImageIndexes.get(i + 1))
-                throw new RuntimeException("Индексы идут не поочередно");
+                throw new RuntimeException("индексы идут не поочередно");
         }
     }
 
-    protected void validateDeleteImageIndexes(List<String> deleteImageIndexes, List<Integer> oldImageIndexes,
+    private void validateDeleteImageIndexes(List<String> deleteImageIndexes, List<Integer> oldImageIndexes,
                                             List<ProductImage> productImages) {
         if(deleteImageIndexes != null) {
             boolean isSpecifyDeletedIndex = oldImageIndexes.stream()
                     .anyMatch(index -> deleteImageIndexes.contains(index.toString()));
 
             if(isSpecifyDeletedIndex)
-                throw new RuntimeException("Указан удалённый индекс в old positions");
+                throw new RuntimeException("указан удалённый индекс в old positions");
 
             int countExistingDeletedIndexes = (int) productImages.stream()
                     .filter(image -> deleteImageIndexes.contains(image.getIndex().toString()))
                     .count();
 
             if(countExistingDeletedIndexes != deleteImageIndexes.size())
-                throw new RuntimeException("Удаляемый индекс отсутствует");
+                throw new RuntimeException("удаляемый индекс отсутствует");
         }
     }
 }

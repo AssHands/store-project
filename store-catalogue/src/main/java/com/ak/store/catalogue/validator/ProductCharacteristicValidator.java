@@ -9,36 +9,36 @@ import java.util.Map;
 
 @Component
 public class ProductCharacteristicValidator {
-    public void validate(Iterable<ProductCharacteristicDTO> characteristics,
+    public void validate(Iterable<ProductCharacteristicDTO> characteristicWriteDTOs,
                          Map<Long, List<String>> availableCharacteristics) {
-        for(var characteristic : characteristics) {
+        for(var characteristic : characteristicWriteDTOs) {
             List<String> textValues = availableCharacteristics.get(characteristic.getId());
 
             if(textValues == null) {
-                throw new RuntimeException("Characteristic with id=%s is not available"
+                throw new RuntimeException("characteristic with id=%s is not available"
                         .formatted(characteristic.getId()));
             }
 
             if(characteristic.getTextValue() != null) {
                 if(characteristic.getNumericValue() != null) {
-                    throw new RuntimeException("Characteristic with id=%s has both text value and numeric value"
+                    throw new RuntimeException("characteristic with id=%s has both text value and numeric value"
                             .formatted(characteristic.getId()));
                 }
 
                 if(textValues.isEmpty()) {
-                    throw new RuntimeException("Characteristic with id=%s is not a text one"
+                    throw new RuntimeException("characteristic with id=%s is not a text one"
                             .formatted(characteristic.getId()));
                 }
 
                 if(!textValues.contains(characteristic.getTextValue())) {
-                    throw new RuntimeException("Not valid text value for characteristic with id=%s"
+                    throw new RuntimeException("not valid text value for characteristic with id=%s"
                             .formatted(characteristic.getId()));
                 }
             }
 
             if(characteristic.getNumericValue() != null) {
                 if(!textValues.isEmpty()) {
-                    throw new RuntimeException("Characteristic with id=%s is not a numeric one"
+                    throw new RuntimeException("characteristic with id=%s is not a numeric one"
                             .formatted(characteristic.getId()));
                 }
             }

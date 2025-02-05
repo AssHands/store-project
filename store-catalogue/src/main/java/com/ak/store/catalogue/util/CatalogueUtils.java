@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.utils;
+package com.ak.store.catalogue.util;
 
 import com.ak.store.common.dto.catalogue.product.CategoryDTO;
 import org.springframework.stereotype.Component;

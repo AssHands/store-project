@@ -58,50 +58,6 @@ public class TestCatalogueFactory {
                 .build();
     }
 
-    public static Filters createTextFilters(List<TextFilter> textFilters) {
-        return Filters.builder().textFilters(textFilters).build();
-    }
-
-    public static Filters createNumericFilters(List<NumericFilter> numericFilters) {
-        return Filters.builder().numericFilters(numericFilters).build();
-    }
-
-    public static Filters createBothFilters(List<TextFilter> textFilters, List<NumericFilter> numericFilters) {
-        return Filters.builder().textFilters(textFilters).numericFilters(numericFilters).build();
-    }
-
-    public static TextFilter createTextFilter(Long id, String name, List<String> values) {
-        return TextFilter.builder()
-                .id(id)
-                .name(name)
-                .values(values)
-                .build();
-    }
-
-    public static NumericFilter createNumericFilter(Long id, String name, Map<Integer, Integer> numericValues) {
-        List<NumericFilterValue> numericFilterValues = new ArrayList<>();
-        for(Map.Entry<Integer, Integer> entry : numericValues.entrySet()) {
-            numericFilterValues.add(NumericFilterValue.builder()
-                    .from(entry.getKey())
-                    .to(entry.getValue())
-                    .build());
-        }
-
-        return NumericFilter.builder()
-                .id(id)
-                .name(name)
-                .values(numericFilterValues)
-                .build();
-    }
-
-    public static Category createCategory(Long id, String name) {
-        return Category.builder().id(id).name(name).build();
-    }
-
-    public static Category createCategory(Long id, String name, Long parentId) {
-        return Category.builder().id(id).name(name).parentId(parentId).build();
-    }
-
     public static CategoryDTO createCategoryDTO(Long id, String name) {
         return CategoryDTO.builder().id(id).name(name).build();
     }

@@ -4,20 +4,18 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
-import com.ak.store.catalogue.utils.CatalogueMapper;
-import com.ak.store.catalogue.utils.CatalogueUtils;
+import com.ak.store.catalogue.util.CatalogueMapper;
+import com.ak.store.catalogue.util.CatalogueUtils;
 import com.ak.store.common.dto.catalogue.product.CategoryDTO;
 import com.ak.store.common.dto.search.Filters;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
-import static com.ak.store.catalogue.TestCatalogueFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;

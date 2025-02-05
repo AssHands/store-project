@@ -1,12 +1,10 @@
 package com.ak.store.catalogue.service;
 
-import com.ak.store.catalogue.utils.CatalogueUtils;
+import com.ak.store.catalogue.util.CatalogueUtils;
 import com.ak.store.catalogue.repository.*;
-import com.ak.store.catalogue.utils.CatalogueMapper;
+import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.common.dto.catalogue.product.*;
 import com.ak.store.common.dto.search.Filters;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

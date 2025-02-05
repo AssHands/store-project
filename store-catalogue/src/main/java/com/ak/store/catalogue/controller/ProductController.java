@@ -8,10 +8,9 @@ import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.SearchProductRequest;
-import com.ak.store.common.validationGroup.Save;
+import com.ak.store.common.validationGroup.Create;
 import com.ak.store.common.validationGroup.Update;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -40,7 +39,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductWriteDTO createOneProduct(@RequestBody @Validated(Save.class) ProductWritePayload productPayload) {
+    public ProductWriteDTO createOneProduct(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
         productService.createOneProduct(productPayload);
         return null;
     }

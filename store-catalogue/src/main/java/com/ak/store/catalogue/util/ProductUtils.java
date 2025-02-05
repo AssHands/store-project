@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.utils;
+package com.ak.store.catalogue.util;
 
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductImage;

@@ -1,6 +1,6 @@
 package com.ak.store.common.dto.catalogue.product;
 
-import com.ak.store.common.validationGroup.Save;
+import com.ak.store.common.validationGroup.Create;
 import com.ak.store.common.validationGroup.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -18,23 +18,23 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductWriteDTO {
-    @Size(min = 5, max = 50, groups = {Save.class, Update.class})
-    @NotBlank(groups = Save.class)
+    @Size(min = 5, max = 50, groups = {Create.class, Update.class})
+    @NotBlank(groups = Create.class)
     private String title;
 
-    @Size(min = 5, max = 150, groups = {Save.class, Update.class})
-    @NotBlank(groups = Save.class)
+    @Size(min = 5, max = 150, groups = {Create.class, Update.class})
+    @NotBlank(groups = Create.class)
     private String description;
 
-    @Min(value = 1, groups = {Save.class, Update.class})
-    @Max(value = 10_000_000, groups = {Save.class, Update.class})
-    @NotNull(groups = Save.class)
+    @Min(value = 1, groups = {Create.class, Update.class})
+    @Max(value = 10_000_000, groups = {Create.class, Update.class})
+    @NotNull(groups = Create.class)
     private Integer fullPrice;
 
-    @Min(value = 0, groups = {Save.class, Update.class})
-    @Max(value = 99, groups = {Save.class, Update.class})
+    @Min(value = 0, groups = {Create.class, Update.class})
+    @Max(value = 99, groups = {Create.class, Update.class})
     private Integer discountPercentage;
 
-    @NotNull(groups = Save.class)
+    @NotNull(groups = Create.class)
     private Long categoryId;
 }

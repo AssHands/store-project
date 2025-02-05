@@ -5,8 +5,8 @@ import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.catalogue.repository.ProductRepo;
-import com.ak.store.catalogue.utils.CatalogueMapper;
-import com.ak.store.catalogue.utils.ProductUtils;
+import com.ak.store.catalogue.util.CatalogueMapper;
+import com.ak.store.catalogue.util.ProductUtils;
 import com.ak.store.catalogue.validator.ProductImageValidator;
 import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
 import com.ak.store.common.dto.catalogue.product.ProductViewReadDTO;
@@ -384,9 +384,9 @@ public class ProductServiceTest {
                 "key 3", mock(MultipartFile.class)
         ));
         List<ProductImage> productImageList = List.of(
-                createProductImage(0, "key 1", expectedProductId),
-                createProductImage(1, "key 2", expectedProductId),
-                createProductImage(2, "key 3", expectedProductId)
+                createProductImage(0, "key 1"),
+                createProductImage(1, "key 2"),
+                createProductImage(2, "key 3")
         );
 
         when(productRepo.findOneWithImagesById(anyLong())).thenReturn(Optional.of(product));
