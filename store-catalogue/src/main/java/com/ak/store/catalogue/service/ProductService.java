@@ -4,7 +4,6 @@ import com.ak.store.catalogue.model.entity.*;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.catalogue.util.ProductUtils;
 import com.ak.store.catalogue.validator.ProductImageValidator;
 import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
 import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +29,6 @@ public class ProductService {
     private final CatalogueMapper catalogueMapper;
     private final ProductImageValidator productImageValidator;
     private final S3Service s3Service;
-    private final ProductUtils productUtils;
     private final ProductCharacteristicService productCharacteristicService;
 
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
@@ -50,9 +49,9 @@ public class ProductService {
         List<ProductImage> productImages = updatedProduct.getImages();
         productImageValidator.validate(allImageIndexes, addImages, deleteImageIndexes, productImages);
 
-        List<String> imageKeysForDelete = productUtils.markImagesForDelete(productImages, deleteImageIndexes);
+        List<String> imageKeysForDelete = markImagesForDelete(productImages, deleteImageIndexes);
         //LinkedHashMap for save order
-        LinkedHashMap<String, MultipartFile> imagesForAdd = productUtils.prepareImagesForAdd(updatedProduct, addImages);
+        LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, addImages);
 
         for (String key : imagesForAdd.keySet()) {
             productImages.add(ProductImage.builder()
@@ -63,7 +62,7 @@ public class ProductService {
                     .build());
         }
 
-        List<ProductImage> newProductImages = productUtils.createNewProductImagesList(productImages, allImageIndexes);
+        List<ProductImage> newProductImages = createNewProductImagesList(productImages, allImageIndexes);
 
         //update images in DB
         updatedProduct.getImages().clear();
@@ -75,6 +74,57 @@ public class ProductService {
         s3Service.putAllImage(imagesForAdd);
 
         return productId;
+    }
+
+    private List<String> markImagesForDelete(List<ProductImage> productImages, List<String> deleteImageIndexes) {
+        List<String> imageKeysForDelete = new ArrayList<>();
+        if (deleteImageIndexes != null && !deleteImageIndexes.isEmpty()) {
+            for (int i = 0; i < productImages.size(); i++) {
+                var index = productImages.get(i).getIndex();
+                boolean isDeleted = deleteImageIndexes.stream()
+                        .map(Integer::parseInt)
+                        .anyMatch(deletedIndex -> deletedIndex.equals(index));
+
+                if (isDeleted) {
+                    imageKeysForDelete.add(productImages.get(i).getImageKey());
+                    productImages.set(i, null);
+                }
+            }
+        }
+        return imageKeysForDelete;
+    }
+
+    private LinkedHashMap<String, MultipartFile> prepareImagesForAdd(Product updatedProduct, List<MultipartFile> addImages) {
+        //LinkedHashMap for save order
+        LinkedHashMap<String, MultipartFile> imagesForAdd = new LinkedHashMap<>();
+        if (addImages != null && !addImages.isEmpty()) {
+            imagesForAdd = s3Service.generateImageKeys(updatedProduct, addImages);
+        }
+        return imagesForAdd;
+    }
+
+    private List<ProductImage> createNewProductImagesList(List<ProductImage> productImages, Map<String, String> allImageIndexes) {
+        int finalProductImagesSize = (int) productImages.stream()
+                .filter(Objects::nonNull)
+                .count();
+
+        List<ProductImage> newProductImages = new ArrayList<>(finalProductImagesSize);
+        for (int i = 0; i < finalProductImagesSize; i++) {
+            newProductImages.add(null);
+        }
+
+        for (var entry : allImageIndexes.entrySet()) {
+            if (!Pattern.compile("image\\[\\d]").matcher(entry.getKey()).matches())
+                continue;
+
+            int currentIndex = Integer.parseInt(entry.getKey().replaceAll("\\D", ""));
+            int newIndex = Integer.parseInt(entry.getValue());
+
+            newProductImages.set(newIndex, productImages.get(currentIndex));
+            newProductImages.get(newIndex).setIndex(newIndex);
+        }
+
+        return newProductImages;
     }
 
     public ProductSearchResponse findAllProductBySearch(SearchProductRequest searchProductRequest) {
@@ -123,7 +173,7 @@ public class ProductService {
         if(createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
             throw new RuntimeException("category_id is null");
         }
-        productCharacteristicService.addProductCharacteristics(createdProduct, productPayload.getCreateCharacteristics());
+        productCharacteristicService.createProductCharacteristics(createdProduct, productPayload.getCreateCharacteristics());
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
         productRepo.saveAndFlush(createdProduct);
@@ -150,7 +200,7 @@ public class ProductService {
             if(createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
                 throw new RuntimeException("one of the products does not have a defined category_id");
             }
-            productCharacteristicService.addProductCharacteristics(createdProduct, productPayloads.get(i).getCreateCharacteristics());
+            productCharacteristicService.createProductCharacteristics(createdProduct, productPayloads.get(i).getCreateCharacteristics());
             products.add(createdProduct);
         }
 
@@ -168,7 +218,7 @@ public class ProductService {
 
         updateProduct(updatedProduct, productPayload.getProduct());
 
-        productCharacteristicService.addProductCharacteristics(updatedProduct, productPayload.getCreateCharacteristics());
+        productCharacteristicService.createProductCharacteristics(updatedProduct, productPayload.getCreateCharacteristics());
         productCharacteristicService.updateProductCharacteristics(updatedProduct, productPayload.getUpdateCharacteristics());
         productCharacteristicService.deleteProductCharacteristics(updatedProduct, productPayload.getDeleteCharacteristics());
 

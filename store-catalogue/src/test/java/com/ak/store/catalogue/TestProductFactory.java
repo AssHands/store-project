@@ -5,7 +5,7 @@ import com.ak.store.common.dto.catalogue.product.ProductCharacteristicDTO;
 import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class TestProductFactory {
     public static ProductWritePayload createProductPayload(String title, String description, Integer fullPrice,
@@ -38,6 +38,28 @@ public class TestProductFactory {
                 .build();
     }
 
+    public static Product createProduct(Long id, Long categoryId, List<ProductCharacteristic> productCharacteristics) {
+        return Product.builder()
+                .id(id)
+                .category(Category.builder().id(categoryId).build())
+                .characteristics(productCharacteristics)
+                .build();
+    }
+
+    public static ProductCharacteristic createProductCharacteristic(Long characteristicId, String textValue) {
+        return ProductCharacteristic.builder()
+                .characteristic(Characteristic.builder().id(characteristicId).build())
+                .textValue(textValue)
+                .build();
+    }
+
+    public static ProductCharacteristic createProductCharacteristic(Long characteristicId, Integer numericValue) {
+        return ProductCharacteristic.builder()
+                .characteristic(Characteristic.builder().id(characteristicId).build())
+                .numericValue(numericValue)
+                .build();
+    }
+
     public static ProductImage createProductImage(Integer index, String key) {
         return ProductImage.builder()
                 .index(index)
@@ -45,8 +67,25 @@ public class TestProductFactory {
                 .build();
     }
 
-//    public static ProductCharacteristicDTO createProductCharacteristicDTO() {
-//        ProductCharacteristicDTO.builder()
-//
-//    }
+    public static ProductCharacteristicDTO createProductCharacteristicDTO(Long characteristicId, String textValue) {
+        return ProductCharacteristicDTO.builder()
+                .characteristicId(characteristicId)
+                .textValue(textValue)
+                .build();
+    }
+
+    public static ProductCharacteristicDTO createProductCharacteristicDTO(Long characteristicId, Integer numericValue) {
+        return ProductCharacteristicDTO.builder()
+                .characteristicId(characteristicId)
+                .numericValue(numericValue)
+                .build();
+    }
+
+    public static ProductCharacteristicDTO createProductCharacteristicDTO(Long characteristicId, Integer numericValue, String textValue) {
+        return ProductCharacteristicDTO.builder()
+                .characteristicId(characteristicId)
+                .numericValue(numericValue)
+                .textValue(textValue)
+                .build();
+    }
 }

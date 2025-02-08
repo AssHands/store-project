@@ -3,21 +3,18 @@ package com.ak.store.common.dto.catalogue.product;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "characteristicId")
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductCharacteristicDTO {
-    private Long id;
-
-    @NotBlank
-    private String name;
+    @NonNull
+    private Long characteristicId;
 
     private Integer numericValue;
 

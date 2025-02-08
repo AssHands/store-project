@@ -4,7 +4,6 @@ import com.ak.store.catalogue.util.CatalogueUtils;
 import com.ak.store.catalogue.repository.*;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.common.dto.catalogue.product.*;
-import com.ak.store.common.dto.search.Filters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,18 +23,17 @@ public class CatalogueService {
     private final CharacteristicRepo characteristicRepo;
     private final CategoryRepo categoryRepo;
 
-    private final CatalogueUtils catalogueUtils;
-
     public List<CategoryDTO> findAllCategory() {
         List<CategoryDTO> categories = categoryRepo.findAll().stream()
                 .map(catalogueMapper::mapToCategoryDTO)
                 .toList();
 
-        return catalogueUtils.buildCategoryTree(categories);
+        return CatalogueUtils.buildCategoryTree(categories);
     }
 
-    //todo: returns null when none. FIX
-    public Filters findAllAvailableCharacteristicByCategory(Long categoryId) {
-        return catalogueMapper.mapToFilters(characteristicRepo.findAllWithTextValuesByCategoryId(categoryId));
+    public List<CharacteristicDTO> findAllAvailableCharacteristicByCategory(Long categoryId) {
+        return characteristicRepo.findAllWithTextValuesByCategoryId(categoryId).stream()
+                .map(catalogueMapper::mapToCharacteristicDTO)
+                .toList();
     }
 }

@@ -1,45 +1,54 @@
 package com.ak.store.catalogue.validator;
 
+import com.ak.store.catalogue.model.entity.Characteristic;
+import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.common.dto.catalogue.product.ProductCharacteristicDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Component
 public class ProductCharacteristicValidator {
-    public void validate(Iterable<ProductCharacteristicDTO> characteristicWriteDTOs,
-                         Map<Long, List<String>> availableCharacteristics) {
-        for(var characteristic : characteristicWriteDTOs) {
-            List<String> textValues = availableCharacteristics.get(characteristic.getId());
+    public void validate(Iterable<ProductCharacteristicDTO> ProductCharacteristicDTOs,
+                         List<Characteristic> availableCharacteristics) {
+
+        var availableTextValues = availableCharacteristics.stream()
+                .collect(Collectors.toMap(
+                        Characteristic::getId,
+                        characteristic -> characteristic.getTextValues().stream().map(TextValue::getTextValue).toList())
+                );
+
+        for(var productCharacteristic : ProductCharacteristicDTOs) {
+            List<String> textValues = availableTextValues.get(productCharacteristic.getCharacteristicId());
 
             if(textValues == null) {
                 throw new RuntimeException("characteristic with id=%s is not available"
-                        .formatted(characteristic.getId()));
+                        .formatted(productCharacteristic.getCharacteristicId()));
             }
 
-            if(characteristic.getTextValue() != null) {
-                if(characteristic.getNumericValue() != null) {
+            if(productCharacteristic.getTextValue() != null) {
+                if(productCharacteristic.getNumericValue() != null) {
                     throw new RuntimeException("characteristic with id=%s has both text value and numeric value"
-                            .formatted(characteristic.getId()));
+                            .formatted(productCharacteristic.getCharacteristicId()));
                 }
 
                 if(textValues.isEmpty()) {
                     throw new RuntimeException("characteristic with id=%s is not a text one"
-                            .formatted(characteristic.getId()));
+                            .formatted(productCharacteristic.getCharacteristicId()));
                 }
 
-                if(!textValues.contains(characteristic.getTextValue())) {
+                if(!textValues.contains(productCharacteristic.getTextValue())) {
                     throw new RuntimeException("not valid text value for characteristic with id=%s"
-                            .formatted(characteristic.getId()));
+                            .formatted(productCharacteristic.getCharacteristicId()));
                 }
             }
 
-            if(characteristic.getNumericValue() != null) {
+            if(productCharacteristic.getNumericValue() != null) {
                 if(!textValues.isEmpty()) {
                     throw new RuntimeException("characteristic with id=%s is not a numeric one"
-                            .formatted(characteristic.getId()));
+                            .formatted(productCharacteristic.getCharacteristicId()));
                 }
             }
         }

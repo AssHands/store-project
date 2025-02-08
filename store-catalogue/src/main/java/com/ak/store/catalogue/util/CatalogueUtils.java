@@ -5,10 +5,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Component
-public class CatalogueUtils {
+public abstract class CatalogueUtils {
 
-    public List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) {
+    static public List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) {
         if(categories.isEmpty()) {
             return Collections.emptyList();
         }

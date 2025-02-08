@@ -1,42 +1,21 @@
 package com.ak.store.catalogue;
 
-import com.ak.store.catalogue.model.entity.Category;
-import com.ak.store.catalogue.model.entity.Characteristic;
-import com.ak.store.catalogue.model.entity.RangeValue;
+ import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.common.dto.catalogue.product.CategoryDTO;
-import com.ak.store.common.dto.search.Filters;
-import com.ak.store.common.dto.search.nested.NumericFilter;
-import com.ak.store.common.dto.search.nested.NumericFilterValue;
-import com.ak.store.common.dto.search.nested.TextFilter;
 
 import java.util.*;
 
 public class TestCatalogueFactory {
-    public static Characteristic createCharacteristic(Long id, String name, boolean isText, Long categoryId, Map<Integer, Integer> rangeValues) {
-        Set<RangeValue> rangeValuesSet = new HashSet<>();
-        long index = 1;
-        for(Map.Entry<Integer, Integer> entry : rangeValues.entrySet()) {
-            rangeValuesSet.add(RangeValue.builder()
-                    .id(index)
-                    .fromValue(entry.getKey())
-                    .toValue(entry.getValue())
-                    .characteristic(Characteristic.builder().id(id).build())
-                    .build());
-
-            index++;
-        }
-
+    public static Characteristic createCharacteristic(Long id, String name, boolean isText) {
         return Characteristic.builder()
                 .id(id)
                 .isText(isText)
-                .category(Set.of(Category.builder().id(categoryId).build()))
                 .name(name)
-                .rangeValues(rangeValuesSet)
                 .build();
     }
 
-    public static Characteristic createCharacteristic(Long id, String name, boolean isText, Long categoryId, List<String> textValues) {
+    public static Characteristic createCharacteristic(Long id, String name, boolean isText, List<String> textValues) {
         Set<TextValue> textValuesSet = new HashSet<>();
         long index = 1;
         for(String value : textValues) {
@@ -52,7 +31,6 @@ public class TestCatalogueFactory {
         return Characteristic.builder()
                 .id(id)
                 .isText(isText)
-                .category(Set.of(Category.builder().id(categoryId).build()))
                 .name(name)
                 .textValues(textValuesSet)
                 .build();

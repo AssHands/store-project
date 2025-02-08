@@ -1,9 +1,7 @@
 package com.ak.store.catalogue.service;
 
-import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
-import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.catalogue.validator.ProductCharacteristicValidator;
@@ -12,32 +10,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class ProductCharacteristicService {
 
     private final CatalogueMapper catalogueMapper;
     private final CharacteristicRepo characteristicRepo;
     private final ProductCharacteristicValidator productCharacteristicValidator;
 
-    public void addProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> createCharacteristicsDTO) {
+    public void createProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> createCharacteristicsDTO) {
         if(createCharacteristicsDTO.isEmpty()) {
             return;
         }
 
-        Map<Long, List<String>> availableCharacteristics =
-                characteristicRepo.findAllWithTextValuesByCategoryId(updatedProduct.getCategory().getId()).stream()
-                        .collect(Collectors.toMap(
-                                        Characteristic::getId,
-                                        characteristic -> characteristic.getTextValues().stream().map(TextValue::getTextValue).toList()
-                                )
-                        );
-        productCharacteristicValidator.validate(createCharacteristicsDTO, availableCharacteristics);
+        productCharacteristicValidator.validate(createCharacteristicsDTO,
+                characteristicRepo.findAllWithTextValuesByCategoryId(updatedProduct.getCategory().getId()));
 
         List<Long> existingCharacteristicIds = updatedProduct.getCharacteristics().stream()
                 .map(pc -> pc.getCharacteristic().getId())
@@ -45,7 +35,7 @@ public class ProductCharacteristicService {
 
         if(!existingCharacteristicIds.isEmpty()) {
             List<Long> creatingCharacteristicIds = createCharacteristicsDTO.stream()
-                    .map(ProductCharacteristicDTO::getId)
+                    .map(ProductCharacteristicDTO::getCharacteristicId)
                     .toList();
 
             Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
@@ -53,7 +43,7 @@ public class ProductCharacteristicService {
                     .findFirst();
 
             if(notUniqCharacteristicId.isPresent()) {
-                throw new RuntimeException("Characteristic with id=%s already exists"
+                throw new RuntimeException("characteristic with id=%s already exists"
                         .formatted(notUniqCharacteristicId.get()));
             }
         }
@@ -70,21 +60,15 @@ public class ProductCharacteristicService {
             return;
         }
 
-        Map<Long, List<String>> availableCharacteristics =
-                characteristicRepo.findAllWithTextValuesByCategoryId(updatedProduct.getCategory().getId()).stream()
-                        .collect(Collectors.toMap(
-                                        Characteristic::getId,
-                                        characteristic -> characteristic.getTextValues().stream().map(TextValue::getTextValue).toList()
-                                )
-                        );
-        productCharacteristicValidator.validate(updateCharacteristicsDTO, availableCharacteristics);
+        productCharacteristicValidator.validate(updateCharacteristicsDTO,
+                characteristicRepo.findAllWithTextValuesByCategoryId(updatedProduct.getCategory().getId()));
 
         for(var characteristic : updateCharacteristicsDTO) {
-            int index = findProductCharacteristicIndexById(updatedProduct.getCharacteristics(), characteristic.getId());
-            if(index != -1) {
-                updatedProduct.getCharacteristics().get(index).setTextValue(characteristic.getTextValue());
-                updatedProduct.getCharacteristics().get(index).setNumericValue(characteristic.getNumericValue());
-            }
+            int index = findProductCharacteristicIndexById(
+                    updatedProduct.getCharacteristics(), characteristic.getCharacteristicId());
+
+            updatedProduct.getCharacteristics().get(index).setTextValue(characteristic.getTextValue());
+            updatedProduct.getCharacteristics().get(index).setNumericValue(characteristic.getNumericValue());
         }
     }
 
@@ -94,9 +78,10 @@ public class ProductCharacteristicService {
         }
 
         for(var characteristic : deleteCharacteristicsDTO) {
-            int index = findProductCharacteristicIndexById(updatedProduct.getCharacteristics(), characteristic.getId());
-            if(index != -1)
-                updatedProduct.getCharacteristics().remove(index);
+            int index = findProductCharacteristicIndexById(
+                    updatedProduct.getCharacteristics(), characteristic.getCharacteristicId());
+
+            updatedProduct.getCharacteristics().remove(index);
         }
     }
 
@@ -105,6 +90,6 @@ public class ProductCharacteristicService {
             if(characteristics.get(i).getCharacteristic().getId().equals(id))
                 return i;
         }
-        return -1;
+        throw new RuntimeException("characteristic with id=%s didn't find in your product".formatted(id));
     }
 }

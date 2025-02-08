@@ -12,11 +12,9 @@ import static org.junit.Assert.assertThrows;
 
 class CatalogueUtilsTest {
 
-    private CatalogueUtils catalogueUtils = new CatalogueUtils();
-
     @Test
     public void buildCategoryTree_withoutCategories() {
-        List<CategoryDTO> categoryDTOList = catalogueUtils.buildCategoryTree(Collections.emptyList());
+        List<CategoryDTO> categoryDTOList = CatalogueUtils.buildCategoryTree(Collections.emptyList());
 
         assertThat(categoryDTOList).isEmpty();
     }
@@ -39,7 +37,7 @@ class CatalogueUtilsTest {
                 createCategoryDTO(5L, "root 5")
         );
 
-        List<CategoryDTO> actualTree = catalogueUtils.buildCategoryTree(categoryDTOList);
+        List<CategoryDTO> actualTree = CatalogueUtils.buildCategoryTree(categoryDTOList);
 
         assertThat(actualTree).isEqualTo(expectedTree);
     }
@@ -57,7 +55,7 @@ class CatalogueUtilsTest {
                 createCategoryDTO(3L, "root 3")
         );
 
-        List<CategoryDTO> actualTree = catalogueUtils.buildCategoryTree(categoryDTOList);
+        List<CategoryDTO> actualTree = CatalogueUtils.buildCategoryTree(categoryDTOList);
 
         assertThat(actualTree).isEqualTo(expectedTree);
     }
@@ -73,7 +71,7 @@ class CatalogueUtilsTest {
 
         Exception thrown = assertThrows(
                 RuntimeException.class,
-                () -> catalogueUtils.buildCategoryTree(categoryDTOList));
+                () -> CatalogueUtils.buildCategoryTree(categoryDTOList));
 
         assertThat(thrown.getMessage()).isEqualTo("no parent with id 5");
     }
