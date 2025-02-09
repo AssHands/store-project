@@ -10,17 +10,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductSearchResponse {
 
     private List<Object> searchAfter;
 
-    private List<ProductViewReadDTO> content;
+    private List<ProductViewReadDTO> content = new ArrayList<>();
 }

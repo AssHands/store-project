@@ -183,8 +183,8 @@ public class ProductCharacteristicServiceTest {
                 createProductCharacteristic(3L, 3)))
         );
         Set<ProductCharacteristicDTO> deleteProductCharacteristicDTOSet = Set.of(
-                ProductCharacteristicDTO.builder().characteristicId(2L).build(),
-                ProductCharacteristicDTO.builder().characteristicId(3L).build()
+                ProductCharacteristicDTO.builder().id(2L).build(),
+                ProductCharacteristicDTO.builder().id(3L).build()
         );
 
         List<ProductCharacteristic> expectedProductCharacteristicList = List.of(
@@ -223,7 +223,7 @@ public class ProductCharacteristicServiceTest {
                 createProductCharacteristic(3L, 3)))
         );
         Set<ProductCharacteristicDTO> deleteProductCharacteristicDTOSet = Set.of(
-                ProductCharacteristicDTO.builder().characteristicId(4L).build()
+                ProductCharacteristicDTO.builder().id(4L).build()
         );
 
         Exception thrown = assertThrows(

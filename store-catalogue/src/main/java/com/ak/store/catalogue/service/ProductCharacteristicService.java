@@ -35,7 +35,7 @@ public class ProductCharacteristicService {
 
         if(!existingCharacteristicIds.isEmpty()) {
             List<Long> creatingCharacteristicIds = createCharacteristicsDTO.stream()
-                    .map(ProductCharacteristicDTO::getCharacteristicId)
+                    .map(ProductCharacteristicDTO::getId)
                     .toList();
 
             Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
@@ -65,7 +65,7 @@ public class ProductCharacteristicService {
 
         for(var characteristic : updateCharacteristicsDTO) {
             int index = findProductCharacteristicIndexById(
-                    updatedProduct.getCharacteristics(), characteristic.getCharacteristicId());
+                    updatedProduct.getCharacteristics(), characteristic.getId());
 
             updatedProduct.getCharacteristics().get(index).setTextValue(characteristic.getTextValue());
             updatedProduct.getCharacteristics().get(index).setNumericValue(characteristic.getNumericValue());
@@ -79,7 +79,7 @@ public class ProductCharacteristicService {
 
         for(var characteristic : deleteCharacteristicsDTO) {
             int index = findProductCharacteristicIndexById(
-                    updatedProduct.getCharacteristics(), characteristic.getCharacteristicId());
+                    updatedProduct.getCharacteristics(), characteristic.getId());
 
             updatedProduct.getCharacteristics().remove(index);
         }

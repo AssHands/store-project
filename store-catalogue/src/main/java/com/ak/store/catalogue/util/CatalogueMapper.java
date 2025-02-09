@@ -67,7 +67,7 @@ public class CatalogueMapper {
                 .textValue(productCharacteristicDTO.getTextValue())
                 .product(product)
                 .characteristic(Characteristic.builder()
-                        .id(productCharacteristicDTO.getCharacteristicId())
+                        .id(productCharacteristicDTO.getId())
                         .build())
                 .build();
     }
@@ -117,6 +117,7 @@ public class CatalogueMapper {
         }
 
         productDocument.setCharacteristics(characteristicDocuments);
+        System.out.println(productDocument);
         return productDocument;
     }
 

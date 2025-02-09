@@ -21,34 +21,34 @@ public class ProductCharacteristicValidator {
                 );
 
         for(var productCharacteristic : ProductCharacteristicDTOs) {
-            List<String> textValues = availableTextValues.get(productCharacteristic.getCharacteristicId());
+            List<String> textValues = availableTextValues.get(productCharacteristic.getId());
 
             if(textValues == null) {
                 throw new RuntimeException("characteristic with id=%s is not available"
-                        .formatted(productCharacteristic.getCharacteristicId()));
+                        .formatted(productCharacteristic.getId()));
             }
 
             if(productCharacteristic.getTextValue() != null) {
                 if(productCharacteristic.getNumericValue() != null) {
                     throw new RuntimeException("characteristic with id=%s has both text value and numeric value"
-                            .formatted(productCharacteristic.getCharacteristicId()));
+                            .formatted(productCharacteristic.getId()));
                 }
 
                 if(textValues.isEmpty()) {
                     throw new RuntimeException("characteristic with id=%s is not a text one"
-                            .formatted(productCharacteristic.getCharacteristicId()));
+                            .formatted(productCharacteristic.getId()));
                 }
 
                 if(!textValues.contains(productCharacteristic.getTextValue())) {
                     throw new RuntimeException("not valid text value for characteristic with id=%s"
-                            .formatted(productCharacteristic.getCharacteristicId()));
+                            .formatted(productCharacteristic.getId()));
                 }
             }
 
             if(productCharacteristic.getNumericValue() != null) {
                 if(!textValues.isEmpty()) {
                     throw new RuntimeException("characteristic with id=%s is not a numeric one"
-                            .formatted(productCharacteristic.getCharacteristicId()));
+                            .formatted(productCharacteristic.getId()));
                 }
             }
         }

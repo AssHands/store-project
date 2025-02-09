@@ -14,7 +14,9 @@ import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
 import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.catalogue.model.entity.Characteristic;
+import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
+import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
 import com.ak.store.common.dto.search.nested.NumericFilterValue;
@@ -23,6 +25,7 @@ import com.ak.store.common.payload.search.SearchProductRequest;
 import com.ak.store.common.dto.search.nested.TextFilter;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,16 +33,13 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ElasticService {
 
     private final ElasticsearchClient esClient;
     private final CharacteristicRepo characteristicRepo;
 
-    @Autowired
-    public ElasticService(ElasticsearchClient esClient, CharacteristicRepo characteristicRepo) {
-        this.esClient = esClient;
-        this.characteristicRepo = characteristicRepo;
-    }
+    private final CatalogueMapper catalogueMapper;
 
     public void deleteOneProduct(Long id) {
         var request = DeleteRequest.of(d -> d
@@ -53,7 +53,8 @@ public class ElasticService {
         }
     }
 
-    public void createOneProduct(ProductDocument productDocument) {
+    public void createOneProduct(Product product) {
+        ProductDocument productDocument = catalogueMapper.mapToProductDocument(product);
         var request = IndexRequest.of(i -> i
                  .index("product")
                  .id(productDocument.getId().toString())
@@ -66,10 +67,13 @@ public class ElasticService {
         }
     }
 
-    public void createAllProduct(List<ProductDocument> productDocuments) {
+    public void createAllProduct(List<Product> productList) {
         var br = new BulkRequest.Builder();
+        List<ProductDocument> productDocumentList = productList.stream()
+                .map(catalogueMapper::mapToProductDocument)
+                .toList();
 
-        productDocuments.forEach(product ->
+        productDocumentList.forEach(product ->
                 br.operations(op -> op
                         .index(idx -> idx
                                 .index("product")
@@ -93,7 +97,9 @@ public class ElasticService {
         }
     }
 
-    public void updateOneProduct(ProductDocument productDocument) {
+    public void updateOneProduct(Product product) {
+        ProductDocument productDocument = catalogueMapper.mapToProductDocument(product);
+
         var request = UpdateRequest.of(u -> u
                 .index("product")
                 .id(productDocument.getId().toString())
@@ -216,6 +222,10 @@ public class ElasticService {
         Map<String, Aggregation> aggs = new HashMap<>();
 
         for(var filter : filters) {
+            if(filter.getRangeValues().isEmpty() && filter.getTextValues().isEmpty()) {
+                throw new RuntimeException("characteristic with id=%d has no filter values".formatted(filter.getId()));
+            }
+
             List<Query> availableFilters = new ArrayList<>();
             if(!searchAvailableFiltersRequest.getTextFilters().isEmpty()) {
                 availableFilters.addAll(makeTextFilters(
@@ -292,7 +302,7 @@ public class ElasticService {
 
         if (searchProductRequest.getPriceTo() != 0) {
             filters.add(RangeQuery.of(r -> r
-                            .field("price")
+                            .field("current_price")
                             .gte(JsonData.of(searchProductRequest.getPriceFrom()))
                             .lte(JsonData.of(searchProductRequest.getPriceTo())))
                     ._toQuery());
@@ -322,14 +332,16 @@ public class ElasticService {
             throw new RuntimeException("Failed to get response from ElasticSearch server");
         }
 
-        ElasticSearchResult elasticSearchResult = new ElasticSearchResult();
         List<Hit<ProductDocument>> productHits = response.hits().hits();
 
         System.out.println(searchRequest);
         response.hits().hits().forEach(System.out::println);
 
+        ElasticSearchResult elasticSearchResult = new ElasticSearchResult();
+        elasticSearchResult.setSort(searchProductRequest.getSort());
+
         if(productHits.size() == 0) {
-            return null;
+            return elasticSearchResult;
         }
 
         elasticSearchResult.setIds(productHits
@@ -435,10 +447,10 @@ public class ElasticService {
 
             switch (searchProductRequest.getSort()) {
                 case PRICE_UP -> {
-                    sr.sort(s -> s.field(sort -> sort.field("price")));
+                    sr.sort(s -> s.field(sort -> sort.field("current_price")));
                 }
                 case PRICE_DOWN -> {
-                    sr.sort(s -> s.field(sort -> sort.field("price").order(SortOrder.Desc)));
+                    sr.sort(s -> s.field(sort -> sort.field("current_price").order(SortOrder.Desc)));
                 }
                 case RATING -> {
                     sr.sort(s -> s.field(sort -> sort.field("grade").order(SortOrder.Desc)));

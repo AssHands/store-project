@@ -69,21 +69,21 @@ public class TestProductFactory {
 
     public static ProductCharacteristicDTO createProductCharacteristicDTO(Long characteristicId, String textValue) {
         return ProductCharacteristicDTO.builder()
-                .characteristicId(characteristicId)
+                .id(characteristicId)
                 .textValue(textValue)
                 .build();
     }
 
     public static ProductCharacteristicDTO createProductCharacteristicDTO(Long characteristicId, Integer numericValue) {
         return ProductCharacteristicDTO.builder()
-                .characteristicId(characteristicId)
+                .id(characteristicId)
                 .numericValue(numericValue)
                 .build();
     }
 
     public static ProductCharacteristicDTO createProductCharacteristicDTO(Long characteristicId, Integer numericValue, String textValue) {
         return ProductCharacteristicDTO.builder()
-                .characteristicId(characteristicId)
+                .id(characteristicId)
                 .numericValue(numericValue)
                 .textValue(textValue)
                 .build();

@@ -1,10 +1,12 @@
 package com.ak.store.catalogue.model.pojo;
 
+import com.ak.store.common.dto.search.nested.Sort;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -12,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ElasticSearchResult {
-    List<Long> ids;
+    List<Long> ids = new ArrayList<>();
     List<Object> searchAfter;
+    Sort sort;
 }

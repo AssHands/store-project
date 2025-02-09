@@ -1,6 +1,7 @@
 package com.ak.store.catalogue.validator;
 
 import com.ak.store.catalogue.model.entity.ProductImage;
+import com.ak.store.common.dto.catalogue.product.ProductImageWriteDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,28 +12,27 @@ import java.util.regex.Pattern;
 
 @Component
 public class ProductImageValidator {
-    public void validate(Map<String, String> allImageIndexes, List<MultipartFile> addImages,
-                         List<String> deleteImageIndexes, List<ProductImage> productImages) {
+    public void validate(ProductImageWriteDTO productImageDTO, List<ProductImage> productImages) {
         int expectedSize = productImages.size();
-        if(addImages != null)
-            expectedSize += addImages.size();
-        if(deleteImageIndexes != null)
-            expectedSize -= deleteImageIndexes.size();
+        if(productImageDTO.getAddImages() != null)
+            expectedSize += productImageDTO.getAddImages().size();
+        if(productImageDTO.getDeleteImageIndexes() != null)
+            expectedSize -= productImageDTO.getDeleteImageIndexes().size();
 
         if(expectedSize > 9)
             throw new RuntimeException("индекс больше 9");
 
-        validateKeysAndValues(allImageIndexes);
+        validateKeysAndValues(productImageDTO.getAllImageIndexes());
 
-        List<Integer> oldImageIndexes = allImageIndexes.keySet().stream()
+        List<Integer> oldImageIndexes = productImageDTO.getAllImageIndexes().keySet().stream()
                 .filter(k -> Pattern.compile("image\\[\\d]").matcher(k).matches())
                 .map(k -> k.replaceAll("\\D", ""))
                 .map(Integer::parseInt)
                 .toList();
 
-        validateDeleteImageIndexes(deleteImageIndexes, oldImageIndexes, productImages);
-        validateOldImageIndexes(deleteImageIndexes, addImages, productImages, oldImageIndexes);
-        validateNewImageIndexes(allImageIndexes, expectedSize);
+        validateDeleteImageIndexes(productImageDTO.getDeleteImageIndexes(), oldImageIndexes, productImages);
+        validateOldImageIndexes(productImageDTO.getDeleteImageIndexes(), productImageDTO.getAddImages(), productImages, oldImageIndexes);
+        validateNewImageIndexes(productImageDTO.getAllImageIndexes(), expectedSize);
     }
 
     private void validateOldImageIndexes(List<String> deleteImageIndexes, List<MultipartFile> addImages,

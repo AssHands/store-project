@@ -1,7 +1,8 @@
 package com.ak.store.catalogue.controller;
 
-import com.ak.store.catalogue.service.ProductService;
+import com.ak.store.catalogue.facade.ProductServiceFacade;
 import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
+import com.ak.store.common.dto.catalogue.product.ProductImageWriteDTO;
 import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
@@ -26,21 +27,21 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/catalogue/products")
 public class ProductController {
-    private final ProductService productService;
+    private final ProductServiceFacade productServiceFacade;
 
     @GetMapping("{id}")
     public ProductFullReadDTO getOneProduct(@PathVariable("id") Long id) {
-        return productService.findOneProductById(id);
+        return productServiceFacade.findOneProductById(id);
     }
 
     @DeleteMapping("{id}")
     public void deleteOneProduct(@PathVariable("id") Long id) {
-        productService.deleteOneProduct(id);
+        productServiceFacade.deleteOneProduct(id);
     }
 
     @PostMapping
     public ProductWriteDTO createOneProduct(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
-        productService.createOneProduct(productPayload);
+        productServiceFacade.createOneProduct(productPayload);
         return null;
     }
     @PostMapping("batch") //todo: make validation for list
@@ -55,14 +56,14 @@ public class ProductController {
             }
         }
 
-        productService.createAllProduct(productPayloads);
+        productServiceFacade.createAllProduct(productPayloads);
         return null;
     }
 
     @PatchMapping("{id}")
     public ProductWriteDTO updateOneProduct(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
                                             @PathVariable("id") Long productId) {
-        productService.updateOneProduct(productPayload, productId);
+        productServiceFacade.updateOneProduct(productPayload, productId);
         return null;
     }
 
@@ -117,19 +118,21 @@ public class ProductController {
                                       @RequestParam Map<String, String> allImageIndexes,
                                       @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,
                                       @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
+        ProductImageWriteDTO productImageWriteDTO =
+                new ProductImageWriteDTO(productId, allImageIndexes, addImages, deleteImageIndexes);
 
-        productService.saveOrUpdateAllImage(productId, allImageIndexes, addImages, deleteImageIndexes);
+        productServiceFacade.saveOrUpdateAllImage(productImageWriteDTO);
     }
 
     @GetMapping("search")
     public ProductSearchResponse searchAllProduct(@RequestBody @Valid SearchProductRequest searchProductRequest) {
         System.out.println(searchProductRequest);
-        return productService.findAllProductBySearch(searchProductRequest);
+        return productServiceFacade.findAllProductBySearch(searchProductRequest);
     }
 
     @GetMapping("search/filters")
     public SearchAvailableFiltersResponse searchAllAvailableFilter(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         System.out.println(searchAvailableFiltersRequest);
-        return productService.findAllAvailableFilter(searchAvailableFiltersRequest);
+        return productServiceFacade.findAllAvailableFilter(searchAvailableFiltersRequest);
     }
 }

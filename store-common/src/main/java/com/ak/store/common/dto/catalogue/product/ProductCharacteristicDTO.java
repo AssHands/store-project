@@ -8,13 +8,13 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "characteristicId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductCharacteristicDTO {
     @NonNull
-    private Long characteristicId;
+    private Long id;
 
     private Integer numericValue;
 

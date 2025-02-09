@@ -1,17 +1,17 @@
 package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.model.entity.*;
-import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
+import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.catalogue.validator.ProductImageValidator;
 import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
+import com.ak.store.common.dto.catalogue.product.ProductImageWriteDTO;
+import com.ak.store.common.dto.catalogue.product.ProductViewReadDTO;
 import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
-import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
-import com.ak.store.common.payload.search.SearchProductRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,43 +40,39 @@ public class ProductService {
                 productRepo.findById(id).orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id))));
     }
 
-    @Transactional
-    public Long saveOrUpdateAllImage(Long productId, Map<String, String> allImageIndexes,
-                                     List<MultipartFile> addImages, List<String> deleteImageIndexes) {
-        Product updatedProduct = productRepo.findOneWithImagesById(productId)
-                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(productId)));
-
+    public ProcessedProductImages saveOrUpdateAllImage(ProductImageWriteDTO productImageDTO) {
+        ProcessedProductImages processedProductImages = new ProcessedProductImages();
+        Product updatedProduct = productRepo.findOneWithImagesById(productImageDTO.getProductId())
+                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(productImageDTO.getProductId())));
         List<ProductImage> productImages = updatedProduct.getImages();
-        productImageValidator.validate(allImageIndexes, addImages, deleteImageIndexes, productImages);
 
-        List<String> imageKeysForDelete = markImagesForDelete(productImages, deleteImageIndexes);
-        //LinkedHashMap for save order
-        LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, addImages);
+        productImageValidator.validate(productImageDTO, productImages);
 
+        processedProductImages.setImageKeysForDelete(
+                markImagesForDeleteAndGetKeys(productImages, productImageDTO.getDeleteImageIndexes()));
+
+        LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, productImageDTO.getAddImages());
         for (String key : imagesForAdd.keySet()) {
             productImages.add(ProductImage.builder()
                     .imageKey(key)
                     .product(Product.builder()
-                            .id(productId)
+                            .id(productImageDTO.getProductId())
                             .build())
                     .build());
         }
+        processedProductImages.setImagesForAdd(imagesForAdd);
 
-        List<ProductImage> newProductImages = createNewProductImagesList(productImages, allImageIndexes);
+        List<ProductImage> newProductImages = createNewProductImageList(productImages, productImageDTO.getAllImageIndexes());
 
         //update images in DB
         updatedProduct.getImages().clear();
         updatedProduct.getImages().addAll(newProductImages);
         productRepo.saveAndFlush(updatedProduct);
 
-        //update images in S3
-        s3Service.deleteAllImage(imageKeysForDelete);
-        s3Service.putAllImage(imagesForAdd);
-
-        return productId;
+        return processedProductImages;
     }
 
-    private List<String> markImagesForDelete(List<ProductImage> productImages, List<String> deleteImageIndexes) {
+    private List<String> markImagesForDeleteAndGetKeys(List<ProductImage> productImages, List<String> deleteImageIndexes) {
         List<String> imageKeysForDelete = new ArrayList<>();
         if (deleteImageIndexes != null && !deleteImageIndexes.isEmpty()) {
             for (int i = 0; i < productImages.size(); i++) {
@@ -103,7 +99,7 @@ public class ProductService {
         return imagesForAdd;
     }
 
-    private List<ProductImage> createNewProductImagesList(List<ProductImage> productImages, Map<String, String> allImageIndexes) {
+    private List<ProductImage> createNewProductImageList(List<ProductImage> productImages, Map<String, String> allImageIndexes) {
         int finalProductImagesSize = (int) productImages.stream()
                 .filter(Objects::nonNull)
                 .count();
@@ -127,77 +123,41 @@ public class ProductService {
         return newProductImages;
     }
 
-    public ProductSearchResponse findAllProductBySearch(SearchProductRequest searchProductRequest) {
-        ElasticSearchResult elasticSearchResult = elasticService.findAllProduct(searchProductRequest);
-
-        if(elasticSearchResult == null) {
-            throw new RuntimeException("no documents found");
-        }
-
-        ProductSearchResponse productSearchResponse = new ProductSearchResponse();
-
-        productSearchResponse.setContent(
-                productRepo.findAllViewByIdIn(elasticSearchResult.getIds()).stream() //todo: make SORT
-                        .map(catalogueMapper::mapToProductViewReadDTO)
-                        .toList());
-
-        productSearchResponse.setSearchAfter(elasticSearchResult.getSearchAfter());
-
-        return productSearchResponse;
+    public List<ProductViewReadDTO> findAllProduct(List<Long> ids) {
+        return productRepo.findAllViewByIdIn(ids).stream() //todo: make SORT
+                .map(catalogueMapper::mapToProductViewReadDTO)
+                .toList();
     }
 
-    public SearchAvailableFiltersResponse findAllAvailableFilter(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
-        return elasticService.searchAvailableFilters(searchAvailableFiltersRequest);
+    public Product deleteOneProduct(Long id) {
+        Product product = productRepo.findOneWithImagesById(id).orElseThrow(() -> new RuntimeException("no products found"));
+        productRepo.deleteById(id);
+        return product;
     }
 
-    @Transactional
-    //todo: when product doesn't exist, no errors will throw. MAKE IT
-    public boolean deleteOneProduct(Long id) {
-        Optional<Product> product = productRepo.findOneWithImagesById(id);
-        if(product.isPresent()) {
-            List<String> imageKeys = product.get().getImages().stream()
-                    .map(ProductImage::getImageKey)
-                    .toList();
-
-            productRepo.deleteById(id);
-            s3Service.deleteAllImage(imageKeys);
-            elasticService.deleteOneProduct(id);
-            return true;
-        }
-        return false;
-    }
-
-    @Transactional
-    public Long createOneProduct(ProductWritePayload productPayload) {
+    public Product createOneProduct(ProductWritePayload productPayload) {
         Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
-        if(createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
+        if (createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
             throw new RuntimeException("category_id is null");
         }
         productCharacteristicService.createProductCharacteristics(createdProduct, productPayload.getCreateCharacteristics());
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
         productRepo.saveAndFlush(createdProduct);
-        elasticService.createOneProduct(catalogueMapper.mapToProductDocument(createdProduct));
 
-        return createdProduct.getId();
+        return createdProduct;
     }
 
-    @Transactional
-    public void createAllProduct(List<ProductWritePayload> productPayloads) {
+    public List<Product> createAllProduct(List<ProductWritePayload> productPayloads) {
         List<Product> products = new ArrayList<>();
         for (int i = 0; i < productPayloads.size(); i++) {
-            if(i > 0 && i % BATCH_SIZE == 0) {
+            if (i > 0 && i % BATCH_SIZE == 0) {
                 productRepo.saveAllAndFlush(products);
-                elasticService.createAllProduct(products.stream()
-                        .map(catalogueMapper::mapToProductDocument)
-                        .toList());
-
                 productRepo.clear();
-                products.clear();
             }
 
             Product createdProduct = catalogueMapper.mapToProduct(productPayloads.get(i).getProduct());
-            if(createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
+            if (createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
                 throw new RuntimeException("one of the products does not have a defined category_id");
             }
             productCharacteristicService.createProductCharacteristics(createdProduct, productPayloads.get(i).getCreateCharacteristics());
@@ -206,13 +166,10 @@ public class ProductService {
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
         productRepo.saveAllAndFlush(products);
-        elasticService.createAllProduct(products.stream()
-                .map(catalogueMapper::mapToProductDocument)
-                .toList());
+        return products;
     }
 
-    @Transactional
-    public Long updateOneProduct(ProductWritePayload productPayload, Long productId) {
+    public Product updateOneProduct(ProductWritePayload productPayload, Long productId) {
         Product updatedProduct = productRepo.findOneWithCharacteristicsAndCategoryById(productId)
                 .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(productId)));
 
@@ -224,39 +181,38 @@ public class ProductService {
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
         productRepo.saveAndFlush(updatedProduct);
-        elasticService.updateOneProduct(catalogueMapper.mapToProductDocument(updatedProduct));
 
-        return productId;
+        return updatedProduct;
     }
 
     private void updateProduct(Product updatedProduct, ProductWriteDTO productWriteDTO) {
-        if(productWriteDTO.getTitle() != null) {
+        if (productWriteDTO.getTitle() != null) {
             updatedProduct.setTitle(productWriteDTO.getTitle());
         }
 
-        if(productWriteDTO.getDescription() != null) {
+        if (productWriteDTO.getDescription() != null) {
             updatedProduct.setDescription(productWriteDTO.getDescription());
         }
 
         boolean isFullPriceUpdated = false;
-        if(productWriteDTO.getFullPrice() != null && productWriteDTO.getFullPrice() != updatedProduct.getFullPrice()) {
+        if (productWriteDTO.getFullPrice() != null && productWriteDTO.getFullPrice() != updatedProduct.getFullPrice()) {
             updatedProduct.setFullPrice(productWriteDTO.getFullPrice());
             isFullPriceUpdated = true;
         }
 
-        if(productWriteDTO.getDiscountPercentage() != null) {
+        if (productWriteDTO.getDiscountPercentage() != null) {
             updatedProduct.setDiscountPercentage(productWriteDTO.getDiscountPercentage());
             int discount = updatedProduct.getFullPrice() * updatedProduct.getDiscountPercentage() / 100;
             int priceWithDiscount = updatedProduct.getFullPrice() - discount;
             updatedProduct.setCurrentPrice(priceWithDiscount);
 
-        } else if(isFullPriceUpdated) {
+        } else if (isFullPriceUpdated) {
             int discount = updatedProduct.getFullPrice() * updatedProduct.getDiscountPercentage() / 100;
             int priceWithDiscount = updatedProduct.getFullPrice() - discount;
             updatedProduct.setCurrentPrice(priceWithDiscount);
         }
 
-        if(productWriteDTO.getCategoryId() != null
+        if (productWriteDTO.getCategoryId() != null
                 && !updatedProduct.getCategory().getId().equals(productWriteDTO.getCategoryId())) {
             updatedProduct.setCategory(
                     Category.builder()
