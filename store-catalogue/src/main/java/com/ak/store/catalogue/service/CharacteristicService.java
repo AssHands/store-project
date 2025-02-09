@@ -1,6 +1,5 @@
 package com.ak.store.catalogue.service;
 
-import com.ak.store.catalogue.util.CatalogueUtils;
 import com.ak.store.catalogue.repository.*;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.common.dto.catalogue.product.*;
@@ -18,20 +17,11 @@ import java.util.*;
 //    CacheRegionStatistics cacheStatistics = statistics.getDomainDataRegionStatistics("static-data");
 @Service
 @RequiredArgsConstructor
-public class CatalogueService {
+public class CharacteristicService {
     private final CatalogueMapper catalogueMapper;
     private final CharacteristicRepo characteristicRepo;
-    private final CategoryRepo categoryRepo;
 
-    public List<CategoryDTO> findAllCategory() {
-        List<CategoryDTO> categories = categoryRepo.findAll().stream()
-                .map(catalogueMapper::mapToCategoryDTO)
-                .toList();
-
-        return CatalogueUtils.buildCategoryTree(categories);
-    }
-
-    public List<CharacteristicDTO> findAllAvailableCharacteristicByCategory(Long categoryId) {
+    public List<CharacteristicDTO> findAllCharacteristicByCategoryId(Long categoryId) {
         return characteristicRepo.findAllWithTextValuesByCategoryId(categoryId).stream()
                 .map(catalogueMapper::mapToCharacteristicDTO)
                 .toList();

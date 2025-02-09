@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.service;
+package com.ak.store.catalogue.integration;
 
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.repository.ProductRepo;
@@ -57,16 +57,5 @@ public class S3Service {
         for(var image : imagesForAdd.entrySet()) {
             putOneImage(image.getValue(), image.getKey());
         }
-    }
-
-    //LinkedHashMap for save order
-    public LinkedHashMap<String, MultipartFile> generateImageKeys(Product product, List<MultipartFile> images) {
-        LinkedHashMap<String, MultipartFile> imageKeys = new LinkedHashMap<>();
-        for(var image : images) {
-            imageKeys.put("category_%s/product_%s/%s".formatted(product.getCategory().getId(),
-                    product.getId(), UUID.randomUUID() + "." + image.getContentType().split("/")[1]), image);
-        }
-
-        return imageKeys;
     }
 }

@@ -1,18 +1,18 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.integration.ElasticService;
+import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.model.entity.*;
 import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
+import com.ak.store.catalogue.util.ProductImageProcessor;
 import com.ak.store.catalogue.validator.ProductImageValidator;
 import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
 import com.ak.store.common.dto.catalogue.product.ProductImageWriteDTO;
 import com.ak.store.common.dto.catalogue.product.ProductViewReadDTO;
 import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
-import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
-import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,14 +21,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static com.ak.store.catalogue.util.ProductImageProcessor.processProductImages;
+
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepo productRepo;
-    private final ElasticService elasticService;
     private final CatalogueMapper catalogueMapper;
     private final ProductImageValidator productImageValidator;
-    private final S3Service s3Service;
     private final ProductCharacteristicService productCharacteristicService;
 
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
@@ -41,86 +41,18 @@ public class ProductService {
     }
 
     public ProcessedProductImages saveOrUpdateAllImage(ProductImageWriteDTO productImageDTO) {
-        ProcessedProductImages processedProductImages = new ProcessedProductImages();
         Product updatedProduct = productRepo.findOneWithImagesById(productImageDTO.getProductId())
                 .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(productImageDTO.getProductId())));
-        List<ProductImage> productImages = updatedProduct.getImages();
 
-        productImageValidator.validate(productImageDTO, productImages);
+        productImageValidator.validate(productImageDTO, updatedProduct.getImages());
 
-        processedProductImages.setImageKeysForDelete(
-                markImagesForDeleteAndGetKeys(productImages, productImageDTO.getDeleteImageIndexes()));
+        ProcessedProductImages processedProductImages = processProductImages(productImageDTO, updatedProduct);
 
-        LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, productImageDTO.getAddImages());
-        for (String key : imagesForAdd.keySet()) {
-            productImages.add(ProductImage.builder()
-                    .imageKey(key)
-                    .product(Product.builder()
-                            .id(productImageDTO.getProductId())
-                            .build())
-                    .build());
-        }
-        processedProductImages.setImagesForAdd(imagesForAdd);
-
-        List<ProductImage> newProductImages = createNewProductImageList(productImages, productImageDTO.getAllImageIndexes());
-
-        //update images in DB
         updatedProduct.getImages().clear();
-        updatedProduct.getImages().addAll(newProductImages);
+        updatedProduct.getImages().addAll(processedProductImages.getNewProductImages());
         productRepo.saveAndFlush(updatedProduct);
 
         return processedProductImages;
-    }
-
-    private List<String> markImagesForDeleteAndGetKeys(List<ProductImage> productImages, List<String> deleteImageIndexes) {
-        List<String> imageKeysForDelete = new ArrayList<>();
-        if (deleteImageIndexes != null && !deleteImageIndexes.isEmpty()) {
-            for (int i = 0; i < productImages.size(); i++) {
-                var index = productImages.get(i).getIndex();
-                boolean isDeleted = deleteImageIndexes.stream()
-                        .map(Integer::parseInt)
-                        .anyMatch(deletedIndex -> deletedIndex.equals(index));
-
-                if (isDeleted) {
-                    imageKeysForDelete.add(productImages.get(i).getImageKey());
-                    productImages.set(i, null);
-                }
-            }
-        }
-        return imageKeysForDelete;
-    }
-
-    private LinkedHashMap<String, MultipartFile> prepareImagesForAdd(Product updatedProduct, List<MultipartFile> addImages) {
-        //LinkedHashMap for save order
-        LinkedHashMap<String, MultipartFile> imagesForAdd = new LinkedHashMap<>();
-        if (addImages != null && !addImages.isEmpty()) {
-            imagesForAdd = s3Service.generateImageKeys(updatedProduct, addImages);
-        }
-        return imagesForAdd;
-    }
-
-    private List<ProductImage> createNewProductImageList(List<ProductImage> productImages, Map<String, String> allImageIndexes) {
-        int finalProductImagesSize = (int) productImages.stream()
-                .filter(Objects::nonNull)
-                .count();
-
-        List<ProductImage> newProductImages = new ArrayList<>(finalProductImagesSize);
-        for (int i = 0; i < finalProductImagesSize; i++) {
-            newProductImages.add(null);
-        }
-
-        for (var entry : allImageIndexes.entrySet()) {
-            if (!Pattern.compile("image\\[\\d]").matcher(entry.getKey()).matches())
-                continue;
-
-            int currentIndex = Integer.parseInt(entry.getKey().replaceAll("\\D", ""));
-            int newIndex = Integer.parseInt(entry.getValue());
-
-            newProductImages.set(newIndex, productImages.get(currentIndex));
-            newProductImages.get(newIndex).setIndex(newIndex);
-        }
-
-        return newProductImages;
     }
 
     public List<ProductViewReadDTO> findAllProduct(List<Long> ids) {

@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.service;
+package com.ak.store.catalogue.integration;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;

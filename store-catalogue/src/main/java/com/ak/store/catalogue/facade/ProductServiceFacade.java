@@ -2,9 +2,9 @@ package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductImage;
-import com.ak.store.catalogue.service.ElasticService;
+import com.ak.store.catalogue.integration.ElasticService;
 import com.ak.store.catalogue.service.ProductService;
-import com.ak.store.catalogue.service.S3Service;
+import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
 import com.ak.store.common.dto.catalogue.product.ProductImageWriteDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
