@@ -2,7 +2,7 @@ package com.ak.store.catalogue;
 
  import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.TextValue;
-import com.ak.store.common.dto.catalogue.product.CategoryDTO;
+import com.ak.store.common.dto.catalogue.CategoryDTO;
 
 import java.util.*;
 

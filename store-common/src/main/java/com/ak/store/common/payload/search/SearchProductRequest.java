@@ -2,7 +2,7 @@ package com.ak.store.common.payload.search;
 
 import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
-import com.ak.store.common.dto.search.nested.Sort;
+import com.ak.store.common.dto.search.nested.SortingType;
 import com.ak.store.common.dto.search.nested.TextFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -41,7 +41,7 @@ public class SearchProductRequest {
     private Filters filters = new Filters();
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
-    private Sort sort = Sort.POPULAR;
+    private SortingType sortingType = SortingType.POPULAR;
 
     public List<NumericFilter> getNumericFilters() {
         return filters.getNumericFilters();

@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.validator;
 
 import com.ak.store.catalogue.model.entity.ProductImage;
-import com.ak.store.common.dto.catalogue.product.ProductImageWriteDTO;
+import com.ak.store.common.dto.catalogue.ProductImageWriteDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 

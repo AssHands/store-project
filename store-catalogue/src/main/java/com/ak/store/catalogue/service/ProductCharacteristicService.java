@@ -5,7 +5,7 @@ import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.catalogue.validator.ProductCharacteristicValidator;
-import com.ak.store.common.dto.catalogue.product.ProductCharacteristicDTO;
+import com.ak.store.common.dto.catalogue.ProductCharacteristicDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

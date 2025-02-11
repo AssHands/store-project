@@ -1,9 +1,9 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.ProductServiceFacade;
-import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
-import com.ak.store.common.dto.catalogue.product.ProductImageWriteDTO;
-import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
+import com.ak.store.common.dto.catalogue.ProductReadDTO;
+import com.ak.store.common.dto.catalogue.ProductImageWriteDTO;
+import com.ak.store.common.dto.catalogue.ProductWriteDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
@@ -30,8 +30,8 @@ public class ProductController {
     private final ProductServiceFacade productServiceFacade;
 
     @GetMapping("{id}")
-    public ProductFullReadDTO getOneProduct(@PathVariable("id") Long id) {
-        return productServiceFacade.findOneProductById(id);
+    public ProductReadDTO getOneProduct(@PathVariable("id") Long id) {
+        return productServiceFacade.findOneProduct(id);
     }
 
     @DeleteMapping("{id}")

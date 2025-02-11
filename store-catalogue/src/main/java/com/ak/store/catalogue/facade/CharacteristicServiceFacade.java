@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.service.CharacteristicService;
-import com.ak.store.common.dto.catalogue.product.CharacteristicDTO;
+import com.ak.store.common.dto.catalogue.CharacteristicDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

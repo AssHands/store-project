@@ -1,4 +1,4 @@
-package com.ak.store.common.dto.catalogue.product;
+package com.ak.store.common.dto.catalogue;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -18,7 +18,7 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductFullReadDTO {
+public class ProductReadDTO {
     private Long id;
 
     private String title;
@@ -37,6 +37,8 @@ public class ProductFullReadDTO {
 
     @Valid
     private CategoryDTO category;
+
+    private List<ImageDTO> images;
 
     @Builder.Default
     private List<@Valid ProductCharacteristicDTO> characteristics = new ArrayList<>();

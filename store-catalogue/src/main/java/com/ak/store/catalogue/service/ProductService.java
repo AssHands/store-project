@@ -1,25 +1,22 @@
 package com.ak.store.catalogue.service;
 
-import com.ak.store.catalogue.integration.ElasticService;
-import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.model.entity.*;
 import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.catalogue.util.ProductImageProcessor;
+import com.ak.store.catalogue.service.product.PriceCalculator;
 import com.ak.store.catalogue.validator.ProductImageValidator;
-import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
-import com.ak.store.common.dto.catalogue.product.ProductImageWriteDTO;
-import com.ak.store.common.dto.catalogue.product.ProductViewReadDTO;
-import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
+import com.ak.store.common.dto.catalogue.ProductImageWriteDTO;
+import com.ak.store.common.dto.catalogue.ProductWriteDTO;
+import com.ak.store.common.dto.search.nested.SortingType;
 import com.ak.store.common.payload.product.ProductWritePayload;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 import static com.ak.store.catalogue.util.ProductImageProcessor.processProductImages;
 
@@ -34,10 +31,18 @@ public class ProductService {
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     private int BATCH_SIZE;
 
-    //todo: check sql statements. probably N + 1
-    public ProductFullReadDTO findOneProductById(Long id) {
-        return catalogueMapper.mapToProductFullReadDTO(
-                productRepo.findById(id).orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id))));
+    @Transactional
+    public Product findOneProductWithAll(Long id) {
+        Product product = productRepo.findOneWithCharacteristicsAndCategoryById(id)
+                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id)));
+
+        product.getImages().size();
+        return product;
+    }
+
+    public Product findOneProductWithCharacteristics(Long id) {
+        return productRepo.findOneWithCharacteristicsAndCategoryById(id)
+                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id)));
     }
 
     public ProcessedProductImages saveOrUpdateAllImage(ProductImageWriteDTO productImageDTO) {
@@ -55,10 +60,34 @@ public class ProductService {
         return processedProductImages;
     }
 
-    public List<ProductViewReadDTO> findAllProduct(List<Long> ids) {
-        return productRepo.findAllViewByIdIn(ids).stream() //todo: make SORT
-                .map(catalogueMapper::mapToProductViewReadDTO)
-                .toList();
+    public List<Product> findAllProductView(List<Long> ids) {
+        return productRepo.findAllWithImagesByIdIn(ids);
+    }
+
+    public List<Product> findAllProductView(List<Long> ids, SortingType sortingType) {
+        return productRepo.findAllWithImagesByIdIn(ids, getSort(sortingType));
+    }
+
+    private Sort getSort(SortingType sortingType) {
+        Sort sort;
+
+        switch (sortingType) {
+            case PRICE_UP -> {
+                sort = Sort.by(Sort.Direction.ASC, "currentPrice");
+            }
+            case PRICE_DOWN -> {
+                sort = Sort.by(Sort.Direction.DESC, "currentPrice");
+            }
+            case RATING -> {
+                //todo: add amount_reviews
+                sort = Sort.by(Sort.Direction.DESC, "grade");
+            }
+            default -> { //POPULAR todo: сделать сортировку по популярности. данный вариант не работает
+                sort = Sort.by(Sort.Direction.DESC, "amount_reviews");
+            }
+        }
+
+        return sort;
     }
 
     public Product deleteOneProduct(Long id) {
@@ -98,6 +127,7 @@ public class ProductService {
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
         productRepo.saveAllAndFlush(products);
+        productRepo.clear();
         return products;
     }
 
@@ -126,23 +156,7 @@ public class ProductService {
             updatedProduct.setDescription(productWriteDTO.getDescription());
         }
 
-        boolean isFullPriceUpdated = false;
-        if (productWriteDTO.getFullPrice() != null && productWriteDTO.getFullPrice() != updatedProduct.getFullPrice()) {
-            updatedProduct.setFullPrice(productWriteDTO.getFullPrice());
-            isFullPriceUpdated = true;
-        }
-
-        if (productWriteDTO.getDiscountPercentage() != null) {
-            updatedProduct.setDiscountPercentage(productWriteDTO.getDiscountPercentage());
-            int discount = updatedProduct.getFullPrice() * updatedProduct.getDiscountPercentage() / 100;
-            int priceWithDiscount = updatedProduct.getFullPrice() - discount;
-            updatedProduct.setCurrentPrice(priceWithDiscount);
-
-        } else if (isFullPriceUpdated) {
-            int discount = updatedProduct.getFullPrice() * updatedProduct.getDiscountPercentage() / 100;
-            int priceWithDiscount = updatedProduct.getFullPrice() - discount;
-            updatedProduct.setCurrentPrice(priceWithDiscount);
-        }
+        PriceCalculator.updatePrice(updatedProduct, productWriteDTO);
 
         if (productWriteDTO.getCategoryId() != null
                 && !updatedProduct.getCategory().getId().equals(productWriteDTO.getCategoryId())) {

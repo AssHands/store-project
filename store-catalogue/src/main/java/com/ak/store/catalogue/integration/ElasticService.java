@@ -14,7 +14,6 @@ import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
 import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.catalogue.model.entity.Characteristic;
-import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.common.dto.search.Filters;
@@ -26,7 +25,6 @@ import com.ak.store.common.dto.search.nested.TextFilter;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -53,8 +51,7 @@ public class ElasticService {
         }
     }
 
-    public void createOneProduct(Product product) {
-        ProductDocument productDocument = catalogueMapper.mapToProductDocument(product);
+    public void createOneProduct(ProductDocument productDocument) {
         var request = IndexRequest.of(i -> i
                  .index("product")
                  .id(productDocument.getId().toString())
@@ -67,11 +64,8 @@ public class ElasticService {
         }
     }
 
-    public void createAllProduct(List<Product> productList) {
+    public void createAllProduct(List<ProductDocument> productDocumentList) {
         var br = new BulkRequest.Builder();
-        List<ProductDocument> productDocumentList = productList.stream()
-                .map(catalogueMapper::mapToProductDocument)
-                .toList();
 
         productDocumentList.forEach(product ->
                 br.operations(op -> op
@@ -97,9 +91,7 @@ public class ElasticService {
         }
     }
 
-    public void updateOneProduct(Product product) {
-        ProductDocument productDocument = catalogueMapper.mapToProductDocument(product);
-
+    public void updateOneProduct(ProductDocument productDocument) {
         var request = UpdateRequest.of(u -> u
                 .index("product")
                 .id(productDocument.getId().toString())
@@ -338,7 +330,7 @@ public class ElasticService {
         response.hits().hits().forEach(System.out::println);
 
         ElasticSearchResult elasticSearchResult = new ElasticSearchResult();
-        elasticSearchResult.setSort(searchProductRequest.getSort());
+        elasticSearchResult.setSortingType(searchProductRequest.getSortingType());
 
         if(productHits.size() == 0) {
             return elasticSearchResult;
@@ -445,7 +437,7 @@ public class ElasticService {
                         sr.searchAfter(sa -> sa.anyValue(JsonData.of(val))));
             }
 
-            switch (searchProductRequest.getSort()) {
+            switch (searchProductRequest.getSortingType()) {
                 case PRICE_UP -> {
                     sr.sort(s -> s.field(sort -> sort.field("current_price")));
                 }

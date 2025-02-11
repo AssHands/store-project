@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.CategoryServiceFacade;
-import com.ak.store.common.dto.catalogue.product.CategoryDTO;
+import com.ak.store.common.dto.catalogue.CategoryDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

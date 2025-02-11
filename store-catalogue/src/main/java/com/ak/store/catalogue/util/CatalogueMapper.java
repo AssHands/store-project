@@ -7,7 +7,7 @@ import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
-import com.ak.store.common.dto.catalogue.product.*;
+import com.ak.store.common.dto.catalogue.*;
 import com.ak.store.common.dto.search.Filters;
 import com.ak.store.common.dto.search.nested.NumericFilter;
 import com.ak.store.common.dto.search.nested.TextFilter;
@@ -28,10 +28,8 @@ public class CatalogueMapper {
 
     public Product mapToProduct(ProductWriteDTO productWriteDTO) {
         Product product = modelMapper.map(productWriteDTO, Product.class);
-        product.setId(null); //todo: delete
-        product.setGrade(null); //todo: delete
+        product.setId(null); //todo: маппер присваивает id категории к продукту
 
-        //todo: delete business logic from HEREEEEEE
         if(productWriteDTO.getDiscountPercentage() == null || productWriteDTO.getDiscountPercentage() == 0) {
             product.setDiscountPercentage(0);
             product.setCurrentPrice(product.getFullPrice());
@@ -55,8 +53,20 @@ public class CatalogueMapper {
         return modelMapper.map(product, ProductViewReadDTO.class);
     }
 
-    public ProductFullReadDTO mapToProductFullReadDTO(Product product) {
-        return modelMapper.map(product, ProductFullReadDTO.class);
+    public ProductReadDTO mapToProductReadDTO(Product product) {
+        var dto = modelMapper.map(product, ProductReadDTO.class);
+        dto.getCharacteristics().clear();
+
+        for (var src : product.getCharacteristics()) {
+            dto.getCharacteristics().add(ProductCharacteristicDTO.builder()
+                    .numericValue(src.getNumericValue())
+                    .textValue(src.getTextValue())
+                    .name(src.getCharacteristic().getName())
+                    .id(src.getCharacteristic().getId())
+                    .build());
+        }
+
+        return dto;
     }
 
 

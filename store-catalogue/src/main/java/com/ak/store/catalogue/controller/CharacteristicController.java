@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.CharacteristicServiceFacade;
-import com.ak.store.common.dto.catalogue.product.CharacteristicDTO;
+import com.ak.store.common.dto.catalogue.CharacteristicDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,8 +1,8 @@
 package com.ak.store.catalogue;
 
 import com.ak.store.catalogue.model.entity.*;
-import com.ak.store.common.dto.catalogue.product.ProductCharacteristicDTO;
-import com.ak.store.common.dto.catalogue.product.ProductWriteDTO;
+import com.ak.store.common.dto.catalogue.ProductCharacteristicDTO;
+import com.ak.store.common.dto.catalogue.ProductWriteDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
 
 import java.util.List;

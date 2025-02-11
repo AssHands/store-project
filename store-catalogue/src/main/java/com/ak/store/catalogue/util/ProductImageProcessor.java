@@ -3,7 +3,7 @@ package com.ak.store.catalogue.util;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
-import com.ak.store.common.dto.catalogue.product.ProductImageWriteDTO;
+import com.ak.store.common.dto.catalogue.ProductImageWriteDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;

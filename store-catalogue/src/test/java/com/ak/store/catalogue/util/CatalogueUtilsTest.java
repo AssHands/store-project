@@ -1,6 +1,6 @@
 //package com.ak.store.catalogue.util;
 //
-//import com.ak.store.common.dto.catalogue.product.CategoryDTO;
+//import com.ak.store.common.dto.catalogue.CategoryDTO;
 //import org.junit.jupiter.api.Test;
 //
 //import java.util.Collections;

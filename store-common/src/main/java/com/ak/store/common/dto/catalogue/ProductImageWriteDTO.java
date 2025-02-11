@@ -1,4 +1,4 @@
-package com.ak.store.common.dto.catalogue.product;
+package com.ak.store.common.dto.catalogue;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

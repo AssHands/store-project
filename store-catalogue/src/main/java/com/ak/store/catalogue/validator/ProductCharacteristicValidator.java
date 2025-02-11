@@ -2,7 +2,7 @@ package com.ak.store.catalogue.validator;
 
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.TextValue;
-import com.ak.store.common.dto.catalogue.product.ProductCharacteristicDTO;
+import com.ak.store.common.dto.catalogue.ProductCharacteristicDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

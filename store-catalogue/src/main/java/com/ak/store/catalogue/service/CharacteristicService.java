@@ -2,7 +2,7 @@ package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.repository.*;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.common.dto.catalogue.product.*;
+import com.ak.store.common.dto.catalogue.CharacteristicDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 package com.ak.store.common.dto.search.nested;
 
-public enum Sort {
+public enum SortingType {
     POPULAR,
     RATING,
     PRICE_UP,
