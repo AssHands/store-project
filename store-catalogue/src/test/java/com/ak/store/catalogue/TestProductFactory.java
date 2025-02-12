@@ -3,7 +3,7 @@ package com.ak.store.catalogue;
 import com.ak.store.catalogue.model.entity.*;
 import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
 import com.ak.store.common.model.catalogue.dto.ProductDTO;
-import com.ak.store.common.payload.product.ProductWritePayload;
+import com.ak.store.common.payload.catalogue.ProductWritePayload;
 
 import java.util.List;
 

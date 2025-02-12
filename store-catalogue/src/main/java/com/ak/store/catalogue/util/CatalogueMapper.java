@@ -2,15 +2,9 @@ package com.ak.store.catalogue.util;
 
 import com.ak.store.catalogue.model.document.ProductCharacteristicDocument;
 import com.ak.store.catalogue.model.document.ProductDocument;
-import com.ak.store.catalogue.model.entity.Category;
-import com.ak.store.catalogue.model.entity.Characteristic;
-import com.ak.store.catalogue.model.entity.Product;
-import com.ak.store.catalogue.model.entity.TextValue;
-import com.ak.store.catalogue.model.entity.ProductCharacteristic;
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
+import com.ak.store.catalogue.model.entity.*;
+import com.ak.store.common.model.catalogue.dto.*;
 import com.ak.store.common.model.catalogue.view.*;
-import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
-import com.ak.store.common.model.catalogue.dto.ProductDTO;
 import com.ak.store.common.model.search.dto.FiltersDTO;
 import com.ak.store.common.model.search.common.NumericFilter;
 import com.ak.store.common.model.search.common.TextFilter;
@@ -150,5 +144,21 @@ public class CatalogueMapper {
         category.setId(null);
         category.setParentId(category.getParentId());
         return category;
+    }
+
+    public Characteristic mapToCharacteristic(CharacteristicDTO characteristicDTO) {
+       return modelMapper.map(characteristicDTO, Characteristic.class);
+    }
+
+    public RangeValue mapToRangeValue(RangeValueDTO rangeValueDTO, Long characteristicId) {
+        RangeValue rangeValue = modelMapper.map(rangeValueDTO, RangeValue.class);
+        rangeValue.setCharacteristic(Characteristic.builder().id(characteristicId).build());
+        return rangeValue;
+    }
+
+    public TextValue mapToTextValue(TextValueDTO textValueDTO, Long id) {
+        TextValue textValue = modelMapper.map(textValueDTO, TextValue.class);
+        textValue.setCharacteristic(Characteristic.builder().id(id).build());
+        return textValue;
     }
 }

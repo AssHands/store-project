@@ -9,7 +9,7 @@ import com.ak.store.catalogue.validator.ProductImageValidator;
 import com.ak.store.common.model.catalogue.dto.ImageDTO;
 import com.ak.store.common.model.catalogue.dto.ProductDTO;
 import com.ak.store.common.model.search.common.SortingType;
-import com.ak.store.common.payload.product.ProductWritePayload;
+import com.ak.store.common.payload.catalogue.ProductWritePayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,7 @@ public class ProductService {
     private int BATCH_SIZE;
 
     @Transactional
-    public Product findOneProductWithAll(Long id) {
+    public Product findOneWithAll(Long id) {
         Product product = productRepo.findOneWithCharacteristicsAndCategoryById(id)
                 .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id)));
 
@@ -40,17 +40,19 @@ public class ProductService {
         return product;
     }
 
-    public Product findOneProductWithCharacteristics(Long id) {
+    public Product findOneWithCharacteristicsAndCategory(Long id) {
         return productRepo.findOneWithCharacteristicsAndCategoryById(id)
                 .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id)));
     }
 
+    public Product findOneWithImages(Long id) {
+        return productRepo.findOneWithImagesById(id)
+                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id)));
+    }
+
     public ProcessedProductImages saveOrUpdateAllImage(ImageDTO imageDTO) {
-        Product updatedProduct = productRepo.findOneWithImagesById(imageDTO.getProductId())
-                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(imageDTO.getProductId())));
-
+        Product updatedProduct = findOneWithImages(imageDTO.getProductId());
         productImageValidator.validate(imageDTO, updatedProduct.getImages());
-
         ProcessedProductImages processedProductImages = processProductImages(imageDTO, updatedProduct);
 
         updatedProduct.getImages().clear();
@@ -60,11 +62,7 @@ public class ProductService {
         return processedProductImages;
     }
 
-    public List<Product> findAllProductView(List<Long> ids) {
-        return productRepo.findAllWithImagesByIdIn(ids);
-    }
-
-    public List<Product> findAllProductView(List<Long> ids, SortingType sortingType) {
+    public List<Product> findAllView(List<Long> ids, SortingType sortingType) {
         return productRepo.findAllWithImagesByIdIn(ids, getSort(sortingType));
     }
 
@@ -90,18 +88,19 @@ public class ProductService {
         return sort;
     }
 
-    public Product deleteOneProduct(Long id) {
-        Product product = productRepo.findOneWithImagesById(id).orElseThrow(() -> new RuntimeException("no products found"));
+    //todo: why with images
+    public Product deleteOne(Long id) {
+        Product product = findOneWithImages(id);
         productRepo.deleteById(id);
         return product;
     }
 
-    public Product createOneProduct(ProductWritePayload productPayload) {
+    public Product createOne(ProductWritePayload productPayload) {
         Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
         if (createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
             throw new RuntimeException("category_id is null");
         }
-        productCharacteristicService.createProductCharacteristics(createdProduct, productPayload.getCreateCharacteristics());
+        productCharacteristicService.createAll(createdProduct, productPayload.getCreateCharacteristics());
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
         productRepo.saveAndFlush(createdProduct);
@@ -109,7 +108,7 @@ public class ProductService {
         return createdProduct;
     }
 
-    public List<Product> createAllProduct(List<ProductWritePayload> productPayloads) {
+    public List<Product> createAll(List<ProductWritePayload> productPayloads) {
         List<Product> products = new ArrayList<>();
         for (int i = 0; i < productPayloads.size(); i++) {
             if (i > 0 && i % BATCH_SIZE == 0) {
@@ -121,7 +120,7 @@ public class ProductService {
             if (createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
                 throw new RuntimeException("one of the products does not have a defined category_id");
             }
-            productCharacteristicService.createProductCharacteristics(createdProduct, productPayloads.get(i).getCreateCharacteristics());
+            productCharacteristicService.createAll(createdProduct, productPayloads.get(i).getCreateCharacteristics());
             products.add(createdProduct);
         }
 
@@ -131,15 +130,13 @@ public class ProductService {
         return products;
     }
 
-    public Product updateOneProduct(ProductWritePayload productPayload, Long productId) {
-        Product updatedProduct = productRepo.findOneWithCharacteristicsAndCategoryById(productId)
-                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(productId)));
+    public Product updateOne(ProductWritePayload productPayload, Long productId) {
+        Product updatedProduct = findOneWithCharacteristicsAndCategory(productId);
 
         updateProduct(updatedProduct, productPayload.getProduct());
-
-        productCharacteristicService.createProductCharacteristics(updatedProduct, productPayload.getCreateCharacteristics());
-        productCharacteristicService.updateProductCharacteristics(updatedProduct, productPayload.getUpdateCharacteristics());
-        productCharacteristicService.deleteProductCharacteristics(updatedProduct, productPayload.getDeleteCharacteristics());
+        productCharacteristicService.createAll(updatedProduct, productPayload.getCreateCharacteristics());
+        productCharacteristicService.updateAll(updatedProduct, productPayload.getUpdateCharacteristics());
+        productCharacteristicService.deleteAll(updatedProduct, productPayload.getDeleteCharacteristics());
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
         productRepo.saveAndFlush(updatedProduct);

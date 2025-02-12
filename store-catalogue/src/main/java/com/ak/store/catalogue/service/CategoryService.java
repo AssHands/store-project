@@ -4,8 +4,8 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
+import com.ak.store.catalogue.validator.CategoryBusinessValidator;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.catalogue.validator.CategoryValidator;
 import com.ak.store.common.model.catalogue.dto.CategoryDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,14 +18,14 @@ public class CategoryService {
     private final CatalogueMapper catalogueMapper;
     private final CategoryRepo categoryRepo;
     private final CharacteristicService characteristicService;
-    private final CategoryValidator categoryValidator;
+    private final CategoryBusinessValidator categoryBusinessValidator;
 
     public List<Category> findAll() {
         return categoryRepo.findAll();
     }
 
     public void createOne(CategoryDTO categoryDTO) {
-        categoryValidator.validateCreation(categoryDTO, categoryRepo.findAll());
+        categoryBusinessValidator.validateCreation(categoryDTO);
         categoryRepo.save(catalogueMapper.mapToCategory(categoryDTO));
     }
 
@@ -43,12 +43,7 @@ public class CategoryService {
         Category category = findOneWithCharacteristics(categoryId);
         //check for characteristic exists
         characteristicService.findOne(characteristicId);
-
-        for (CategoryCharacteristic cc : category.getCharacteristics()) {
-            if (cc.getCharacteristic().getId().equals(characteristicId)) {
-                throw new RuntimeException("this characteristic is already bound to category");
-            }
-        }
+        categoryBusinessValidator.validateAddCharacteristic(category, characteristicId);
 
         category.getCharacteristics().add(
                 CategoryCharacteristic.builder()
@@ -59,21 +54,15 @@ public class CategoryService {
         categoryRepo.save(category);
     }
 
-    public void deleteCharacteristicToCategory(Long categoryId, Long characteristicId) {
+    public void deleteCharacteristicFromCategory(Long categoryId, Long characteristicId) {
         Category category = findOneWithCharacteristics(categoryId);
+        categoryBusinessValidator.validateDeleteCharacteristic(category, characteristicId);
 
-        boolean isCharacteristicExist = false;
         for (int i = 0; i < category.getCharacteristics().size(); i++) {
             if(category.getCharacteristics().get(i).getCharacteristic().getId().equals(characteristicId)) {
                 category.getCharacteristics().remove(i);
-                isCharacteristicExist = true;
                 break;
             }
-        }
-
-        if(!isCharacteristicExist) {
-            throw new RuntimeException("characteristic with id=%d is not bound to category"
-                    .formatted(characteristicId));
         }
 
         categoryRepo.save(category);
@@ -81,22 +70,14 @@ public class CategoryService {
 
     //todo: make check if product has this category
     public void deleteOne(Long id) {
-        List<Category> categoryList = categoryRepo.findAll();
-
-        for (var category : categoryList) {
-            if (category.getParentId() != null && category.getParentId().equals(id)) {
-                throw new RuntimeException("this category has children. delete children first");
-            }
-        }
-
-        categoryRepo.deleteById(id);
+        Category category = findOne(id);
+        categoryBusinessValidator.validateDeletion(category);
+        categoryRepo.delete(category);
     }
 
     public void updateOne(Long id, CategoryDTO categoryDTO) {
-        List<Category> allCategoryList = categoryRepo.findAll();
         Category category = findOne(id);
-        categoryValidator.validateUpdate(category, categoryDTO, allCategoryList);
-
+        categoryBusinessValidator.validateUpdate(category, categoryDTO);
         updateCategory(category, categoryDTO);
         categoryRepo.save(category);
     }

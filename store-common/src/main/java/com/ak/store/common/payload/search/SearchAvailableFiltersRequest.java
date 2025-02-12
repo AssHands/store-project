@@ -4,6 +4,7 @@ import com.ak.store.common.model.search.dto.FiltersDTO;
 import com.ak.store.common.model.search.common.NumericFilter;
 import com.ak.store.common.model.search.common.TextFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.Valid;
@@ -31,6 +32,7 @@ public class SearchAvailableFiltersRequest {
     private String text;
 
     @Valid
+    @JsonProperty("filters")
     private FiltersDTO filtersDTO = new FiltersDTO();
 
     public List<NumericFilter> getNumericFilters() {

@@ -37,8 +37,6 @@ public class ElasticService {
     private final ElasticsearchClient esClient;
     private final CharacteristicRepo characteristicRepo;
 
-    private final CatalogueMapper catalogueMapper;
-
     public void deleteOneProduct(Long id) {
         var request = DeleteRequest.of(d -> d
                 .index("product")
@@ -210,7 +208,7 @@ public class ElasticService {
 
     private Map<String, Aggregation> buildAggregations(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         List<Characteristic> filters = 
-                characteristicRepo.findAllWithAllValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
+                characteristicRepo.findAllWithTextValuesByCategoryId(searchAvailableFiltersRequest.getCategoryId());
         Map<String, Aggregation> aggs = new HashMap<>();
 
         for(var filter : filters) {

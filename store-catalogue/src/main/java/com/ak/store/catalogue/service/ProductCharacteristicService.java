@@ -21,7 +21,7 @@ public class ProductCharacteristicService {
     private final CharacteristicRepo characteristicRepo;
     private final ProductCharacteristicValidator productCharacteristicValidator;
 
-    public void createProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> createCharacteristicsDTO) {
+    public void createAll(Product updatedProduct, Set<ProductCharacteristicDTO> createCharacteristicsDTO) {
         if(createCharacteristicsDTO.isEmpty()) {
             return;
         }
@@ -55,7 +55,7 @@ public class ProductCharacteristicService {
         updatedProduct.addCharacteristics(createdCharacteristics);
     }
 
-    public void updateProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> updateCharacteristicsDTO) {
+    public void updateAll(Product updatedProduct, Set<ProductCharacteristicDTO> updateCharacteristicsDTO) {
         if(updateCharacteristicsDTO.isEmpty()) {
             return;
         }
@@ -72,7 +72,7 @@ public class ProductCharacteristicService {
         }
     }
 
-    public void deleteProductCharacteristics(Product updatedProduct, Set<ProductCharacteristicDTO> deleteCharacteristicsDTO) {
+    public void deleteAll(Product updatedProduct, Set<ProductCharacteristicDTO> deleteCharacteristicsDTO) {
         if(deleteCharacteristicsDTO.isEmpty()) {
             return;
         }
@@ -86,9 +86,11 @@ public class ProductCharacteristicService {
     }
 
     private int findProductCharacteristicIndexById(List<ProductCharacteristic> characteristics, Long id) {
-        for (int i = 0; i < characteristics.size(); i++) {
-            if(characteristics.get(i).getCharacteristic().getId().equals(id))
-                return i;
+        int index = 0;
+        for (var characteristic : characteristics) {
+            if(characteristic.getCharacteristic().getId().equals(id))
+                return index;
+            index++;
         }
         throw new RuntimeException("characteristic with id=%s didn't find in your product".formatted(id));
     }

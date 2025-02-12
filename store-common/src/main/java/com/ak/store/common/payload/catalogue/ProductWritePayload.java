@@ -1,4 +1,4 @@
-package com.ak.store.common.payload.product;
+package com.ak.store.common.payload.catalogue;
 
 import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
 import com.ak.store.common.model.catalogue.dto.ProductDTO;

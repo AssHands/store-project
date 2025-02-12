@@ -8,7 +8,7 @@ import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.model.catalogue.dto.ImageDTO;
-import com.ak.store.common.payload.product.ProductWritePayload;
+import com.ak.store.common.payload.catalogue.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
@@ -43,7 +43,7 @@ public class ProductServiceFacade {
         }
 
         productSearchResponse.setContent(
-                productService.findAllProductView(elasticSearchResult.getIds(), searchProductRequest.getSortingType()).stream()
+                productService.findAllView(elasticSearchResult.getIds(), searchProductRequest.getSortingType()).stream()
                         .map(catalogueMapper::mapToProductPoorView)
                         .toList()
         );
@@ -53,16 +53,17 @@ public class ProductServiceFacade {
     }
 
     public ProductRichView findOneProduct(Long id) {
-        return catalogueMapper.mapToProductRichView(productService.findOneProductWithAll(id));
+        return catalogueMapper.mapToProductRichView(productService.findOneWithAll(id));
     }
 
+    @Transactional
     public SearchAvailableFiltersResponse findAllAvailableFilter(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         return elasticService.searchAvailableFilters(searchAvailableFiltersRequest);
     }
 
     @Transactional
     public void createAllProduct(List<ProductWritePayload> payloadList) {
-        List<Product> createdProductList = productService.createAllProduct(payloadList);
+        List<Product> createdProductList = productService.createAll(payloadList);
         elasticService.createAllProduct(createdProductList.stream()
                 .map(catalogueMapper::mapToProductDocument)
                 .toList());
@@ -70,13 +71,13 @@ public class ProductServiceFacade {
 
     @Transactional
     public void createOneProduct(ProductWritePayload payload) {
-        Product createdProduct = productService.createOneProduct(payload);
+        Product createdProduct = productService.createOne(payload);
         elasticService.createOneProduct(catalogueMapper.mapToProductDocument(createdProduct));
     }
 
     @Transactional
     public void deleteOneProduct(Long id) {
-        Product deletedProduct = productService.deleteOneProduct(id);
+        Product deletedProduct = productService.deleteOne(id);
         elasticService.deleteOneProduct(id);
         s3Service.deleteAllImage(deletedProduct.getImages().stream()
                 .map(ProductImage::getImageKey)
@@ -85,7 +86,7 @@ public class ProductServiceFacade {
 
     @Transactional
     public void updateOneProduct(ProductWritePayload productPayload, Long productId) {
-        Product updatedProduct = productService.updateOneProduct(productPayload, productId);
+        Product updatedProduct = productService.updateOne(productPayload, productId);
         elasticService.updateOneProduct(catalogueMapper.mapToProductDocument(updatedProduct));
     }
 }

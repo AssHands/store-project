@@ -6,8 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -29,18 +33,21 @@ public class Characteristic {
     @NotNull
     private Boolean isText;
 
-    @OneToMany(mappedBy = "characteristic")
     @Builder.Default
-    private Set<TextValue> textValues = new HashSet<>();
-
-    @OneToMany(mappedBy = "characteristic")
-    @OrderBy("fromValue")
-    @Builder.Default
-    private Set<RangeValue> rangeValues = new HashSet<>();
-
-    @Builder.Default
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "characteristic", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CategoryCharacteristic> category = new HashSet<>();
+    private List<TextValue> textValues = new ArrayList<>();
+
+    @Builder.Default
+    @OrderBy("fromValue")
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "characteristic", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RangeValue> rangeValues = new ArrayList<>();
+
+    @Builder.Default
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "characteristic", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CategoryCharacteristic> category = new ArrayList<>();
 
     public Characteristic(Long id) {
         this.id = id;

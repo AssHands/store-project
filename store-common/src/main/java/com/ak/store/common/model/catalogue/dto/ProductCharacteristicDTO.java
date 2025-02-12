@@ -13,6 +13,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductCharacteristicDTO {
+    //its characteristic id
     private Long id;
     private String name;
     private Integer numericValue;

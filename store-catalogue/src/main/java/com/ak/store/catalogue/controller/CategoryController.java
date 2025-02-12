@@ -37,9 +37,9 @@ public class CategoryController {
     }
 
     @DeleteMapping("{id}/characteristics")
-    public void deleteCharacteristicToCategory(@PathVariable("id") Long categoryId,
-                                            @RequestParam("characteristic") Long characteristicId) {
-        categoryServiceFacade.deleteCharacteristicToCategory(categoryId, characteristicId);
+    public void deleteCharacteristicFromCategory(@PathVariable("id") Long categoryId,
+                                                 @RequestParam("characteristic") Long characteristicId) {
+        categoryServiceFacade.deleteCharacteristicFromCategory(categoryId, characteristicId);
     }
 
     @PatchMapping("{id}")

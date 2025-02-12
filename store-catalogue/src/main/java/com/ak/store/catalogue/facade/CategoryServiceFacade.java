@@ -1,6 +1,5 @@
 package com.ak.store.catalogue.facade;
 
-import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.service.CategoryService;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.catalogue.util.CatalogueUtils;
@@ -40,8 +39,8 @@ public class CategoryServiceFacade {
     }
 
     @Transactional
-    public void deleteCharacteristicToCategory(Long categoryId, Long characteristicId) {
-        categoryService.deleteCharacteristicToCategory(categoryId, characteristicId);
+    public void deleteCharacteristicFromCategory(Long categoryId, Long characteristicId) {
+        categoryService.deleteCharacteristicFromCategory(categoryId, characteristicId);
     }
 
     @Transactional
