@@ -6,8 +6,8 @@ import com.ak.store.catalogue.integration.ElasticService;
 import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.common.dto.catalogue.ProductReadDTO;
-import com.ak.store.common.dto.catalogue.ProductImageWriteDTO;
+import com.ak.store.common.model.catalogue.view.ProductRichView;
+import com.ak.store.common.model.catalogue.dto.ImageDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
@@ -28,8 +28,8 @@ public class ProductServiceFacade {
     private final CatalogueMapper catalogueMapper;
 
     @Transactional
-    public void saveOrUpdateAllImage(ProductImageWriteDTO productImageWriteDTO) {
-        var processedProductImages = productService.saveOrUpdateAllImage(productImageWriteDTO);
+    public void saveOrUpdateAllImage(ImageDTO imageDTO) {
+        var processedProductImages = productService.saveOrUpdateAllImage(imageDTO);
         s3Service.putAllImage(processedProductImages.getImagesForAdd());
         s3Service.deleteAllImage(processedProductImages.getImageKeysForDelete());
     }
@@ -44,7 +44,7 @@ public class ProductServiceFacade {
 
         productSearchResponse.setContent(
                 productService.findAllProductView(elasticSearchResult.getIds(), searchProductRequest.getSortingType()).stream()
-                        .map(catalogueMapper::mapToProductViewReadDTO)
+                        .map(catalogueMapper::mapToProductPoorView)
                         .toList()
         );
         productSearchResponse.setSearchAfter(elasticSearchResult.getSearchAfter());
@@ -52,8 +52,8 @@ public class ProductServiceFacade {
         return productSearchResponse;
     }
 
-    public ProductReadDTO findOneProduct(Long id) {
-        return catalogueMapper.mapToProductReadDTO(productService.findOneProductWithAll(id));
+    public ProductRichView findOneProduct(Long id) {
+        return catalogueMapper.mapToProductRichView(productService.findOneProductWithAll(id));
     }
 
     public SearchAvailableFiltersResponse findAllAvailableFilter(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {

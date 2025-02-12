@@ -1,6 +1,7 @@
-package com.ak.store.common.dto.catalogue;
+package com.ak.store.common.model.search.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -8,17 +9,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CharacteristicDTO {
-    private Long id;
-    private String name;
-    private boolean isText;
-    private List<String> textValues;
+public class NumericFilterValue {
+    @JsonProperty(required = true)
+    private Integer from;
+
+    @JsonProperty(required = true)
+    private Integer to;
 }

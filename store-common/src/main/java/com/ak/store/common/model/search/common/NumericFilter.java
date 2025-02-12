@@ -1,14 +1,17 @@
-package com.ak.store.common.dto.catalogue;
+package com.ak.store.common.model.search.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,20 +19,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductViewReadDTO {
+public class NumericFilter {
+    @NotNull
     private Long id;
 
-    private String title;
+    private String name;
 
-    private String description;
-
-    private int currentPrice;
-
-    private int fullPrice;
-
-    private int discountPercentage;
-
-    private int amountReviews;
-
-    private float grade;
+    @Builder.Default
+    @NotEmpty
+    private List<NumericFilterValue> values = new ArrayList<>();
 }

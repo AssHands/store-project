@@ -3,33 +3,33 @@ package com.ak.store.catalogue.util;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
-import com.ak.store.common.dto.catalogue.ProductImageWriteDTO;
+import com.ak.store.common.model.catalogue.dto.ImageDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
 public abstract class ProductImageProcessor {
-    public static ProcessedProductImages processProductImages(ProductImageWriteDTO productImageDTO, Product updatedProduct) {
+    public static ProcessedProductImages processProductImages(ImageDTO imageDTO, Product updatedProduct) {
         ProcessedProductImages processedProductImages = new ProcessedProductImages();
         List<ProductImage> productImages = updatedProduct.getImages();
 
         processedProductImages.setImageKeysForDelete(
-                markImagesForDeleteAndGetKeys(productImages, productImageDTO.getDeleteImageIndexes()));
+                markImagesForDeleteAndGetKeys(productImages, imageDTO.getDeleteImageIndexes()));
 
-        LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, productImageDTO.getAddImages());
+        LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, imageDTO.getAddImages());
         for (String key : imagesForAdd.keySet()) {
             productImages.add(ProductImage.builder()
                     .imageKey(key)
                     .product(Product.builder()
-                            .id(productImageDTO.getProductId())
+                            .id(imageDTO.getProductId())
                             .build())
                     .build());
         }
         processedProductImages.setImagesForAdd(imagesForAdd);
 
         processedProductImages.setNewProductImages(
-                createNewProductImageList(productImages, productImageDTO.getAllImageIndexes()));
+                createNewProductImageList(productImages, imageDTO.getAllImageIndexes()));
 
         return processedProductImages;
     }

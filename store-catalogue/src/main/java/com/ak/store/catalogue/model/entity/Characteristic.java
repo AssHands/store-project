@@ -38,14 +38,9 @@ public class Characteristic {
     @Builder.Default
     private Set<RangeValue> rangeValues = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "category_characteristic",
-            joinColumns = @JoinColumn(name = "characteristic_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
     @Builder.Default
-    private Set<Category> category = new HashSet<>();
+    @OneToMany(mappedBy = "characteristic", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CategoryCharacteristic> category = new HashSet<>();
 
     public Characteristic(Long id) {
         this.id = id;

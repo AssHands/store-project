@@ -1,11 +1,8 @@
-package com.ak.store.common.dto.search.nested;
+package com.ak.store.common.model.search.common;
 
 public enum SortingType {
     POPULAR,
     RATING,
     PRICE_UP,
-
-    SALE,
-
     PRICE_DOWN
 }

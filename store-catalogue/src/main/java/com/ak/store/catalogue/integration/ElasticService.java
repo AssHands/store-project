@@ -16,12 +16,12 @@ import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.common.dto.search.Filters;
-import com.ak.store.common.dto.search.nested.NumericFilter;
-import com.ak.store.common.dto.search.nested.NumericFilterValue;
+import com.ak.store.common.model.search.dto.FiltersDTO;
+import com.ak.store.common.model.search.common.NumericFilter;
+import com.ak.store.common.model.search.common.NumericFilterValue;
 import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.SearchProductRequest;
-import com.ak.store.common.dto.search.nested.TextFilter;
+import com.ak.store.common.model.search.common.TextFilter;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
 import lombok.RequiredArgsConstructor;
@@ -147,14 +147,14 @@ public class ElasticService {
         }
 
         return SearchAvailableFiltersResponse.builder()
-                .filters(transformSearchFiltersResponseToFiltersDTO(response))
+                .filtersDTO(transformSearchFiltersResponseToFiltersDTO(response))
                 .categoryId(searchAvailableFiltersRequest.getCategoryId())
                 .build();
     }
 
     //todo: move to utils class?
-    private Filters transformSearchFiltersResponseToFiltersDTO(SearchResponse<Void> response) {
-        Filters filters = new Filters();
+    private FiltersDTO transformSearchFiltersResponseToFiltersDTO(SearchResponse<Void> response) {
+        FiltersDTO filtersDTO = new FiltersDTO();
 
         for(var allAggs : response.aggregations().entrySet()) {
             Long characteristicId = Long.parseLong(allAggs.getKey().split("__")[0]);
@@ -182,7 +182,7 @@ public class ElasticService {
                     }
 
                     if(rangeValues.isEmpty()) continue;
-                    filters.getNumericFilters().add(NumericFilter.builder()
+                    filtersDTO.getNumericFilters().add(NumericFilter.builder()
                             .id(characteristicId)
                             .name(characteristicName)
                             .values(rangeValues)
@@ -196,7 +196,7 @@ public class ElasticService {
                     }
 
                     if(textValues.isEmpty()) continue;
-                    filters.getTextFilters().add(TextFilter.builder()
+                    filtersDTO.getTextFilters().add(TextFilter.builder()
                             .id(characteristicId)
                             .name(characteristicName)
                             .values(textValues)
@@ -205,7 +205,7 @@ public class ElasticService {
             }
         }
 
-        return filters;
+        return filtersDTO;
     }
 
     private Map<String, Aggregation> buildAggregations(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {

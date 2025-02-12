@@ -6,9 +6,9 @@ import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.catalogue.service.product.PriceCalculator;
 import com.ak.store.catalogue.validator.ProductImageValidator;
-import com.ak.store.common.dto.catalogue.ProductImageWriteDTO;
-import com.ak.store.common.dto.catalogue.ProductWriteDTO;
-import com.ak.store.common.dto.search.nested.SortingType;
+import com.ak.store.common.model.catalogue.dto.ImageDTO;
+import com.ak.store.common.model.catalogue.dto.ProductDTO;
+import com.ak.store.common.model.search.common.SortingType;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -45,13 +45,13 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id)));
     }
 
-    public ProcessedProductImages saveOrUpdateAllImage(ProductImageWriteDTO productImageDTO) {
-        Product updatedProduct = productRepo.findOneWithImagesById(productImageDTO.getProductId())
-                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(productImageDTO.getProductId())));
+    public ProcessedProductImages saveOrUpdateAllImage(ImageDTO imageDTO) {
+        Product updatedProduct = productRepo.findOneWithImagesById(imageDTO.getProductId())
+                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(imageDTO.getProductId())));
 
-        productImageValidator.validate(productImageDTO, updatedProduct.getImages());
+        productImageValidator.validate(imageDTO, updatedProduct.getImages());
 
-        ProcessedProductImages processedProductImages = processProductImages(productImageDTO, updatedProduct);
+        ProcessedProductImages processedProductImages = processProductImages(imageDTO, updatedProduct);
 
         updatedProduct.getImages().clear();
         updatedProduct.getImages().addAll(processedProductImages.getNewProductImages());
@@ -147,22 +147,22 @@ public class ProductService {
         return updatedProduct;
     }
 
-    private void updateProduct(Product updatedProduct, ProductWriteDTO productWriteDTO) {
-        if (productWriteDTO.getTitle() != null) {
-            updatedProduct.setTitle(productWriteDTO.getTitle());
+    private void updateProduct(Product updatedProduct, ProductDTO productDTO) {
+        if (productDTO.getTitle() != null) {
+            updatedProduct.setTitle(productDTO.getTitle());
         }
 
-        if (productWriteDTO.getDescription() != null) {
-            updatedProduct.setDescription(productWriteDTO.getDescription());
+        if (productDTO.getDescription() != null) {
+            updatedProduct.setDescription(productDTO.getDescription());
         }
 
-        PriceCalculator.updatePrice(updatedProduct, productWriteDTO);
+        PriceCalculator.updatePrice(updatedProduct, productDTO);
 
-        if (productWriteDTO.getCategoryId() != null
-                && !updatedProduct.getCategory().getId().equals(productWriteDTO.getCategoryId())) {
+        if (productDTO.getCategoryId() != null
+                && !updatedProduct.getCategory().getId().equals(productDTO.getCategoryId())) {
             updatedProduct.setCategory(
                     Category.builder()
-                            .id(productWriteDTO.getCategoryId())
+                            .id(productDTO.getCategoryId())
                             .build()
             );
             updatedProduct.getCharacteristics().clear();

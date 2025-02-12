@@ -1,4 +1,4 @@
-package com.ak.store.common.dto.search.nested;
+package com.ak.store.common.model.search.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -16,16 +16,16 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class NumericFilter {
+public class TextFilter {
     @NotNull
     private Long id;
 
     private String name;
 
-    @Builder.Default
     @NotEmpty
-    private List<NumericFilterValue> values = new ArrayList<>();
+    @Builder.Default
+    private List<String> values = new ArrayList<>();
 }

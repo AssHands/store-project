@@ -1,9 +1,9 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.ProductServiceFacade;
-import com.ak.store.common.dto.catalogue.ProductReadDTO;
-import com.ak.store.common.dto.catalogue.ProductImageWriteDTO;
-import com.ak.store.common.dto.catalogue.ProductWriteDTO;
+import com.ak.store.common.model.catalogue.view.ProductRichView;
+import com.ak.store.common.model.catalogue.dto.ImageDTO;
+import com.ak.store.common.model.catalogue.dto.ProductDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
@@ -30,7 +30,7 @@ public class ProductController {
     private final ProductServiceFacade productServiceFacade;
 
     @GetMapping("{id}")
-    public ProductReadDTO getOneProduct(@PathVariable("id") Long id) {
+    public ProductRichView getOneProduct(@PathVariable("id") Long id) {
         return productServiceFacade.findOneProduct(id);
     }
 
@@ -40,12 +40,11 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductWriteDTO createOneProduct(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
+    public void createOneProduct(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
         productServiceFacade.createOneProduct(productPayload);
-        return null;
     }
     @PostMapping("batch") //todo: make validation for list
-    public ProductWriteDTO createAllProduct(@RequestBody List<ProductWritePayload> productPayloads) {
+    public void createAllProduct(@RequestBody List<ProductWritePayload> productPayloads) {
 
         for(ProductWritePayload payload : productPayloads) {
             Errors errors = new BeanPropertyBindingResult(payload, "productPayload");
@@ -57,14 +56,12 @@ public class ProductController {
         }
 
         productServiceFacade.createAllProduct(productPayloads);
-        return null;
     }
 
     @PatchMapping("{id}")
-    public ProductWriteDTO updateOneProduct(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
-                                            @PathVariable("id") Long productId) {
+    public void updateOneProduct(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
+                                       @PathVariable("id") Long productId) {
         productServiceFacade.updateOneProduct(productPayload, productId);
-        return null;
     }
 
     /**
@@ -118,19 +115,18 @@ public class ProductController {
                                       @RequestParam Map<String, String> allImageIndexes,
                                       @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,
                                       @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
-        ProductImageWriteDTO productImageWriteDTO =
-                new ProductImageWriteDTO(productId, allImageIndexes, addImages, deleteImageIndexes);
+        ImageDTO imageDTO = new ImageDTO(productId, allImageIndexes, addImages, deleteImageIndexes);
 
-        productServiceFacade.saveOrUpdateAllImage(productImageWriteDTO);
+        productServiceFacade.saveOrUpdateAllImage(imageDTO);
     }
 
-    @GetMapping("search")
+    @PostMapping("search")
     public ProductSearchResponse searchAllProduct(@RequestBody @Valid SearchProductRequest searchProductRequest) {
         System.out.println(searchProductRequest);
         return productServiceFacade.findAllProductBySearch(searchProductRequest);
     }
 
-    @GetMapping("search/filters")
+    @PostMapping("search/filters")
     public SearchAvailableFiltersResponse searchAllAvailableFilter(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         System.out.println(searchAvailableFiltersRequest);
         return productServiceFacade.findAllAvailableFilter(searchAvailableFiltersRequest);

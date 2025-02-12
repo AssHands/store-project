@@ -6,8 +6,8 @@
 //import com.ak.store.catalogue.repository.CharacteristicRepo;
 //import com.ak.store.catalogue.util.CatalogueMapper;
 //import com.ak.store.catalogue.util.CatalogueUtils;
-//import com.ak.store.common.dto.catalogue.CategoryDTO;
-//import com.ak.store.common.dto.catalogue.CharacteristicDTO;
+//import com.ak.store.common.dto.catalogue.read.CategoryDTO;
+//import com.ak.store.common.dto.catalogue.read.CharacteristicDTO;
 //import org.junit.jupiter.api.*;
 //import org.junit.jupiter.api.extension.ExtendWith;
 //import org.mockito.AdditionalAnswers;

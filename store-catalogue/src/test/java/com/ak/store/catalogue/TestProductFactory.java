@@ -1,8 +1,8 @@
 package com.ak.store.catalogue;
 
 import com.ak.store.catalogue.model.entity.*;
-import com.ak.store.common.dto.catalogue.ProductCharacteristicDTO;
-import com.ak.store.common.dto.catalogue.ProductWriteDTO;
+import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
+import com.ak.store.common.model.catalogue.dto.ProductDTO;
 import com.ak.store.common.payload.product.ProductWritePayload;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public class TestProductFactory {
     public static ProductWritePayload createProductPayload(String title, String description, Integer fullPrice,
                                                            Integer discountPercentage, Long categoryId) {
         return ProductWritePayload.builder()
-                .product(ProductWriteDTO.builder()
+                .product(ProductDTO.builder()
                         .title(title)
                         .description(description)
                         .fullPrice(fullPrice)

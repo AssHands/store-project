@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.model.pojo;
 
-import com.ak.store.common.dto.search.nested.SortingType;
+import com.ak.store.common.model.search.common.SortingType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

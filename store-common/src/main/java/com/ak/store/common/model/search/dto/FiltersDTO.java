@@ -1,5 +1,7 @@
-package com.ak.store.common.dto.catalogue;
+package com.ak.store.common.model.search.dto;
 
+import com.ak.store.common.model.search.common.NumericFilter;
+import com.ak.store.common.model.search.common.TextFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -15,31 +17,14 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductReadDTO {
-    private Long id;
-
-    private String title;
-
-    private String description;
-
-    private int currentPrice;
-
-    private int fullPrice;
-
-    private int discountPercentage;
-
-    private int amountReviews;
-
-    private float grade;
-
-    @Valid
-    private CategoryDTO category;
-
-    private List<ImageDTO> images;
+@Builder
+public class FiltersDTO {
 
     @Builder.Default
-    private List<@Valid ProductCharacteristicDTO> characteristics = new ArrayList<>();
+    private List<@Valid NumericFilter> numericFilters = new ArrayList<>();
+
+    @Builder.Default
+    private List<@Valid TextFilter> textFilters = new ArrayList<>();
 }

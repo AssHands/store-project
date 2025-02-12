@@ -1,14 +1,15 @@
-package com.ak.store.common.dto.search.nested;
+package com.ak.store.common.model.catalogue.view;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,11 +17,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class NumericFilterValue {
+public class CategoryView {
+    private Long id;
+    private String name;
+    private Long parentId;
 
-    @JsonProperty(required = true)
-    private Integer from;
-
-    @JsonProperty(required = true)
-    private Integer to;
+    @Builder.Default
+    private List<CategoryView> childCategories = new ArrayList<>();
 }

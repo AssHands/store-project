@@ -1,6 +1,5 @@
-package com.ak.store.common.payload.search;
+package com.ak.store.common.model.catalogue.view;
 
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -8,17 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductSearchResponse {
-
-    private List<Object> searchAfter;
-
-    private List<ProductPoorView> content = new ArrayList<>();
+public class ImageView {
+    private Long productId;
+    private Integer index;
+    private String imageKey;
 }

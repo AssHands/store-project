@@ -1,4 +1,4 @@
-package com.ak.store.common.dto.catalogue;
+package com.ak.store.common.model.catalogue.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -14,10 +14,7 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductCharacteristicDTO {
     private Long id;
-
     private String name;
-
     private Integer numericValue;
-
     private String textValue;
 }

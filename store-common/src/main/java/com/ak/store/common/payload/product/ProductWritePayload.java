@@ -1,7 +1,7 @@
 package com.ak.store.common.payload.product;
 
-import com.ak.store.common.dto.catalogue.ProductCharacteristicDTO;
-import com.ak.store.common.dto.catalogue.ProductWriteDTO;
+import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
+import com.ak.store.common.model.catalogue.dto.ProductDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -22,7 +22,7 @@ import java.util.Set;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductWritePayload {
     @Valid
-    ProductWriteDTO product = new ProductWriteDTO();
+    ProductDTO product = new ProductDTO();
 
     @Builder.Default
     Set<@Valid ProductCharacteristicDTO> createCharacteristics = new HashSet<>();

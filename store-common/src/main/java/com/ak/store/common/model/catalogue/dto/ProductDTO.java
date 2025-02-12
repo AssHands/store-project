@@ -1,4 +1,4 @@
-package com.ak.store.common.dto.catalogue;
+package com.ak.store.common.model.catalogue.dto;
 
 import com.ak.store.common.validationGroup.Create;
 import com.ak.store.common.validationGroup.Update;
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductWriteDTO {
+public class ProductDTO {
     @Size(min = 5, max = 50, groups = {Create.class, Update.class})
     @NotBlank(groups = Create.class)
     private String title;

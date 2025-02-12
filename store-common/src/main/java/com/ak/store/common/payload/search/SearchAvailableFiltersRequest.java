@@ -1,16 +1,13 @@
 package com.ak.store.common.payload.search;
 
-import com.ak.store.common.dto.search.Filters;
-import com.ak.store.common.dto.search.nested.NumericFilter;
-import com.ak.store.common.dto.search.nested.TextFilter;
+import com.ak.store.common.model.search.dto.FiltersDTO;
+import com.ak.store.common.model.search.common.NumericFilter;
+import com.ak.store.common.model.search.common.TextFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,13 +31,13 @@ public class SearchAvailableFiltersRequest {
     private String text;
 
     @Valid
-    private Filters filters = new Filters();
+    private FiltersDTO filtersDTO = new FiltersDTO();
 
     public List<NumericFilter> getNumericFilters() {
-        return filters.getNumericFilters();
+        return filtersDTO.getNumericFilters();
     }
 
     public List<TextFilter> getTextFilters() {
-        return filters.getTextFilters();
+        return filtersDTO.getTextFilters();
     }
 }

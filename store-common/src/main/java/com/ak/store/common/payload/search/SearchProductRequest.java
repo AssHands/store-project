@@ -1,9 +1,9 @@
 package com.ak.store.common.payload.search;
 
-import com.ak.store.common.dto.search.Filters;
-import com.ak.store.common.dto.search.nested.NumericFilter;
-import com.ak.store.common.dto.search.nested.SortingType;
-import com.ak.store.common.dto.search.nested.TextFilter;
+import com.ak.store.common.model.search.dto.FiltersDTO;
+import com.ak.store.common.model.search.common.NumericFilter;
+import com.ak.store.common.model.search.common.SortingType;
+import com.ak.store.common.model.search.common.TextFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -38,21 +38,21 @@ public class SearchProductRequest {
     private Long categoryId;
 
     @Valid
-    private Filters filters = new Filters();
+    private FiltersDTO filtersDTO = new FiltersDTO();
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
     private SortingType sortingType = SortingType.POPULAR;
 
     public List<NumericFilter> getNumericFilters() {
-        return filters.getNumericFilters();
+        return filtersDTO.getNumericFilters();
     }
 
     public List<TextFilter> getTextFilters() {
-        return filters.getTextFilters();
+        return filtersDTO.getTextFilters();
     }
 
-    public Filters getAllFilters() {
-        return filters;
+    public FiltersDTO getAllFilters() {
+        return filtersDTO;
     }
 
 

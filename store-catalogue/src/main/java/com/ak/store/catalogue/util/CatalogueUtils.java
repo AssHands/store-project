@@ -1,28 +1,28 @@
 package com.ak.store.catalogue.util;
 
-import com.ak.store.common.dto.catalogue.CategoryDTO;
+import com.ak.store.common.model.catalogue.view.CategoryView;
 
 import java.util.*;
 
 public abstract class CatalogueUtils {
 
-    static public List<CategoryDTO> buildCategoryTree(List<CategoryDTO> categories) {
+    static public List<CategoryView> buildCategoryTree(List<CategoryView> categories) {
         if(categories.isEmpty()) {
             return Collections.emptyList();
         }
 
-        Map<Long, CategoryDTO> categoryMap = new LinkedHashMap<>();
-        List<CategoryDTO> rootCategories = new ArrayList<>();
+        Map<Long, CategoryView> categoryMap = new LinkedHashMap<>();
+        List<CategoryView> rootCategories = new ArrayList<>();
 
-        for (CategoryDTO category : categories) {
+        for (CategoryView category : categories) {
             categoryMap.put(category.getId(), category);
         }
 
-        for (CategoryDTO category : categories) {
+        for (CategoryView category : categories) {
             if (category.getParentId() == null) {
                 rootCategories.add(category);
             } else {
-                CategoryDTO parent = categoryMap.get(category.getParentId());
+                CategoryView parent = categoryMap.get(category.getParentId());
                 if (parent != null) {
                     parent.getChildCategories().add(category);
                 } else {

@@ -7,10 +7,13 @@ import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
-import com.ak.store.common.dto.catalogue.*;
-import com.ak.store.common.dto.search.Filters;
-import com.ak.store.common.dto.search.nested.NumericFilter;
-import com.ak.store.common.dto.search.nested.TextFilter;
+import com.ak.store.common.model.catalogue.dto.CategoryDTO;
+import com.ak.store.common.model.catalogue.view.*;
+import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
+import com.ak.store.common.model.catalogue.dto.ProductDTO;
+import com.ak.store.common.model.search.dto.FiltersDTO;
+import com.ak.store.common.model.search.common.NumericFilter;
+import com.ak.store.common.model.search.common.TextFilter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,11 +29,11 @@ public class CatalogueMapper {
         this.modelMapper = modelMapper;
     }
 
-    public Product mapToProduct(ProductWriteDTO productWriteDTO) {
-        Product product = modelMapper.map(productWriteDTO, Product.class);
+    public Product mapToProduct(ProductDTO productDTO) {
+        Product product = modelMapper.map(productDTO, Product.class);
         product.setId(null); //todo: маппер присваивает id категории к продукту
 
-        if(productWriteDTO.getDiscountPercentage() == null || productWriteDTO.getDiscountPercentage() == 0) {
+        if(productDTO.getDiscountPercentage() == null || productDTO.getDiscountPercentage() == 0) {
             product.setDiscountPercentage(0);
             product.setCurrentPrice(product.getFullPrice());
         } else {
@@ -39,26 +42,26 @@ public class CatalogueMapper {
             product.setCurrentPrice(priceWithDiscount);
         }
 
-        if(productWriteDTO.getCategoryId() != null) {
+        if(productDTO.getCategoryId() != null) {
             product.setCategory(
                     Category.builder()
-                            .id(productWriteDTO.getCategoryId())
+                            .id(productDTO.getCategoryId())
                             .build());
         }
 
         return product;
     }
 
-    public ProductViewReadDTO mapToProductViewReadDTO(Product product) {
-        return modelMapper.map(product, ProductViewReadDTO.class);
+    public ProductPoorView mapToProductPoorView(Product product) {
+        return modelMapper.map(product, ProductPoorView.class);
     }
 
-    public ProductReadDTO mapToProductReadDTO(Product product) {
-        var dto = modelMapper.map(product, ProductReadDTO.class);
+    public ProductRichView mapToProductRichView(Product product) {
+        var dto = modelMapper.map(product, ProductRichView.class);
         dto.getCharacteristics().clear();
 
         for (var src : product.getCharacteristics()) {
-            dto.getCharacteristics().add(ProductCharacteristicDTO.builder()
+            dto.getCharacteristics().add(ProductCharacteristicView.builder()
                     .numericValue(src.getNumericValue())
                     .textValue(src.getTextValue())
                     .name(src.getCharacteristic().getName())
@@ -82,12 +85,12 @@ public class CatalogueMapper {
                 .build();
     }
 
-    public CategoryDTO mapToCategoryDTO(Category category) {
-        return modelMapper.map(category, CategoryDTO.class);
+    public CategoryView mapToCategoryView(Category category) {
+        return modelMapper.map(category, CategoryView.class);
     }
 
-    public Filters mapToFilters(List<Characteristic> characteristics) {
-        Filters filters = new Filters();
+    public FiltersDTO mapToFiltersDTO(List<Characteristic> characteristics) {
+        FiltersDTO filtersDTO = new FiltersDTO();
         List<TextFilter> textFilters = new ArrayList<>();
         List<NumericFilter> numericFilters = new ArrayList<>();
 
@@ -108,9 +111,9 @@ public class CatalogueMapper {
             }
         }
 
-        filters.setTextFilters(textFilters);
-        filters.setNumericFilters(numericFilters);
-        return filters;
+        filtersDTO.setTextFilters(textFilters);
+        filtersDTO.setNumericFilters(numericFilters);
+        return filtersDTO;
     }
 
     public ProductDocument mapToProductDocument(Product product) {
@@ -131,8 +134,8 @@ public class CatalogueMapper {
         return productDocument;
     }
 
-    public CharacteristicDTO mapToCharacteristicDTO(Characteristic characteristic) {
-        return CharacteristicDTO.builder()
+    public CharacteristicView mapToCharacteristicView(Characteristic characteristic) {
+        return CharacteristicView.builder()
                 .id(characteristic.getId())
                 .name(characteristic.getName())
                 .isText(characteristic.getIsText())
@@ -140,5 +143,12 @@ public class CatalogueMapper {
                         .map(TextValue::getTextValue)
                         .toList())
                 .build();
+    }
+
+    public Category mapToCategory(CategoryDTO categoryDTO) {
+        Category category = modelMapper.map(categoryDTO, Category.class);
+        category.setId(null);
+        category.setParentId(category.getParentId());
+        return category;
     }
 }

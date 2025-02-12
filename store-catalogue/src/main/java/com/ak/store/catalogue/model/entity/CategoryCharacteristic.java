@@ -1,10 +1,11 @@
-package com.ak.store.catalogue.model.entity.relation;
+package com.ak.store.catalogue.model.entity;
 
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cache;
@@ -14,21 +15,22 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "static-data")
 @Entity
 @Table(name = "category_characteristic")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "static-data")
 public class CategoryCharacteristic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "characteristic_id")
     private Characteristic characteristic;
 }

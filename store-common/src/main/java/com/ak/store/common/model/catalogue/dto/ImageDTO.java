@@ -1,4 +1,4 @@
-package com.ak.store.common.dto.catalogue;
+package com.ak.store.common.model.catalogue.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductImageWriteDTO {
+public class ImageDTO {
     private Long productId;
     private Map<String, String> allImageIndexes = new HashMap<>();
     private List<MultipartFile> addImages = new ArrayList<>();

@@ -8,7 +8,7 @@
 //import com.ak.store.catalogue.util.CatalogueMapper;
 //import com.ak.store.catalogue.validator.ProductImageValidator;
 //import com.ak.store.common.dto.catalogue.product.ProductFullReadDTO;
-//import com.ak.store.common.dto.catalogue.ProductViewReadDTO;
+//import com.ak.store.common.dto.catalogue.read.ProductViewReadDTO;
 //import com.ak.store.common.payload.product.ProductWritePayload;
 //import com.ak.store.common.payload.search.ProductSearchResponse;
 //import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;

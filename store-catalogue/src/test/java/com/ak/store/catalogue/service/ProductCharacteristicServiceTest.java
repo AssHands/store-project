@@ -5,7 +5,7 @@
 //import com.ak.store.catalogue.repository.CharacteristicRepo;
 //import com.ak.store.catalogue.util.CatalogueMapper;
 //import com.ak.store.catalogue.validator.ProductCharacteristicValidator;
-//import com.ak.store.common.dto.catalogue.ProductCharacteristicDTO;
+//import com.ak.store.common.dto.catalogue.write.ProductCharacteristicDTO;
 //import org.junit.jupiter.api.Test;
 //import org.junit.jupiter.api.extension.ExtendWith;
 //import org.mockito.AdditionalAnswers;

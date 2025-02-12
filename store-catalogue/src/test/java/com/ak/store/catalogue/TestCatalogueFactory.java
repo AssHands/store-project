@@ -2,7 +2,7 @@ package com.ak.store.catalogue;
 
  import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.TextValue;
-import com.ak.store.common.dto.catalogue.CategoryDTO;
+import com.ak.store.common.model.catalogue.view.CategoryView;
 
 import java.util.*;
 
@@ -36,19 +36,19 @@ public class TestCatalogueFactory {
                 .build();
     }
 
-    public static CategoryDTO createCategoryDTO(Long id, String name) {
-        return CategoryDTO.builder().id(id).name(name).build();
+    public static CategoryView createCategoryDTO(Long id, String name) {
+        return CategoryView.builder().id(id).name(name).build();
     }
 
-    public static CategoryDTO createCategoryDTO(Long id, String name, Long parentId) {
-        return CategoryDTO.builder().id(id).name(name).parentId(parentId).build();
+    public static CategoryView createCategoryDTO(Long id, String name, Long parentId) {
+        return CategoryView.builder().id(id).name(name).parentId(parentId).build();
     }
 
-    public static CategoryDTO createCategoryDTO(Long id, String name, List<CategoryDTO> childList) {
-        return CategoryDTO.builder().id(id).name(name).childCategories(childList).build();
+    public static CategoryView createCategoryDTO(Long id, String name, List<CategoryView> childList) {
+        return CategoryView.builder().id(id).name(name).childCategories(childList).build();
     }
 
-    public static CategoryDTO createCategoryDTO(Long id, String name, Long parentId, List<CategoryDTO> childList) {
-        return CategoryDTO.builder().id(id).name(name).parentId(parentId).childCategories(childList).build();
+    public static CategoryView createCategoryDTO(Long id, String name, Long parentId, List<CategoryView> childList) {
+        return CategoryView.builder().id(id).name(name).parentId(parentId).childCategories(childList).build();
     }
 }

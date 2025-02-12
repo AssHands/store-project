@@ -1,12 +1,12 @@
 package com.ak.store.catalogue.model.entity;
 
-import com.ak.store.catalogue.model.entity.relation.CategoryCharacteristic;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -28,13 +28,8 @@ public class Category {
     @NotBlank
     private String name;
 
-    @ManyToMany
-    @JoinTable(
-            name = "category_characteristic",
-            joinColumns = @JoinColumn(name = "category_id"),
-            inverseJoinColumns = @JoinColumn(name = "characteristic_id")
-    )
-    private List<CategoryCharacteristic> characteristics;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CategoryCharacteristic> characteristics = new ArrayList<>();
 
     public Category(Long id) {
         this.id = id;

@@ -1,8 +1,9 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.*;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.common.dto.catalogue.CharacteristicDTO;
+import com.ak.store.common.model.catalogue.view.CharacteristicView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +22,11 @@ public class CharacteristicService {
     private final CatalogueMapper catalogueMapper;
     private final CharacteristicRepo characteristicRepo;
 
-    public List<CharacteristicDTO> findAllCharacteristicByCategoryId(Long categoryId) {
-        return characteristicRepo.findAllWithTextValuesByCategoryId(categoryId).stream()
-                .map(catalogueMapper::mapToCharacteristicDTO)
-                .toList();
+    public List<Characteristic> findAllCharacteristicByCategoryId(Long categoryId) {
+        return characteristicRepo.findAllWithTextValuesByCategoryId(categoryId);
+    }
+
+    public Characteristic findOne(Long id) {
+        return characteristicRepo.findById(id).orElseThrow(() -> new RuntimeException("no characteristic found"));
     }
 }
