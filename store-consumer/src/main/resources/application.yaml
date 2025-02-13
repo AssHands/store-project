@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5431/postgres
+    username: root
+    password: root
+
+  jpa:
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        #logs
+        format_sql: true
+        generate_statistics: true
+
+        #batch
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB

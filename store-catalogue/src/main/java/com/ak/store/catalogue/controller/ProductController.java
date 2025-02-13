@@ -13,8 +13,6 @@ import com.ak.store.common.validationGroup.Update;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,12 +27,12 @@ public class ProductController {
     private final ProductServiceFacade productServiceFacade;
 
     @GetMapping("{id}")
-    public ProductRichView getOne(@PathVariable("id") Long id) {
+    public ProductRichView getOne(@PathVariable Long id) {
         return productServiceFacade.findOneProduct(id);
     }
 
     @DeleteMapping("{id}")
-    public void deleteOne(@PathVariable("id") Long id) {
+    public void deleteOne(@PathVariable Long id) {
         productServiceFacade.deleteOneProduct(id);
     }
 
@@ -45,14 +43,14 @@ public class ProductController {
     @PostMapping("batch") //todo: make validation for list
     public void createAll(@RequestBody List<ProductWritePayload> productPayloads) {
 
-        for(ProductWritePayload payload : productPayloads) {
-            Errors errors = new BeanPropertyBindingResult(payload, "productPayload");
-            //validator.validate(payload.getProduct(), errors, ProductWriteDTO.Save.class);
-
-            if(errors.hasErrors()){
-                //return ResponseEntity.badRequest().body(errors.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList()));
-            }
-        }
+//        for(ProductWritePayload payload : productPayloads) {
+//            Errors errors = new BeanPropertyBindingResult(payload, "productPayload");
+//            validator.validate(payload.getProduct(), errors, ProductWriteDTO.Save.class);
+//
+//            if(errors.hasErrors()){
+//                return ResponseEntity.badRequest().body(errors.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList()));
+//            }
+//        }
 
         productServiceFacade.createAllProduct(productPayloads);
     }

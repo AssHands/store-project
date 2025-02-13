@@ -17,8 +17,8 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<modules>
-		<module>store-user</module>
 		<module>store-common</module>
         <module>store-catalogue</module>
+        <module>store-consumer</module>
     </modules>
 </project>

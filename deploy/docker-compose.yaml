@@ -46,6 +46,14 @@ services:
     ports:
       - 5430:5432
 
+  db-consumer:
+    image: postgres:17.0-alpine
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+    ports:
+      - 5431:5432
+
   adminer:
     image: adminer
     restart: always
