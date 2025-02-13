@@ -28,10 +28,11 @@ public class ProductServiceFacade {
     private final CatalogueMapper catalogueMapper;
 
     @Transactional
-    public void saveOrUpdateAllImage(ImageDTO imageDTO) {
+    public Long saveOrUpdateAllImage(ImageDTO imageDTO) {
         var processedProductImages = productService.saveOrUpdateAllImage(imageDTO);
         s3Service.putAllImage(processedProductImages.getImagesForAdd());
         s3Service.deleteAllImage(processedProductImages.getImageKeysForDelete());
+        return imageDTO.getProductId();
     }
 
     public ProductSearchResponse findAllProductBySearch(SearchProductRequest searchProductRequest) {
@@ -70,9 +71,10 @@ public class ProductServiceFacade {
     }
 
     @Transactional
-    public void createOneProduct(ProductWritePayload payload) {
+    public Long createOneProduct(ProductWritePayload payload) {
         Product createdProduct = productService.createOne(payload);
         elasticService.createOneProduct(catalogueMapper.mapToProductDocument(createdProduct));
+        return createdProduct.getId();
     }
 
     @Transactional
@@ -85,8 +87,9 @@ public class ProductServiceFacade {
     }
 
     @Transactional
-    public void updateOneProduct(ProductWritePayload productPayload, Long productId) {
+    public Long updateOneProduct(ProductWritePayload productPayload, Long productId) {
         Product updatedProduct = productService.updateOne(productPayload, productId);
         elasticService.updateOneProduct(catalogueMapper.mapToProductDocument(updatedProduct));
+        return updatedProduct.getId();
     }
 }

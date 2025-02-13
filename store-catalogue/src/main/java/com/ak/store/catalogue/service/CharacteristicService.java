@@ -47,9 +47,9 @@ public class CharacteristicService {
                 .orElseThrow(() -> new RuntimeException("no characteristic found"));
     }
 
-    public void createOne(CharacteristicDTO characteristicDTO) {
+    public Characteristic createOne(CharacteristicDTO characteristicDTO) {
         characteristicBusinessValidator.validateCreation(characteristicDTO);
-        characteristicRepo.save(catalogueMapper.mapToCharacteristic(characteristicDTO));
+        return characteristicRepo.save(catalogueMapper.mapToCharacteristic(characteristicDTO));
     }
 
 
@@ -59,39 +59,39 @@ public class CharacteristicService {
     }
 
 
-    public void updateOne(Long id, CharacteristicDTO characteristicDTO) {
+    public Characteristic updateOne(Long id, CharacteristicDTO characteristicDTO) {
         Characteristic characteristic = findOne(id);
         characteristicBusinessValidator.validateUpdate(characteristicDTO);
         updateCharacteristic(characteristic, characteristicDTO);
-        characteristicRepo.save(characteristic);
+        return characteristicRepo.save(characteristic);
     }
 
-    public void createRangeValue(Long id, RangeValueDTO rangeValueDTO) {
+    public Characteristic createRangeValue(Long id, RangeValueDTO rangeValueDTO) {
         Characteristic characteristic = findOneWithRangeValues(id);
         characteristicBusinessValidator.validateCreationRangeValue(characteristic, rangeValueDTO);
         characteristic.getRangeValues().add(catalogueMapper.mapToRangeValue(rangeValueDTO, id));
-        characteristicRepo.save(characteristic);
+        return characteristicRepo.save(characteristic);
     }
 
-    public void createTextValue(Long id, TextValueDTO textValueDTO) {
+    public Characteristic createTextValue(Long id, TextValueDTO textValueDTO) {
         Characteristic characteristic = findOneWithTextValues(id);
         characteristicBusinessValidator.validateCreationTextValue(characteristic, textValueDTO);
         characteristic.getTextValues().add(catalogueMapper.mapToTextValue(textValueDTO, id));
-        characteristicRepo.save(characteristic);
+        return characteristicRepo.save(characteristic);
     }
 
-    public void deleteOneRangeValue(Long id, RangeValueDTO rangeValueDTO) {
+    public Characteristic deleteOneRangeValue(Long id, RangeValueDTO rangeValueDTO) {
         Characteristic characteristic = findOneWithRangeValues(id);
         int index = findRangeValueIndex(characteristic, rangeValueDTO);
         characteristic.getRangeValues().remove(index);
-        characteristicRepo.save(characteristic);
+        return characteristicRepo.save(characteristic);
     }
 
-    public void deleteOneTextValue(Long id, TextValueDTO textValueDTO) {
+    public Characteristic deleteOneTextValue(Long id, TextValueDTO textValueDTO) {
         Characteristic characteristic = findOneWithTextValues(id);
         int index = findTextValueIndex(characteristic, textValueDTO);
         characteristic.getTextValues().remove(index);
-        characteristicRepo.save(characteristic);
+        return characteristicRepo.save(characteristic);
     }
 
     private void updateCharacteristic(Characteristic characteristic, CharacteristicDTO characteristicDTO) {

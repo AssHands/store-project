@@ -23,8 +23,8 @@ public class CharacteristicController {
     }
 
     @PostMapping
-    public void createOne(@RequestBody @Valid CharacteristicDTO characteristicDTO) {
-        characteristicServiceFacade.createOne(characteristicDTO);
+    public Long createOne(@RequestBody @Valid CharacteristicDTO characteristicDTO) {
+        return characteristicServiceFacade.createOne(characteristicDTO);
     }
 
     @DeleteMapping("{id}")
@@ -33,27 +33,27 @@ public class CharacteristicController {
     }
 
     @PatchMapping("{id}")
-    public void updateOne(@PathVariable Long id, @RequestBody CharacteristicDTO characteristicDTO) {
-        characteristicServiceFacade.updateOne(id, characteristicDTO);
+    public Long updateOne(@PathVariable Long id, @RequestBody CharacteristicDTO characteristicDTO) {
+        return characteristicServiceFacade.updateOne(id, characteristicDTO);
     }
 
     @PostMapping("{id}/range")
-    public void createOneRangeValue(@PathVariable Long id, @RequestBody @Valid RangeValueDTO rangeValueDTO) {
-        characteristicServiceFacade.createOneRangeValue(id, rangeValueDTO);
+    public Long createOneRangeValue(@PathVariable Long id, @RequestBody @Valid RangeValueDTO rangeValueDTO) {
+        return characteristicServiceFacade.createOneRangeValue(id, rangeValueDTO);
     }
 
     @PostMapping("{id}/text")
-    public void createOneTextValue(@PathVariable Long id, @RequestBody @Valid TextValueDTO textValueDTO) {
-        characteristicServiceFacade.createOneTextValue(id, textValueDTO);
+    public Long createOneTextValue(@PathVariable Long id, @RequestBody @Valid TextValueDTO textValueDTO) {
+        return characteristicServiceFacade.createOneTextValue(id, textValueDTO);
     }
 
     @DeleteMapping("{id}/range")
-    public void deleteOneRangeValue(@PathVariable Long id, @RequestBody @Valid RangeValueDTO rangeValueDTO) {
-        characteristicServiceFacade.deleteOneRangeValue(id, rangeValueDTO);
+    public Long deleteOneRangeValue(@PathVariable Long id, @RequestBody @Valid RangeValueDTO rangeValueDTO) {
+        return characteristicServiceFacade.deleteOneRangeValue(id, rangeValueDTO);
     }
 
     @DeleteMapping("{id}/text")
-    public void deleteOneRangeValue(@PathVariable Long id, @RequestBody @Valid TextValueDTO textValueDTO) {
-        characteristicServiceFacade.deleteOneTextValue(id, textValueDTO);
+    public Long deleteOneRangeValue(@PathVariable Long id, @RequestBody @Valid TextValueDTO textValueDTO) {
+        return characteristicServiceFacade.deleteOneTextValue(id, textValueDTO);
     }
 }

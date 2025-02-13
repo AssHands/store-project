@@ -21,8 +21,8 @@ public class CategoryController {
     }
 
     @PostMapping
-    public void createOne(@RequestBody @Valid CategoryDTO categoryDTO) {
-        categoryServiceFacade.createOne(categoryDTO);
+    public Long createOne(@RequestBody @Valid CategoryDTO categoryDTO) {
+        return categoryServiceFacade.createOne(categoryDTO);
     }
 
     @DeleteMapping("{id}")
@@ -31,19 +31,19 @@ public class CategoryController {
     }
 
     @PostMapping("{id}/characteristics")
-    public void addCharacteristicToCategory(@PathVariable("id") Long categoryId,
+    public Long addCharacteristicToCategory(@PathVariable("id") Long categoryId,
                                             @RequestParam("characteristic") Long characteristicId) {
-        categoryServiceFacade.addCharacteristicToCategory(categoryId, characteristicId);
+        return categoryServiceFacade.addCharacteristicToCategory(categoryId, characteristicId);
     }
 
     @DeleteMapping("{id}/characteristics")
-    public void deleteCharacteristicFromCategory(@PathVariable("id") Long categoryId,
+    public Long deleteCharacteristicFromCategory(@PathVariable("id") Long categoryId,
                                                  @RequestParam("characteristic") Long characteristicId) {
-        categoryServiceFacade.deleteCharacteristicFromCategory(categoryId, characteristicId);
+        return categoryServiceFacade.deleteCharacteristicFromCategory(categoryId, characteristicId);
     }
 
     @PatchMapping("{id}")
-    public void updateOne(@PathVariable Long id, @RequestBody @Valid CategoryDTO categoryDTO) {
-        categoryServiceFacade.updateOne(id, categoryDTO);
+    public Long updateOne(@PathVariable Long id, @RequestBody @Valid CategoryDTO categoryDTO) {
+        return categoryServiceFacade.updateOne(id, categoryDTO);
     }
 }

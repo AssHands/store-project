@@ -39,8 +39,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public void createOne(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
-        productServiceFacade.createOneProduct(productPayload);
+    public Long createOne(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
+        return productServiceFacade.createOneProduct(productPayload);
     }
     @PostMapping("batch") //todo: make validation for list
     public void createAll(@RequestBody List<ProductWritePayload> productPayloads) {
@@ -58,9 +58,9 @@ public class ProductController {
     }
 
     @PatchMapping("{id}")
-    public void updateOne(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
+    public Long updateOne(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
                           @PathVariable("id") Long productId) {
-        productServiceFacade.updateOneProduct(productPayload, productId);
+        return productServiceFacade.updateOneProduct(productPayload, productId);
     }
 
     /**
@@ -110,18 +110,17 @@ public class ProductController {
      */
     //todo: validate data in controller
     @PatchMapping(value = "{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void updateAllProductImage(@PathVariable("id") Long productId,
+    public Long updateAllProductImage(@PathVariable("id") Long productId,
                                       @RequestParam Map<String, String> allImageIndexes,
                                       @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,
                                       @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
         ImageDTO imageDTO = new ImageDTO(productId, allImageIndexes, addImages, deleteImageIndexes);
 
-        productServiceFacade.saveOrUpdateAllImage(imageDTO);
+        return productServiceFacade.saveOrUpdateAllImage(imageDTO);
     }
 
     @PostMapping("search")
     public ProductSearchResponse searchAllProduct(@RequestBody @Valid SearchProductRequest searchProductRequest) {
-        System.out.println(searchProductRequest);
         return productServiceFacade.findAllProductBySearch(searchProductRequest);
     }
 

@@ -24,9 +24,9 @@ public class CategoryService {
         return categoryRepo.findAll();
     }
 
-    public void createOne(CategoryDTO categoryDTO) {
+    public Category createOne(CategoryDTO categoryDTO) {
         categoryBusinessValidator.validateCreation(categoryDTO);
-        categoryRepo.save(catalogueMapper.mapToCategory(categoryDTO));
+        return categoryRepo.save(catalogueMapper.mapToCategory(categoryDTO));
     }
 
     private Category findOneWithCharacteristics(Long id) {
@@ -39,7 +39,7 @@ public class CategoryService {
                 .orElseThrow(() -> new RuntimeException("no category found"));
     }
 
-    public void addCharacteristicToCategory(Long categoryId, Long characteristicId) {
+    public Category addCharacteristicToCategory(Long categoryId, Long characteristicId) {
         Category category = findOneWithCharacteristics(categoryId);
         //check for characteristic exists
         characteristicService.findOne(characteristicId);
@@ -51,10 +51,10 @@ public class CategoryService {
                         .characteristic(Characteristic.builder().id(characteristicId).build())
                         .build()
         );
-        categoryRepo.save(category);
+        return categoryRepo.save(category);
     }
 
-    public void deleteCharacteristicFromCategory(Long categoryId, Long characteristicId) {
+    public Category deleteCharacteristicFromCategory(Long categoryId, Long characteristicId) {
         Category category = findOneWithCharacteristics(categoryId);
         categoryBusinessValidator.validateDeleteCharacteristic(category, characteristicId);
 
@@ -65,7 +65,7 @@ public class CategoryService {
             }
         }
 
-        categoryRepo.save(category);
+        return categoryRepo.save(category);
     }
 
     //todo: make check if product has this category
@@ -75,11 +75,11 @@ public class CategoryService {
         categoryRepo.delete(category);
     }
 
-    public void updateOne(Long id, CategoryDTO categoryDTO) {
+    public Category updateOne(Long id, CategoryDTO categoryDTO) {
         Category category = findOne(id);
         categoryBusinessValidator.validateUpdate(category, categoryDTO);
         updateCategory(category, categoryDTO);
-        categoryRepo.save(category);
+        return categoryRepo.save(category);
     }
 
     private void updateCategory(Category category, CategoryDTO categoryDTO) {

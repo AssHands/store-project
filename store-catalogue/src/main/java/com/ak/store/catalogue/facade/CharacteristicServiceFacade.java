@@ -26,8 +26,8 @@ public class CharacteristicServiceFacade {
     }
 
     @Transactional
-    public void createOne(CharacteristicDTO characteristicDTO) {
-        characteristicService.createOne(characteristicDTO);
+    public Long createOne(CharacteristicDTO characteristicDTO) {
+        return characteristicService.createOne(characteristicDTO).getId();
     }
 
     @Transactional
@@ -36,27 +36,27 @@ public class CharacteristicServiceFacade {
     }
 
     @Transactional
-    public void updateOne(Long id, CharacteristicDTO characteristicDTO) {
-        characteristicService.updateOne(id, characteristicDTO);
+    public Long updateOne(Long id, CharacteristicDTO characteristicDTO) {
+        return characteristicService.updateOne(id, characteristicDTO).getId();
     }
 
     @Transactional
-    public void createOneRangeValue(Long id, RangeValueDTO rangeValueDTO) {
-        characteristicService.createRangeValue(id, rangeValueDTO);
+    public Long createOneRangeValue(Long id, RangeValueDTO rangeValueDTO) {
+        return characteristicService.createRangeValue(id, rangeValueDTO).getId();
     }
 
     @Transactional
-    public void createOneTextValue(Long id, TextValueDTO textValueDTO) {
-        characteristicService.createTextValue(id, textValueDTO);
+    public Long createOneTextValue(Long id, TextValueDTO textValueDTO) {
+        return characteristicService.createTextValue(id, textValueDTO).getId();
     }
 
     @Transactional
-    public void deleteOneRangeValue(Long id, RangeValueDTO rangeValueDTO) {
-        characteristicService.deleteOneRangeValue(id, rangeValueDTO);
+    public Long deleteOneRangeValue(Long id, RangeValueDTO rangeValueDTO) {
+        return characteristicService.deleteOneRangeValue(id, rangeValueDTO).getId();
     }
 
     @Transactional
-    public void deleteOneTextValue(Long id,TextValueDTO textValueDTO) {
-        characteristicService.deleteOneTextValue(id, textValueDTO);
+    public Long deleteOneTextValue(Long id,TextValueDTO textValueDTO) {
+        return characteristicService.deleteOneTextValue(id, textValueDTO).getId();
     }
 }

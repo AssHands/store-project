@@ -91,8 +91,8 @@ public class ProductService {
         return sort;
     }
 
-    //todo: why with images
     public Product deleteOne(Long id) {
+        //find with images for reduce queries to db
         Product product = findOneWithImages(id);
         productRepo.deleteById(id);
         return product;
@@ -103,7 +103,7 @@ public class ProductService {
         Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
         productCharacteristicService.createAll(createdProduct, productPayload.getCreateCharacteristics());
 
-        //flush for immediate validation, without it, data will index in ES, even when validation failed
+        //flush for immediate validation
         productRepo.saveAndFlush(createdProduct);
         return createdProduct;
     }
@@ -122,7 +122,7 @@ public class ProductService {
             products.add(createdProduct);
         }
 
-        //flush for immediate validation, without it, data will index in ES, even when validation failed
+        //flush for immediate validation
         productRepo.saveAllAndFlush(products);
         productRepo.clear();
         return products;
@@ -136,7 +136,7 @@ public class ProductService {
         productCharacteristicService.updateAll(updatedProduct, productPayload.getUpdateCharacteristics());
         productCharacteristicService.deleteAll(updatedProduct, productPayload.getDeleteCharacteristics());
 
-        //flush for immediate validation, without it, data will index in ES, even when validation failed
+        //flush for immediate validation
         productRepo.saveAndFlush(updatedProduct);
 
         return updatedProduct;
