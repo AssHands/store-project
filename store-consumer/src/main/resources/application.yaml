@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5431/postgres
@@ -23,3 +26,11 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 5MB
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 7000
+            readTimeout: 7000

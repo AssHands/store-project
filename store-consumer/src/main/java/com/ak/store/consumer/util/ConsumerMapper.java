@@ -1,6 +1,8 @@
 package com.ak.store.consumer.util;
 
+import com.ak.store.common.model.consumer.dto.CartView;
 import com.ak.store.common.model.consumer.dto.ConsumerDTO;
+import com.ak.store.consumer.model.Cart;
 import com.ak.store.consumer.model.Consumer;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,5 +23,10 @@ public class ConsumerMapper {
 
     public ConsumerDTO mapToConsumerDTO(Consumer consumer) {
         return modelMapper.map(consumer, ConsumerDTO.class);
+    }
+
+    //todo: он зачем то создает объект ProductView в CartView, который я затем перезаписываю. исправить
+    public CartView mapToCartView(Cart cart) {
+        return modelMapper.map(cart, CartView.class);
     }
 }

@@ -1,10 +1,10 @@
 package com.ak.store.consumer.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -23,4 +23,7 @@ public class Consumer {
     private String phone;
 
     private String avatarKey;
+
+    @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cart> carts = new ArrayList<>();
 }

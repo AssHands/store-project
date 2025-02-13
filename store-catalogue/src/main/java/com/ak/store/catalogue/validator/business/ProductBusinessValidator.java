@@ -15,6 +15,8 @@ public class ProductBusinessValidator {
         if (productDTO.getCategoryId() == null) {
             throw new RuntimeException("category_id is null");
         }
+
+        //todo: здесь лучше сервис или репозиторий?
         //check for category exists
         categoryService.findOne(productDTO.getCategoryId());
     }

@@ -6,6 +6,7 @@ import com.ak.store.catalogue.integration.ElasticService;
 import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.util.CatalogueMapper;
+import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.model.catalogue.dto.ImageDTO;
 import com.ak.store.common.payload.catalogue.ProductWritePayload;
@@ -35,7 +36,7 @@ public class ProductServiceFacade {
         return imageDTO.getProductId();
     }
 
-    public ProductSearchResponse findAllProductBySearch(SearchProductRequest searchProductRequest) {
+    public ProductSearchResponse findAllBySearch(SearchProductRequest searchProductRequest) {
         var elasticSearchResult = elasticService.findAllProduct(searchProductRequest);
 
         ProductSearchResponse productSearchResponse = new ProductSearchResponse();
@@ -44,7 +45,7 @@ public class ProductServiceFacade {
         }
 
         productSearchResponse.setContent(
-                productService.findAllView(elasticSearchResult.getIds(), searchProductRequest.getSortingType()).stream()
+                productService.findAllPoor(elasticSearchResult.getIds(), searchProductRequest.getSortingType()).stream()
                         .map(catalogueMapper::mapToProductPoorView)
                         .toList()
         );
@@ -53,8 +54,12 @@ public class ProductServiceFacade {
         return productSearchResponse;
     }
 
-    public ProductRichView findOneProduct(Long id) {
+    public ProductRichView findOneRich(Long id) {
         return catalogueMapper.mapToProductRichView(productService.findOneWithAll(id));
+    }
+
+    public ProductPoorView findOnePoor(Long id) {
+        return catalogueMapper.mapToProductPoorView(productService.findOneWithImages(id));
     }
 
     @Transactional
@@ -63,7 +68,7 @@ public class ProductServiceFacade {
     }
 
     @Transactional
-    public void createAllProduct(List<ProductWritePayload> payloadList) {
+    public void createAll(List<ProductWritePayload> payloadList) {
         List<Product> createdProductList = productService.createAll(payloadList);
         elasticService.createAllProduct(createdProductList.stream()
                 .map(catalogueMapper::mapToProductDocument)
@@ -71,14 +76,14 @@ public class ProductServiceFacade {
     }
 
     @Transactional
-    public Long createOneProduct(ProductWritePayload payload) {
+    public Long createOne(ProductWritePayload payload) {
         Product createdProduct = productService.createOne(payload);
         elasticService.createOneProduct(catalogueMapper.mapToProductDocument(createdProduct));
         return createdProduct.getId();
     }
 
     @Transactional
-    public void deleteOneProduct(Long id) {
+    public void deleteOne(Long id) {
         Product deletedProduct = productService.deleteOne(id);
         elasticService.deleteOneProduct(id);
         s3Service.deleteAllImage(deletedProduct.getImages().stream()
@@ -87,9 +92,19 @@ public class ProductServiceFacade {
     }
 
     @Transactional
-    public Long updateOneProduct(ProductWritePayload productPayload, Long productId) {
+    public Long updateOne(ProductWritePayload productPayload, Long productId) {
         Product updatedProduct = productService.updateOne(productPayload, productId);
         elasticService.updateOneProduct(catalogueMapper.mapToProductDocument(updatedProduct));
         return updatedProduct.getId();
+    }
+
+    public List<ProductPoorView> findAllPoor(List<Long> ids) {
+        return productService.findAllPoor(ids).stream()
+                .map(catalogueMapper::mapToProductPoorView)
+                .toList();
+    }
+
+    public boolean existOne(Long id) {
+        return productService.existOne(id);
     }
 }

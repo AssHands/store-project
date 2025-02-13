@@ -1,6 +1,7 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.ProductServiceFacade;
+import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.model.catalogue.dto.ImageDTO;
 import com.ak.store.common.payload.catalogue.ProductWritePayload;
@@ -26,19 +27,36 @@ import java.util.Map;
 public class ProductController {
     private final ProductServiceFacade productServiceFacade;
 
-    @GetMapping("{id}")
-    public ProductRichView getOne(@PathVariable Long id) {
-        return productServiceFacade.findOneProduct(id);
+    @GetMapping("{id}/rich")
+    public ProductRichView getOneRich(@PathVariable Long id) {
+        return productServiceFacade.findOneRich(id);
+    }
+
+    @GetMapping("{id}/poor")
+    public ProductPoorView getOnePoor(@PathVariable Long id) {
+        return productServiceFacade.findOnePoor(id);
+    }
+
+    @PostMapping("poor")
+    public List<ProductPoorView> getAllPoor(@RequestBody List<Long> ids) {
+        return productServiceFacade.findAllPoor(ids);
+    }
+
+    @GetMapping("exist/{id}")
+    public void existOne(@PathVariable Long id) {
+        if(!productServiceFacade.existOne(id)) {
+            throw new RuntimeException("no product exist");
+        }
     }
 
     @DeleteMapping("{id}")
     public void deleteOne(@PathVariable Long id) {
-        productServiceFacade.deleteOneProduct(id);
+        productServiceFacade.deleteOne(id);
     }
 
     @PostMapping
     public Long createOne(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
-        return productServiceFacade.createOneProduct(productPayload);
+        return productServiceFacade.createOne(productPayload);
     }
     @PostMapping("batch") //todo: make validation for list
     public void createAll(@RequestBody List<ProductWritePayload> productPayloads) {
@@ -52,13 +70,13 @@ public class ProductController {
 //            }
 //        }
 
-        productServiceFacade.createAllProduct(productPayloads);
+        productServiceFacade.createAll(productPayloads);
     }
 
     @PatchMapping("{id}")
     public Long updateOne(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
                           @PathVariable("id") Long productId) {
-        return productServiceFacade.updateOneProduct(productPayload, productId);
+        return productServiceFacade.updateOne(productPayload, productId);
     }
 
     /**
@@ -119,7 +137,7 @@ public class ProductController {
 
     @PostMapping("search")
     public ProductSearchResponse searchAllProduct(@RequestBody @Valid SearchProductRequest searchProductRequest) {
-        return productServiceFacade.findAllProductBySearch(searchProductRequest);
+        return productServiceFacade.findAllBySearch(searchProductRequest);
     }
 
     @PostMapping("search/filters")

@@ -30,4 +30,6 @@ public class ProductPoorView {
     private int amountReviews;
 
     private float grade;
+
+    //todo: add image list
 }

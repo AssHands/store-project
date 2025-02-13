@@ -65,8 +65,12 @@ public class ProductService {
         return processedProductImages;
     }
 
-    public List<Product> findAllView(List<Long> ids, SortingType sortingType) {
+    public List<Product> findAllPoor(List<Long> ids, SortingType sortingType) {
         return productRepo.findAllWithImagesByIdIn(ids, getSort(sortingType));
+    }
+
+    public List<Product> findAllPoor(List<Long> ids) {
+        return productRepo.findAllWithImagesByIdIn(ids);
     }
 
     private Sort getSort(SortingType sortingType) {
@@ -162,5 +166,9 @@ public class ProductService {
             );
             updatedProduct.getCharacteristics().clear();
         }
+    }
+
+    public boolean existOne(Long id) {
+        return productRepo.existsById(id);
     }
 }
