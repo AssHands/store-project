@@ -5,6 +5,7 @@ import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.catalogue.service.product.PriceCalculator;
+import com.ak.store.catalogue.validator.business.ProductBusinessValidator;
 import com.ak.store.catalogue.validator.ProductImageValidator;
 import com.ak.store.common.model.catalogue.dto.ImageDTO;
 import com.ak.store.common.model.catalogue.dto.ProductDTO;
@@ -27,6 +28,8 @@ public class ProductService {
     private final CatalogueMapper catalogueMapper;
     private final ProductImageValidator productImageValidator;
     private final ProductCharacteristicService productCharacteristicService;
+
+    private final ProductBusinessValidator productBusinessValidator;
 
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     private int BATCH_SIZE;
@@ -96,15 +99,12 @@ public class ProductService {
     }
 
     public Product createOne(ProductWritePayload productPayload) {
+        productBusinessValidator.validateCreation(productPayload.getProduct());
         Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
-        if (createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
-            throw new RuntimeException("category_id is null");
-        }
         productCharacteristicService.createAll(createdProduct, productPayload.getCreateCharacteristics());
 
         //flush for immediate validation, without it, data will index in ES, even when validation failed
         productRepo.saveAndFlush(createdProduct);
-
         return createdProduct;
     }
 
@@ -116,10 +116,8 @@ public class ProductService {
                 productRepo.clear();
             }
 
+            productBusinessValidator.validateCreation(productPayloads.get(i).getProduct());
             Product createdProduct = catalogueMapper.mapToProduct(productPayloads.get(i).getProduct());
-            if (createdProduct.getCategory() == null || createdProduct.getCategory().getId() == null) {
-                throw new RuntimeException("one of the products does not have a defined category_id");
-            }
             productCharacteristicService.createAll(createdProduct, productPayloads.get(i).getCreateCharacteristics());
             products.add(createdProduct);
         }

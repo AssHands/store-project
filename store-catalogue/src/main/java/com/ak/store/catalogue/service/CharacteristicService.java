@@ -5,7 +5,7 @@ import com.ak.store.catalogue.model.entity.RangeValue;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.*;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.catalogue.validator.CharacteristicBusinessValidator;
+import com.ak.store.catalogue.validator.business.CharacteristicBusinessValidator;
 import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
 import com.ak.store.common.model.catalogue.dto.RangeValueDTO;
 import com.ak.store.common.model.catalogue.dto.TextValueDTO;

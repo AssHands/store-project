@@ -1,7 +1,6 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.CharacteristicServiceFacade;
-import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
 import com.ak.store.common.model.catalogue.dto.RangeValueDTO;
 import com.ak.store.common.model.catalogue.dto.TextValueDTO;
@@ -19,22 +18,22 @@ public class CharacteristicController {
     private final CharacteristicServiceFacade characteristicServiceFacade;
 
     @GetMapping
-    public List<CharacteristicView> getAllAvailableCharacteristicByCategory(@RequestParam Long categoryId) {
-        return characteristicServiceFacade.findAllCharacteristicByCategoryId(categoryId);
+    public List<CharacteristicView> getAllByCategory(@RequestParam Long categoryId) {
+        return characteristicServiceFacade.findAllByCategoryId(categoryId);
     }
 
     @PostMapping
-    public void createOneCharacteristic(@RequestBody @Valid CharacteristicDTO characteristicDTO) {
+    public void createOne(@RequestBody @Valid CharacteristicDTO characteristicDTO) {
         characteristicServiceFacade.createOne(characteristicDTO);
     }
 
     @DeleteMapping("{id}")
-    public void deleteOneCharacteristic(@PathVariable Long id) {
+    public void deleteOne(@PathVariable Long id) {
         characteristicServiceFacade.deleteOne(id);
     }
 
     @PatchMapping("{id}")
-    public void updateOneCharacteristic(@PathVariable Long id, @RequestBody CharacteristicDTO characteristicDTO) {
+    public void updateOne(@PathVariable Long id, @RequestBody CharacteristicDTO characteristicDTO) {
         characteristicServiceFacade.updateOne(id, characteristicDTO);
     }
 

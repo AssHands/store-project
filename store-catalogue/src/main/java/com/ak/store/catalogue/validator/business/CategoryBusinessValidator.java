@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.validator;
+package com.ak.store.catalogue.validator.business;
 
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;

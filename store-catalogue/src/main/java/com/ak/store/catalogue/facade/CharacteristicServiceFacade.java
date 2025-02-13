@@ -19,7 +19,7 @@ public class CharacteristicServiceFacade {
 
     private final CatalogueMapper catalogueMapper;
 
-    public List<CharacteristicView> findAllCharacteristicByCategoryId(Long categoryId) {
+    public List<CharacteristicView> findAllByCategoryId(Long categoryId) {
         return characteristicService.findAllByCategoryId(categoryId).stream()
                 .map(catalogueMapper::mapToCharacteristicView)
                 .toList();

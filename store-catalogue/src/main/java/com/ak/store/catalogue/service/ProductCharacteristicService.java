@@ -2,15 +2,13 @@ package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
-import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.catalogue.validator.ProductCharacteristicValidator;
+import com.ak.store.catalogue.validator.business.ProductCharacteristicBusinessValidator;
 import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -18,35 +16,11 @@ import java.util.Set;
 public class ProductCharacteristicService {
 
     private final CatalogueMapper catalogueMapper;
-    private final CharacteristicRepo characteristicRepo;
-    private final ProductCharacteristicValidator productCharacteristicValidator;
+    private final ProductCharacteristicBusinessValidator productCharacteristicBusinessValidator;
 
     public void createAll(Product updatedProduct, Set<ProductCharacteristicDTO> createCharacteristicsDTO) {
-        if(createCharacteristicsDTO.isEmpty()) {
-            return;
-        }
-
-        productCharacteristicValidator.validate(createCharacteristicsDTO,
-                characteristicRepo.findAllWithTextValuesByCategoryId(updatedProduct.getCategory().getId()));
-
-        List<Long> existingCharacteristicIds = updatedProduct.getCharacteristics().stream()
-                .map(pc -> pc.getCharacteristic().getId())
-                .toList();
-
-        if(!existingCharacteristicIds.isEmpty()) {
-            List<Long> creatingCharacteristicIds = createCharacteristicsDTO.stream()
-                    .map(ProductCharacteristicDTO::getId)
-                    .toList();
-
-            Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
-                    .filter(existingCharacteristicIds::contains)
-                    .findFirst();
-
-            if(notUniqCharacteristicId.isPresent()) {
-                throw new RuntimeException("characteristic with id=%s already exists"
-                        .formatted(notUniqCharacteristicId.get()));
-            }
-        }
+        if(createCharacteristicsDTO.isEmpty()) return;
+        productCharacteristicBusinessValidator.validateCreation(createCharacteristicsDTO, updatedProduct);
 
         List<ProductCharacteristic> createdCharacteristics = createCharacteristicsDTO.stream()
                 .map(c -> catalogueMapper.mapToProductCharacteristic(c, updatedProduct))
@@ -56,12 +30,9 @@ public class ProductCharacteristicService {
     }
 
     public void updateAll(Product updatedProduct, Set<ProductCharacteristicDTO> updateCharacteristicsDTO) {
-        if(updateCharacteristicsDTO.isEmpty()) {
-            return;
-        }
-
-        productCharacteristicValidator.validate(updateCharacteristicsDTO,
-                characteristicRepo.findAllWithTextValuesByCategoryId(updatedProduct.getCategory().getId()));
+        if(updateCharacteristicsDTO.isEmpty()) return;
+        productCharacteristicBusinessValidator.validateUpdate
+                (updateCharacteristicsDTO, updatedProduct.getCategory().getId());
 
         for(var characteristic : updateCharacteristicsDTO) {
             int index = findProductCharacteristicIndexById(
@@ -73,9 +44,7 @@ public class ProductCharacteristicService {
     }
 
     public void deleteAll(Product updatedProduct, Set<ProductCharacteristicDTO> deleteCharacteristicsDTO) {
-        if(deleteCharacteristicsDTO.isEmpty()) {
-            return;
-        }
+        if(deleteCharacteristicsDTO.isEmpty()) return;
 
         for(var characteristic : deleteCharacteristicsDTO) {
             int index = findProductCharacteristicIndexById(

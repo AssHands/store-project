@@ -29,21 +29,21 @@ public class ProductController {
     private final ProductServiceFacade productServiceFacade;
 
     @GetMapping("{id}")
-    public ProductRichView getOneProduct(@PathVariable("id") Long id) {
+    public ProductRichView getOne(@PathVariable("id") Long id) {
         return productServiceFacade.findOneProduct(id);
     }
 
     @DeleteMapping("{id}")
-    public void deleteOneProduct(@PathVariable("id") Long id) {
+    public void deleteOne(@PathVariable("id") Long id) {
         productServiceFacade.deleteOneProduct(id);
     }
 
     @PostMapping
-    public void createOneProduct(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
+    public void createOne(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
         productServiceFacade.createOneProduct(productPayload);
     }
     @PostMapping("batch") //todo: make validation for list
-    public void createAllProduct(@RequestBody List<ProductWritePayload> productPayloads) {
+    public void createAll(@RequestBody List<ProductWritePayload> productPayloads) {
 
         for(ProductWritePayload payload : productPayloads) {
             Errors errors = new BeanPropertyBindingResult(payload, "productPayload");
@@ -58,8 +58,8 @@ public class ProductController {
     }
 
     @PatchMapping("{id}")
-    public void updateOneProduct(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
-                                       @PathVariable("id") Long productId) {
+    public void updateOne(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
+                          @PathVariable("id") Long productId) {
         productServiceFacade.updateOneProduct(productPayload, productId);
     }
 
@@ -126,7 +126,7 @@ public class ProductController {
     }
 
     @PostMapping("search/filters")
-    public SearchAvailableFiltersResponse searchAllAvailableFilter(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+    public SearchAvailableFiltersResponse searchAllAvailableFilters(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         System.out.println(searchAvailableFiltersRequest);
         return productServiceFacade.findAllAvailableFilter(searchAvailableFiltersRequest);
     }

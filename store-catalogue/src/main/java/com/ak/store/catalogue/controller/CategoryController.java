@@ -16,17 +16,17 @@ public class CategoryController {
     private final CategoryServiceFacade categoryServiceFacade;
 
     @GetMapping
-    public List<CategoryView> getAllCategory() {
+    public List<CategoryView> getAll() {
         return categoryServiceFacade.findAll();
     }
 
     @PostMapping
-    public void createOneCategory(@RequestBody @Valid CategoryDTO categoryDTO) {
+    public void createOne(@RequestBody @Valid CategoryDTO categoryDTO) {
         categoryServiceFacade.createOne(categoryDTO);
     }
 
     @DeleteMapping("{id}")
-    public void deleteOneCategory(@PathVariable Long id) {
+    public void deleteOne(@PathVariable Long id) {
         categoryServiceFacade.deleteOne(id);
     }
 
@@ -43,7 +43,7 @@ public class CategoryController {
     }
 
     @PatchMapping("{id}")
-    public void updateOneCategory(@PathVariable Long id, @RequestBody @Valid CategoryDTO categoryDTO) {
+    public void updateOne(@PathVariable Long id, @RequestBody @Valid CategoryDTO categoryDTO) {
         categoryServiceFacade.updateOne(id, categoryDTO);
     }
 }

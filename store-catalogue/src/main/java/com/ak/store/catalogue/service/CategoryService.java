@@ -4,7 +4,7 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
-import com.ak.store.catalogue.validator.CategoryBusinessValidator;
+import com.ak.store.catalogue.validator.business.CategoryBusinessValidator;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.common.model.catalogue.dto.CategoryDTO;
 import lombok.RequiredArgsConstructor;
