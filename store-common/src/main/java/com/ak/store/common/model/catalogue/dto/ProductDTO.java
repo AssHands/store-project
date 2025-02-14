@@ -36,5 +36,8 @@ public class ProductDTO {
     private Integer discountPercentage;
 
     @NotNull(groups = Create.class)
+    private Boolean isAvailable;
+
+    @NotNull(groups = Create.class)
     private Long categoryId;
 }

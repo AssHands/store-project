@@ -1,8 +1,9 @@
-package com.ak.store.common.model.catalogue.view;
+package com.ak.store.common.model.consumer.view;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,25 +18,24 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductPoorView {
+public class ReviewView {
     private Long id;
 
-    private String title;
+    private ConsumerPoorView consumer;
 
-    private String description;
+    private List<CommentReviewView> comments = new ArrayList<>();
 
-    private Integer currentPrice;
+    private Long productId;
 
-    private Integer fullPrice;
+    private String text;
 
-    private Integer discountPercentage;
+    private String advantages;
 
-    private Integer amountReviews;
+    private String disadvantages;
 
-    private Float grade;
+    private Integer grade;
 
-    private Boolean isAvailable;
+    private Integer amountLikes;
 
-    //todo: test image list
-    private List<ImageView> images = new ArrayList<>();
+    private Integer amountDislikes;
 }

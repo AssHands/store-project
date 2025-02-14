@@ -15,5 +15,5 @@ public interface CatalogueFeign {
     List<ProductPoorView> findAllProductPoor(@RequestBody List<Long> ids);
 
     @GetMapping("products/exist/{id}")
-    void existOne(@PathVariable Long id);
+    Boolean existOne(@PathVariable Long id);
 }

@@ -43,10 +43,8 @@ public class ProductController {
     }
 
     @GetMapping("exist/{id}")
-    public void existOne(@PathVariable Long id) {
-        if(!productServiceFacade.existOne(id)) {
-            throw new RuntimeException("no product exist");
-        }
+    public Boolean existOne(@PathVariable Long id) {
+        return productServiceFacade.existOne(id);
     }
 
     @DeleteMapping("{id}")

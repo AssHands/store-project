@@ -10,6 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = { "carts", "reviews", "commentReviews" })
+@EqualsAndHashCode(exclude = { "carts", "reviews", "commentReviews" })
 @Entity
 public class Consumer {
     @Id
@@ -26,4 +28,10 @@ public class Consumer {
 
     @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Cart> carts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentReview> commentReviews = new ArrayList<>();
 }

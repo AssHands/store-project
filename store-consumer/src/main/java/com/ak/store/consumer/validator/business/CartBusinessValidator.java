@@ -12,7 +12,9 @@ public class CartBusinessValidator {
     private final CartRepo cartRepo;
 
     public void validateCreation(Long consumerId, Long productId) {
-        catalogueFeign.existOne(productId);
+        if(!catalogueFeign.existOne(productId)) {
+            throw new RuntimeException("product with id=%d is not exists".formatted(productId));
+        }
 
         if(isProductExist(consumerId, productId)) {
             throw new RuntimeException("product is already in cart");

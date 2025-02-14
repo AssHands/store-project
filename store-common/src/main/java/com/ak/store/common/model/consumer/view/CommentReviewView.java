@@ -1,6 +1,6 @@
-package com.ak.store.common.model.consumer.dto;
+package com.ak.store.common.model.consumer.view;
 
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -12,8 +12,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CartView {
-    private ProductPoorView product;
-    private Integer amount;
+public class CommentReviewView {
+    private ConsumerPoorView consumer;
+
+    private Long reviewId;
+
+    private String text;
+
+    private Integer amountLikes;
+
+    private Integer amountDislikes;
 }

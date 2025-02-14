@@ -147,16 +147,16 @@ public class ProductService {
     }
 
     private void updateProduct(Product updatedProduct, ProductDTO productDTO) {
+        PriceCalculator.updatePrice(updatedProduct, productDTO);
         if (productDTO.getTitle() != null) {
             updatedProduct.setTitle(productDTO.getTitle());
         }
-
         if (productDTO.getDescription() != null) {
             updatedProduct.setDescription(productDTO.getDescription());
         }
-
-        PriceCalculator.updatePrice(updatedProduct, productDTO);
-
+        if(productDTO.getIsAvailable() != null) {
+            updatedProduct.setIsAvailable(productDTO.getIsAvailable());
+        }
         if (productDTO.getCategoryId() != null
                 && !updatedProduct.getCategory().getId().equals(productDTO.getCategoryId())) {
             updatedProduct.setCategory(
@@ -168,7 +168,7 @@ public class ProductService {
         }
     }
 
-    public boolean existOne(Long id) {
+    public Boolean existOne(Long id) {
         return productRepo.existsById(id);
     }
 }

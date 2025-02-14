@@ -53,6 +53,8 @@ public class Product {
     @DecimalMax(value = "5.0")
     private Float grade;
 
+    private Boolean isAvailable;
+
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductCharacteristic> characteristics = new ArrayList<>();

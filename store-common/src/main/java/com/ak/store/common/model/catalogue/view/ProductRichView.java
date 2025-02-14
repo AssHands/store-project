@@ -24,15 +24,17 @@ public class ProductRichView {
 
     private String description;
 
-    private int currentPrice;
+    private Integer currentPrice;
 
-    private int fullPrice;
+    private Integer fullPrice;
 
-    private int discountPercentage;
+    private Integer discountPercentage;
 
-    private int amountReviews;
+    private Integer amountReviews;
 
-    private float grade;
+    private Float grade;
+
+    private Boolean isAvailable;
 
     private CategoryView category;
 

@@ -104,7 +104,7 @@ public class ProductServiceFacade {
                 .toList();
     }
 
-    public boolean existOne(Long id) {
+    public Boolean existOne(Long id) {
         return productService.existOne(id);
     }
 }

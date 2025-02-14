@@ -1,6 +1,6 @@
 package com.ak.store.consumer.controller;
 
-import com.ak.store.common.model.consumer.dto.CartView;
+import com.ak.store.common.model.consumer.view.CartView;
 import com.ak.store.consumer.facade.CartServiceFacade;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;

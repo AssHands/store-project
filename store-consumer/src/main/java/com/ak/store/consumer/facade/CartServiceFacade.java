@@ -1,7 +1,7 @@
 package com.ak.store.consumer.facade;
 
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
-import com.ak.store.common.model.consumer.dto.CartView;
+import com.ak.store.common.model.consumer.view.CartView;
 import com.ak.store.consumer.feign.CatalogueFeign;
 import com.ak.store.consumer.model.Cart;
 import com.ak.store.consumer.service.CartService;
@@ -35,6 +35,8 @@ public class CartServiceFacade {
         for(var cart : cartList) {
             CartView cartView = consumerMapper.mapToCartView(cart);
             cartView.setProduct(map.get(cart.getProductId()).orElse(null));
+            //todo: если продукт не найден, то он пропускается.
+            // при удалении продукта надо отправлять через mq сообщение для удаления этого продукта у всех пользователей в корзине
             if(cartView.getProduct() == null) continue;
 
             cartViewList.add(cartView);

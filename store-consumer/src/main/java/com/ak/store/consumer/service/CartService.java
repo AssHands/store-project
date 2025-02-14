@@ -26,6 +26,7 @@ public class CartService {
     }
 
 
+    //todo: проверять существует ли такое кол-во продуктов у миркосервиса склада
     public void setProductAmount(Long id, Long productId, int amount) {
         cartBusinessValidator.validateSetAmountProducts(id, productId);
         Cart cart = findOneByConsumerIdAndProductId(id, productId);
