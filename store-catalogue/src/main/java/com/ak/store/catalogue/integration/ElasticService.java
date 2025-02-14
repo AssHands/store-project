@@ -24,6 +24,7 @@ import com.ak.store.common.payload.search.SearchProductRequest;
 import com.ak.store.common.model.search.common.TextFilter;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
+import com.fasterxml.classmate.AnnotationOverrides;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -119,6 +120,11 @@ public class ElasticService {
         filters.add(TermQuery.of(t -> t
                         .field("category_id")
                         .value(searchAvailableFiltersRequest.getCategoryId()))
+                ._toQuery());
+
+        filters.add(TermQuery.of(t -> t
+                        .field("is_available")
+                        .value(true))
                 ._toQuery());
 
         if (searchAvailableFiltersRequest.getPriceTo() != 0) {
@@ -305,6 +311,11 @@ public class ElasticService {
                     ._toQuery());
         }
 
+        filters.add(TermQuery.of(t -> t
+                        .field("is_available")
+                        .value(true))
+                ._toQuery());
+
         if (!searchProductRequest.getNumericFilters().isEmpty())
             filters.addAll(makeNumericFilters(searchProductRequest.getNumericFilters(), null));
 
@@ -351,9 +362,15 @@ public class ElasticService {
     }
 
     private Long defineCategory(String fullTextSearch) {
+        List<Query> filters = new ArrayList<>();
+        filters.add(TermQuery.of(t -> t
+                        .field("is_available")
+                        .value(true))
+                ._toQuery());
+
         SearchRequest request = SearchRequest.of(sr -> sr
                 .index("product")
-                .query(q -> q.bool(makeSearchQuery(null, fullTextSearch)))
+                .query(q -> q.bool(makeSearchQuery(filters, fullTextSearch)))
                 .size(0)
                 .aggregations("most_frequent_category", a -> a
                         .terms(t -> t

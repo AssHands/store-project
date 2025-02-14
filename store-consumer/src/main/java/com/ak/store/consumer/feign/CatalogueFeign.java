@@ -16,4 +16,7 @@ public interface CatalogueFeign {
 
     @GetMapping("products/exist/{id}")
     Boolean existOne(@PathVariable Long id);
+
+    @GetMapping("products/available/{id}")
+    Boolean availableOne(@PathVariable Long id);
 }

@@ -107,4 +107,8 @@ public class ProductServiceFacade {
     public Boolean existOne(Long id) {
         return productService.existOne(id);
     }
+
+    public Boolean availableOne(Long id) {
+        return productService.availableOne(id);
+    }
 }

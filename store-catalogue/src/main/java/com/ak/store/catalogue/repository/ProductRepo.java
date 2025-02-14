@@ -5,6 +5,7 @@ import lombok.NonNull;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,4 +26,6 @@ public interface ProductRepo extends JpaRepository<Product, Long>, ProductRepoCu
     Optional<Product> findOneWithImagesById(Long id);
 
     boolean existsById(@NonNull Long id);
+
+    boolean existsByIdAndIsAvailableIsTrue(Long id);
 }

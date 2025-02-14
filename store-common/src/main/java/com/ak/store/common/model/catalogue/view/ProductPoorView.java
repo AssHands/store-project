@@ -36,6 +36,5 @@ public class ProductPoorView {
 
     private Boolean isAvailable;
 
-    //todo: test image list
     private List<ImageView> images = new ArrayList<>();
 }

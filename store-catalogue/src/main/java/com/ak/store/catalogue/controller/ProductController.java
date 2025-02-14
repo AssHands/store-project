@@ -47,6 +47,11 @@ public class ProductController {
         return productServiceFacade.existOne(id);
     }
 
+    @GetMapping("available/{id}")
+    public Boolean availableOne(@PathVariable Long id) {
+        return productServiceFacade.availableOne(id);
+    }
+
     @DeleteMapping("{id}")
     public void deleteOne(@PathVariable Long id) {
         productServiceFacade.deleteOne(id);

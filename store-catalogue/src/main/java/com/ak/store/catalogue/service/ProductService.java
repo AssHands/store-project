@@ -171,4 +171,8 @@ public class ProductService {
     public Boolean existOne(Long id) {
         return productRepo.existsById(id);
     }
+
+    public Boolean availableOne(Long id) {
+        return productRepo.existsByIdAndIsAvailableIsTrue(id);
+    }
 }

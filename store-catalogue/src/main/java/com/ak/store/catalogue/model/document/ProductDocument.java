@@ -1,7 +1,8 @@
 package com.ak.store.catalogue.model.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductDocument {
     private Long id;
 
@@ -20,22 +22,19 @@ public class ProductDocument {
 
     private String description;
 
-    @JsonProperty("current_price")
     private int currentPrice;
 
-    @JsonProperty("discount_percentage")
     private int discountPercentage;
 
-    @JsonProperty("category_id")
     private Long categoryId;
 
-    @JsonProperty("amount_sales")
     private int amountSales;
 
-    @JsonProperty("amount_reviews")
     private int amountReviews;
 
     private float grade;
+
+    private Boolean isAvailable;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<ProductCharacteristicDocument> characteristics;
