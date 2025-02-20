@@ -38,6 +38,19 @@ public class ElasticService {
     private final ElasticsearchClient esClient;
     private final CharacteristicRepo characteristicRepo;
 
+    public void restoreOneProduct(ProductDocument productDocument) {
+        var request = IndexRequest.of(i -> i
+                .index("product")
+                .id(productDocument.getId().toString())
+                .document(productDocument));
+
+        try {
+            esClient.index(request);
+        } catch (Exception e) {
+            throw new RuntimeException("index document error");
+        }
+    }
+
     public void deleteOneProduct(Long id) {
         var request = DeleteRequest.of(d -> d
                 .index("product")

@@ -15,4 +15,6 @@ public interface CartRepo extends JpaRepository<Cart, Long> {
 
     @Query("SELECT c FROM Cart c WHERE c.consumer.id = :id AND c.productId = :productId")
     Optional<Cart> findByConsumerIdAndProductId(Long id, Long productId);
+
+    void deleteAllByProductId(Long productId);
 }

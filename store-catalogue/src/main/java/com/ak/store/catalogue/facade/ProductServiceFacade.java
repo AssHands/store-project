@@ -1,11 +1,14 @@
 package com.ak.store.catalogue.facade;
 
+import com.ak.store.catalogue.util.SagaBuilder;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.catalogue.integration.ElasticService;
 import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.util.CatalogueMapper;
+import com.ak.store.common.event.ProductDeletedEvent;
+import com.ak.store.common.event.ProductEvent;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.model.catalogue.dto.ImageDTO;
@@ -16,6 +19,7 @@ import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.SearchProductRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,11 +32,19 @@ public class ProductServiceFacade {
     private final S3Service s3Service;
     private final CatalogueMapper catalogueMapper;
 
+    private final KafkaTemplate<String, ProductEvent> kafkaProductTemplate;
+
     @Transactional
     public Long saveOrUpdateAllImage(ImageDTO imageDTO) {
         var processedProductImages = productService.saveOrUpdateAllImage(imageDTO);
-        s3Service.putAllImage(processedProductImages.getImagesForAdd());
-        s3Service.deleteAllImage(processedProductImages.getImageKeysForDelete());
+
+        new SagaBuilder()
+                .step(() -> s3Service.putAllImage(processedProductImages.getImagesForAdd()))
+                .compensate(() -> s3Service.compensatePutAllImage(processedProductImages.getImagesForAdd().keySet()))
+                .step(() -> s3Service.deleteAllImage(processedProductImages.getImageKeysForDelete()))
+                .compensate(() -> s3Service.compensateDeleteAllImage(processedProductImages.getImageKeysForDelete()))
+                .execute();
+
         return imageDTO.getProductId();
     }
 
@@ -40,7 +52,7 @@ public class ProductServiceFacade {
         var elasticSearchResult = elasticService.findAllProduct(searchProductRequest);
 
         ProductSearchResponse productSearchResponse = new ProductSearchResponse();
-        if(elasticSearchResult.getIds().isEmpty()) {
+        if (elasticSearchResult.getIds().isEmpty()) {
             return productSearchResponse;
         }
 
@@ -85,10 +97,17 @@ public class ProductServiceFacade {
     @Transactional
     public void deleteOne(Long id) {
         Product deletedProduct = productService.deleteOne(id);
-        elasticService.deleteOneProduct(id);
-        s3Service.deleteAllImage(deletedProduct.getImages().stream()
+        List<String> imageKeyList = deletedProduct.getImages().stream()
                 .map(ProductImage::getImageKey)
-                .toList());
+                .toList();
+
+        new SagaBuilder()
+                .step(() -> elasticService.deleteOneProduct(id))
+                .compensate(() -> elasticService.restoreOneProduct(catalogueMapper.mapToProductDocument(deletedProduct)))
+                .step(() -> s3Service.deleteAllImage(imageKeyList))
+                .compensate(() -> s3Service.compensateDeleteAllImage(imageKeyList))
+                .step(() -> kafkaProductTemplate.send("product-deleted-events", new ProductDeletedEvent(id)))
+                .execute();
     }
 
     @Transactional

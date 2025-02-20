@@ -35,8 +35,6 @@ public class CartServiceFacade {
         for(var cart : cartList) {
             CartView cartView = consumerMapper.mapToCartView(cart);
             cartView.setProduct(map.get(cart.getProductId()).orElse(null));
-            //todo: если продукт не найден, то он пропускается.
-            // при удалении продукта надо отправлять через mq сообщение для удаления этого продукта у всех пользователей в корзине
             if(cartView.getProduct() == null) continue;
 
             cartViewList.add(cartView);
@@ -58,5 +56,10 @@ public class CartServiceFacade {
     @Transactional
     public void createOne(Long id, Long productId) {
         cartService.createOne(id, productId);
+    }
+
+    @Transactional
+    public void deleteAllByProductId(Long productId) {
+        cartService.deleteAllByProductId(productId);
     }
 }

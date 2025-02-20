@@ -47,4 +47,8 @@ public class CartService {
                 .amount(1)
                 .build());
     }
+
+    public void deleteAllByProductId(Long productId) {
+        cartRepo.deleteAllByProductId(productId);
+    }
 }
