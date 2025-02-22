@@ -19,4 +19,6 @@ public interface ReviewRepo extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r WHERE r.productId = :productId AND r.consumer.id = :consumerId")
     Optional<Review> findOneByProductIdAndConsumerId(Long productId, Long consumerId);
+
+    void deleteAllByProductId(Long productId);
 }

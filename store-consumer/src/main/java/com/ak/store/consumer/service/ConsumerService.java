@@ -7,6 +7,8 @@ import com.ak.store.consumer.util.ConsumerMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ConsumerService {
@@ -43,5 +45,9 @@ public class ConsumerService {
         if(consumerDTO.getPhone() != null) {
             consumer.setPhone(consumerDTO.getPhone());
         }
+    }
+
+    public Boolean existOne(Long id) {
+        return consumerRepo.existsOneById(id);
     }
 }

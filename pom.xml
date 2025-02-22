@@ -20,5 +20,7 @@
 		<module>store-common</module>
         <module>store-catalogue</module>
         <module>store-consumer</module>
+        <module>store-order</module>
+        <module>store-warehouse</module>
     </modules>
 </project>

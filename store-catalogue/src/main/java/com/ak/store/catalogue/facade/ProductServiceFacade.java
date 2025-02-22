@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.facade;
 
+import com.ak.store.catalogue.kafka.ProductProducerKafka;
 import com.ak.store.catalogue.util.SagaBuilder;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductImage;
@@ -7,8 +8,7 @@ import com.ak.store.catalogue.integration.ElasticService;
 import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.common.event.ProductDeletedEvent;
-import com.ak.store.common.event.ProductEvent;
+import com.ak.store.common.event.catalogue.ProductDeletedEvent;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.model.catalogue.dto.ImageDTO;
@@ -19,7 +19,6 @@ import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.SearchProductRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +31,7 @@ public class ProductServiceFacade {
     private final S3Service s3Service;
     private final CatalogueMapper catalogueMapper;
 
-    private final KafkaTemplate<String, ProductEvent> kafkaProductTemplate;
+    private final ProductProducerKafka productProducerKafka;
 
     @Transactional
     public Long saveOrUpdateAllImage(ImageDTO imageDTO) {
@@ -106,7 +105,7 @@ public class ProductServiceFacade {
                 .compensate(() -> elasticService.restoreOneProduct(catalogueMapper.mapToProductDocument(deletedProduct)))
                 .step(() -> s3Service.deleteAllImage(imageKeyList))
                 .compensate(() -> s3Service.compensateDeleteAllImage(imageKeyList))
-                .step(() -> kafkaProductTemplate.send("product-deleted-events", new ProductDeletedEvent(id)))
+                .step(() -> productProducerKafka.send(new ProductDeletedEvent(id)))
                 .execute();
     }
 
@@ -129,5 +128,9 @@ public class ProductServiceFacade {
 
     public Boolean availableOne(Long id) {
         return productService.availableOne(id);
+    }
+
+    public Boolean availableAll(List<Long> ids) {
+        return productService.availableAll(ids);
     }
 }

@@ -63,4 +63,8 @@ public class ReviewService {
             review.setGrade(reviewDTO.getGrade());
         }
     }
+
+    public void deleteAllByProductId(Long productId) {
+        reviewRepo.deleteAllByProductId(productId);
+    }
 }

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ConsumerRepo extends JpaRepository<Consumer, Long> {
+    boolean existsOneById(Long id);
 }

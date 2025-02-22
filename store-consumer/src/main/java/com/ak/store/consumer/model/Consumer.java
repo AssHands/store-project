@@ -26,12 +26,16 @@ public class Consumer {
 
     private String avatarKey;
 
+
+    @Builder.Default
     @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Cart> carts = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentReview> commentReviews = new ArrayList<>();
 }

@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ConsumerPoorView {
+    private Long id;
+
     private String name;
 
     private String avatarKey;

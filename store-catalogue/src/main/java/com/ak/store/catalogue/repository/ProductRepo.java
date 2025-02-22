@@ -27,5 +27,7 @@ public interface ProductRepo extends JpaRepository<Product, Long>, ProductRepoCu
 
     boolean existsById(@NonNull Long id);
 
-    boolean existsByIdAndIsAvailableIsTrue(Long id);
+    boolean existsOneByIdAndIsAvailableIsTrue(Long id);
+
+    boolean existsAllByIdInAndIsAvailableIsTrue(List<Long> id);
 }

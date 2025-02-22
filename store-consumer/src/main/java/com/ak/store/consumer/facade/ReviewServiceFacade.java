@@ -23,17 +23,30 @@ public class ReviewServiceFacade {
     }
 
     @Transactional
+    //todo: отправлять сообщение о новой оценки в redis для аналитики
     public Long createOne(Long productId, Long consumerId, ReviewDTO reviewDTO) {
-        return reviewService.createOne(productId, consumerId, reviewDTO).getId();
+        Long reviewId = reviewService.createOne(productId, consumerId, reviewDTO).getId();
+
+        return reviewId;
     }
 
     @Transactional
+    //todo: отправлять сообщение о новой оценки в redis для аналитики
     public Long updateOne(Long productId, Long consumerId, ReviewDTO reviewDTO) {
-        return reviewService.updateOne(productId, consumerId, reviewDTO).getId();
+        Long reviewId = reviewService.updateOne(productId, consumerId, reviewDTO).getId();
+
+        return reviewId;
     }
 
     @Transactional
+    //todo: отправлять сообщение о удалении оценки в redis для аналитики
     public void deleteOne(Long productId, Long consumerId) {
         reviewService.deleteOne(productId, consumerId);
     }
+
+    @Transactional
+    public void deleteAllByProductId(Long productId) {
+        reviewService.deleteAllByProductId(productId);
+    }
+
 }

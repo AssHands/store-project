@@ -54,6 +54,14 @@ services:
     ports:
       - 5431:5432
 
+  db-order:
+    image: postgres:17.0-alpine
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+    ports:
+      - 5432:5432
+
   adminer:
     image: adminer
     restart: always

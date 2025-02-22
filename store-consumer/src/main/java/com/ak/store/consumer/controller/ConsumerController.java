@@ -1,11 +1,14 @@
 package com.ak.store.consumer.controller;
 
+import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.consumer.dto.ConsumerDTO;
 import com.ak.store.common.validationGroup.Create;
 import com.ak.store.consumer.facade.ConsumerServiceFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,5 +34,10 @@ public class ConsumerController {
     @PatchMapping("{id}")
     public Long updateOne(@PathVariable Long id, @RequestBody ConsumerDTO consumerDTO) {
         return consumerServiceFacade.updateOne(id, consumerDTO);
+    }
+
+    @GetMapping("exist/{id}")
+    public Boolean existOne(@PathVariable Long id) {
+        return consumerServiceFacade.existOne(id);
     }
 }

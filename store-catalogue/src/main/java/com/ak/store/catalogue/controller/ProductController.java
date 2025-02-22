@@ -47,6 +47,11 @@ public class ProductController {
         return productServiceFacade.existOne(id);
     }
 
+    @PostMapping("available")
+    public Boolean availableAll(@RequestBody List<Long> ids) {
+        return productServiceFacade.availableAll(ids);
+    }
+
     @GetMapping("available/{id}")
     public Boolean availableOne(@PathVariable Long id) {
         return productServiceFacade.availableOne(id);

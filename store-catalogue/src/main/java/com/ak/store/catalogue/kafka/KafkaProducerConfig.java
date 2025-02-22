@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.kafka;
 
-import com.ak.store.common.event.ProductEvent;
+import com.ak.store.common.event.catalogue.ProductEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;

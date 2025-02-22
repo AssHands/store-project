@@ -173,6 +173,10 @@ public class ProductService {
     }
 
     public Boolean availableOne(Long id) {
-        return productRepo.existsByIdAndIsAvailableIsTrue(id);
+        return productRepo.existsOneByIdAndIsAvailableIsTrue(id);
+    }
+
+    public Boolean availableAll(List<Long> ids) {
+        return productRepo.existsAllByIdInAndIsAvailableIsTrue(ids);
     }
 }
