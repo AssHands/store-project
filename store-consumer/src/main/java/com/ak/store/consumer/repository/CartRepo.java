@@ -1,6 +1,6 @@
 package com.ak.store.consumer.repository;
 
-import com.ak.store.consumer.model.Cart;
+import com.ak.store.consumer.model.entity.Cart;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

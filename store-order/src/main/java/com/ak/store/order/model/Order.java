@@ -21,6 +21,7 @@ public class Order {
 
     private Integer totalPrice;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderProduct> products = new ArrayList<>();
 }

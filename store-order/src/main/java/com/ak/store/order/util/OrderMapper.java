@@ -2,8 +2,10 @@ package com.ak.store.order.util;
 
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.order.dto.OrderDTO;
+import com.ak.store.common.model.order.dto.OrderProductDTO;
 import com.ak.store.common.model.order.view.OrderView;
 import com.ak.store.order.model.Order;
+import com.ak.store.order.model.OrderProduct;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -14,17 +16,15 @@ public class OrderMapper {
     private final ModelMapper modelMapper;
 
     public OrderView mapToOrderView(Order order) {
-        var orderView = modelMapper.map(order, OrderView.class);
-        for (int i = 0; i < order.getProducts().size(); i++) {
-            orderView.getProducts().get(i).setProductPoorView(ProductPoorView.builder()
-                    .id(order.getProducts().get(i).getProductId())
-                    .build());
-        }
-
-        return orderView;
+        return modelMapper.map(order, OrderView.class);
     }
 
     public Order mapToOrder(OrderDTO orderDTO) {
-        return
+        var order = modelMapper.map(orderDTO, Order.class);
+        for (var orderProduct : order.getProducts()) {
+            orderProduct.setId(null);
+        }
+
+        return order;
     }
 }

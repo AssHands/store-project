@@ -1,4 +1,4 @@
-package com.ak.store.consumer.model;
+package com.ak.store.consumer.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,6 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 @ToString(exclude = { "consumer" })
 @EqualsAndHashCode(exclude = { "consumer" })
 @Entity
@@ -20,6 +21,7 @@ public class Review {
     @ManyToOne(fetch = FetchType.LAZY)
     private Consumer consumer;
 
+    @Builder.Default
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentReview> comments = new ArrayList<>();
 

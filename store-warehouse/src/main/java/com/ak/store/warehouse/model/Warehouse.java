@@ -1,4 +1,4 @@
-package com.ak.store.consumer.model;
+package com.ak.store.warehouse.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,17 +6,12 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@ToString(exclude = { "consumer" })
-@EqualsAndHashCode(exclude = { "consumer" })
 @Entity
-public class Cart {
+@Builder
+public class Warehouse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Consumer consumer;
 
     private Long productId;
 

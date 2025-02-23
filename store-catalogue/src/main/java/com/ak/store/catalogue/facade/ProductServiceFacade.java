@@ -10,6 +10,7 @@ import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.util.CatalogueMapper;
 import com.ak.store.common.event.catalogue.ProductDeletedEvent;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
+import com.ak.store.common.model.catalogue.view.ProductPrice;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.model.catalogue.dto.ImageDTO;
 import com.ak.store.common.payload.catalogue.ProductWritePayload;
@@ -132,5 +133,11 @@ public class ProductServiceFacade {
 
     public Boolean availableAll(List<Long> ids) {
         return productService.availableAll(ids);
+    }
+
+    public List<ProductPrice> getAllPrice(List<Long> ids) {
+        return productService.findAll(ids).stream()
+                .map(catalogueMapper::mapToProductPrice)
+                .toList();
     }
 }

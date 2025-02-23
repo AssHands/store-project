@@ -18,5 +18,5 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderDTO {
-    private List<Long> productIds = new ArrayList<>();
+    private List<OrderProductDTO> products = new ArrayList<>();
 }

@@ -1,7 +1,8 @@
 package com.ak.store.consumer.service;
 
-import com.ak.store.consumer.model.Cart;
-import com.ak.store.consumer.model.Consumer;
+import com.ak.store.consumer.feign.WarehouseFeign;
+import com.ak.store.consumer.model.entity.Cart;
+import com.ak.store.consumer.model.entity.Consumer;
 import com.ak.store.consumer.repository.CartRepo;
 import com.ak.store.consumer.validator.business.CartBusinessValidator;
 import jakarta.transaction.Transactional;
@@ -15,6 +16,7 @@ import java.util.*;
 public class CartService {
     private final CartRepo cartRepo;
     private final CartBusinessValidator cartBusinessValidator;
+    private final WarehouseFeign warehouseFeign;
 
     public List<Cart> findAllByConsumerId(Long id) {
         return cartRepo.findAllByConsumerId(id);
@@ -25,13 +27,21 @@ public class CartService {
                 .orElseThrow(() -> new RuntimeException("no cart found"));
     }
 
-
-    //todo: проверять существует ли такое кол-во продуктов у миркосервиса склада
-    public void setProductAmount(Long id, Long productId, int amount) {
-        cartBusinessValidator.validateSetAmountProducts(id, productId);
+    public Boolean setProductAmount(Long id, Long productId, int amount) {
+        cartBusinessValidator.validateSetProductAmount(id, productId);
         Cart cart = findOneByConsumerIdAndProductId(id, productId);
-        cart.setAmount(amount);
+        int maxAmount = warehouseFeign.getAmount(productId);
+        boolean isMax = false;
+
+        if(amount > maxAmount) {
+            cart.setAmount(maxAmount);
+            isMax = true;
+        } else {
+            cart.setAmount(amount);
+        }
+
         cartRepo.save(cart);
+        return isMax;
     }
 
     public void deleteOne(Long id, Long productId) {

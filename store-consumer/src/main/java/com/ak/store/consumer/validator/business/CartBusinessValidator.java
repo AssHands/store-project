@@ -13,21 +13,21 @@ public class CartBusinessValidator {
 
     public void validateCreation(Long consumerId, Long productId) {
         if(!catalogueFeign.availableOne(productId)) {
-            throw new RuntimeException("product with id=%d is not exists".formatted(productId));
+            throw new RuntimeException("product with id=%d is not exist".formatted(productId));
         }
 
-        if(isProductExist(consumerId, productId)) {
+        if(isProductExistInCart(consumerId, productId)) {
             throw new RuntimeException("product is already in cart");
         }
     }
 
-    public void validateSetAmountProducts(Long consumerId, Long productId) {
-        if(!isProductExist(consumerId, productId)) {
+    public void validateSetProductAmount(Long consumerId, Long productId) {
+        if(!isProductExistInCart(consumerId, productId)) {
             throw new RuntimeException("product is not in cart");
         }
     }
 
-    private boolean isProductExist(Long consumerId, Long productId) {
+    private boolean isProductExistInCart(Long consumerId, Long productId) {
         return cartRepo.findByConsumerIdAndProductId(consumerId, productId).isPresent();
     }
 }

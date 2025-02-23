@@ -161,4 +161,8 @@ public class CatalogueMapper {
         textValue.setCharacteristic(Characteristic.builder().id(id).build());
         return textValue;
     }
+
+    public ProductPrice mapToProductPrice(Product product) {
+        return new ProductPrice(product.getId(), product.getCurrentPrice());
+    }
 }

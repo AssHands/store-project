@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CartView {
-    private ProductPoorView product;
+    private Long productId;
     private Integer amount;
 }

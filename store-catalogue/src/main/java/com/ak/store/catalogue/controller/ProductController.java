@@ -2,6 +2,7 @@ package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.ProductServiceFacade;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
+import com.ak.store.common.model.catalogue.view.ProductPrice;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.model.catalogue.dto.ImageDTO;
 import com.ak.store.common.payload.catalogue.ProductWritePayload;
@@ -40,6 +41,11 @@ public class ProductController {
     @PostMapping("poor")
     public List<ProductPoorView> getAllPoor(@RequestBody List<Long> ids) {
         return productServiceFacade.findAllPoor(ids);
+    }
+
+    @PostMapping("price")
+    public List<ProductPrice> getAllPrice(@RequestBody List<Long> ids) {
+        return productServiceFacade.getAllPrice(ids);
     }
 
     @GetMapping("exist/{id}")

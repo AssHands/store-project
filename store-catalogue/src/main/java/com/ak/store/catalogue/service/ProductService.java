@@ -177,6 +177,10 @@ public class ProductService {
     }
 
     public Boolean availableAll(List<Long> ids) {
-        return productRepo.existsAllByIdInAndIsAvailableIsTrue(ids);
+        return productRepo.countByIdInAndIsAvailableIsTrue(ids) == ids.size();
+    }
+
+    public List<Product> findAll(List<Long> ids) {
+        return productRepo.findAllById(ids);
     }
 }

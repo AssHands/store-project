@@ -1,14 +1,21 @@
 package com.ak.store.order.service;
 
+import com.ak.store.common.model.catalogue.view.ProductPrice;
 import com.ak.store.common.model.order.dto.OrderDTO;
+import com.ak.store.common.model.order.dto.OrderProductDTO;
+import com.ak.store.order.feign.CatalogueFeign;
+import com.ak.store.order.feign.WarehouseFeign;
 import com.ak.store.order.model.Order;
+import com.ak.store.order.model.OrderProduct;
 import com.ak.store.order.repository.OrderRepo;
 import com.ak.store.order.util.OrderMapper;
 import com.ak.store.order.validator.business.OrderBusinessValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,14 +23,43 @@ public class OrderService {
     private final OrderRepo orderRepo;
     private final OrderBusinessValidator orderBusinessValidator;
     private final OrderMapper orderMapper;
+    private final CatalogueFeign catalogueFeign;
+    private final WarehouseFeign warehouseFeign;
 
     public List<Order> findAllByConsumerId(Long consumerId) {
         return orderRepo.findAllWithProductsByConsumerId(consumerId);
     }
 
     public void createOne(Long consumerId, OrderDTO orderDTO) {
-        orderBusinessValidator.validateCreation(consumerId, orderDTO.getProductIds());
-        Order
-        orderRepo.save(orderMapper.mapToOrder(orderDTO));
+        orderBusinessValidator.validateCreation(orderDTO);
+
+        var productIds = orderDTO.getProducts().stream()
+                .map(OrderProductDTO::getProductId)
+                .toList();
+
+        var productPriceMap = catalogueFeign.getAllPrice(productIds).stream()
+                .collect(Collectors.toMap(ProductPrice::getId, ProductPrice::getPrice));
+
+        var order = Order.builder()
+                .consumerId(consumerId)
+                .build();
+
+        int totalPrice = 0;
+        List<OrderProduct> orderProductList = new ArrayList<>();
+        for (var orderProductDTO : orderDTO.getProducts()) {
+            totalPrice += orderProductDTO.getAmount() * productPriceMap.get(orderProductDTO.getProductId());
+
+            orderProductList.add(OrderProduct.builder()
+                    .productId(orderProductDTO.getProductId())
+                    .amount(orderProductDTO.getAmount())
+                    .pricePerOne(productPriceMap.get(orderProductDTO.getProductId()))
+                    .order(order)
+                    .build());
+        }
+
+        order.setTotalPrice(totalPrice);
+        order.setProducts(orderProductList);
+
+        orderRepo.save(order);
     }
 }

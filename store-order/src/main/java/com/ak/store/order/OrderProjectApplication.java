@@ -1,5 +1,6 @@
 package com.ak.store.order;
 
+import feign.okhttp.OkHttpClient;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
@@ -25,6 +26,11 @@ public class OrderProjectApplication {
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
+    }
+
+    @Bean
+    public OkHttpClient client() {
+        return new OkHttpClient();
     }
 
     @Bean

@@ -3,10 +3,14 @@ package com.ak.store.consumer.util;
 import com.ak.store.common.model.consumer.dto.ReviewDTO;
 import com.ak.store.common.model.consumer.view.CartView;
 import com.ak.store.common.model.consumer.dto.ConsumerDTO;
+import com.ak.store.common.model.consumer.view.CommentReviewView;
+import com.ak.store.common.model.consumer.view.ConsumerPoorView;
 import com.ak.store.common.model.consumer.view.ReviewView;
-import com.ak.store.consumer.model.Cart;
-import com.ak.store.consumer.model.Consumer;
-import com.ak.store.consumer.model.Review;
+import com.ak.store.consumer.model.entity.Cart;
+import com.ak.store.consumer.model.entity.CommentReview;
+import com.ak.store.consumer.model.entity.Consumer;
+import com.ak.store.consumer.model.entity.Review;
+import com.ak.store.consumer.model.projection.ReviewWithCommentCountProjection;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,7 +32,6 @@ public class ConsumerMapper {
         return modelMapper.map(consumer, ConsumerDTO.class);
     }
 
-    //todo: он зачем то создает объект ProductView в CartView, который я затем перезаписываю. исправить
     public CartView mapToCartView(Cart cart) {
         return modelMapper.map(cart, CartView.class);
     }
@@ -42,5 +45,15 @@ public class ConsumerMapper {
 
     public ReviewView mapToReviewView(Review review) {
         return modelMapper.map(review, ReviewView.class);
+    }
+
+    public ReviewView mapToReviewView(ReviewWithCommentCountProjection reviewProjection) {
+        var reviewView = modelMapper.map(reviewProjection.getReview(), ReviewView.class);
+        reviewView.setAmountComment(reviewProjection.getAmountComment());
+        return reviewView;
+    }
+
+    public CommentReviewView mapToCommentReviewView(CommentReview commentReview) {
+        return modelMapper.map(commentReview, CommentReviewView.class);
     }
 }

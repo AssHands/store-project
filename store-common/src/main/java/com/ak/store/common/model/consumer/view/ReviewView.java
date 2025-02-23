@@ -23,7 +23,7 @@ public class ReviewView {
 
     private ConsumerPoorView consumer;
 
-    private List<CommentReviewView> comments = new ArrayList<>();
+    private int amountComment;
 
     private Long productId;
 

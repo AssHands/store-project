@@ -1,0 +1,23 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: root
+    password: root
+
+  jpa:
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        #logs
+        format_sql: true
+        generate_statistics: true
+
+        #batch
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true

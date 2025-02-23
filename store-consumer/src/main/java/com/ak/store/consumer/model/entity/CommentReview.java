@@ -1,4 +1,4 @@
-package com.ak.store.consumer.model;
+package com.ak.store.consumer.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 @ToString(exclude = { "consumer", "review" })
 @EqualsAndHashCode(exclude = { "consumer", "review" })
 @Entity

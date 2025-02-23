@@ -19,9 +19,11 @@ public class CartController {
         return cartServiceFacade.findOne(id);
     }
 
+    //TODO: CHECK
+    //возвращает было ли значение amount максимально возможным
     @PatchMapping("{productId}")
-    public void setProductAmount(@PathVariable Long id, @PathVariable Long productId, @RequestParam @Positive int amount) {
-        cartServiceFacade.setProductAmount(id, productId, amount);
+    public Boolean setProductAmount(@PathVariable Long id, @PathVariable Long productId, @RequestParam @Positive int amount) {
+        return cartServiceFacade.setProductAmount(id, productId, amount);
     }
 
     @DeleteMapping("{productId}")

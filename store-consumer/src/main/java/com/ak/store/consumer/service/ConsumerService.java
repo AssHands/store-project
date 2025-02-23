@@ -1,13 +1,11 @@
 package com.ak.store.consumer.service;
 
 import com.ak.store.common.model.consumer.dto.ConsumerDTO;
-import com.ak.store.consumer.model.Consumer;
+import com.ak.store.consumer.model.entity.Consumer;
 import com.ak.store.consumer.repository.ConsumerRepo;
 import com.ak.store.consumer.util.ConsumerMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

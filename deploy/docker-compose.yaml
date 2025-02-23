@@ -62,6 +62,14 @@ services:
     ports:
       - 5432:5432
 
+  db-warehouse:
+    image: postgres:17.0-alpine
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+    ports:
+      - 5433:5432
+
   adminer:
     image: adminer
     restart: always
