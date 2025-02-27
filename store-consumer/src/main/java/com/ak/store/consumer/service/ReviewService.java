@@ -11,9 +11,11 @@ import com.ak.store.consumer.repository.ReviewRepo;
 import com.ak.store.consumer.util.ConsumerMapper;
 import com.ak.store.consumer.validator.business.ReviewBusinessValidator;
 import lombok.RequiredArgsConstructor;
+import org.glassfish.jaxb.core.v2.TODO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,21 +29,21 @@ public class ReviewService {
         return reviewRepo.findAllWithConsumerAndCommentCountByProductId(productId);
     }
 
-    public Review findOneWithComments(Long productId, Long consumerId) {
+    public Review findOneWithComments(Long productId, String consumerId) {
         return reviewRepo.findOneWithCommentsByProductIdAndConsumerId(productId, consumerId)
                 .orElseThrow(() -> new RuntimeException("no review found"));
     }
 
-    public Review findOne(Long productId, Long consumerId) {
+    public Review findOne(Long productId, String consumerId) {
         return reviewRepo.findOneByProductIdAndConsumerId(productId, consumerId)
                 .orElseThrow(() -> new RuntimeException("no review found"));
     }
 
-    public void deleteOne(Long productId, Long consumerId) {
+    public void deleteOne(Long productId, String consumerId) {
         reviewRepo.delete(findOne(productId, consumerId));
     }
 
-    public Review createOne(Long productId, Long consumerId, ReviewDTO reviewDTO) {
+    public Review createOne(Long productId, String consumerId, ReviewDTO reviewDTO) {
         reviewBusinessValidator.validateCreation(productId, consumerId);
         Review review = consumerMapper.mapToReview(reviewDTO, productId, consumerId);
         review.setAmountDislikes(0);
@@ -49,7 +51,7 @@ public class ReviewService {
         return reviewRepo.save(review);
     }
 
-    public Review updateOne(Long productId, Long consumerId, ReviewDTO reviewDTO) {
+    public Review updateOne(Long productId, String consumerId, ReviewDTO reviewDTO) {
         Review review = findOne(productId, consumerId);
         updateReview(review, reviewDTO);
         return reviewRepo.save(review);
@@ -74,14 +76,14 @@ public class ReviewService {
         reviewRepo.deleteAllByProductId(productId);
     }
 
-    public List<CommentReview> findAllCommentById(Long id) {
-        return commentReviewRepo.findAllByReviewId(id);
+    public List<CommentReview> findAllCommentById(Long reviewId) {
+        return commentReviewRepo.findAllByReviewId(reviewId);
     }
 
-    public CommentReview createOneComment(Long consumerId, Long reviewId, CommentReviewDTO commentReviewDTO) {
+    public CommentReview createOneComment(String consumerId, Long reviewId, CommentReviewDTO commentReviewDTO) {
         var commentReview = CommentReview.builder()
                 .review(Review.builder().id(reviewId).build())
-                .consumer(Consumer.builder().id(consumerId).build())
+                .consumer(Consumer.builder().id(UUID.fromString(consumerId)).build())
                 .text(commentReviewDTO.getText())
                 .amountDislikes(0)
                 .amountLikes(0)

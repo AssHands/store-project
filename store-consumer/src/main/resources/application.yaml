@@ -54,3 +54,18 @@ spring:
         delivery.timeout.ms: 20000
         enable.idempotence: true
         max.in.flight.requests.per.connection: 5
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8070/realms/store-realm/protocol/openid-connect/certs
+
+keycloak:
+  auth-server-url: http://localhost:8070/
+  resource: store-consumer-manage-client
+  realm: store-realm
+  ssl-required: external
+  use-resource-role-mapping: true
+  credentials:
+    secret: 07B3LalGkjpaDZdIXAcPhnmOsphPCRIR

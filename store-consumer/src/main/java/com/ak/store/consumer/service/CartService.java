@@ -7,6 +7,7 @@ import com.ak.store.consumer.repository.CartRepo;
 import com.ak.store.consumer.validator.business.CartBusinessValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,18 +19,18 @@ public class CartService {
     private final CartBusinessValidator cartBusinessValidator;
     private final WarehouseFeign warehouseFeign;
 
-    public List<Cart> findAllByConsumerId(Long id) {
-        return cartRepo.findAllByConsumerId(id);
+    public List<Cart> findAllByConsumerId(String consumerId) {
+        return cartRepo.findAllByConsumerId(consumerId);
     }
 
-    public Cart findOneByConsumerIdAndProductId(Long id, Long productId) {
-        return cartRepo.findByConsumerIdAndProductId(id, productId)
+    public Cart findOneByConsumerIdAndProductId(String consumerId, Long productId) {
+        return cartRepo.findByConsumerIdAndProductId(consumerId, productId)
                 .orElseThrow(() -> new RuntimeException("no cart found"));
     }
 
-    public Boolean setProductAmount(Long id, Long productId, int amount) {
-        cartBusinessValidator.validateSetProductAmount(id, productId);
-        Cart cart = findOneByConsumerIdAndProductId(id, productId);
+    public Boolean setProductAmount(String consumerId, Long productId, int amount) {
+        cartBusinessValidator.validateSetProductAmount(consumerId, productId);
+        Cart cart = findOneByConsumerIdAndProductId(consumerId, productId);
         int maxAmount = warehouseFeign.getAmount(productId);
         boolean isMax = false;
 
@@ -44,15 +45,16 @@ public class CartService {
         return isMax;
     }
 
-    public void deleteOne(Long id, Long productId) {
-        cartRepo.delete(findOneByConsumerIdAndProductId(id, productId));
+    public void deleteOne(String consumerId, Long productId) {
+        cartRepo.delete(findOneByConsumerIdAndProductId(consumerId, productId));
     }
 
     @Transactional
-    public void createOne(Long id, Long productId) {
-        cartBusinessValidator.validateCreation(id, productId);
+    public void createOne(String consumerId, Long productId) {
+        cartBusinessValidator.validateCreation(consumerId, productId);
         cartRepo.save(Cart.builder()
-                .consumer(Consumer.builder().id(id).build())
+                //TODO
+                //.consumer(Consumer.builder().id(id).build())
                 .productId(productId)
                 .amount(1)
                 .build());

@@ -4,6 +4,7 @@ import com.ak.store.consumer.feign.CatalogueFeign;
 import com.ak.store.consumer.repository.ReviewRepo;
 import com.ak.store.consumer.service.ConsumerService;
 import lombok.RequiredArgsConstructor;
+import org.glassfish.jaxb.core.v2.TODO;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -15,15 +16,17 @@ public class ReviewBusinessValidator {
 
     private final ReviewRepo reviewRepo;
 
-    public void validateCreation(Long productId, Long customerId) {
-        consumerService.findOne(customerId);
+    public void validateCreation(Long productId, String customerId) {
+        //TODO
+        //consumerService.findOne(customerId);
         if(!catalogueFeign.existOne(productId)) {
             throw new RuntimeException("product with id=%d is not exists".formatted(productId));
         }
 
-        boolean isExist = reviewRepo.findOneByProductIdAndConsumerId(productId, customerId).isPresent();
-        if(isExist) {
-            throw new RuntimeException("this customer already has review on this product");
-        }
+        //TODO
+//        boolean isExist = reviewRepo.findOneByProductIdAndConsumerId(productId, customerId).isPresent();
+//        if(isExist) {
+//            throw new RuntimeException("this customer already has review on this product");
+//        }
     }
 }

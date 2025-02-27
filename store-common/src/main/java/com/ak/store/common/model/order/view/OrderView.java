@@ -19,7 +19,7 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderView {
     private Long id;
-    private Long consumerId;
+    private String consumerId;
     private Integer totalPrice;
     List<OrderProductView> products = new ArrayList<>();
 }

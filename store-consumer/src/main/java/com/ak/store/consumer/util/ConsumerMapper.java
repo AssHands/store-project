@@ -15,6 +15,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class ConsumerMapper {
     private final ModelMapper modelMapper;
@@ -36,10 +38,10 @@ public class ConsumerMapper {
         return modelMapper.map(cart, CartView.class);
     }
 
-    public Review mapToReview(ReviewDTO reviewDTO, Long productId, Long consumerId) {
+    public Review mapToReview(ReviewDTO reviewDTO, Long productId, String consumerId) {
         Review review = modelMapper.map(reviewDTO, Review.class);
         review.setProductId(productId);
-        review.setConsumer(Consumer.builder().id(consumerId).build());
+        review.setConsumer(Consumer.builder().id(UUID.fromString(consumerId)).build());
         return review;
     }
 
@@ -55,5 +57,9 @@ public class ConsumerMapper {
 
     public CommentReviewView mapToCommentReviewView(CommentReview commentReview) {
         return modelMapper.map(commentReview, CommentReviewView.class);
+    }
+
+    public ConsumerPoorView mapToConsumerPoorView(Consumer consumer) {
+        return modelMapper.map(consumer, ConsumerPoorView.class);
     }
 }

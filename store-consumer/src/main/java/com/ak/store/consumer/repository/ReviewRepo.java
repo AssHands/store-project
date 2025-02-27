@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface ReviewRepo extends JpaRepository<Review, Long> {
@@ -26,10 +27,10 @@ public interface ReviewRepo extends JpaRepository<Review, Long> {
     List<ReviewWithCommentCountProjection> findAllWithConsumerAndCommentCountByProductId(Long productId);
 
     @Query("SELECT r, r.comments FROM Review r JOIN r.comments WHERE r.productId = :productId AND r.consumer.id = :consumerId")
-    Optional<Review> findOneWithCommentsByProductIdAndConsumerId(Long productId, Long consumerId);
+    Optional<Review> findOneWithCommentsByProductIdAndConsumerId(Long productId, String consumerId);
 
     @Query("SELECT r FROM Review r WHERE r.productId = :productId AND r.consumer.id = :consumerId")
-    Optional<Review> findOneByProductIdAndConsumerId(Long productId, Long consumerId);
+    Optional<Review> findOneByProductIdAndConsumerId(Long productId, String consumerId);
 
     void deleteAllByProductId(Long productId);
 }

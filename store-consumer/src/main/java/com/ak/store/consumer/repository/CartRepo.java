@@ -10,11 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface CartRepo extends JpaRepository<Cart, Long> {
-    @Query("SELECT c FROM Cart c WHERE c.consumer.id = :id")
-    List<Cart> findAllByConsumerId(Long id);
+    @Query("SELECT c FROM Cart c WHERE c.consumer.id = :consumerId")
+    List<Cart> findAllByConsumerId(String consumerId);
 
-    @Query("SELECT c FROM Cart c WHERE c.consumer.id = :id AND c.productId = :productId")
-    Optional<Cart> findByConsumerIdAndProductId(Long id, Long productId);
+    @Query("SELECT c FROM Cart c WHERE c.consumer.id = :consumerId AND c.productId = :productId")
+    Optional<Cart> findByConsumerIdAndProductId(String consumerId, Long productId);
 
     void deleteAllByProductId(Long productId);
 }

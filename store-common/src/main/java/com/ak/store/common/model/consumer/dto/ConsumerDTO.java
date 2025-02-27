@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ConsumerDTO {
     private String name;
-    private String mail;
-    private String phone;
+    private String email;
+    private String password;
 }

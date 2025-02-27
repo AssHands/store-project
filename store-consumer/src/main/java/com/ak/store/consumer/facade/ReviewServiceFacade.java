@@ -4,7 +4,6 @@ import com.ak.store.common.model.consumer.dto.CommentReviewDTO;
 import com.ak.store.common.model.consumer.dto.ReviewDTO;
 import com.ak.store.common.model.consumer.view.CommentReviewView;
 import com.ak.store.common.model.consumer.view.ReviewView;
-import com.ak.store.consumer.model.entity.CommentReview;
 import com.ak.store.consumer.service.ReviewService;
 import com.ak.store.consumer.util.ConsumerMapper;
 import jakarta.transaction.Transactional;
@@ -25,15 +24,15 @@ public class ReviewServiceFacade {
                 .toList();
     }
 
-    public List<CommentReviewView> findAllCommentById(Long id) {
-        return reviewService.findAllCommentById(id).stream()
+    public List<CommentReviewView> findAllCommentByReviewId(Long ReviewId) {
+        return reviewService.findAllCommentById(ReviewId).stream()
                 .map(consumerMapper::mapToCommentReviewView)
                 .toList();
     }
 
     @Transactional
     //todo: отправлять сообщение о новой оценки в redis для аналитики
-    public Long createOne(Long productId, Long consumerId, ReviewDTO reviewDTO) {
+    public Long createOne(Long productId, String consumerId, ReviewDTO reviewDTO) {
         Long reviewId = reviewService.createOne(productId, consumerId, reviewDTO).getId();
 
         return reviewId;
@@ -41,20 +40,20 @@ public class ReviewServiceFacade {
 
     @Transactional
     //todo: отправлять сообщение о новой оценки в redis для аналитики
-    public Long updateOne(Long productId, Long consumerId, ReviewDTO reviewDTO) {
+    public Long updateOne(Long productId, String consumerId, ReviewDTO reviewDTO) {
         Long reviewId = reviewService.updateOne(productId, consumerId, reviewDTO).getId();
 
         return reviewId;
     }
 
     @Transactional
-    public Long createOneComment(Long consumerId, Long reviewId, CommentReviewDTO commentReviewDTO) {
+    public Long createOneComment(String consumerId, Long reviewId, CommentReviewDTO commentReviewDTO) {
         return reviewService.createOneComment(consumerId, reviewId, commentReviewDTO).getId();
     }
 
     @Transactional
     //todo: отправлять сообщение о удалении оценки в redis для аналитики
-    public void deleteOne(Long productId, Long consumerId) {
+    public void deleteOne(Long productId, String consumerId) {
         reviewService.deleteOne(productId, consumerId);
     }
 
