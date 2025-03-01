@@ -66,7 +66,29 @@ public class ProductServiceFacade {
         return productSearchResponse;
     }
 
+    public ProductSearchResponse findAllBySearch(String consumerId, SearchProductRequest searchProductRequest) {
+        var elasticSearchResult = elasticService.findAllProduct(searchProductRequest);
+
+        ProductSearchResponse productSearchResponse = new ProductSearchResponse();
+        if (elasticSearchResult.getIds().isEmpty()) {
+            return productSearchResponse;
+        }
+
+        productSearchResponse.setContent(
+                productService.findAllPoor(elasticSearchResult.getIds(), searchProductRequest.getSortingType()).stream()
+                        .map(catalogueMapper::mapToProductPoorView)
+                        .toList()
+        );
+        productSearchResponse.setSearchAfter(elasticSearchResult.getSearchAfter());
+
+        return productSearchResponse;
+    }
+
     public ProductRichView findOneRich(Long id) {
+        return catalogueMapper.mapToProductRichView(productService.findOneWithAll(id));
+    }
+
+    public ProductRichView findOneRich(String consumerId, Long id) {
         return catalogueMapper.mapToProductRichView(productService.findOneWithAll(id));
     }
 

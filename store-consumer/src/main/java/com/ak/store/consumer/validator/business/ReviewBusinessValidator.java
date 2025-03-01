@@ -16,17 +16,14 @@ public class ReviewBusinessValidator {
 
     private final ReviewRepo reviewRepo;
 
-    public void validateCreation(Long productId, String customerId) {
-        //TODO
-        //consumerService.findOne(customerId);
+    public void validateCreation(Long productId, String consumerId) {
         if(!catalogueFeign.existOne(productId)) {
             throw new RuntimeException("product with id=%d is not exists".formatted(productId));
         }
 
-        //TODO
-//        boolean isExist = reviewRepo.findOneByProductIdAndConsumerId(productId, customerId).isPresent();
-//        if(isExist) {
-//            throw new RuntimeException("this customer already has review on this product");
-//        }
+        boolean isExist = reviewRepo.findOneByProductIdAndConsumerId(productId, consumerId).isPresent();
+        if(isExist) {
+            throw new RuntimeException("this customer already has review on this product");
+        }
     }
 }

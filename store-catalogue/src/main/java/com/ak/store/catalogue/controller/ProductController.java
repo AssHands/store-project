@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,8 +31,8 @@ public class ProductController {
     private final ProductServiceFacade productServiceFacade;
 
     @GetMapping("{id}/rich")
-    public ProductRichView getOneRich(@PathVariable Long id) {
-        return productServiceFacade.findOneRich(id);
+    public ProductRichView getOneRich(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long id) {
+        return productServiceFacade.findOneRich(accessToken.getSubject(), id);
     }
 
     @GetMapping("{id}/poor")
@@ -151,8 +152,9 @@ public class ProductController {
     }
 
     @PostMapping("search")
-    public ProductSearchResponse searchAllProduct(@RequestBody @Valid SearchProductRequest searchProductRequest) {
-        return productServiceFacade.findAllBySearch(searchProductRequest);
+    public ProductSearchResponse searchAllProduct(@AuthenticationPrincipal Jwt accessToken,
+                                                  @RequestBody @Valid SearchProductRequest searchProductRequest) {
+        return productServiceFacade.findAllBySearch(accessToken.getSubject(), searchProductRequest);
     }
 
     @PostMapping("search/filters")

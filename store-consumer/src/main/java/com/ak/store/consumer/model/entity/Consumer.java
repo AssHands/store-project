@@ -24,8 +24,9 @@ public class Consumer {
 
     private String password;
 
-    private String avatarKey;
+    private Boolean enabled;
 
+    private String avatarKey;
 
     @Builder.Default
     @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -38,4 +39,7 @@ public class Consumer {
     @Builder.Default
     @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentReview> commentReviews = new ArrayList<>();
+
+    @OneToOne(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private VerificationCode verificationCode;
 }

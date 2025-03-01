@@ -45,6 +45,11 @@ public class ConsumerController {
         return consumerServiceFacade.existOne(id);
     }
 
+    @PostMapping("verify")
+    public void verifyOne(@RequestParam String code) {
+        consumerServiceFacade.verifyOne(code);
+    }
+
     //-----------
 
     @GetMapping("me")
