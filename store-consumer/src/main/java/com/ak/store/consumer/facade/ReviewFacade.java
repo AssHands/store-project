@@ -14,7 +14,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ReviewServiceFacade {
+public class ReviewFacade {
     private final ReviewService reviewService;
     private final ConsumerMapper consumerMapper;
 

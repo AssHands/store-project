@@ -15,6 +15,6 @@ public interface WarehouseFeign {
     @PostMapping("warehouse/check")
     Boolean checkProductAmount(@RequestBody List<ProductCheckDTO> productCheckDTOList);
 
-    @PatchMapping("warehouse")
+    @PatchMapping("warehouse/reserve")
     void reserveAll(@RequestBody List<ReserveProductDTO> reserveProductDTOList);
 }

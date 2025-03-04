@@ -7,14 +7,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface CartRepo extends JpaRepository<Cart, Long> {
+public interface CartRepo extends JpaRepository<Cart, UUID> {
     @Query("SELECT c FROM Cart c WHERE c.consumer.id = :consumerId")
-    List<Cart> findAllByConsumerId(String consumerId);
+    List<Cart> findAllByConsumerId(UUID consumerId);
 
     @Query("SELECT c FROM Cart c WHERE c.consumer.id = :consumerId AND c.productId = :productId")
-    Optional<Cart> findByConsumerIdAndProductId(String consumerId, Long productId);
+    Optional<Cart> findByConsumerIdAndProductId(UUID consumerId, Long productId);
 
     void deleteAllByProductId(Long productId);
 }

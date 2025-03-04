@@ -2,7 +2,6 @@ package com.ak.store.consumer.facade;
 
 import com.ak.store.common.model.consumer.dto.ConsumerDTO;
 import com.ak.store.common.model.consumer.view.ConsumerPoorView;
-import com.ak.store.common.util.SagaBuilder;
 import com.ak.store.consumer.model.entity.Consumer;
 import com.ak.store.consumer.service.ConsumerService;
 import com.ak.store.consumer.service.EmailSender;
@@ -17,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Component
 @RequiredArgsConstructor
-public class ConsumerServiceFacade {
+public class ConsumerFacade {
     private final ConsumerService consumerService;
     private final ConsumerMapper consumerMapper;
     private final KeycloakService keycloakService;
@@ -31,8 +30,9 @@ public class ConsumerServiceFacade {
         try {
             id = keycloakService.createOneConsumer(consumerDTO);
             Consumer consumer = consumerService.createOne(id, consumerDTO);
-            //CompletableFuture.runAsync(() -> emailSender.sendVerificationEmail(consumer, verificationCode));
-            consumerService.makeVerificationCode(id, verificationCode);
+            consumerService.makeVerificationCode(id, verificationCode, consumer.getEmail());
+            //CompletableFuture.runAsync(() ->
+            //        emailSender.sendVerificationEmail(consumer.getEmail(), verificationCode));
         } catch (Exception e) {
             if (!id.isBlank())
                 keycloakService.deleteOneConsumer(id);
@@ -60,14 +60,26 @@ public class ConsumerServiceFacade {
         return consumerService.updateOne(id, consumerDTO).getId().toString();
     }
 
+    @Transactional
+    public String updateOneEmail(String id, String email) {
+        String verificationCode = UUID.randomUUID().toString();
+
+        consumerService.makeVerificationCode(id, verificationCode, email);
+        //CompletableFuture.runAsync(() ->
+        //        emailSender.sendVerificationEmail(email, verificationCode));
+
+        return id;
+    }
+
     public Boolean existOne(String id) {
         return consumerService.existOne(id);
     }
 
     @Transactional
     public String verifyOne(String code) {
-        String id = consumerService.verifyOne(code).getId().toString();
-        keycloakService.verifyOneConsumer(id);
+        Consumer consumer = consumerService.verifyOne(code);
+        String id = consumer.getId().toString();
+        keycloakService.verifyOneConsumer(id, consumer.getEmail());
         return id;
     }
 }

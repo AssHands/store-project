@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.0</version> <!-- do not delete or add 'spring-cloud-dependencies' -->
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

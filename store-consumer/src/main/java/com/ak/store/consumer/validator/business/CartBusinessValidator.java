@@ -5,6 +5,8 @@ import com.ak.store.consumer.repository.CartRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Component
 public class CartBusinessValidator {
@@ -28,6 +30,6 @@ public class CartBusinessValidator {
     }
 
     private boolean isProductExistInCart(String consumerId, Long productId) {
-        return cartRepo.findByConsumerIdAndProductId(consumerId, productId).isPresent();
+        return cartRepo.findByConsumerIdAndProductId(UUID.fromString(consumerId), productId).isPresent();
     }
 }

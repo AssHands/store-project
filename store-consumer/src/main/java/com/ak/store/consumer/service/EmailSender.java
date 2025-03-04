@@ -18,23 +18,22 @@ public class EmailSender {
     private final String VERIFY_URL = "http://localhost:8081/api/v1/consumer/consumers/verify?code=%s";
     private final String SUBJECT = "Please verify your registration";
     private final String CONTENT = """
-            Dear %s,<br>
             Please click the link below to verify your registration:<br>
             <h3><a href="%s" target="_self">VERIFY</a></h3>
             Thank you,<br>
             Store.
             """;
 
-    public void sendVerificationEmail(Consumer consumer, String code) {
+    public void sendVerificationEmail(String email, String verificationCode) {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
         try {
-            helper.setTo(consumer.getEmail());
+            helper.setTo(email);
             helper.setSubject(SUBJECT);
 
-            String url = VERIFY_URL.formatted(code);
-            String content = CONTENT.formatted(consumer.getName(), url);
+            String url = VERIFY_URL.formatted(verificationCode);
+            String content = CONTENT.formatted(url);
             helper.setText(content, true);
         } catch (Exception e) {
             throw new RuntimeException("error while sending email");

@@ -11,7 +11,7 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class CartServiceFacade {
+public class CartFacade {
     private final ConsumerMapper consumerMapper;
     private final CartService cartService;
 

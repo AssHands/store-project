@@ -92,9 +92,6 @@ public class KeycloakService {
     }
 
     private void updateUser(UserRepresentation user, ConsumerDTO consumerDTO) {
-        if (consumerDTO.getEmail() != null) {
-            user.setEmail(consumerDTO.getEmail());
-        }
         if (consumerDTO.getName() != null) {
             user.setFirstName(consumerDTO.getName());
         }
@@ -104,9 +101,10 @@ public class KeycloakService {
         }
     }
 
-    public void verifyOneConsumer(String consumerId) {
+    public void verifyOneConsumer(String consumerId, String email) {
         UserRepresentation user = new UserRepresentation();
         user.setEmailVerified(true);
+        user.setEmail(email);
 
         UserResource userResource = getUsersResource().get(consumerId);
         try {

@@ -32,6 +32,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/v1/consumer/consumers/verify").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/consumer/consumers/email").hasRole("CONSUMER")
                 .requestMatchers("/api/v1/consumer/consumers/me").hasRole("CONSUMER")
                 .requestMatchers("/api/v1/consumer/consumers/{id}").hasRole("MANAGER")
                 .requestMatchers(HttpMethod.POST, "/api/v1/consumer/consumers").anonymous()

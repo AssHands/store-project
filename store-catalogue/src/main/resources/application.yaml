@@ -53,3 +53,4 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8070/realms/store-realm/protocol/openid-connect/certs
+

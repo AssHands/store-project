@@ -19,12 +19,12 @@ public class WarehouseController {
         return warehouseFacade.checkProductAmount(productCheckDTOList);
     }
 
-    @PatchMapping
+    @PatchMapping("reserve")
     public void reserveAll(@RequestBody List<ReserveProductDTO> reserveProductDTOList) {
         warehouseFacade.reserveAllProduct(reserveProductDTOList);
     }
 
-    @GetMapping("{productId}")
+    @GetMapping("amount/{productId}")
     public Integer getAmount(@PathVariable Long productId) {
         return warehouseFacade.getAmount(productId);
     }

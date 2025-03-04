@@ -25,4 +25,6 @@ public class VerificationCode {
     private LocalDateTime expiresAt;
 
     private String code;
+
+    private String email;
 }

@@ -19,12 +19,16 @@ public class CartService {
     private final CartBusinessValidator cartBusinessValidator;
     private final WarehouseFeign warehouseFeign;
 
+    private UUID makeUUID(String id) {
+        return UUID.fromString(id);
+    }
+
     public List<Cart> findAllByConsumerId(String consumerId) {
-        return cartRepo.findAllByConsumerId(consumerId);
+        return cartRepo.findAllByConsumerId(makeUUID(consumerId));
     }
 
     public Cart findOneByConsumerIdAndProductId(String consumerId, Long productId) {
-        return cartRepo.findByConsumerIdAndProductId(consumerId, productId)
+        return cartRepo.findByConsumerIdAndProductId(makeUUID(consumerId), productId)
                 .orElseThrow(() -> new RuntimeException("no cart found"));
     }
 
@@ -53,8 +57,7 @@ public class CartService {
     public void createOne(String consumerId, Long productId) {
         cartBusinessValidator.validateCreation(consumerId, productId);
         cartRepo.save(Cart.builder()
-                //TODO
-                //.consumer(Consumer.builder().id(id).build())
+                .consumer(Consumer.builder().id(makeUUID(consumerId)).build())
                 .productId(productId)
                 .amount(1)
                 .build());

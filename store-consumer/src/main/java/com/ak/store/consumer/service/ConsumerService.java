@@ -47,9 +47,6 @@ public class ConsumerService {
         if (consumerDTO.getName() != null) {
             consumer.setName(consumerDTO.getName());
         }
-        if (consumerDTO.getEmail() != null) {
-            consumer.setEmail(consumerDTO.getEmail());
-        }
         if (consumerDTO.getPassword() != null) {
             consumer.setPassword(consumerDTO.getPassword());
         }
@@ -63,20 +60,27 @@ public class ConsumerService {
         Consumer consumer = consumerRepo.findOneByVerificationCode(code)
                 .orElseThrow(() -> new RuntimeException("No consumer found"));
 
+        if(consumer.getVerificationCode().getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("this verify code is expired");
+        }
+
         consumer.setEnabled(true);
+        String email = consumer.getVerificationCode().getEmail();
+        consumer.setEmail(email);
         consumer.setVerificationCode(null);
 
         return consumerRepo.save(consumer);
     }
 
-    public Consumer makeVerificationCode(String id, String verificationCode) {
-        Consumer consumer = consumerRepo.findOneWithCodeById(UUID.fromString(id))
+    public Consumer makeVerificationCode(String id, String verificationCode, String email) {
+        Consumer consumer = consumerRepo.findOneWithCodeById(makeUUID(id))
                 .orElseThrow(() -> new RuntimeException("product no found"));
 
         consumer.setVerificationCode(VerificationCode.builder()
                 .code(verificationCode)
                 .consumer(Consumer.builder().id(makeUUID(id)).build())
                 .expiresAt(LocalDateTime.now().plusDays(1L))
+                .email(email)
                 .build()
         );
 

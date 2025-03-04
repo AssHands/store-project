@@ -13,6 +13,6 @@ public interface WarehouseFeign {
     @PostMapping("warehouse/check")
     Boolean checkProductAmount(@RequestBody List<ProductCheckDTO> productCheckDTOList);
 
-    @GetMapping("warehouse/{productId}")
+    @GetMapping("warehouse/amount/{productId}")
     Integer getAmount(@PathVariable Long productId);
 }
