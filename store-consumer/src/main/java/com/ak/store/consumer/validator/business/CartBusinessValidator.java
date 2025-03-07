@@ -15,7 +15,7 @@ public class CartBusinessValidator {
 
     public void validateCreation(String consumerId, Long productId) {
         if(!catalogueFeign.availableOne(productId)) {
-            throw new RuntimeException("product with id=%d is not exist".formatted(productId));
+            throw new RuntimeException("product with id=%d is not available".formatted(productId));
         }
 
         if(isProductExistInCart(consumerId, productId)) {

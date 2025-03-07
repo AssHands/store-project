@@ -40,7 +40,7 @@ spring:
     bootstrap-servers: localhost:29092,localhost:39092
 
     consumer:
-      group-id: group
+      group-id: consumer-consumers-group
       properties:
         spring.json.trusted.packages: "com.ak.store.*"
       auto-offset-reset: earliest
@@ -64,10 +64,10 @@ spring:
       client:
         registration:
           keycloak:
+            provider: keycloak
             client-id: store-consumer-service-client
             client-secret: 7Iqf1S2bESodz36SFISi3n51xgYGoV9S
             authorization-grant-type: client_credentials
-            provider: keycloak
         provider:
           keycloak:
             token-uri: http://localhost:8070/realms/store-realm/protocol/openid-connect/token

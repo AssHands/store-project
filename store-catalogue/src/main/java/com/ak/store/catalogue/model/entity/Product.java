@@ -55,6 +55,8 @@ public class Product {
 
     private Boolean isAvailable;
 
+    private Boolean isDeleted;
+
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductCharacteristic> characteristics = new ArrayList<>();

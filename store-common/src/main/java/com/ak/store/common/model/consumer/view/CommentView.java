@@ -14,14 +14,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CommentReviewView {
+public class CommentView {
     private ConsumerPoorView consumer;
 
     private Long reviewId;
 
     private String text;
-
-    private Integer amountLikes;
-
-    private Integer amountDislikes;
 }

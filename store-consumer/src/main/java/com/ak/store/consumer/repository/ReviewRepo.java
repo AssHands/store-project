@@ -1,6 +1,5 @@
 package com.ak.store.consumer.repository;
 
-import com.ak.store.consumer.model.entity.CommentReview;
 import com.ak.store.consumer.model.entity.Review;
 import com.ak.store.consumer.model.projection.ReviewWithCommentCountProjection;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -30,7 +29,7 @@ public interface ReviewRepo extends JpaRepository<Review, Long> {
     Optional<Review> findOneWithCommentsByProductIdAndConsumerId(Long productId, String consumerId);
 
     @Query("SELECT r FROM Review r WHERE r.productId = :productId AND r.consumer.id = :consumerId")
-    Optional<Review> findOneByProductIdAndConsumerId(Long productId, String consumerId);
+    Optional<Review> findOneByProductIdAndConsumerId(Long productId, UUID consumerId);
 
     void deleteAllByProductId(Long productId);
 }

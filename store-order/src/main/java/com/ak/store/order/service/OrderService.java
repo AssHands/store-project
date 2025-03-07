@@ -22,9 +22,7 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepo orderRepo;
     private final OrderBusinessValidator orderBusinessValidator;
-    private final OrderMapper orderMapper;
     private final CatalogueFeign catalogueFeign;
-    private final WarehouseFeign warehouseFeign;
 
     public List<Order> findAllByConsumerId(Long consumerId) {
         return orderRepo.findAllWithProductsByConsumerId(consumerId);

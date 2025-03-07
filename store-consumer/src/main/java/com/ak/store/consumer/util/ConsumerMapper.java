@@ -3,11 +3,11 @@ package com.ak.store.consumer.util;
 import com.ak.store.common.model.consumer.dto.ReviewDTO;
 import com.ak.store.common.model.consumer.view.CartView;
 import com.ak.store.common.model.consumer.dto.ConsumerDTO;
-import com.ak.store.common.model.consumer.view.CommentReviewView;
+import com.ak.store.common.model.consumer.view.CommentView;
 import com.ak.store.common.model.consumer.view.ConsumerPoorView;
 import com.ak.store.common.model.consumer.view.ReviewView;
 import com.ak.store.consumer.model.entity.Cart;
-import com.ak.store.consumer.model.entity.CommentReview;
+import com.ak.store.consumer.model.entity.Comment;
 import com.ak.store.consumer.model.entity.Consumer;
 import com.ak.store.consumer.model.entity.Review;
 import com.ak.store.consumer.model.projection.ReviewWithCommentCountProjection;
@@ -55,8 +55,8 @@ public class ConsumerMapper {
         return reviewView;
     }
 
-    public CommentReviewView mapToCommentReviewView(CommentReview commentReview) {
-        return modelMapper.map(commentReview, CommentReviewView.class);
+    public CommentView mapToCommentReviewView(Comment comment) {
+        return modelMapper.map(comment, CommentView.class);
     }
 
     public ConsumerPoorView mapToConsumerPoorView(Consumer consumer) {

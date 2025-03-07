@@ -34,8 +34,4 @@ public class ReviewView {
     private String disadvantages;
 
     private Integer grade;
-
-    private Integer amountLikes;
-
-    private Integer amountDislikes;
 }

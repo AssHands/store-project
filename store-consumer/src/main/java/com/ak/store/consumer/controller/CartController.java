@@ -18,7 +18,7 @@ public class CartController {
 
     @GetMapping("{consumerId}")
     public List<CartView> findAll(@PathVariable String consumerId) {
-        return cartFacade.findOne(consumerId);
+        return cartFacade.findAll(consumerId);
     }
 
     @PostMapping("{consumerId}/{productId}")
@@ -31,9 +31,18 @@ public class CartController {
         cartFacade.deleteOne(consumerId, productId);
     }
 
+    //TODO: CHECK
+    @PatchMapping("{consumerId}/{productId}")
+    public CartView setProductAmount(@PathVariable String consumerId, @PathVariable Long productId,
+                                    @RequestParam @Positive int amount) {
+        return cartFacade.setProductAmount(consumerId, productId, amount);
+    }
+
+    //-------------------------
+
     @GetMapping("me")
     public List<CartView> findAllMe(@AuthenticationPrincipal Jwt accessToken) {
-        return cartFacade.findOne(accessToken.getSubject());
+        return cartFacade.findAll(accessToken.getSubject());
     }
 
     @PostMapping("me/{productId}")
@@ -42,23 +51,14 @@ public class CartController {
     }
 
     @DeleteMapping("me/{productId}")
-    public void deleteOne(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long productId) {
+    public void deleteOneMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long productId) {
         cartFacade.deleteOne(accessToken.getSubject(), productId);
     }
 
     //TODO: CHECK
-    //возвращает было ли значение amount максимально возможным
-    @PatchMapping("{consumerId}/{productId}")
-    public Boolean setProductAmount(@PathVariable String consumerId, @PathVariable Long productId,
-                                    @RequestParam @Positive int amount) {
-        return cartFacade.setProductAmount(consumerId, productId, amount);
-    }
-
-    //TODO: CHECK
-    //возвращает было ли значение amount максимально возможным
     @PatchMapping("me/{productId}")
-    public Boolean setProductAmount(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long productId,
-                                    @RequestParam @Positive int amount) {
+    public CartView setProductAmountMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long productId,
+                                      @RequestParam @Positive int amount) {
         return cartFacade.setProductAmount(accessToken.getSubject(), productId, amount);
     }
 }

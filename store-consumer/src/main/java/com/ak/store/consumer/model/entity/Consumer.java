@@ -38,7 +38,7 @@ public class Consumer {
 
     @Builder.Default
     @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommentReview> commentReviews = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
     @OneToOne(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
     private VerificationCode verificationCode;

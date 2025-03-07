@@ -11,7 +11,8 @@ import lombok.*;
 @ToString(exclude = { "consumer", "review" })
 @EqualsAndHashCode(exclude = { "consumer", "review" })
 @Entity
-public class CommentReview {
+@Table(name = "comment_review")
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,8 +24,4 @@ public class CommentReview {
     private Review review;
 
     private String text;
-
-    private Integer amountLikes;
-
-    private Integer amountDislikes;
 }

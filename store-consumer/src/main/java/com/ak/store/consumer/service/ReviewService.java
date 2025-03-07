@@ -1,17 +1,16 @@
 package com.ak.store.consumer.service;
 
-import com.ak.store.common.model.consumer.dto.CommentReviewDTO;
+import com.ak.store.common.model.consumer.dto.CommentDTO;
 import com.ak.store.common.model.consumer.dto.ReviewDTO;
-import com.ak.store.consumer.model.entity.CommentReview;
+import com.ak.store.consumer.model.entity.Comment;
 import com.ak.store.consumer.model.entity.Consumer;
 import com.ak.store.consumer.model.entity.Review;
 import com.ak.store.consumer.model.projection.ReviewWithCommentCountProjection;
-import com.ak.store.consumer.repository.CommentReviewRepo;
+import com.ak.store.consumer.repository.CommentRepo;
 import com.ak.store.consumer.repository.ReviewRepo;
 import com.ak.store.consumer.util.ConsumerMapper;
 import com.ak.store.consumer.validator.business.ReviewBusinessValidator;
 import lombok.RequiredArgsConstructor;
-import org.glassfish.jaxb.core.v2.TODO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepo reviewRepo;
-    private final CommentReviewRepo commentReviewRepo;
+    private final CommentRepo commentRepo;
     private final ReviewBusinessValidator reviewBusinessValidator;
     private final ConsumerMapper consumerMapper;
 
@@ -29,32 +28,68 @@ public class ReviewService {
         return reviewRepo.findAllWithConsumerAndCommentCountByProductId(productId);
     }
 
-    public Review findOneWithComments(Long productId, String consumerId) {
+    public Review findOneReviewWithComments(Long productId, String consumerId) {
         return reviewRepo.findOneWithCommentsByProductIdAndConsumerId(productId, consumerId)
                 .orElseThrow(() -> new RuntimeException("no review found"));
     }
 
-    public Review findOne(Long productId, String consumerId) {
-        return reviewRepo.findOneByProductIdAndConsumerId(productId, consumerId)
+    public Review findOneReview(Long productId, String consumerId) {
+        return reviewRepo.findOneByProductIdAndConsumerId(productId, UUID.fromString(consumerId))
                 .orElseThrow(() -> new RuntimeException("no review found"));
     }
 
-    public void deleteOne(Long productId, String consumerId) {
-        reviewRepo.delete(findOne(productId, consumerId));
+    public Comment findOmeComment(Long commentId) {
+        return commentRepo.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("no comment found"));
     }
 
-    public Review createOne(Long productId, String consumerId, ReviewDTO reviewDTO) {
+    private Review findOneReview(Long reviewId) {
+        return reviewRepo.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("no review found"));
+    }
+
+    public void deleteOneReview(Long reviewId) {
+        reviewRepo.deleteById(reviewId);
+    }
+
+    public Review createOneReview(Long productId, String consumerId, ReviewDTO reviewDTO) {
         reviewBusinessValidator.validateCreation(productId, consumerId);
         Review review = consumerMapper.mapToReview(reviewDTO, productId, consumerId);
-        review.setAmountDislikes(0);
-        review.setAmountLikes(0);
         return reviewRepo.save(review);
     }
 
-    public Review updateOne(Long productId, String consumerId, ReviewDTO reviewDTO) {
-        Review review = findOne(productId, consumerId);
+    public Review updateOneReview(Long ReviewId, ReviewDTO reviewDTO) {
+        Review review = findOneReview(ReviewId);
         updateReview(review, reviewDTO);
         return reviewRepo.save(review);
+    }
+
+    public void deleteAllReviewByProductId(Long productId) {
+        reviewRepo.deleteAllByProductId(productId);
+    }
+
+    public List<Comment> findAllCommentByReviewId(Long reviewId) {
+        return commentRepo.findAllByReviewId(reviewId);
+    }
+
+    public Comment createOneComment(String consumerId, Long reviewId, CommentDTO commentDTO) {
+        var commentReview = Comment.builder()
+                .review(Review.builder().id(reviewId).build())
+                .consumer(Consumer.builder().id(UUID.fromString(consumerId)).build())
+                .text(commentDTO.getText())
+                .build();
+
+        return commentRepo.save(commentReview);
+    }
+
+    public void deleteOneComment(Long commentId) {
+        commentRepo.deleteById(commentId);
+    }
+
+    public Comment updateOneComment(Long commentId, CommentDTO commentDTO) {
+        Comment comment = findOmeComment(commentId);
+        updateComment(comment, commentDTO);
+        return commentRepo.save(comment);
     }
 
     private void updateReview(Review review, ReviewDTO reviewDTO) {
@@ -72,23 +107,9 @@ public class ReviewService {
         }
     }
 
-    public void deleteAllByProductId(Long productId) {
-        reviewRepo.deleteAllByProductId(productId);
-    }
-
-    public List<CommentReview> findAllCommentById(Long reviewId) {
-        return commentReviewRepo.findAllByReviewId(reviewId);
-    }
-
-    public CommentReview createOneComment(String consumerId, Long reviewId, CommentReviewDTO commentReviewDTO) {
-        var commentReview = CommentReview.builder()
-                .review(Review.builder().id(reviewId).build())
-                .consumer(Consumer.builder().id(UUID.fromString(consumerId)).build())
-                .text(commentReviewDTO.getText())
-                .amountDislikes(0)
-                .amountLikes(0)
-                .build();
-
-        return commentReviewRepo.save(commentReview);
+    private void updateComment(Comment comment, CommentDTO commentDTO) {
+        if (commentDTO.getText() != null) {
+            comment.setText(commentDTO.getText());
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.kafka;
 
+import com.ak.store.common.event.catalogue.ProductCreatedEvent;
 import com.ak.store.common.event.catalogue.ProductDeletedEvent;
 import com.ak.store.common.event.catalogue.ProductEvent;
 import lombok.RequiredArgsConstructor;
@@ -21,4 +22,12 @@ public class ProductProducerKafka {
         }
     }
 
+    public void send(ProductCreatedEvent productCreatedEvent) {
+        try {
+            SendResult<String, ProductEvent> future = kafkaProductTemplate
+                    .send("product-created-events", productCreatedEvent).get();
+        } catch (Exception e) {
+            throw new RuntimeException("kafka product-created-events error");
+        }
+    }
 }

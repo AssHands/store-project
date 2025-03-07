@@ -1,6 +1,5 @@
-package com.ak.store.common.model.consumer.dto;
+package com.ak.store.common.event.catalogue;
 
-import com.ak.store.common.model.consumer.view.ConsumerPoorView;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -13,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CommentReviewDTO {
-    private String text;
+public class ProductCreatedEvent implements ProductEvent {
+    private Long id;
 }

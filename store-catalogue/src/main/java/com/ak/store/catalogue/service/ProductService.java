@@ -98,14 +98,20 @@ public class ProductService {
     public Product deleteOne(Long id) {
         //find with images for reduce queries to db
         Product product = findOneWithImages(id);
-        productRepo.deleteById(id);
-        return product;
+
+        product.setIsAvailable(false);
+        product.setIsDeleted(true);
+
+        return productRepo.save(product);
     }
 
     public Product createOne(ProductWritePayload productPayload) {
         productBusinessValidator.validateCreation(productPayload.getProduct());
         Product createdProduct = catalogueMapper.mapToProduct(productPayload.getProduct());
         productCharacteristicService.createAll(createdProduct, productPayload.getCreateCharacteristics());
+
+        createdProduct.setIsAvailable(true);
+        createdProduct.setIsDeleted(false);
 
         //flush for immediate validation
         productRepo.saveAndFlush(createdProduct);
@@ -169,15 +175,15 @@ public class ProductService {
     }
 
     public Boolean existOne(Long id) {
-        return productRepo.existsById(id);
+        return productRepo.existOneById(id);
     }
 
     public Boolean availableOne(Long id) {
-        return productRepo.existsOneByIdAndIsAvailableIsTrue(id);
+        return productRepo.availableOneById(id);
     }
 
     public Boolean availableAll(List<Long> ids) {
-        return productRepo.countByIdInAndIsAvailableIsTrue(ids) == ids.size();
+        return productRepo.availableAllById(ids, ids.size());
     }
 
     public List<Product> findAll(List<Long> ids) {

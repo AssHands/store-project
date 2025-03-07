@@ -8,6 +8,7 @@ import com.ak.store.catalogue.integration.ElasticService;
 import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.util.CatalogueMapper;
+import com.ak.store.common.event.catalogue.ProductCreatedEvent;
 import com.ak.store.common.event.catalogue.ProductDeletedEvent;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.view.ProductPrice;
@@ -112,7 +113,13 @@ public class ProductServiceFacade {
     @Transactional
     public Long createOne(ProductWritePayload payload) {
         Product createdProduct = productService.createOne(payload);
-        elasticService.createOneProduct(catalogueMapper.mapToProductDocument(createdProduct));
+
+        new SagaBuilder()
+                .step(() -> elasticService.createOneProduct(catalogueMapper.mapToProductDocument(createdProduct)))
+                .compensate(() -> elasticService.deleteOneProduct(createdProduct.getId()))
+                .step(() -> productProducerKafka.send(new ProductCreatedEvent(createdProduct.getId())))
+                .execute();
+
         return createdProduct.getId();
     }
 

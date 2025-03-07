@@ -32,21 +32,18 @@ public class CartService {
                 .orElseThrow(() -> new RuntimeException("no cart found"));
     }
 
-    public Boolean setProductAmount(String consumerId, Long productId, int amount) {
+    public Cart setProductAmount(String consumerId, Long productId, int amount) {
         cartBusinessValidator.validateSetProductAmount(consumerId, productId);
         Cart cart = findOneByConsumerIdAndProductId(consumerId, productId);
         int maxAmount = warehouseFeign.getAmount(productId);
-        boolean isMax = false;
 
         if(amount > maxAmount) {
             cart.setAmount(maxAmount);
-            isMax = true;
         } else {
             cart.setAmount(amount);
         }
 
-        cartRepo.save(cart);
-        return isMax;
+        return cartRepo.save(cart);
     }
 
     public void deleteOne(String consumerId, Long productId) {

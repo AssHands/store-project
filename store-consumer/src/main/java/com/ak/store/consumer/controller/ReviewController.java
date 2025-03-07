@@ -1,8 +1,8 @@
 package com.ak.store.consumer.controller;
 
-import com.ak.store.common.model.consumer.dto.CommentReviewDTO;
+import com.ak.store.common.model.consumer.dto.CommentDTO;
 import com.ak.store.common.model.consumer.dto.ReviewDTO;
-import com.ak.store.common.model.consumer.view.CommentReviewView;
+import com.ak.store.common.model.consumer.view.CommentView;
 import com.ak.store.common.model.consumer.view.ReviewView;
 import com.ak.store.consumer.facade.ReviewFacade;
 import jakarta.validation.Valid;
@@ -20,60 +20,80 @@ public class ReviewController {
     private final ReviewFacade reviewFacade;
 
     @GetMapping("{productId}")
-    public List<ReviewView> findAll(@PathVariable Long productId) {
-        return reviewFacade.findAllByProductId(productId);
+    public List<ReviewView> findAllReview(@PathVariable Long productId) {
+        return reviewFacade.findAllReviewByProductId(productId);
     }
 
     @GetMapping("{reviewId}/comments")
-    public List<CommentReviewView> findAllCommentByReviewId(@PathVariable Long reviewId) {
+    public List<CommentView> findAllCommentByReviewId(@PathVariable Long reviewId) {
         return reviewFacade.findAllCommentByReviewId(reviewId);
     }
 
     @PostMapping("{productId}")
-    public Long createOne(@PathVariable Long productId, @RequestParam String consumerId,
+    public Long createOneReview(@PathVariable Long productId, @RequestParam String consumerId,
                           @RequestBody @Valid ReviewDTO reviewDTO) {
-        return reviewFacade.createOne(productId, consumerId, reviewDTO);
+        return reviewFacade.createOneReview(consumerId, productId, reviewDTO);
     }
 
-    @PatchMapping("{productId}")
-    public Long updateOne(@PathVariable Long productId, @RequestParam String consumerId,
-                          @RequestBody @Valid ReviewDTO reviewDTO) {
-        return reviewFacade.updateOne(productId, consumerId, reviewDTO);
+    @PatchMapping("{reviewId}")
+    public Long updateOneReview(@PathVariable Long reviewId, @RequestBody @Valid ReviewDTO reviewDTO) {
+        return reviewFacade.updateOneReview(reviewId, reviewDTO);
     }
 
-    @DeleteMapping("{productId}")
-    public void deleteOne(@PathVariable Long productId, @RequestParam String consumerId) {
-        reviewFacade.deleteOne(productId, consumerId);
+    @DeleteMapping("{reviewId}")
+    public void deleteOneReview(@PathVariable Long reviewId) {
+        reviewFacade.deleteOneReview(reviewId);
     }
 
     @PostMapping("{reviewId}/comments")
     public Long createOneComment(@PathVariable Long reviewId, @RequestParam String consumerId,
-                                 @RequestBody @Valid CommentReviewDTO commentReviewDTO) {
-        return reviewFacade.createOneComment(consumerId, reviewId, commentReviewDTO);
+                                 @RequestBody @Valid CommentDTO commentDTO) {
+        return reviewFacade.createOneComment(consumerId, reviewId, commentDTO);
+    }
+
+    @PatchMapping("comments/{commentId}")
+    public Long updateOneComment(@PathVariable Long commentId, @RequestBody @Valid CommentDTO commentDTO) {
+        return reviewFacade.updateOneComment(commentId, commentDTO);
+    }
+
+    @DeleteMapping("comments/{commentId}")
+    public void deleteOneComment(@PathVariable Long commentId) {
+        reviewFacade.deleteOneComment(commentId);
     }
 
     //----------------
 
     @PostMapping("me/{productId}")
-    public Long createOne(@PathVariable Long productId, @AuthenticationPrincipal Jwt accessToken,
-                          @RequestBody @Valid ReviewDTO reviewDTO) {
-        return reviewFacade.createOne(productId, accessToken.getSubject(), reviewDTO);
+    public Long createOneReviewMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long productId,
+                                @RequestBody @Valid ReviewDTO reviewDTO) {
+        return reviewFacade.createOneReview(accessToken.getSubject(), productId, reviewDTO);
     }
 
-    @PatchMapping("me/{productId}")
-    public Long updateOne(@PathVariable Long productId, @AuthenticationPrincipal Jwt accessToken,
+    @PatchMapping("me/{reviewId}")
+    public Long updateOneReviewMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long reviewId,
                           @RequestBody @Valid ReviewDTO reviewDTO) {
-        return reviewFacade.updateOne(productId, accessToken.getSubject(), reviewDTO);
+        return reviewFacade.updateOneReview(reviewId, reviewDTO);
     }
 
-    @DeleteMapping("me/{productId}")
-    public void deleteOne(@PathVariable Long productId, @AuthenticationPrincipal Jwt accessToken) {
-        reviewFacade.deleteOne(productId, accessToken.getSubject());
+    @DeleteMapping("me/{reviewId}")
+    public void deleteOneReviewMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long reviewId) {
+        reviewFacade.deleteOneReview(reviewId);
     }
 
     @PostMapping("me/{reviewId}/comments")
-    public Long createOneComment(@PathVariable Long reviewId, @AuthenticationPrincipal Jwt accessToken,
-                                 @RequestBody @Valid CommentReviewDTO commentReviewDTO) {
-        return reviewFacade.createOneComment(accessToken.getSubject(), reviewId, commentReviewDTO);
+    public Long createOneCommentMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long reviewId,
+                                 @RequestBody @Valid CommentDTO commentDTO) {
+        return reviewFacade.createOneComment(accessToken.getSubject(), reviewId, commentDTO);
+    }
+
+    @PatchMapping("me/comments/{commentId}")
+    public Long updateOneCommentMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long commentId,
+                                   @RequestBody @Valid CommentDTO commentDTO) {
+        return reviewFacade.updateOneComment(commentId, commentDTO);
+    }
+
+    @DeleteMapping("me/comments/{commentId}")
+    public void deleteOneCommentMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long commentId) {
+        reviewFacade.deleteOneComment(commentId);
     }
 }

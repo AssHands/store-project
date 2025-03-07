@@ -25,9 +25,12 @@ public interface ProductRepo extends JpaRepository<Product, Long>, ProductRepoCu
     @EntityGraph(attributePaths = {"images"})
     Optional<Product> findOneWithImagesById(Long id);
 
-    boolean existsById(@NonNull Long id);
+    @Query("SELECT COUNT(p) > 0 FROM Product p WHERE p.id = :id AND p.isDeleted = false")
+    boolean existOneById(@NonNull Long id);
 
-    boolean existsOneByIdAndIsAvailableIsTrue(Long id);
+    @Query("SELECT COUNT(p) > 0 FROM Product p WHERE p.id = :id AND p.isAvailable = true AND p.isDeleted = false")
+    boolean availableOneById(Long id);
 
-    long countByIdInAndIsAvailableIsTrue(List<Long> id);
+    @Query("SELECT COUNT(p) = :size FROM Product p WHERE p.id IN :ids AND p.isAvailable = true AND p.isDeleted = false")
+    boolean availableAllById(List<Long> ids, long size);
 }

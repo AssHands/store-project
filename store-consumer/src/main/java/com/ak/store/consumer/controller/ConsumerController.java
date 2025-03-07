@@ -5,6 +5,7 @@ import com.ak.store.common.model.consumer.view.ConsumerPoorView;
 import com.ak.store.common.validationGroup.Create;
 import com.ak.store.common.validationGroup.Update;
 import com.ak.store.consumer.facade.ConsumerFacade;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -47,12 +48,7 @@ public class ConsumerController {
         return consumerFacade.verifyOne(code);
     }
 
-    @PatchMapping("email")
-    public String updateOneEmail(@AuthenticationPrincipal Jwt accessToken, @RequestBody String email) {
-        return consumerFacade.updateOneEmail(accessToken.getSubject(), email);
-    }
-
-    //-----------
+    //-----------------------
 
     @GetMapping("me")
     public ConsumerPoorView getMe(@AuthenticationPrincipal Jwt accessToken) {
@@ -68,5 +64,10 @@ public class ConsumerController {
     @DeleteMapping("me")
     public void deleteOne(@AuthenticationPrincipal Jwt accessToken) {
         consumerFacade.deleteOne(accessToken.getSubject());
+    }
+
+    @PatchMapping("email")
+    public String updateOneEmail(@AuthenticationPrincipal Jwt accessToken, @RequestBody @Email String email) {
+        return consumerFacade.updateOneEmail(accessToken.getSubject(), email);
     }
 }

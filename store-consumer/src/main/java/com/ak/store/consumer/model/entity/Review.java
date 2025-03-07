@@ -23,7 +23,7 @@ public class Review {
 
     @Builder.Default
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommentReview> comments = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
     private Long productId;
 
@@ -34,8 +34,4 @@ public class Review {
     private String disadvantages;
 
     private Integer grade;
-
-    private Integer amountLikes;
-
-    private Integer amountDislikes;
 }

@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.glassfish.jaxb.core.v2.TODO;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Component
 public class ReviewBusinessValidator {
@@ -21,9 +23,9 @@ public class ReviewBusinessValidator {
             throw new RuntimeException("product with id=%d is not exists".formatted(productId));
         }
 
-        boolean isExist = reviewRepo.findOneByProductIdAndConsumerId(productId, consumerId).isPresent();
+        boolean isExist = reviewRepo.findOneByProductIdAndConsumerId(productId, UUID.fromString(consumerId)).isPresent();
         if(isExist) {
-            throw new RuntimeException("this customer already has review on this product");
+            throw new RuntimeException("this consumer already has review on this product");
         }
     }
 }

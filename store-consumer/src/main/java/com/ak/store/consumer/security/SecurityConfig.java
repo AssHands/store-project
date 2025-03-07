@@ -29,6 +29,9 @@ public class SecurityConfig {
 
 //        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //        http.cors(AbstractHttpConfigurer::disable);
+        http.exceptionHandling(e -> e
+                .accessDeniedHandler((request, response, accessDeniedException) ->
+                        accessDeniedException.printStackTrace()));
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/v1/consumer/consumers/verify").permitAll()
@@ -41,7 +44,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/consumer/cart/{consumerId}/*").hasRole("MANAGER")
 
                 .requestMatchers(HttpMethod.GET, "/api/v1/consumer/reviews/{productId}/*").permitAll()
-                .requestMatchers("/api/v1/consumer/reviews/me/{productId}/*").hasRole("CONSUMER")
+                .requestMatchers("/api/v1/consumer/reviews/me/**").hasRole("CONSUMER")
                 .requestMatchers("/api/v1/consumer/reviews/{productId}/*").hasRole("MANAGER")
 
                 .anyRequest().permitAll());
