@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ak.store.synchronization</groupId>
-    <artifactId>store-synchronization</artifactId>
+    <groupId>com.ak.store.emailSender</groupId>
+    <artifactId>store-email-sender</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -47,14 +47,8 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-            <groupId>co.elastic.clients</groupId>
-            <artifactId>elasticsearch-java</artifactId>
-            <version>7.17.25</version>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-client</artifactId>
-            <version>7.17.25</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
     </dependencies>
 

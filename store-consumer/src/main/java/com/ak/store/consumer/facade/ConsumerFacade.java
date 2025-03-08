@@ -1,10 +1,11 @@
 package com.ak.store.consumer.facade;
 
+import com.ak.store.common.event.consumer.ConsumerVerifyEvent;
 import com.ak.store.common.model.consumer.dto.ConsumerDTO;
 import com.ak.store.common.model.consumer.view.ConsumerPoorView;
+import com.ak.store.consumer.kafka.ConsumerProducerKafka;
 import com.ak.store.consumer.model.entity.Consumer;
 import com.ak.store.consumer.service.ConsumerService;
-import com.ak.store.consumer.service.EmailSender;
 import com.ak.store.consumer.service.KeycloakService;
 import com.ak.store.consumer.util.ConsumerMapper;
 import jakarta.transaction.Transactional;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Component
 @RequiredArgsConstructor
@@ -20,7 +20,7 @@ public class ConsumerFacade {
     private final ConsumerService consumerService;
     private final ConsumerMapper consumerMapper;
     private final KeycloakService keycloakService;
-    private final EmailSender emailSender;
+    private final ConsumerProducerKafka consumerProducerKafka;
 
     @Transactional
     public String createOne(ConsumerDTO consumerDTO) {
@@ -31,8 +31,7 @@ public class ConsumerFacade {
             id = keycloakService.createOneConsumer(consumerDTO);
             Consumer consumer = consumerService.createOne(id, consumerDTO);
             consumerService.makeVerificationCode(id, verificationCode, consumer.getEmail());
-            //CompletableFuture.runAsync(() ->
-            //        emailSender.sendVerificationEmail(consumer.getEmail(), verificationCode));
+            consumerProducerKafka.send(new ConsumerVerifyEvent(verificationCode, consumer.getEmail()));
         } catch (Exception e) {
             if (!id.isBlank())
                 keycloakService.deleteOneConsumer(id);
@@ -65,8 +64,7 @@ public class ConsumerFacade {
         String verificationCode = UUID.randomUUID().toString();
 
         consumerService.makeVerificationCode(id, verificationCode, email);
-        //CompletableFuture.runAsync(() ->
-        //        emailSender.sendVerificationEmail(email, verificationCode));
+        consumerProducerKafka.send(new ConsumerVerifyEvent(verificationCode, email));
 
         return id;
     }

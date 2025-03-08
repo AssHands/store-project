@@ -27,15 +27,6 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
 
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: umafamilia17@gmail.com
-    password: kogq znhz ignn bwvq
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
-
   kafka:
     bootstrap-servers: localhost:29092,localhost:39092
 
@@ -79,6 +70,7 @@ spring:
           default:
             connectTimeout: 7000
             readTimeout: 7000
+
 #      oauth2:
 #        enabled: true
 #        clientRegistrationId: keycloak

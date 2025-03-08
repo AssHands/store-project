@@ -1,15 +1,10 @@
-package com.ak.store.consumer.service;
+package com.ak.store.emailSender.service;
 
-import com.ak.store.consumer.model.entity.Consumer;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
-
-import java.io.UnsupportedEncodingException;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Component

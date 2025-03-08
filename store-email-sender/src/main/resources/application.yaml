@@ -1,0 +1,34 @@
+server:
+  port: 8085
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: umafamilia17@gmail.com
+    password: kogq znhz ignn bwvq
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:39092
+
+    consumer:
+      group-id: email-consumer-group
+      properties:
+        spring.json.trusted.packages: "com.ak.store.*"
+      auto-offset-reset: earliest
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 7
+      properties:
+        retry.backoff.ms: 500
+        retry.backoff.max.ms: 5000
+        request.timeout.ms: 15000
+        delivery.timeout.ms: 20000
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5

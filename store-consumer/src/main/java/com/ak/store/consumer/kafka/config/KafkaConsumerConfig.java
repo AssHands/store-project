@@ -1,4 +1,4 @@
-package com.ak.store.consumer.kafka;
+package com.ak.store.consumer.kafka.config;
 
 import com.ak.store.common.exception.kafka.NonRetryableException;
 import com.ak.store.common.exception.kafka.RetryableException;
