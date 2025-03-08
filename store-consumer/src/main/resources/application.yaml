@@ -31,7 +31,7 @@ spring:
     bootstrap-servers: localhost:29092,localhost:39092
 
     consumer:
-      group-id: consumer-consumers-group
+      group-id: consumer-group
       properties:
         spring.json.trusted.packages: "com.ak.store.*"
       auto-offset-reset: earliest

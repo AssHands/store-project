@@ -6,9 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface OrderRepo extends JpaRepository<Order, Long> {
     @EntityGraph(attributePaths = {"products"})
-    List<Order> findAllWithProductsByConsumerId(Long consumerId);
+    List<Order> findAllWithProductsByConsumerId(UUID consumerId);
 }

@@ -1,7 +1,7 @@
 package com.ak.store.warehouse.serivce;
 
+import com.ak.store.common.model.order.dto.OrderProductDTO;
 import com.ak.store.common.model.warehouse.dto.ProductCheckDTO;
-import com.ak.store.common.model.warehouse.dto.ReserveProductDTO;
 import com.ak.store.warehouse.model.Warehouse;
 import com.ak.store.warehouse.repostitory.WarehouseRepo;
 import lombok.RequiredArgsConstructor;
@@ -40,13 +40,13 @@ public class WarehouseService {
         return true;
     }
 
-    public void reserveAllProduct(List<ReserveProductDTO> reserveProductDTOList) {
-        List<Long> ids = reserveProductDTOList.stream()
-                .map(ReserveProductDTO::getProductId)
+    public void reserveAllProduct(List<OrderProductDTO> orderProductList) {
+        List<Long> ids = orderProductList.stream()
+                .map(OrderProductDTO::getProductId)
                 .toList();
 
-        var reserveProductMap = reserveProductDTOList.stream()
-                .collect(Collectors.toMap(ReserveProductDTO::getProductId, ReserveProductDTO::getAmount));
+        var reserveProductMap = orderProductList.stream()
+                .collect(Collectors.toMap(OrderProductDTO::getProductId, OrderProductDTO::getAmount));
 
         List<Warehouse> warehouseList = warehouseRepo.findAllLockedByProductIdIn(ids);
 

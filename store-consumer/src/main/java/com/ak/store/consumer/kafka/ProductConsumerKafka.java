@@ -13,7 +13,7 @@ public class ProductConsumerKafka {
     private final CartFacade cartFacade;
     private final ReviewFacade reviewFacade;
 
-    @KafkaListener(topics = "product-deleted-events", groupId = "consumer-consumers-group")
+    @KafkaListener(topics = "product-deleted-events", groupId = "consumer-group")
     //todo: разные транзакции? чё делать
     public void handle(ProductDeletedEvent productDeletedEvent) {
         cartFacade.deleteAllByProductId(productDeletedEvent.getId());

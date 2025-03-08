@@ -15,9 +15,9 @@ public class ConsumerProducerKafka {
     public void send(ConsumerVerifyEvent consumerVerifyEvent) {
         try {
             SendResult<String, ConsumerEvent> future = kafkaProductTemplate
-                    .send("consumer-verify-events", consumerVerifyEvent).get();
+                    .send("order-created-events", consumerVerifyEvent).get();
         } catch (Exception e) {
-            throw new RuntimeException("kafka product-deleted-events error");
+            throw new RuntimeException("kafka order-created-events error");
         }
     }
 }

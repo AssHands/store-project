@@ -1,7 +1,7 @@
 package com.ak.store.warehouse.facade;
 
+import com.ak.store.common.model.order.dto.OrderProductDTO;
 import com.ak.store.common.model.warehouse.dto.ProductCheckDTO;
-import com.ak.store.common.model.warehouse.dto.ReserveProductDTO;
 import com.ak.store.warehouse.serivce.WarehouseService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,8 @@ public class WarehouseFacade {
     }
 
     @Transactional
-    public void reserveAllProduct(List<ReserveProductDTO> reserveProductDTOList) {
-        warehouseService.reserveAllProduct(reserveProductDTOList);
+    public void reserveAllProduct(List<OrderProductDTO> orderProductList) {
+        warehouseService.reserveAllProduct(orderProductList);
     }
 
     public Integer getAmount(Long productId) {

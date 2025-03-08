@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,11 +25,11 @@ public class OrderService {
     private final OrderBusinessValidator orderBusinessValidator;
     private final CatalogueFeign catalogueFeign;
 
-    public List<Order> findAllByConsumerId(Long consumerId) {
-        return orderRepo.findAllWithProductsByConsumerId(consumerId);
+    public List<Order> findAllByConsumerId(String consumerId) {
+        return orderRepo.findAllWithProductsByConsumerId(UUID.fromString(consumerId));
     }
 
-    public void createOne(Long consumerId, OrderDTO orderDTO) {
+    public Order createOne(String consumerId, OrderDTO orderDTO) {
         orderBusinessValidator.validateCreation(orderDTO);
 
         var productIds = orderDTO.getProducts().stream()
@@ -39,7 +40,7 @@ public class OrderService {
                 .collect(Collectors.toMap(ProductPrice::getId, ProductPrice::getPrice));
 
         var order = Order.builder()
-                .consumerId(consumerId)
+                .consumerId(UUID.fromString(consumerId))
                 .build();
 
         int totalPrice = 0;
@@ -58,6 +59,6 @@ public class OrderService {
         order.setTotalPrice(totalPrice);
         order.setProducts(orderProductList);
 
-        orderRepo.save(order);
+        return orderRepo.save(order);
     }
 }

@@ -1,9 +1,7 @@
-package com.ak.store.catalogue.security;
+package com.ak.store.order.security;
 
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,26 +27,7 @@ public class SecurityConfig {
 //        http.cors(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.GET, "/api/v1/catalogue/products/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v1/catalogue/products/{id}/*").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v1/catalogue/products/poor").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/catalogue/products/search/*").permitAll()
-
-                .requestMatchers("/api/v1/catalogue/products").hasRole("MANAGER")
-                .requestMatchers(HttpMethod.POST, "/api/v1/catalogue/products/price").permitAll()
-                .requestMatchers(HttpMethod.PATCH, "/api/v1/catalogue/products/**").hasRole("MANAGER")
-                .requestMatchers(HttpMethod.POST, "/api/v1/catalogue/products/exist/*").hasRole("MANAGER")
-                .requestMatchers(HttpMethod.POST, "/api/v1/catalogue/products/available/*").hasRole("MANAGER")
-                .requestMatchers(HttpMethod.POST, "/api/v1/catalogue/products/available/*").hasRole("MANAGER")
-                .requestMatchers(HttpMethod.POST, "/api/v1/catalogue/products/batch").hasRole("MANAGER")
-
-                .requestMatchers(HttpMethod.GET, "/api/v1/catalogue/characteristics").permitAll()
-                .requestMatchers("/api/v1/catalogue/characteristics/**").hasRole("MANAGER")
-
-                .requestMatchers(HttpMethod.GET, "/api/v1/catalogue/categories").permitAll()
-                .requestMatchers("/api/v1/catalogue/categories/**").hasRole("MANAGER")
-
-                .anyRequest().permitAll());
+                .requestMatchers("/api/v1/order/orders").hasRole("CONSUMER"));
 
         return http.build();
     }

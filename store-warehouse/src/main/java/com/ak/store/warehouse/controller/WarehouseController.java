@@ -1,7 +1,7 @@
 package com.ak.store.warehouse.controller;
 
+import com.ak.store.common.model.order.dto.OrderProductDTO;
 import com.ak.store.common.model.warehouse.dto.ProductCheckDTO;
-import com.ak.store.common.model.warehouse.dto.ReserveProductDTO;
 import com.ak.store.warehouse.facade.WarehouseFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +20,8 @@ public class WarehouseController {
     }
 
     @PatchMapping("reserve")
-    public void reserveAll(@RequestBody List<ReserveProductDTO> reserveProductDTOList) {
-        warehouseFacade.reserveAllProduct(reserveProductDTOList);
+    public void reserveAll(@RequestBody List<OrderProductDTO> orderProductList) {
+        warehouseFacade.reserveAllProduct(orderProductList);
     }
 
     @GetMapping("amount/{productId}")
