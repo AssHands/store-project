@@ -271,17 +271,15 @@ public class ElasticService {
         response.hits().hits().forEach(System.out::println);
 
         ElasticSearchResult elasticSearchResult = new ElasticSearchResult();
-        elasticSearchResult.setSortingType(searchProductRequest.getSortingType());
 
         if(productHits.size() == 0) {
             return elasticSearchResult;
         }
 
-        elasticSearchResult.setIds(productHits
+        elasticSearchResult.setContent(productHits
                 .stream()
                 .filter(doc -> doc.source() != null)
                 .map(Hit::source)
-                .map(ProductDocument::getId)
                 .toList());
 
         elasticSearchResult.setSearchAfter(

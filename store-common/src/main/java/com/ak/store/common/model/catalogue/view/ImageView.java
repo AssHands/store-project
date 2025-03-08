@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ImageView {
-    private Long productId;
     private Integer index;
     private String imageKey;
 }

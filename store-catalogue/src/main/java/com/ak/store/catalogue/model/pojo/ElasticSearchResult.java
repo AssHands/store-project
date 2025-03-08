@@ -1,10 +1,12 @@
 package com.ak.store.catalogue.model.pojo;
 
+import com.ak.store.common.document.ProductDocument;
 import com.ak.store.common.model.search.common.SortingType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.kafka.clients.producer.ProducerConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ElasticSearchResult {
-    List<Long> ids = new ArrayList<>();
+    @Builder.Default
+    List<ProductDocument> content = new ArrayList<>();
     List<Object> searchAfter;
-    SortingType sortingType;
 }

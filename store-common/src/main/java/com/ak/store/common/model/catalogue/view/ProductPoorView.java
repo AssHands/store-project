@@ -34,7 +34,5 @@ public class ProductPoorView {
 
     private Float grade;
 
-    private Boolean isAvailable;
-
     private List<ImageView> images = new ArrayList<>();
 }

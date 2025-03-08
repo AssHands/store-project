@@ -51,6 +51,10 @@ public class CatalogueMapper {
         return modelMapper.map(product, ProductPoorView.class);
     }
 
+    public ProductPoorView mapToProductPoorView(ProductDocument product) {
+        return modelMapper.map(product, ProductPoorView.class);
+    }
+
     public ProductRichView mapToProductRichView(Product product) {
         var dto = modelMapper.map(product, ProductRichView.class);
         dto.getCharacteristics().clear();

@@ -18,7 +18,7 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductSearchResponse {
 
-    private List<Object> searchAfter;
-
     private List<ProductPoorView> content = new ArrayList<>();
+
+    private List<Object> searchAfter;
 }

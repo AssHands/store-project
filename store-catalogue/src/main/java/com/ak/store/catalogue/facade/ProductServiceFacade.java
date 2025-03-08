@@ -24,6 +24,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -93,19 +94,16 @@ public class ProductServiceFacade {
     public ProductSearchResponse findAllBySearch(String consumerId, SearchProductRequest searchProductRequest) {
         var elasticSearchResult = elasticService.findAllProduct(searchProductRequest);
 
-        ProductSearchResponse productSearchResponse = new ProductSearchResponse();
-        if (elasticSearchResult.getIds().isEmpty()) {
-            return productSearchResponse;
-        }
-
-        productSearchResponse.setContent(
-                productService.findAllPoor(elasticSearchResult.getIds(), searchProductRequest.getSortingType()).stream()
+        List<ProductPoorView> productPoorViewList = new ArrayList<>(
+                elasticSearchResult.getContent().stream()
                         .map(catalogueMapper::mapToProductPoorView)
                         .toList()
         );
-        productSearchResponse.setSearchAfter(elasticSearchResult.getSearchAfter());
 
-        return productSearchResponse;
+        return ProductSearchResponse.builder()
+                .content(productPoorViewList)
+                .searchAfter(elasticSearchResult.getSearchAfter())
+                .build();
     }
 
     public ProductRichView findOneRich(String consumerId, Long id) {
