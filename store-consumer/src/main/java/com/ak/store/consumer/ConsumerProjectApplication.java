@@ -1,3 +1,5 @@
+package com.ak.store.consumer;
+
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
@@ -9,8 +11,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.annotation.KafkaListener;
 
 @EnableJpaRepositories("com.ak.store.*")
 @ComponentScan(basePackages = {"com.ak.store.*" })

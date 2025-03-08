@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.model.document;
+package com.ak.store.common.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 
@@ -37,5 +38,8 @@ public class ProductDocument {
     private Boolean isAvailable;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    private List<ProductCharacteristicDocument> characteristics;
+    private List<CharacteristicDocument> characteristics;
+
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    private List<ImageDocument> images;
 }

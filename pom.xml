@@ -22,5 +22,6 @@
         <module>store-consumer</module>
         <module>store-order</module>
         <module>store-warehouse</module>
+        <module>store-synchronization</module>
     </modules>
 </project>

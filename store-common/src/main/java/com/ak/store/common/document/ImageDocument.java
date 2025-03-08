@@ -1,6 +1,5 @@
-package com.ak.store.common.model.order.dto;
+package com.ak.store.common.document;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -8,17 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrderDTO {
+public class ImageDocument {
+    private String imageKey;
 
-    @Builder.Default
-    private List<OrderProductDTO> products = new ArrayList<>();
+    private Integer index;
 }

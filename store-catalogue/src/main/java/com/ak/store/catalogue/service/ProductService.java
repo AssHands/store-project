@@ -117,27 +117,6 @@ public class ProductService {
         productRepo.saveAndFlush(createdProduct);
         return createdProduct;
     }
-
-    public List<Product> createAll(List<ProductWritePayload> productPayloads) {
-        List<Product> products = new ArrayList<>();
-        for (int i = 0; i < productPayloads.size(); i++) {
-            if (i > 0 && i % BATCH_SIZE == 0) {
-                productRepo.saveAllAndFlush(products);
-                productRepo.clear();
-            }
-
-            productBusinessValidator.validateCreation(productPayloads.get(i).getProduct());
-            Product createdProduct = catalogueMapper.mapToProduct(productPayloads.get(i).getProduct());
-            productCharacteristicService.createAll(createdProduct, productPayloads.get(i).getCreateCharacteristics());
-            products.add(createdProduct);
-        }
-
-        //flush for immediate validation
-        productRepo.saveAllAndFlush(products);
-        productRepo.clear();
-        return products;
-    }
-
     public Product updateOne(ProductWritePayload productPayload, Long productId) {
         Product updatedProduct = findOneWithCharacteristicsAndCategory(productId);
 

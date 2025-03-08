@@ -1,8 +1,9 @@
 package com.ak.store.catalogue.util;
 
-import com.ak.store.catalogue.model.document.ProductCharacteristicDocument;
-import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.catalogue.model.entity.*;
+import com.ak.store.common.document.CharacteristicDocument;
+import com.ak.store.common.document.ImageDocument;
+import com.ak.store.common.document.ProductDocument;
 import com.ak.store.common.model.catalogue.dto.*;
 import com.ak.store.common.model.catalogue.view.*;
 import com.ak.store.common.model.search.dto.FiltersDTO;
@@ -27,7 +28,7 @@ public class CatalogueMapper {
         Product product = modelMapper.map(productDTO, Product.class);
         product.setId(null); //todo: маппер присваивает id категории к продукту
 
-        if(productDTO.getDiscountPercentage() == null || productDTO.getDiscountPercentage() == 0) {
+        if (productDTO.getDiscountPercentage() == null || productDTO.getDiscountPercentage() == 0) {
             product.setDiscountPercentage(0);
             product.setCurrentPrice(product.getFullPrice());
         } else {
@@ -36,7 +37,7 @@ public class CatalogueMapper {
             product.setCurrentPrice(priceWithDiscount);
         }
 
-        if(productDTO.getCategoryId() != null) {
+        if (productDTO.getCategoryId() != null) {
             product.setCategory(
                     Category.builder()
                             .id(productDTO.getCategoryId())
@@ -88,8 +89,8 @@ public class CatalogueMapper {
         List<TextFilter> textFilters = new ArrayList<>();
         List<NumericFilter> numericFilters = new ArrayList<>();
 
-        for(var characteristic : characteristics) {
-            if(characteristic.getIsText()) {
+        for (var characteristic : characteristics) {
+            if (characteristic.getIsText()) {
                 textFilters.add(TextFilter.builder()
                         .id(characteristic.getId())
                         .name(characteristic.getName())
@@ -112,18 +113,32 @@ public class CatalogueMapper {
 
     public ProductDocument mapToProductDocument(Product product) {
         ProductDocument productDocument = modelMapper.map(product, ProductDocument.class);
-        productDocument.getCharacteristics().clear(); //todo: хз что тут происходит, но избавиться от этого
-        List<ProductCharacteristicDocument> characteristicDocuments = new ArrayList<>();
 
-        for(var characteristic : product.getCharacteristics()) {
-            characteristicDocuments.add(ProductCharacteristicDocument.builder()
+        productDocument.getCharacteristics().clear(); //todo: хз что тут происходит, но избавиться от этого
+        productDocument.getImages().clear();
+
+        List<CharacteristicDocument> characteristicDocuments = new ArrayList<>();
+        for (var characteristic : product.getCharacteristics()) {
+            characteristicDocuments.add(CharacteristicDocument.builder()
                     .id(characteristic.getCharacteristic().getId())
                     .numericValue(characteristic.getNumericValue())
                     .textValue(characteristic.getTextValue())
                     .build());
         }
 
+        List<ImageDocument> imageDocumentList = new ArrayList<>();
+        for (var image : product.getImages()) {
+            imageDocumentList.add(
+                    ImageDocument.builder()
+                            .imageKey(image.getImageKey())
+                            .index(image.getIndex())
+                            .build()
+            );
+        }
+
         productDocument.setCharacteristics(characteristicDocuments);
+        productDocument.setImages(imageDocumentList);
+
         System.out.println(productDocument);
         return productDocument;
     }
@@ -147,7 +162,7 @@ public class CatalogueMapper {
     }
 
     public Characteristic mapToCharacteristic(CharacteristicDTO characteristicDTO) {
-       return modelMapper.map(characteristicDTO, Characteristic.class);
+        return modelMapper.map(characteristicDTO, Characteristic.class);
     }
 
     public RangeValue mapToRangeValue(RangeValueDTO rangeValueDTO, Long characteristicId) {

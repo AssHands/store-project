@@ -74,20 +74,6 @@ public class ProductController {
     public Long createOne(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
         return productServiceFacade.createOne(productPayload);
     }
-    @PostMapping("batch") //todo: make validation for list
-    public void createAll(@RequestBody List<ProductWritePayload> productPayloads) {
-
-//        for(ProductWritePayload payload : productPayloads) {
-//            Errors errors = new BeanPropertyBindingResult(payload, "productPayload");
-//            validator.validate(payload.getProduct(), errors, ProductWriteDTO.Save.class);
-//
-//            if(errors.hasErrors()){
-//                return ResponseEntity.badRequest().body(errors.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList()));
-//            }
-//        }
-
-        productServiceFacade.createAll(productPayloads);
-    }
 
     @PatchMapping("{id}")
     public Long updateOne(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,

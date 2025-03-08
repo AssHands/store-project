@@ -1,5 +1,6 @@
 package com.ak.store.common.event.catalogue;
 
+import com.ak.store.common.document.ProductDocument;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -13,5 +14,5 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductCreatedEvent implements ProductEvent {
-    private Long id;
+    private ProductDocument productDocument;
 }

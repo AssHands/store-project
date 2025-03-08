@@ -46,7 +46,7 @@ public class S3Service {
     public void deleteAllImage(List<String> imageKeysForDelete) {
         boolean a = false;
         for(var key : imageKeysForDelete) {
-            copyImage("products-photos", "deleted-product-images", key);
+            copyOneImage("products-photos", "deleted-product-images", key);
 
             if(!isExist("deleted-product-images", key)) {
                 throw new RuntimeException("error while delete images");
@@ -60,7 +60,7 @@ public class S3Service {
 
     public void compensateDeleteAllImage(List<String> imageKeysForCompensate) {
         for(var key : imageKeysForCompensate) {
-            copyImage("deleted-product-images", "products-photos", key);
+            copyOneImage("deleted-product-images", "products-photos", key);
 
             if(!isExist("products-photos", key)) {
                 throw new RuntimeException("error while compensate delete images");
@@ -93,7 +93,7 @@ public class S3Service {
         }
     }
 
-    private void copyImage(String sourceBucket, String destinationBucket, String key) {
+    private void copyOneImage(String sourceBucket, String destinationBucket, String key) {
         CopyObjectRequest copyReq = CopyObjectRequest.builder()
                 .sourceBucket(sourceBucket)
                 .sourceKey(key)

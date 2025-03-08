@@ -8,14 +8,12 @@ import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationRange;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.*;
-import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
-import com.ak.store.catalogue.model.document.ProductDocument;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
-import com.ak.store.catalogue.util.CatalogueMapper;
+import com.ak.store.common.document.ProductDocument;
 import com.ak.store.common.model.search.dto.FiltersDTO;
 import com.ak.store.common.model.search.common.NumericFilter;
 import com.ak.store.common.model.search.common.NumericFilterValue;
@@ -24,7 +22,6 @@ import com.ak.store.common.payload.search.SearchProductRequest;
 import com.ak.store.common.model.search.common.TextFilter;
 import com.ak.store.catalogue.model.pojo.ElasticSearchResult;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
-import com.fasterxml.classmate.AnnotationOverrides;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,84 +34,6 @@ public class ElasticService {
 
     private final ElasticsearchClient esClient;
     private final CharacteristicRepo characteristicRepo;
-
-    public void restoreOneProduct(ProductDocument productDocument) {
-        var request = IndexRequest.of(i -> i
-                .index("product")
-                .id(productDocument.getId().toString())
-                .document(productDocument));
-
-        try {
-            esClient.index(request);
-        } catch (Exception e) {
-            throw new RuntimeException("index document error");
-        }
-    }
-
-    public void deleteOneProduct(Long id) {
-        var request = DeleteRequest.of(d -> d
-                .index("product")
-                .id(id.toString()));
-
-        try {
-            esClient.delete(request);
-        } catch (Exception e) {
-            throw new RuntimeException("delete document error");
-        }
-    }
-
-    public void createOneProduct(ProductDocument productDocument) {
-        var request = IndexRequest.of(i -> i
-                 .index("product")
-                 .id(productDocument.getId().toString())
-                 .document(productDocument));
-
-        try {
-            esClient.index(request);
-        } catch (Exception e) {
-            throw new RuntimeException("index document error");
-        }
-    }
-
-    public void createAllProduct(List<ProductDocument> productDocumentList) {
-        var br = new BulkRequest.Builder();
-
-        productDocumentList.forEach(product ->
-                br.operations(op -> op
-                        .index(idx -> idx
-                                .index("product")
-                                .id(product.getId().toString())
-                                .document(product))));
-
-        BulkResponse result = null;
-        
-        try {
-            result = esClient.bulk(br.build());
-        } catch (Exception e) {
-            throw new RuntimeException("bulk document error");
-        }
-
-        if (result.errors()) {
-            for (BulkResponseItem item: result.items()) {
-                if (item.error() != null) {
-                    throw new RuntimeException("bulk had errors\n" + item.error().reason());
-                }
-            }
-        }
-    }
-
-    public void updateOneProduct(ProductDocument productDocument) {
-        var request = UpdateRequest.of(u -> u
-                .index("product")
-                .id(productDocument.getId().toString())
-                .doc(productDocument));
-
-        try {
-            esClient.update(request, ProductDocument.class);
-        } catch (Exception e) {
-            throw new RuntimeException("update document error");
-        }
-    }
 
     public SearchAvailableFiltersResponse searchAvailableFilters(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
         List<Query> filters = new ArrayList<>();
