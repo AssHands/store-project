@@ -2,7 +2,7 @@ package com.ak.store.emailSender.service;
 
 import com.ak.store.common.event.order.OrderCreatedEvent;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
-import com.ak.store.common.model.order.dto.OrderProductDTO;
+import com.ak.store.common.model.order.dto.ProductAmountDTO;
 import com.ak.store.emailSender.feign.CatalogueFeign;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class EmailSender {
             """;
     private final String ORDER_SUBJECT = "Your order created";
     private final String ORDER_CONTENT = """
-            Your order:<br>
+            Your order %d:<br>
             <h2>%s</h2>
             Total price: %d$<br>
             Thank you,<br>
@@ -62,7 +62,7 @@ public class EmailSender {
             helper.setTo(orderCreatedEvent.getConsumerEmail());
             helper.setSubject(ORDER_SUBJECT);
 
-            String content = ORDER_CONTENT.formatted(
+            String content = ORDER_CONTENT.formatted(orderCreatedEvent.getOrderId(),
                     getOrderContent(orderCreatedEvent), orderCreatedEvent.getTotalPrice());
 
             helper.setText(content, true);
@@ -74,7 +74,7 @@ public class EmailSender {
     }
 
     private String getOrderContent(OrderCreatedEvent orderCreatedEvent) {
-        List<Long> ids = orderCreatedEvent.getOrderProducts().stream().map(OrderProductDTO::getProductId).toList();
+        List<Long> ids = orderCreatedEvent.getOrderProducts().stream().map(ProductAmountDTO::getProductId).toList();
         List<ProductPoorView> products = catalogueFeign.findAllProductPoor(ids);
         Map<Integer, ProductPoorView> orderContent = new HashMap<>();
 

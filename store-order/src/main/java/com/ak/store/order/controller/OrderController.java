@@ -18,12 +18,17 @@ public class OrderController {
     private final OrderFacade orderFacade;
 
     @GetMapping
-    public List<OrderView> findAllOrder(@AuthenticationPrincipal Jwt accessToken) {
-        return orderFacade.findAllByConsumerId(accessToken.getSubject());
+    public List<OrderView> findAllOrder(@RequestParam String consumerId) {
+        return orderFacade.findAllByConsumerId(consumerId);
     }
 
-    @PostMapping
+    @PostMapping("me")
     public void createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody OrderDTO orderDTO) {
         orderFacade.createOne(accessToken, orderDTO);
+    }
+
+    @GetMapping("me")
+    public List<OrderView> getAllOrderMe(@AuthenticationPrincipal Jwt accessToken) {
+        return orderFacade.findAllByConsumerId(accessToken.getSubject());
     }
 }

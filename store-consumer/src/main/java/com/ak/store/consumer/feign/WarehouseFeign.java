@@ -6,12 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "warehouse", url = "http://localhost:8083/api/v1/warehouse")
+@FeignClient(name = "warehouse", url = "http://localhost:8083/api/v1/warehouse", configuration = OAuthFeignConfig.class)
 public interface WarehouseFeign {
 
-    @PostMapping("warehouse/check")
-    Boolean checkProductAmount(@RequestBody List<ProductCheckDTO> productCheckDTOList);
-
-    @GetMapping("warehouse/amount/{productId}")
+    @GetMapping("warehouses/{productId}/amount")
     Integer getAmount(@PathVariable Long productId);
 }

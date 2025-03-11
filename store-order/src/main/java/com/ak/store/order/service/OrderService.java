@@ -2,13 +2,11 @@ package com.ak.store.order.service;
 
 import com.ak.store.common.model.catalogue.view.ProductPrice;
 import com.ak.store.common.model.order.dto.OrderDTO;
-import com.ak.store.common.model.order.dto.OrderProductDTO;
+import com.ak.store.common.model.order.dto.ProductAmountDTO;
 import com.ak.store.order.feign.CatalogueFeign;
-import com.ak.store.order.feign.WarehouseFeign;
 import com.ak.store.order.model.Order;
 import com.ak.store.order.model.OrderProduct;
 import com.ak.store.order.repository.OrderRepo;
-import com.ak.store.order.util.OrderMapper;
 import com.ak.store.order.validator.business.OrderBusinessValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +31,7 @@ public class OrderService {
         orderBusinessValidator.validateCreation(orderDTO);
 
         var productIds = orderDTO.getProducts().stream()
-                .map(OrderProductDTO::getProductId)
+                .map(ProductAmountDTO::getProductId)
                 .toList();
 
         var productPriceMap = catalogueFeign.getAllPrice(productIds).stream()

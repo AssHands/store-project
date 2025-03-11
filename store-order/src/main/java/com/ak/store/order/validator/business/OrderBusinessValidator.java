@@ -2,7 +2,7 @@ package com.ak.store.order.validator.business;
 
 
 import com.ak.store.common.model.order.dto.OrderDTO;
-import com.ak.store.common.model.order.dto.OrderProductDTO;
+import com.ak.store.common.model.order.dto.ProductAmountDTO;
 import com.ak.store.common.model.warehouse.dto.ProductCheckDTO;
 import com.ak.store.order.feign.CatalogueFeign;
 import com.ak.store.order.feign.WarehouseFeign;
@@ -20,7 +20,7 @@ public class OrderBusinessValidator {
 
     public void validateCreation(OrderDTO orderDTO) {
         var productIds = orderDTO.getProducts().stream()
-                .map(OrderProductDTO::getProductId)
+                .map(ProductAmountDTO::getProductId)
                 .toList();
 
         if (!catalogueFeign.availableAll(productIds)) {

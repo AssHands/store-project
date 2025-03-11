@@ -20,5 +20,5 @@ import java.util.List;
 public class OrderDTO {
 
     @Builder.Default
-    private List<OrderProductDTO> products = new ArrayList<>();
+    private List<ProductAmountDTO> products = new ArrayList<>();
 }

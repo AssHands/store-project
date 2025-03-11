@@ -1,4 +1,4 @@
-package com.ak.store.order.security;
+package com.ak.store.warehouse.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,8 +27,12 @@ public class SecurityConfig {
 //        http.cors(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/order/orders/me").hasRole("CONSUMER")
-                .requestMatchers("/api/v1/order/orders").hasRole("MANAGER"));
+                .requestMatchers("/api/v1/warehouse/warehouses/check").permitAll()
+                .requestMatchers("/api/v1/warehouse/warehouses/reserve").hasRole("CONSUMER")
+                .requestMatchers("/api/v1/warehouse/warehouses/{productId}/amount").permitAll()
+                .requestMatchers("/api/v1/warehouse/warehouses/{productId}/amount/*").hasRole("MANAGER")
+
+                .anyRequest().permitAll());
 
         return http.build();
     }
