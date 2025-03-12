@@ -24,5 +24,6 @@
         <module>store-warehouse</module>
         <module>store-synchronization</module>
         <module>store-email-sender</module>
+        <module>store-outbox-scheduler</module>
     </modules>
 </project>

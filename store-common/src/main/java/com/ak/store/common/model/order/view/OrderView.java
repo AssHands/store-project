@@ -21,5 +21,7 @@ public class OrderView {
     private Long id;
     private String consumerId;
     private Integer totalPrice;
+
+    @Builder.Default
     List<OrderProductView> products = new ArrayList<>();
 }

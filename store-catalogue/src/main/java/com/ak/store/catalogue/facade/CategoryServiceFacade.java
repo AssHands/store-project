@@ -34,6 +34,11 @@ public class CategoryServiceFacade {
     }
 
     @Transactional
+    public Long updateOne(Long id, CategoryDTO categoryDTO) {
+        return categoryService.updateOne(id, categoryDTO).getId();
+    }
+
+    @Transactional
     public Long addCharacteristicToCategory(Long categoryId, Long characteristicId) {
          return categoryService.addCharacteristicToCategory(categoryId, characteristicId).getId();
     }
@@ -41,10 +46,5 @@ public class CategoryServiceFacade {
     @Transactional
     public Long deleteCharacteristicFromCategory(Long categoryId, Long characteristicId) {
         return categoryService.deleteCharacteristicFromCategory(categoryId, characteristicId).getId();
-    }
-
-    @Transactional
-    public Long updateOne(Long id, CategoryDTO categoryDTO) {
-        return categoryService.updateOne(id, categoryDTO).getId();
     }
 }

@@ -1,3 +1,6 @@
+server:
+  port: 8086
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5430/postgres
@@ -12,15 +15,6 @@ spring:
         #logs
         format_sql: true
         generate_statistics: true
-
-        #cache
-        javax.cache:
-          provider: org.ehcache.jsr107.EhcacheCachingProvider
-          uri: classpath:ehcache-config.xml
-        cache:
-          use_second_level_cache: true
-          use_query_cache: true
-          region.factory_class: jcache
 
         #batch
         jdbc:
@@ -43,14 +37,3 @@ spring:
         delivery.timeout.ms: 20000
         enable.idempotence: true
         max.in.flight.requests.per.connection: 5
-
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 50MB
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:8070/realms/store-realm/protocol/openid-connect/certs

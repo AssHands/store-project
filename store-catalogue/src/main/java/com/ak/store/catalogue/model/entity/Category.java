@@ -16,7 +16,6 @@ import java.util.List;
 @Builder
 @ToString(exclude = { "characteristics" })
 @EqualsAndHashCode(of = { "name" })
-@Table(name = "category")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "static-data")
 public class Category {
     @Id

@@ -56,11 +56,11 @@ public class CatalogueMapper {
     }
 
     public ProductRichView mapToProductRichView(Product product) {
-        var dto = modelMapper.map(product, ProductRichView.class);
-        dto.getCharacteristics().clear();
+        var view = modelMapper.map(product, ProductRichView.class);
+        view.getCharacteristics().clear();
 
         for (var src : product.getCharacteristics()) {
-            dto.getCharacteristics().add(ProductCharacteristicView.builder()
+            view.getCharacteristics().add(ProductCharacteristicView.builder()
                     .numericValue(src.getNumericValue())
                     .textValue(src.getTextValue())
                     .name(src.getCharacteristic().getName())
@@ -68,7 +68,7 @@ public class CatalogueMapper {
                     .build());
         }
 
-        return dto;
+        return view;
     }
 
 

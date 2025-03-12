@@ -1,16 +1,13 @@
 package com.ak.store.catalogue.facade;
 
-import com.ak.store.catalogue.kafka.ProductProducerKafka;
+import com.ak.store.catalogue.outbox.OutboxTaskService;
+import com.ak.store.catalogue.outbox.OutboxTaskType;
 import com.ak.store.catalogue.util.SagaBuilder;
-import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.catalogue.integration.ElasticService;
 import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.common.event.catalogue.ProductCreatedEvent;
-import com.ak.store.common.event.catalogue.ProductDeletedEvent;
-import com.ak.store.common.event.catalogue.ProductUpdatedEvent;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.view.ProductPrice;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
@@ -34,21 +31,19 @@ public class ProductServiceFacade {
     private final ElasticService elasticService;
     private final S3Service s3Service;
     private final CatalogueMapper catalogueMapper;
-    private final ProductProducerKafka productProducerKafka;
+    private final OutboxTaskService<ProductRichView> outboxTaskService;
 
     @Transactional
     public Long saveOrUpdateAllImage(ImageDTO imageDTO) {
         var processedProductImages = productService.saveOrUpdateAllImage(imageDTO);
         var product = productService.findOneWithImages(imageDTO.getProductId());
+        outboxTaskService.createOutboxTask(catalogueMapper.mapToProductRichView(product), OutboxTaskType.PRODUCT_UPDATED);
 
         new SagaBuilder()
                 .step(() -> s3Service.putAllImage(processedProductImages.getImagesForAdd()))
                 .compensate(() -> s3Service.compensatePutAllImage(processedProductImages.getImagesForAdd().keySet()))
                 .step(() -> s3Service.deleteAllImage(processedProductImages.getImageKeysForDelete()))
                 .compensate(() -> s3Service.compensateDeleteAllImage(processedProductImages.getImageKeysForDelete()))
-                .step(() -> productProducerKafka.send(new ProductUpdatedEvent(
-                        catalogueMapper.mapToProductDocument(product)))
-                )
                 .execute();
 
         return product.getId();
@@ -56,34 +51,30 @@ public class ProductServiceFacade {
 
     @Transactional
     public Long createOne(ProductWritePayload payload) {
-        Product createdProduct = productService.createOne(payload);
-
-        productProducerKafka.send(new ProductCreatedEvent(
-                catalogueMapper.mapToProductDocument(createdProduct)
-        ));
-
-        return createdProduct.getId();
+        var product = productService.createOne(payload);
+        outboxTaskService.createOutboxTask(catalogueMapper.mapToProductRichView(product), OutboxTaskType.PRODUCT_CREATED);
+        return product.getId();
     }
 
     @Transactional
     public void deleteOne(Long id) {
-        Product deletedProduct = productService.deleteOne(id);
-        List<String> imageKeyList = deletedProduct.getImages().stream()
+        var product = productService.deleteOne(id);
+        outboxTaskService.createOutboxTask(catalogueMapper.mapToProductRichView(product), OutboxTaskType.PRODUCT_DELETED);
+        List<String> imageKeyList = product.getImages().stream()
                 .map(ProductImage::getImageKey)
                 .toList();
 
         new SagaBuilder()
                 .step(() -> s3Service.deleteAllImage(imageKeyList))
                 .compensate(() -> s3Service.compensateDeleteAllImage(imageKeyList))
-                .step(() -> productProducerKafka.send(new ProductDeletedEvent(id)))
                 .execute();
     }
 
     @Transactional
     public Long updateOne(ProductWritePayload productPayload, Long productId) {
-        Product updatedProduct = productService.updateOne(productPayload, productId);
-        productProducerKafka.send(new ProductUpdatedEvent());
-        return updatedProduct.getId();
+        var product = productService.updateOne(productPayload, productId);
+        outboxTaskService.createOutboxTask(catalogueMapper.mapToProductRichView(product), OutboxTaskType.PRODUCT_UPDATED);
+        return product.getId();
     }
 
     @Transactional
