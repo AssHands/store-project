@@ -2,21 +2,14 @@ package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.ProductServiceFacade;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
-import com.ak.store.common.model.catalogue.view.ProductPrice;
+import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.model.catalogue.form.ImageForm;
 import com.ak.store.common.payload.catalogue.ProductWritePayload;
-import com.ak.store.common.payload.search.ProductSearchResponse;
-import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
-import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
-import com.ak.store.common.payload.search.SearchProductRequest;
 import com.ak.store.common.validationGroup.Create;
 import com.ak.store.common.validationGroup.Update;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,8 +24,8 @@ public class ProductController {
     private final ProductServiceFacade productServiceFacade;
 
     @GetMapping("{id}/rich")
-    public ProductRichView getOneRich(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long id) {
-        return productServiceFacade.findOneRich(accessToken.getSubject(), id);
+    public ProductRichView getOneRich(@PathVariable Long id) {
+        return productServiceFacade.findOneRich(id);
     }
 
     @GetMapping("{id}/poor")
@@ -46,7 +39,7 @@ public class ProductController {
     }
 
     @PostMapping("price")
-    public List<ProductPrice> getAllPrice(@RequestBody List<Long> ids) {
+    public List<ProductPriceDTO> getAllPrice(@RequestBody List<Long> ids) {
         return productServiceFacade.getAllPrice(ids);
     }
 
@@ -137,15 +130,14 @@ public class ProductController {
         return productServiceFacade.saveOrUpdateAllImage(imageForm);
     }
 
-    @PostMapping("search")
-    public ProductSearchResponse searchAllProduct(@AuthenticationPrincipal Jwt accessToken,
-                                                  @RequestBody @Valid SearchProductRequest searchProductRequest) {
-        return productServiceFacade.findAllBySearch(accessToken.getSubject(), searchProductRequest);
-    }
-
-    @PostMapping("search/filters")
-    public SearchAvailableFiltersResponse searchAllAvailableFilters(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
-        System.out.println(searchAvailableFiltersRequest);
-        return productServiceFacade.findAllAvailableFilter(searchAvailableFiltersRequest);
-    }
+//    @PostMapping("search")
+//    public ProductSearchResponse searchAllProduct(@AuthenticationPrincipal Jwt accessToken,
+//                                                  @RequestBody @Valid SearchProductRequest searchProductRequest) {
+//        return productServiceFacade.findAllBySearch(accessToken.getSubject(), searchProductRequest);
+//    }
+//
+//    @PostMapping("search/filters")
+//    public SearchAvailableFiltersResponse searchAllAvailableFilters(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
+//        return productServiceFacade.findAllAvailableFilter(searchAvailableFiltersRequest);
+//    }
 }

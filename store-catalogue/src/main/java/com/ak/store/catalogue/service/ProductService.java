@@ -3,7 +3,7 @@ package com.ak.store.catalogue.service;
 import com.ak.store.catalogue.model.entity.*;
 import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
 import com.ak.store.catalogue.repository.ProductRepo;
-import com.ak.store.catalogue.util.CatalogueMapper0;
+import com.ak.store.catalogue.util.mapper.CatalogueMapper0;
 import com.ak.store.catalogue.service.product.PriceCalculator;
 import com.ak.store.catalogue.validator.business.ProductBusinessValidator;
 import com.ak.store.catalogue.validator.ProductImageValidator;

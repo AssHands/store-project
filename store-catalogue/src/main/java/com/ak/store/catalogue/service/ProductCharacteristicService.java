@@ -2,7 +2,7 @@ package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
-import com.ak.store.catalogue.util.CatalogueMapper0;
+import com.ak.store.catalogue.util.mapper.CatalogueMapper0;
 import com.ak.store.catalogue.validator.business.ProductCharacteristicBusinessValidator;
 import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
 import lombok.RequiredArgsConstructor;

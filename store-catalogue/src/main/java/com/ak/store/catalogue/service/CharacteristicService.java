@@ -4,7 +4,7 @@ import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.RangeValue;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.*;
-import com.ak.store.catalogue.util.CatalogueMapper0;
+import com.ak.store.catalogue.util.mapper.CatalogueMapper0;
 import com.ak.store.catalogue.validator.business.CharacteristicBusinessValidator;
 import com.ak.store.common.model.catalogue.form.CharacteristicForm;
 import com.ak.store.common.model.catalogue.form.RangeValueForm;

@@ -1,10 +1,8 @@
 package com.ak.store.order.feign;
 
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
-import com.ak.store.common.model.catalogue.view.ProductPrice;
+import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -19,5 +17,5 @@ public interface CatalogueFeign {
     Boolean availableAll(@RequestBody List<Long> ids);
 
     @PostMapping("products/price")
-    List<ProductPrice> getAllPrice(@RequestBody List<Long> ids);
+    List<ProductPriceDTO> getAllPrice(@RequestBody List<Long> ids);
 }

@@ -2,6 +2,7 @@ package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.CategoryServiceFacade;
 import com.ak.store.common.model.catalogue.form.CategoryForm;
+import com.ak.store.common.model.catalogue.view.CategoryTreeView;
 import com.ak.store.common.model.catalogue.view.CategoryView;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,8 @@ public class CategoryController {
     private final CategoryServiceFacade categoryServiceFacade;
 
     @GetMapping
-    public List<CategoryView> getAll() {
-        return categoryServiceFacade.findAll();
+    public List<CategoryTreeView> getAll() {
+        return categoryServiceFacade.findAllAsTree();
     }
 
     @PostMapping

@@ -1,6 +1,6 @@
 package com.ak.store.order.service;
 
-import com.ak.store.common.model.catalogue.view.ProductPrice;
+import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
 import com.ak.store.common.model.order.dto.OrderDTO;
 import com.ak.store.common.model.order.dto.ProductAmountDTO;
 import com.ak.store.order.feign.CatalogueFeign;
@@ -35,7 +35,7 @@ public class OrderService {
                 .toList();
 
         var productPriceMap = catalogueFeign.getAllPrice(productIds).stream()
-                .collect(Collectors.toMap(ProductPrice::getId, ProductPrice::getPrice));
+                .collect(Collectors.toMap(ProductPriceDTO::getId, ProductPriceDTO::getPrice));
 
         var order = Order.builder()
                 .consumerId(UUID.fromString(consumerId))

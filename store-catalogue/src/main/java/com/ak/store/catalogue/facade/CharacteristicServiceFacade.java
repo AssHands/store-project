@@ -1,7 +1,8 @@
 package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.service.CharacteristicService;
-import com.ak.store.catalogue.util.CatalogueMapper0;
+import com.ak.store.catalogue.util.mapper.CatalogueMapper0;
+import com.ak.store.catalogue.util.mapper.CharacteristicMapper;
 import com.ak.store.common.model.catalogue.form.CharacteristicForm;
 import com.ak.store.common.model.catalogue.form.RangeValueForm;
 import com.ak.store.common.model.catalogue.form.TextValueForm;
@@ -16,12 +17,11 @@ import java.util.List;
 @Service
 public class CharacteristicServiceFacade {
     private final CharacteristicService characteristicService;
-
-    private final CatalogueMapper0 catalogueMapper0;
+    private final CharacteristicMapper characteristicMapper;
 
     public List<CharacteristicView> findAllByCategoryId(Long categoryId) {
         return characteristicService.findAllByCategoryId(categoryId).stream()
-                .map(catalogueMapper0::mapToCharacteristicView)
+                .map(characteristicMapper::toCharacteristicView)
                 .toList();
     }
 

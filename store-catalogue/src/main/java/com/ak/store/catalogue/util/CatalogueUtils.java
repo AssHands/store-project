@@ -1,28 +1,28 @@
 package com.ak.store.catalogue.util;
 
-import com.ak.store.common.model.catalogue.view.CategoryView;
+import com.ak.store.common.model.catalogue.view.CategoryTreeView;
 
 import java.util.*;
 
 public abstract class CatalogueUtils {
 
-    static public List<CategoryView> buildCategoryTree(List<CategoryView> categories) {
-        if(categories.isEmpty()) {
+    static public List<CategoryTreeView> buildCategoryTree(List<CategoryTreeView> categories) {
+        if (categories.isEmpty()) {
             return Collections.emptyList();
         }
 
-        Map<Long, CategoryView> categoryMap = new LinkedHashMap<>();
-        List<CategoryView> rootCategories = new ArrayList<>();
+        Map<Long, CategoryTreeView> categoryMap = new LinkedHashMap<>();
+        List<CategoryTreeView> rootCategories = new ArrayList<>();
 
-        for (CategoryView category : categories) {
+        for (CategoryTreeView category : categories) {
             categoryMap.put(category.getId(), category);
         }
 
-        for (CategoryView category : categories) {
+        for (CategoryTreeView category : categories) {
             if (category.getParentId() == null) {
                 rootCategories.add(category);
             } else {
-                CategoryView parent = categoryMap.get(category.getParentId());
+                CategoryTreeView parent = categoryMap.get(category.getParentId());
                 if (parent != null) {
                     parent.getChildCategories().add(category);
                 } else {

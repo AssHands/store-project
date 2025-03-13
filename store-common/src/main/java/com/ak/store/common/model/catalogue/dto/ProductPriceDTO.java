@@ -1,4 +1,4 @@
-package com.ak.store.common.model.catalogue.view;
+package com.ak.store.common.model.catalogue.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -8,17 +8,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CategoryView {
+public class ProductPriceDTO {
     private Long id;
-    private String name;
-    private Long parentId;
+    private Integer price;
 }

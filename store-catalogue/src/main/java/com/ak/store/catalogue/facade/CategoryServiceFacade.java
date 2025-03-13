@@ -1,9 +1,10 @@
 package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.service.CategoryService;
-import com.ak.store.catalogue.util.CatalogueMapper0;
 import com.ak.store.catalogue.util.CatalogueUtils;
+import com.ak.store.catalogue.util.mapper.CategoryMapper;
 import com.ak.store.common.model.catalogue.form.CategoryForm;
+import com.ak.store.common.model.catalogue.view.CategoryTreeView;
 import com.ak.store.common.model.catalogue.view.CategoryView;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +16,17 @@ import java.util.List;
 @Service
 public class CategoryServiceFacade {
     private final CategoryService categoryService;
-    private final CatalogueMapper0 catalogueMapper0;
+    private final CategoryMapper categoryMapper;
 
     public List<CategoryView> findAll() {
+        return categoryService.findAll().stream()
+                .map(categoryMapper::toCategoryView)
+                .toList();
+    }
+
+    public List<CategoryTreeView> findAllAsTree() {
         return CatalogueUtils.buildCategoryTree(categoryService.findAll().stream()
-                .map(catalogueMapper0::mapToCategoryView)
+                .map(categoryMapper::toCategoryTreeView)
                 .toList());
     }
 
@@ -40,7 +47,7 @@ public class CategoryServiceFacade {
 
     @Transactional
     public Long addCharacteristicToCategory(Long categoryId, Long characteristicId) {
-         return categoryService.addCharacteristicToCategory(categoryId, characteristicId).getId();
+        return categoryService.addCharacteristicToCategory(categoryId, characteristicId).getId();
     }
 
     @Transactional
