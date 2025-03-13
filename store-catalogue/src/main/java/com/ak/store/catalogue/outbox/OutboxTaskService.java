@@ -11,7 +11,7 @@ public class OutboxTaskService<T> {
     private final OutboxTaskRepo outboxTaskRepo;
     private final OutboxTaskMapper<T> outboxTaskMapper;
 
-    public void createOutboxTask(T payload, OutboxTaskType type) {
+    public void createOneTask(T payload, OutboxTaskType type) {
         var task = outboxTaskMapper.mapToOutboxTask(payload);
 
         task.setType(type);

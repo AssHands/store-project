@@ -4,11 +4,11 @@ import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.RangeValue;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.*;
-import com.ak.store.catalogue.util.CatalogueMapper;
+import com.ak.store.catalogue.util.CatalogueMapper0;
 import com.ak.store.catalogue.validator.business.CharacteristicBusinessValidator;
-import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
-import com.ak.store.common.model.catalogue.dto.RangeValueDTO;
-import com.ak.store.common.model.catalogue.dto.TextValueDTO;
+import com.ak.store.common.model.catalogue.form.CharacteristicForm;
+import com.ak.store.common.model.catalogue.form.RangeValueForm;
+import com.ak.store.common.model.catalogue.form.TextValueForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class CharacteristicService {
-    private final CatalogueMapper catalogueMapper;
+    private final CatalogueMapper0 catalogueMapper0;
     private final CharacteristicRepo characteristicRepo;
     private final CharacteristicBusinessValidator characteristicBusinessValidator;
 
@@ -47,9 +47,9 @@ public class CharacteristicService {
                 .orElseThrow(() -> new RuntimeException("no characteristic found"));
     }
 
-    public Characteristic createOne(CharacteristicDTO characteristicDTO) {
-        characteristicBusinessValidator.validateCreation(characteristicDTO);
-        return characteristicRepo.save(catalogueMapper.mapToCharacteristic(characteristicDTO));
+    public Characteristic createOne(CharacteristicForm characteristicForm) {
+        characteristicBusinessValidator.validateCreation(characteristicForm);
+        return characteristicRepo.save(catalogueMapper0.mapToCharacteristic(characteristicForm));
     }
 
 
@@ -59,52 +59,52 @@ public class CharacteristicService {
     }
 
 
-    public Characteristic updateOne(Long id, CharacteristicDTO characteristicDTO) {
+    public Characteristic updateOne(Long id, CharacteristicForm characteristicForm) {
         Characteristic characteristic = findOne(id);
-        characteristicBusinessValidator.validateUpdate(characteristicDTO);
-        updateCharacteristic(characteristic, characteristicDTO);
+        characteristicBusinessValidator.validateUpdate(characteristicForm);
+        updateCharacteristic(characteristic, characteristicForm);
         return characteristicRepo.save(characteristic);
     }
 
-    public Characteristic createRangeValue(Long id, RangeValueDTO rangeValueDTO) {
+    public Characteristic createRangeValue(Long id, RangeValueForm rangeValueForm) {
         Characteristic characteristic = findOneWithRangeValues(id);
-        characteristicBusinessValidator.validateCreationRangeValue(characteristic, rangeValueDTO);
-        characteristic.getRangeValues().add(catalogueMapper.mapToRangeValue(rangeValueDTO, id));
+        characteristicBusinessValidator.validateCreationRangeValue(characteristic, rangeValueForm);
+        characteristic.getRangeValues().add(catalogueMapper0.mapToRangeValue(rangeValueForm, id));
         return characteristicRepo.save(characteristic);
     }
 
-    public Characteristic createTextValue(Long id, TextValueDTO textValueDTO) {
+    public Characteristic createTextValue(Long id, TextValueForm textValueForm) {
         Characteristic characteristic = findOneWithTextValues(id);
-        characteristicBusinessValidator.validateCreationTextValue(characteristic, textValueDTO);
-        characteristic.getTextValues().add(catalogueMapper.mapToTextValue(textValueDTO, id));
+        characteristicBusinessValidator.validateCreationTextValue(characteristic, textValueForm);
+        characteristic.getTextValues().add(catalogueMapper0.mapToTextValue(textValueForm, id));
         return characteristicRepo.save(characteristic);
     }
 
-    public Characteristic deleteOneRangeValue(Long id, RangeValueDTO rangeValueDTO) {
+    public Characteristic deleteOneRangeValue(Long id, RangeValueForm rangeValueForm) {
         Characteristic characteristic = findOneWithRangeValues(id);
-        int index = findRangeValueIndex(characteristic, rangeValueDTO);
+        int index = findRangeValueIndex(characteristic, rangeValueForm);
         characteristic.getRangeValues().remove(index);
         return characteristicRepo.save(characteristic);
     }
 
-    public Characteristic deleteOneTextValue(Long id, TextValueDTO textValueDTO) {
+    public Characteristic deleteOneTextValue(Long id, TextValueForm textValueForm) {
         Characteristic characteristic = findOneWithTextValues(id);
-        int index = findTextValueIndex(characteristic, textValueDTO);
+        int index = findTextValueIndex(characteristic, textValueForm);
         characteristic.getTextValues().remove(index);
         return characteristicRepo.save(characteristic);
     }
 
-    private void updateCharacteristic(Characteristic characteristic, CharacteristicDTO characteristicDTO) {
-        if(characteristicDTO.getName() != null) {
-            characteristic.setName(characteristicDTO.getName());
+    private void updateCharacteristic(Characteristic characteristic, CharacteristicForm characteristicForm) {
+        if(characteristicForm.getName() != null) {
+            characteristic.setName(characteristicForm.getName());
         }
     }
 
-    private int findRangeValueIndex(Characteristic characteristic, RangeValueDTO rangeValueDTO) {
+    private int findRangeValueIndex(Characteristic characteristic, RangeValueForm rangeValueForm) {
         int index = 0;
         for(RangeValue rangeValue : characteristic.getRangeValues()) {
-            if(rangeValue.getFromValue().equals(rangeValueDTO.getFrom())
-                    && rangeValue.getToValue().equals(rangeValueDTO.getTo())) {
+            if(rangeValue.getFromValue().equals(rangeValueForm.getFrom())
+                    && rangeValue.getToValue().equals(rangeValueForm.getTo())) {
                 return index;
             }
             index++;
@@ -113,10 +113,10 @@ public class CharacteristicService {
         throw new RuntimeException("range value didn't find");
     }
 
-    private int findTextValueIndex(Characteristic characteristic, TextValueDTO textValueDTO) {
+    private int findTextValueIndex(Characteristic characteristic, TextValueForm textValueForm) {
         int index = 0;
         for(TextValue textValue : characteristic.getTextValues()) {
-            if(textValue.getTextValue().equals(textValueDTO.getText())) {
+            if(textValue.getTextValue().equals(textValueForm.getText())) {
                 return index;
             }
             index++;

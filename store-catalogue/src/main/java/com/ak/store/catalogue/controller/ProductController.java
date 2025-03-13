@@ -4,7 +4,7 @@ import com.ak.store.catalogue.facade.ProductServiceFacade;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.view.ProductPrice;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
-import com.ak.store.common.model.catalogue.dto.ImageDTO;
+import com.ak.store.common.model.catalogue.form.ImageForm;
 import com.ak.store.common.payload.catalogue.ProductWritePayload;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.common.payload.search.SearchAvailableFiltersRequest;
@@ -132,9 +132,9 @@ public class ProductController {
                                       @RequestParam Map<String, String> allImageIndexes,
                                       @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,
                                       @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
-        ImageDTO imageDTO = new ImageDTO(productId, allImageIndexes, addImages, deleteImageIndexes);
+        ImageForm imageForm = new ImageForm(productId, allImageIndexes, addImages, deleteImageIndexes);
 
-        return productServiceFacade.saveOrUpdateAllImage(imageDTO);
+        return productServiceFacade.saveOrUpdateAllImage(imageForm);
     }
 
     @PostMapping("search")

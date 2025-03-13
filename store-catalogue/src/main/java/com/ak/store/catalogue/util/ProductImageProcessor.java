@@ -3,33 +3,33 @@ package com.ak.store.catalogue.util;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
-import com.ak.store.common.model.catalogue.dto.ImageDTO;
+import com.ak.store.common.model.catalogue.form.ImageForm;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
 public abstract class ProductImageProcessor {
-    public static ProcessedProductImages processProductImages(ImageDTO imageDTO, Product updatedProduct) {
+    public static ProcessedProductImages processProductImages(ImageForm imageForm, Product updatedProduct) {
         ProcessedProductImages processedProductImages = new ProcessedProductImages();
         List<ProductImage> productImages = updatedProduct.getImages();
 
         processedProductImages.setImageKeysForDelete(
-                markImagesForDeleteAndGetKeys(productImages, imageDTO.getDeleteImageIndexes()));
+                markImagesForDeleteAndGetKeys(productImages, imageForm.getDeleteImageIndexes()));
 
-        LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, imageDTO.getAddImages());
+        LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, imageForm.getAddImages());
         for (String key : imagesForAdd.keySet()) {
             productImages.add(ProductImage.builder()
                     .imageKey(key)
                     .product(Product.builder()
-                            .id(imageDTO.getProductId())
+                            .id(imageForm.getProductId())
                             .build())
                     .build());
         }
         processedProductImages.setImagesForAdd(imagesForAdd);
 
         processedProductImages.setNewProductImages(
-                createNewProductImageList(productImages, imageDTO.getAllImageIndexes()));
+                createNewProductImageList(productImages, imageForm.getAllImageIndexes()));
 
         return processedProductImages;
     }

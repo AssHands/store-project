@@ -36,6 +36,22 @@ public class OutboxTaskService {
     }
 
     @Transactional
+    public List<OutboxTask> getAllTaskForProcessingAndMarkAsCompleted(OutboxTaskType type) {
+        LocalDateTime retryTime = LocalDateTime.now();
+
+        Pageable pageable = PageRequest.of(0, batchSize);
+        List<OutboxTask> tasks = outboxTaskRepo.findAllTaskForProcessing(
+                type, OutboxTaskStatus.IN_PROGRESS, LocalDateTime.now(), pageable);
+
+        for (OutboxTask task : tasks) {
+            task.setRetryTime(retryTime.plusMinutes(retryTimeMinutes));
+            task.setStatus(OutboxTaskStatus.COMPLETED);
+        }
+
+        return tasks;
+    }
+
+    @Transactional
     public void markAllTaskAsCompleted(List<OutboxTask> tasks) {
         outboxTaskRepo.updateAllTask(tasks, OutboxTaskStatus.COMPLETED);
     }

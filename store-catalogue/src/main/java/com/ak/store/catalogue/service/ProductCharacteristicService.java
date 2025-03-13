@@ -2,9 +2,9 @@ package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
-import com.ak.store.catalogue.util.CatalogueMapper;
+import com.ak.store.catalogue.util.CatalogueMapper0;
 import com.ak.store.catalogue.validator.business.ProductCharacteristicBusinessValidator;
-import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
+import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +15,21 @@ import java.util.Set;
 @Service
 public class ProductCharacteristicService {
 
-    private final CatalogueMapper catalogueMapper;
+    private final CatalogueMapper0 catalogueMapper0;
     private final ProductCharacteristicBusinessValidator productCharacteristicBusinessValidator;
 
-    public void createAll(Product updatedProduct, Set<ProductCharacteristicDTO> createCharacteristicsDTO) {
+    public void createAll(Product updatedProduct, Set<ProductCharacteristicForm> createCharacteristicsDTO) {
         if(createCharacteristicsDTO.isEmpty()) return;
         productCharacteristicBusinessValidator.validateCreation(createCharacteristicsDTO, updatedProduct);
 
         List<ProductCharacteristic> createdCharacteristics = createCharacteristicsDTO.stream()
-                .map(c -> catalogueMapper.mapToProductCharacteristic(c, updatedProduct))
+                .map(c -> catalogueMapper0.mapToProductCharacteristic(c, updatedProduct))
                 .toList();
 
         updatedProduct.addCharacteristics(createdCharacteristics);
     }
 
-    public void updateAll(Product updatedProduct, Set<ProductCharacteristicDTO> updateCharacteristicsDTO) {
+    public void updateAll(Product updatedProduct, Set<ProductCharacteristicForm> updateCharacteristicsDTO) {
         if(updateCharacteristicsDTO.isEmpty()) return;
         productCharacteristicBusinessValidator.validateUpdate
                 (updateCharacteristicsDTO, updatedProduct.getCategory().getId());
@@ -43,7 +43,7 @@ public class ProductCharacteristicService {
         }
     }
 
-    public void deleteAll(Product updatedProduct, Set<ProductCharacteristicDTO> deleteCharacteristicsDTO) {
+    public void deleteAll(Product updatedProduct, Set<ProductCharacteristicForm> deleteCharacteristicsDTO) {
         if(deleteCharacteristicsDTO.isEmpty()) return;
 
         for(var characteristic : deleteCharacteristicsDTO) {

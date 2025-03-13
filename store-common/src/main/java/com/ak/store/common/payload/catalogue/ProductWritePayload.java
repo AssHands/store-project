@@ -1,7 +1,7 @@
 package com.ak.store.common.payload.catalogue;
 
-import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
-import com.ak.store.common.model.catalogue.dto.ProductDTO;
+import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
+import com.ak.store.common.model.catalogue.form.ProductForm;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -22,14 +22,14 @@ import java.util.Set;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductWritePayload {
     @Valid
-    ProductDTO product = new ProductDTO();
+    ProductForm product = new ProductForm();
 
     @Builder.Default
-    Set<@Valid ProductCharacteristicDTO> createCharacteristics = new HashSet<>();
+    Set<@Valid ProductCharacteristicForm> createCharacteristics = new HashSet<>();
 
     @Builder.Default
-    Set<@Valid ProductCharacteristicDTO> updateCharacteristics = new HashSet<>();
+    Set<@Valid ProductCharacteristicForm> updateCharacteristics = new HashSet<>();
 
     @Builder.Default
-    Set<@Valid ProductCharacteristicDTO> deleteCharacteristics = new HashSet<>();
+    Set<@Valid ProductCharacteristicForm> deleteCharacteristics = new HashSet<>();
 }

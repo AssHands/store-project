@@ -1,9 +1,9 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.CharacteristicServiceFacade;
-import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
-import com.ak.store.common.model.catalogue.dto.RangeValueDTO;
-import com.ak.store.common.model.catalogue.dto.TextValueDTO;
+import com.ak.store.common.model.catalogue.form.CharacteristicForm;
+import com.ak.store.common.model.catalogue.form.RangeValueForm;
+import com.ak.store.common.model.catalogue.form.TextValueForm;
 import com.ak.store.common.model.catalogue.view.CharacteristicView;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +23,8 @@ public class CharacteristicController {
     }
 
     @PostMapping
-    public Long createOne(@RequestBody @Valid CharacteristicDTO characteristicDTO) {
-        return characteristicServiceFacade.createOne(characteristicDTO);
+    public Long createOne(@RequestBody @Valid CharacteristicForm characteristicForm) {
+        return characteristicServiceFacade.createOne(characteristicForm);
     }
 
     @DeleteMapping("{id}")
@@ -33,27 +33,27 @@ public class CharacteristicController {
     }
 
     @PatchMapping("{id}")
-    public Long updateOne(@PathVariable Long id, @RequestBody CharacteristicDTO characteristicDTO) {
-        return characteristicServiceFacade.updateOne(id, characteristicDTO);
+    public Long updateOne(@PathVariable Long id, @RequestBody CharacteristicForm characteristicForm) {
+        return characteristicServiceFacade.updateOne(id, characteristicForm);
     }
 
     @PostMapping("{id}/range")
-    public Long createOneRangeValue(@PathVariable Long id, @RequestBody @Valid RangeValueDTO rangeValueDTO) {
-        return characteristicServiceFacade.createOneRangeValue(id, rangeValueDTO);
+    public Long createOneRangeValue(@PathVariable Long id, @RequestBody @Valid RangeValueForm rangeValueForm) {
+        return characteristicServiceFacade.createOneRangeValue(id, rangeValueForm);
     }
 
     @PostMapping("{id}/text")
-    public Long createOneTextValue(@PathVariable Long id, @RequestBody @Valid TextValueDTO textValueDTO) {
-        return characteristicServiceFacade.createOneTextValue(id, textValueDTO);
+    public Long createOneTextValue(@PathVariable Long id, @RequestBody @Valid TextValueForm textValueForm) {
+        return characteristicServiceFacade.createOneTextValue(id, textValueForm);
     }
 
     @DeleteMapping("{id}/range")
-    public Long deleteOneRangeValue(@PathVariable Long id, @RequestBody @Valid RangeValueDTO rangeValueDTO) {
-        return characteristicServiceFacade.deleteOneRangeValue(id, rangeValueDTO);
+    public Long deleteOneRangeValue(@PathVariable Long id, @RequestBody @Valid RangeValueForm rangeValueForm) {
+        return characteristicServiceFacade.deleteOneRangeValue(id, rangeValueForm);
     }
 
     @DeleteMapping("{id}/text")
-    public Long deleteOneRangeValue(@PathVariable Long id, @RequestBody @Valid TextValueDTO textValueDTO) {
-        return characteristicServiceFacade.deleteOneTextValue(id, textValueDTO);
+    public Long deleteOneRangeValue(@PathVariable Long id, @RequestBody @Valid TextValueForm textValueForm) {
+        return characteristicServiceFacade.deleteOneTextValue(id, textValueForm);
     }
 }

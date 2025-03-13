@@ -1,17 +1,14 @@
 package com.ak.store.common.model.catalogue.dto;
 
-import com.ak.store.common.validationGroup.Create;
-import com.ak.store.common.validationGroup.Update;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,10 +16,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CharacteristicDTO {
-    @NotBlank(groups = { Create.class, Update.class })
+    private Long id;
     private String name;
-
-    @Null(groups = Update.class)
-    @NotNull(groups = Create.class)
     private Boolean isText;
+
+    @Builder.Default
+    private List<RangeValueDTO> rangeValues = new ArrayList<>();
+
+    @Builder.Default
+    private List<String> textValues = new ArrayList<>();
 }

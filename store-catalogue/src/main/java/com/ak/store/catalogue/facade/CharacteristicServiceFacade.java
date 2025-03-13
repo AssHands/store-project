@@ -1,10 +1,10 @@
 package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.service.CharacteristicService;
-import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
-import com.ak.store.common.model.catalogue.dto.RangeValueDTO;
-import com.ak.store.common.model.catalogue.dto.TextValueDTO;
+import com.ak.store.catalogue.util.CatalogueMapper0;
+import com.ak.store.common.model.catalogue.form.CharacteristicForm;
+import com.ak.store.common.model.catalogue.form.RangeValueForm;
+import com.ak.store.common.model.catalogue.form.TextValueForm;
 import com.ak.store.common.model.catalogue.view.CharacteristicView;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,17 +17,17 @@ import java.util.List;
 public class CharacteristicServiceFacade {
     private final CharacteristicService characteristicService;
 
-    private final CatalogueMapper catalogueMapper;
+    private final CatalogueMapper0 catalogueMapper0;
 
     public List<CharacteristicView> findAllByCategoryId(Long categoryId) {
         return characteristicService.findAllByCategoryId(categoryId).stream()
-                .map(catalogueMapper::mapToCharacteristicView)
+                .map(catalogueMapper0::mapToCharacteristicView)
                 .toList();
     }
 
     @Transactional
-    public Long createOne(CharacteristicDTO characteristicDTO) {
-        return characteristicService.createOne(characteristicDTO).getId();
+    public Long createOne(CharacteristicForm characteristicForm) {
+        return characteristicService.createOne(characteristicForm).getId();
     }
 
     @Transactional
@@ -36,27 +36,27 @@ public class CharacteristicServiceFacade {
     }
 
     @Transactional
-    public Long updateOne(Long id, CharacteristicDTO characteristicDTO) {
-        return characteristicService.updateOne(id, characteristicDTO).getId();
+    public Long updateOne(Long id, CharacteristicForm characteristicForm) {
+        return characteristicService.updateOne(id, characteristicForm).getId();
     }
 
     @Transactional
-    public Long createOneRangeValue(Long id, RangeValueDTO rangeValueDTO) {
-        return characteristicService.createRangeValue(id, rangeValueDTO).getId();
+    public Long createOneRangeValue(Long id, RangeValueForm rangeValueForm) {
+        return characteristicService.createRangeValue(id, rangeValueForm).getId();
     }
 
     @Transactional
-    public Long createOneTextValue(Long id, TextValueDTO textValueDTO) {
-        return characteristicService.createTextValue(id, textValueDTO).getId();
+    public Long createOneTextValue(Long id, TextValueForm textValueForm) {
+        return characteristicService.createTextValue(id, textValueForm).getId();
     }
 
     @Transactional
-    public Long deleteOneRangeValue(Long id, RangeValueDTO rangeValueDTO) {
-        return characteristicService.deleteOneRangeValue(id, rangeValueDTO).getId();
+    public Long deleteOneRangeValue(Long id, RangeValueForm rangeValueForm) {
+        return characteristicService.deleteOneRangeValue(id, rangeValueForm).getId();
     }
 
     @Transactional
-    public Long deleteOneTextValue(Long id,TextValueDTO textValueDTO) {
-        return characteristicService.deleteOneTextValue(id, textValueDTO).getId();
+    public Long deleteOneTextValue(Long id, TextValueForm textValueForm) {
+        return characteristicService.deleteOneTextValue(id, textValueForm).getId();
     }
 }

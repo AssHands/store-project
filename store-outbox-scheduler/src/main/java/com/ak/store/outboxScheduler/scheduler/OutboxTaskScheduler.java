@@ -33,7 +33,7 @@ public class OutboxTaskScheduler {
             var taskType = entry.getKey();
             var taskProcessor = entry.getValue();
 
-            var tasks = outboxTaskService.getAllTaskForProcessing(taskType);
+            var tasks = outboxTaskService.getAllTaskForProcessingAndMarkAsCompleted(taskType);
             taskProcessor.process(tasks);
         }
     }

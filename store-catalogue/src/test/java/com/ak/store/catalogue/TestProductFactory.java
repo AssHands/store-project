@@ -1,8 +1,8 @@
 package com.ak.store.catalogue;
 
 import com.ak.store.catalogue.model.entity.*;
-import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
-import com.ak.store.common.model.catalogue.dto.ProductDTO;
+import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
+import com.ak.store.common.model.catalogue.form.ProductForm;
 import com.ak.store.common.payload.catalogue.ProductWritePayload;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public class TestProductFactory {
     public static ProductWritePayload createProductPayload(String title, String description, Integer fullPrice,
                                                            Integer discountPercentage, Long categoryId) {
         return ProductWritePayload.builder()
-                .product(ProductDTO.builder()
+                .product(ProductForm.builder()
                         .title(title)
                         .description(description)
                         .fullPrice(fullPrice)
@@ -67,22 +67,22 @@ public class TestProductFactory {
                 .build();
     }
 
-    public static ProductCharacteristicDTO createProductCharacteristicDTO(Long characteristicId, String textValue) {
-        return ProductCharacteristicDTO.builder()
+    public static ProductCharacteristicForm createProductCharacteristicDTO(Long characteristicId, String textValue) {
+        return ProductCharacteristicForm.builder()
                 .id(characteristicId)
                 .textValue(textValue)
                 .build();
     }
 
-    public static ProductCharacteristicDTO createProductCharacteristicDTO(Long characteristicId, Integer numericValue) {
-        return ProductCharacteristicDTO.builder()
+    public static ProductCharacteristicForm createProductCharacteristicDTO(Long characteristicId, Integer numericValue) {
+        return ProductCharacteristicForm.builder()
                 .id(characteristicId)
                 .numericValue(numericValue)
                 .build();
     }
 
-    public static ProductCharacteristicDTO createProductCharacteristicDTO(Long characteristicId, Integer numericValue, String textValue) {
-        return ProductCharacteristicDTO.builder()
+    public static ProductCharacteristicForm createProductCharacteristicDTO(Long characteristicId, Integer numericValue, String textValue) {
+        return ProductCharacteristicForm.builder()
                 .id(characteristicId)
                 .numericValue(numericValue)
                 .textValue(textValue)

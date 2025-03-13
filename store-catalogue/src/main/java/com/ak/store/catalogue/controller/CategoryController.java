@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.CategoryServiceFacade;
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
+import com.ak.store.common.model.catalogue.form.CategoryForm;
 import com.ak.store.common.model.catalogue.view.CategoryView;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,8 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Long createOne(@RequestBody @Valid CategoryDTO categoryDTO) {
-        return categoryServiceFacade.createOne(categoryDTO);
+    public Long createOne(@RequestBody @Valid CategoryForm categoryForm) {
+        return categoryServiceFacade.createOne(categoryForm);
     }
 
     @DeleteMapping("{id}")
@@ -43,7 +43,7 @@ public class CategoryController {
     }
 
     @PatchMapping("{id}")
-    public Long updateOne(@PathVariable Long id, @RequestBody @Valid CategoryDTO categoryDTO) {
-        return categoryServiceFacade.updateOne(id, categoryDTO);
+    public Long updateOne(@PathVariable Long id, @RequestBody @Valid CategoryForm categoryForm) {
+        return categoryServiceFacade.updateOne(id, categoryForm);
     }
 }

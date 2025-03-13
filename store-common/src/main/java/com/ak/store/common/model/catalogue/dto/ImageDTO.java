@@ -1,21 +1,18 @@
 package com.ak.store.common.model.catalogue.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ImageDTO {
-    private Long productId;
-    private Map<String, String> allImageIndexes = new HashMap<>();
-    private List<MultipartFile> addImages = new ArrayList<>();
-    private List<String> deleteImageIndexes = new ArrayList<>();
+    private Integer index;
+    private String imageKey;
 }

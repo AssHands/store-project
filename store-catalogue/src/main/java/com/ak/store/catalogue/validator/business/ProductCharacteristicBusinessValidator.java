@@ -4,7 +4,7 @@ import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
-import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
+import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,23 +19,23 @@ import java.util.stream.Collectors;
 public class ProductCharacteristicBusinessValidator {
     private final CharacteristicRepo characteristicRepo;
 
-    public void validateCreation(Set<ProductCharacteristicDTO> productCharacteristicDTOs, Product product) {
-        validateProductCharacteristics(productCharacteristicDTOs, product.getCategory().getId());
-        validateExistingProductCharacteristic(product, productCharacteristicDTOs);
+    public void validateCreation(Set<ProductCharacteristicForm> productCharacteristicForms, Product product) {
+        validateProductCharacteristics(productCharacteristicForms, product.getCategory().getId());
+        validateExistingProductCharacteristic(product, productCharacteristicForms);
     }
 
-    public void validateUpdate(Set<ProductCharacteristicDTO> productCharacteristicDTOs, Long categoryId) {
-        validateProductCharacteristics(productCharacteristicDTOs, categoryId);
+    public void validateUpdate(Set<ProductCharacteristicForm> productCharacteristicForms, Long categoryId) {
+        validateProductCharacteristics(productCharacteristicForms, categoryId);
     }
 
-    private void validateExistingProductCharacteristic(Product product, Set<ProductCharacteristicDTO> productCharacteristicDTOs) {
+    private void validateExistingProductCharacteristic(Product product, Set<ProductCharacteristicForm> productCharacteristicForms) {
         List<Long> existingCharacteristicIds = product.getCharacteristics().stream()
                 .map(pc -> pc.getCharacteristic().getId())
                 .toList();
 
         if(!existingCharacteristicIds.isEmpty()) {
-            List<Long> creatingCharacteristicIds = productCharacteristicDTOs.stream()
-                    .map(ProductCharacteristicDTO::getId)
+            List<Long> creatingCharacteristicIds = productCharacteristicForms.stream()
+                    .map(ProductCharacteristicForm::getId)
                     .toList();
 
             Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
@@ -49,14 +49,14 @@ public class ProductCharacteristicBusinessValidator {
         }
     }
 
-    private void validateProductCharacteristics(Set<ProductCharacteristicDTO> ProductCharacteristicDTOs, Long categoryId) {
+    private void validateProductCharacteristics(Set<ProductCharacteristicForm> productCharacteristicForms, Long categoryId) {
         var availableTextValues = characteristicRepo.findAllWithTextValuesByCategoryId(categoryId).stream()
                 .collect(Collectors.toMap(
                         Characteristic::getId,
                         characteristic -> characteristic.getTextValues().stream().map(TextValue::getTextValue).toList())
                 );
 
-        for (var productCharacteristic : ProductCharacteristicDTOs) {
+        for (var productCharacteristic : productCharacteristicForms) {
             List<String> textValues = availableTextValues.get(productCharacteristic.getId());
 
             if (textValues == null) {

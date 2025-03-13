@@ -1,9 +1,9 @@
 package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.service.CategoryService;
-import com.ak.store.catalogue.util.CatalogueMapper;
+import com.ak.store.catalogue.util.CatalogueMapper0;
 import com.ak.store.catalogue.util.CatalogueUtils;
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
+import com.ak.store.common.model.catalogue.form.CategoryForm;
 import com.ak.store.common.model.catalogue.view.CategoryView;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -11,21 +11,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class CategoryServiceFacade {
     private final CategoryService categoryService;
-    private final CatalogueMapper catalogueMapper;
+    private final CatalogueMapper0 catalogueMapper0;
 
     public List<CategoryView> findAll() {
         return CatalogueUtils.buildCategoryTree(categoryService.findAll().stream()
-                .map(catalogueMapper::mapToCategoryView)
+                .map(catalogueMapper0::mapToCategoryView)
                 .toList());
     }
 
     @Transactional
-    public Long createOne(CategoryDTO categoryDTO) {
-        return categoryService.createOne(categoryDTO).getId();
+    public Long createOne(CategoryForm categoryForm) {
+        return categoryService.createOne(categoryForm).getId();
     }
 
     @Transactional
@@ -34,8 +34,8 @@ public class CategoryServiceFacade {
     }
 
     @Transactional
-    public Long updateOne(Long id, CategoryDTO categoryDTO) {
-        return categoryService.updateOne(id, categoryDTO).getId();
+    public Long updateOne(Long id, CategoryForm categoryForm) {
+        return categoryService.updateOne(id, categoryForm).getId();
     }
 
     @Transactional

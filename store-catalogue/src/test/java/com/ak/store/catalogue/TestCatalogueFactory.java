@@ -16,24 +16,25 @@ public class TestCatalogueFactory {
     }
 
     public static Characteristic createCharacteristic(Long id, String name, boolean isText, List<String> textValues) {
-        Set<TextValue> textValuesSet = new HashSet<>();
-        long index = 1;
-        for(String value : textValues) {
-            textValuesSet.add(TextValue.builder()
-                    .id(index)
-                    .textValue(value)
-                    .characteristic(Characteristic.builder().id(id).build())
-                    .build());
-
-            index++;
-        }
-
-        return Characteristic.builder()
-                .id(id)
-                .isText(isText)
-                .name(name)
-                .textValues(textValuesSet)
-                .build();
+//        Set<TextValue> textValuesSet = new HashSet<>();
+//        long index = 1;
+//        for(String value : textValues) {
+//            textValuesSet.add(TextValue.builder()
+//                    .id(index)
+//                    .textValue(value)
+//                    .characteristic(Characteristic.builder().id(id).build())
+//                    .build());
+//
+//            index++;
+//        }
+//
+//        return Characteristic.builder()
+//                .id(id)
+//                .isText(isText)
+//                .name(name)
+//                .textValues(textValuesSet)
+//                .build();
+        return null;
     }
 
     public static CategoryView createCategoryDTO(Long id, String name) {

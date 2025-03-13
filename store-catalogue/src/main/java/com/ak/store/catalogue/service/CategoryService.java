@@ -5,8 +5,8 @@ import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
 import com.ak.store.catalogue.validator.business.CategoryBusinessValidator;
-import com.ak.store.catalogue.util.CatalogueMapper;
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
+import com.ak.store.catalogue.util.CatalogueMapper0;
+import com.ak.store.common.model.catalogue.form.CategoryForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class CategoryService {
-    private final CatalogueMapper catalogueMapper;
+    private final CatalogueMapper0 catalogueMapper0;
     private final CategoryRepo categoryRepo;
     private final CharacteristicService characteristicService;
     private final CategoryBusinessValidator categoryBusinessValidator;
@@ -24,9 +24,9 @@ public class CategoryService {
         return categoryRepo.findAll();
     }
 
-    public Category createOne(CategoryDTO categoryDTO) {
-        categoryBusinessValidator.validateCreation(categoryDTO);
-        return categoryRepo.save(catalogueMapper.mapToCategory(categoryDTO));
+    public Category createOne(CategoryForm categoryForm) {
+        categoryBusinessValidator.validateCreation(categoryForm);
+        return categoryRepo.save(catalogueMapper0.mapToCategory(categoryForm));
     }
 
     private Category findOneWithCharacteristics(Long id) {
@@ -75,19 +75,19 @@ public class CategoryService {
         categoryRepo.delete(category);
     }
 
-    public Category updateOne(Long id, CategoryDTO categoryDTO) {
+    public Category updateOne(Long id, CategoryForm categoryForm) {
         Category category = findOne(id);
-        categoryBusinessValidator.validateUpdate(category, categoryDTO);
-        updateCategory(category, categoryDTO);
+        categoryBusinessValidator.validateUpdate(category, categoryForm);
+        updateCategory(category, categoryForm);
         return categoryRepo.save(category);
     }
 
-    private void updateCategory(Category category, CategoryDTO categoryDTO) {
-        if(categoryDTO.getName() != null) {
-            category.setName(categoryDTO.getName());
+    private void updateCategory(Category category, CategoryForm categoryForm) {
+        if(categoryForm.getName() != null) {
+            category.setName(categoryForm.getName());
         }
-        if(categoryDTO.getParentId() != null) {
-            category.setParentId(categoryDTO.getParentId());
+        if(categoryForm.getParentId() != null) {
+            category.setParentId(categoryForm.getParentId());
         }
     }
 }

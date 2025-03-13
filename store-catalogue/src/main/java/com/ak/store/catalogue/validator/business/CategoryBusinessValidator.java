@@ -3,7 +3,7 @@ package com.ak.store.catalogue.validator.business;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
+import com.ak.store.common.model.catalogue.form.CategoryForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,17 +12,17 @@ import org.springframework.stereotype.Component;
 public class CategoryBusinessValidator {
     private final CategoryRepo categoryRepo;
 
-    public void validateCreation(CategoryDTO categoryDTO) {
-        checkUniqName(categoryDTO.getName());
-        checkParentExist(categoryDTO.getParentId());
+    public void validateCreation(CategoryForm categoryForm) {
+        checkUniqName(categoryForm.getName());
+        checkParentExist(categoryForm.getParentId());
     }
 
-    public void validateUpdate(Category category, CategoryDTO categoryDTO) {
-        if(categoryDTO.getParentId() != null && category.getId().equals(categoryDTO.getParentId())) {
+    public void validateUpdate(Category category, CategoryForm categoryForm) {
+        if(categoryForm.getParentId() != null && category.getId().equals(categoryForm.getParentId())) {
             throw new RuntimeException("must category_id != parent_id");
         }
-        checkUniqName(categoryDTO.getName());
-        checkParentExist(categoryDTO.getParentId());
+        checkUniqName(categoryForm.getName());
+        checkParentExist(categoryForm.getParentId());
     }
 
     public void validateDeletion(Category category) {

@@ -25,5 +25,6 @@
         <module>store-synchronization</module>
         <module>store-email-sender</module>
         <module>store-outbox-scheduler</module>
+        <module>store-search</module>
     </modules>
 </project>
