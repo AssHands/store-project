@@ -1,8 +1,8 @@
 package com.ak.store.order.facade;
 
 import com.ak.store.common.event.order.OrderCreatedEvent;
-import com.ak.store.common.model.order.dto.OrderDTO;
-import com.ak.store.common.model.order.dto.ProductAmountDTO;
+import com.ak.store.common.model.order.form.OrderForm;
+import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.common.model.order.view.OrderView;
 import com.ak.store.order.feign.WarehouseFeign;
 import com.ak.store.order.kafka.OrderProducerKafka;
@@ -32,12 +32,12 @@ public class OrderFacade {
     }
 
     @Transactional
-    public void createOne(Jwt accessToken, OrderDTO orderDTO) {
-        Order order = orderService.createOne(accessToken.getSubject(), orderDTO);
+    public void createOne(Jwt accessToken, OrderForm orderForm) {
+        Order order = orderService.createOne(accessToken.getSubject(), orderForm);
 
-        List<ProductAmountDTO> orderProductList = new ArrayList<>();
-        for (var orderProduct : orderDTO.getProducts()) {
-            orderProductList.add(new ProductAmountDTO(
+        List<ProductAmount> orderProductList = new ArrayList<>();
+        for (var orderProduct : orderForm.getProducts()) {
+            orderProductList.add(new ProductAmount(
                     orderProduct.getProductId(), orderProduct.getAmount()));
         }
 

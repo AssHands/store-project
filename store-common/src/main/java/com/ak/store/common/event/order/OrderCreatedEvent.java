@@ -1,6 +1,6 @@
 package com.ak.store.common.event.order;
 
-import com.ak.store.common.model.order.dto.ProductAmountDTO;
+import com.ak.store.common.model.order.dto.ProductAmount;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -22,5 +22,5 @@ public class OrderCreatedEvent implements OrderEvent {
     private Integer totalPrice;
 
     @Builder.Default
-    private List<ProductAmountDTO> orderProducts = new ArrayList<>();
+    private List<ProductAmount> orderProducts = new ArrayList<>();
 }

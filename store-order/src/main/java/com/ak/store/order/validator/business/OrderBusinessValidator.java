@@ -1,8 +1,8 @@
 package com.ak.store.order.validator.business;
 
 
-import com.ak.store.common.model.order.dto.OrderDTO;
-import com.ak.store.common.model.order.dto.ProductAmountDTO;
+import com.ak.store.common.model.order.form.OrderForm;
+import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.common.model.warehouse.dto.ProductCheckDTO;
 import com.ak.store.order.feign.CatalogueFeign;
 import com.ak.store.order.feign.WarehouseFeign;
@@ -18,9 +18,9 @@ public class OrderBusinessValidator {
     private final CatalogueFeign catalogueFeign;
     private final WarehouseFeign warehouseFeign;
 
-    public void validateCreation(OrderDTO orderDTO) {
-        var productIds = orderDTO.getProducts().stream()
-                .map(ProductAmountDTO::getProductId)
+    public void validateCreation(OrderForm orderForm) {
+        var productIds = orderForm.getProducts().stream()
+                .map(ProductAmount::getProductId)
                 .toList();
 
         if (!catalogueFeign.availableAll(productIds)) {
@@ -28,7 +28,7 @@ public class OrderBusinessValidator {
         }
 
         List<ProductCheckDTO> productCheckDTOList = new ArrayList<>();
-        for (var orderProduct : orderDTO.getProducts()) {
+        for (var orderProduct : orderForm.getProducts()) {
             productCheckDTOList.add(ProductCheckDTO.builder()
                     .productId(orderProduct.getProductId())
                     .amount(orderProduct.getAmount())

@@ -1,7 +1,6 @@
 package com.ak.store.warehouse.controller;
 
-import com.ak.store.common.model.order.dto.ProductAmountDTO;
-import com.ak.store.common.model.warehouse.dto.ProductCheckDTO;
+import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.warehouse.facade.WarehouseFacade;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +15,12 @@ public class WarehouseController {
     private final WarehouseFacade warehouseFacade;
 
     @PostMapping("check")
-    public Boolean checkProductAmount(@RequestBody List<ProductAmountDTO> productCheckDTOList) {
+    public Boolean checkProductAmount(@RequestBody List<ProductAmount> productCheckDTOList) {
         return warehouseFacade.checkProductAmount(productCheckDTOList);
     }
 
     @PatchMapping("reserve")
-    public void reserveAll(@RequestBody List<ProductAmountDTO> orderProductList) {
+    public void reserveAll(@RequestBody List<ProductAmount> orderProductList) {
         warehouseFacade.reserveAllProduct(orderProductList);
     }
 

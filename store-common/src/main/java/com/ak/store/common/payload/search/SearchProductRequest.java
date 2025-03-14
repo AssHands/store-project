@@ -38,21 +38,21 @@ public class SearchProductRequest {
     private Long categoryId;
 
     @Valid
-    private FiltersDTO filters = new FiltersDTO();
+    private FiltersDTO filtersDTO = new FiltersDTO();
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
     private SortingType sortingType = SortingType.POPULAR;
 
     public List<NumericFilter> getNumericFilters() {
-        return filters.getNumericFilters();
+        return filtersDTO.getNumericFilters();
     }
 
     public List<TextFilter> getTextFilters() {
-        return filters.getTextFilters();
+        return filtersDTO.getTextFilters();
     }
 
     public FiltersDTO getAllFilters() {
-        return filters;
+        return filtersDTO;
     }
 
 

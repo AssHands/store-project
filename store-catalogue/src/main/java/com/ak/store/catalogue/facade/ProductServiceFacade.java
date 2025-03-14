@@ -56,7 +56,7 @@ public class ProductServiceFacade {
         outboxTaskService.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_DELETED);
 
         List<String> imageKeyList = product.getImages().stream()
-                .map(ProductImage::getImageKey)
+                .map(ProductImage::getKey)
                 .toList();
 
         new SagaBuilder()

@@ -1,5 +1,6 @@
-package com.ak.store.common.model.order.dto;
+package com.ak.store.common.model.order.form;
 
+import com.ak.store.common.model.order.dto.ProductAmount;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -17,8 +18,8 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrderDTO {
+public class OrderForm {
 
     @Builder.Default
-    private List<ProductAmountDTO> products = new ArrayList<>();
+    private List<ProductAmount> products = new ArrayList<>();
 }

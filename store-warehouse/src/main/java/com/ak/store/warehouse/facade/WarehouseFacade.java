@@ -1,10 +1,8 @@
 package com.ak.store.warehouse.facade;
 
-import com.ak.store.common.model.order.dto.ProductAmountDTO;
-import com.ak.store.common.model.warehouse.dto.ProductCheckDTO;
+import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.warehouse.serivce.WarehouseService;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,12 +13,12 @@ import java.util.List;
 public class WarehouseFacade {
 
     private final WarehouseService warehouseService;
-    public Boolean checkProductAmount(List<ProductAmountDTO> productCheckDTOList) {
+    public Boolean checkProductAmount(List<ProductAmount> productCheckDTOList) {
         return warehouseService.checkProductAmount(productCheckDTOList);
     }
 
     @Transactional
-    public void reserveAllProduct(List<ProductAmountDTO> productCheckDTOList) {
+    public void reserveAllProduct(List<ProductAmount> productCheckDTOList) {
         warehouseService.reserveAllProduct(productCheckDTOList);
     }
 

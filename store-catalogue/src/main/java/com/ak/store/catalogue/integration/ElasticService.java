@@ -17,6 +17,7 @@ import com.ak.store.common.document.ProductDocument;
 import com.ak.store.common.model.search.dto.FiltersDTO;
 import com.ak.store.common.model.search.common.NumericFilter;
 import com.ak.store.common.model.search.common.NumericFilterValue;
+import com.ak.store.common.model.search.view.FiltersView;
 import com.ak.store.common.payload.search.SearchAvailableFiltersResponse;
 import com.ak.store.common.payload.search.SearchProductRequest;
 import com.ak.store.common.model.search.common.TextFilter;
@@ -83,14 +84,14 @@ public class ElasticService {
         }
 
         return SearchAvailableFiltersResponse.builder()
-                .filtersDTO(transformSearchFiltersResponseToFiltersDTO(response))
+                .filtersView(transformSearchFiltersResponseToFilters(response))
                 .categoryId(searchAvailableFiltersRequest.getCategoryId())
                 .build();
     }
 
     //todo: move to utils class?
-    private FiltersDTO transformSearchFiltersResponseToFiltersDTO(SearchResponse<Void> response) {
-        FiltersDTO filtersDTO = new FiltersDTO();
+    private FiltersView transformSearchFiltersResponseToFilters(SearchResponse<Void> response) {
+        FiltersView filtersView = new FiltersView();
 
         for(var allAggs : response.aggregations().entrySet()) {
             Long characteristicId = Long.parseLong(allAggs.getKey().split("__")[0]);
@@ -118,7 +119,7 @@ public class ElasticService {
                     }
 
                     if(rangeValues.isEmpty()) continue;
-                    filtersDTO.getNumericFilters().add(NumericFilter.builder()
+                    filtersView.getNumericFilters().add(NumericFilter.builder()
                             .id(characteristicId)
                             .name(characteristicName)
                             .values(rangeValues)
@@ -132,7 +133,7 @@ public class ElasticService {
                     }
 
                     if(textValues.isEmpty()) continue;
-                    filtersDTO.getTextFilters().add(TextFilter.builder()
+                    filtersView.getTextFilters().add(TextFilter.builder()
                             .id(characteristicId)
                             .name(characteristicName)
                             .values(textValues)
@@ -141,7 +142,7 @@ public class ElasticService {
             }
         }
 
-        return filtersDTO;
+        return filtersView;
     }
 
     private Map<String, Aggregation> buildAggregations(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {

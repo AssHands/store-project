@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Builder
-@EqualsAndHashCode(of = { "imageKey" })
+@EqualsAndHashCode(of = { "key" })
 @ToString(exclude = { "product" })
 @Table(name = "product_image")
 public class ProductImage {
@@ -28,7 +28,7 @@ public class ProductImage {
 
     @NotBlank
     @Column(name = "image_key")
-    private String imageKey;
+    private String key;
 
     @NotNull
     @Min(0)

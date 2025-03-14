@@ -1,10 +1,8 @@
 package com.ak.store.warehouse.serivce;
 
-import com.ak.store.common.model.order.dto.ProductAmountDTO;
-import com.ak.store.common.model.warehouse.dto.ProductCheckDTO;
+import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.warehouse.model.Warehouse;
 import com.ak.store.warehouse.repostitory.WarehouseRepo;
-import com.fasterxml.jackson.annotation.JacksonInject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +19,9 @@ public class WarehouseService {
                 .orElseThrow(() -> new RuntimeException("product is not exist in warehouse"));
     }
 
-    public Boolean checkProductAmount(List<ProductAmountDTO> productCheckDTOList) {
+    public Boolean checkProductAmount(List<ProductAmount> productCheckDTOList) {
         List<Long> ids = productCheckDTOList.stream()
-                .map(ProductAmountDTO::getProductId)
+                .map(ProductAmount::getProductId)
                 .toList();
 
         var warehouseMap = warehouseRepo.findAllByProductIdIn(ids).stream()
@@ -41,13 +39,13 @@ public class WarehouseService {
         return true;
     }
 
-    public void reserveAllProduct(List<ProductAmountDTO> orderProductList) {
+    public void reserveAllProduct(List<ProductAmount> orderProductList) {
         List<Long> ids = orderProductList.stream()
-                .map(ProductAmountDTO::getProductId)
+                .map(ProductAmount::getProductId)
                 .toList();
 
         var reserveProductMap = orderProductList.stream()
-                .collect(Collectors.toMap(ProductAmountDTO::getProductId, ProductAmountDTO::getAmount));
+                .collect(Collectors.toMap(ProductAmount::getProductId, ProductAmount::getAmount));
 
         List<Warehouse> warehouseList = warehouseRepo.findAllLockedByProductIdIn(ids);
 

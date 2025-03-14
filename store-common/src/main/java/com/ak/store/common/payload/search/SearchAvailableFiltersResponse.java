@@ -3,6 +3,7 @@ package com.ak.store.common.payload.search;
 import com.ak.store.common.model.search.dto.FiltersDTO;
 import com.ak.store.common.model.search.common.NumericFilter;
 import com.ak.store.common.model.search.common.TextFilter;
+import com.ak.store.common.model.search.view.FiltersView;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -24,20 +25,20 @@ public class SearchAvailableFiltersResponse {
 
     private Long categoryId;
     @Builder.Default
-    private FiltersDTO filtersDTO = new FiltersDTO();
+    private FiltersView filtersView = new FiltersView();
 
     @JsonIgnore
     public List<NumericFilter> getNumericFilters() {
-        return filtersDTO.getNumericFilters();
+        return filtersView.getNumericFilters();
     }
 
     @JsonIgnore
     public List<TextFilter> getTextFilters() {
-        return filtersDTO.getTextFilters();
+        return filtersView.getTextFilters();
     }
 
     @JsonIgnore
-    public FiltersDTO getAllFilters() {
-        return filtersDTO;
+    public FiltersView getAllFilters() {
+        return filtersView;
     }
 }

@@ -1,8 +1,8 @@
 package com.ak.store.order.service;
 
 import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
-import com.ak.store.common.model.order.dto.OrderDTO;
-import com.ak.store.common.model.order.dto.ProductAmountDTO;
+import com.ak.store.common.model.order.form.OrderForm;
+import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.order.feign.CatalogueFeign;
 import com.ak.store.order.model.Order;
 import com.ak.store.order.model.OrderProduct;
@@ -27,11 +27,11 @@ public class OrderService {
         return orderRepo.findAllWithProductsByConsumerId(UUID.fromString(consumerId));
     }
 
-    public Order createOne(String consumerId, OrderDTO orderDTO) {
-        orderBusinessValidator.validateCreation(orderDTO);
+    public Order createOne(String consumerId, OrderForm orderForm) {
+        orderBusinessValidator.validateCreation(orderForm);
 
-        var productIds = orderDTO.getProducts().stream()
-                .map(ProductAmountDTO::getProductId)
+        var productIds = orderForm.getProducts().stream()
+                .map(ProductAmount::getProductId)
                 .toList();
 
         var productPriceMap = catalogueFeign.getAllPrice(productIds).stream()
@@ -43,7 +43,7 @@ public class OrderService {
 
         int totalPrice = 0;
         List<OrderProduct> orderProductList = new ArrayList<>();
-        for (var orderProductDTO : orderDTO.getProducts()) {
+        for (var orderProductDTO : orderForm.getProducts()) {
             totalPrice += orderProductDTO.getAmount() * productPriceMap.get(orderProductDTO.getProductId());
 
             orderProductList.add(OrderProduct.builder()

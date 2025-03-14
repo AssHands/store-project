@@ -1,6 +1,6 @@
 package com.ak.store.order.feign;
 
-import com.ak.store.common.model.order.dto.ProductAmountDTO;
+import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.common.model.warehouse.dto.ProductCheckDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,5 +16,5 @@ public interface WarehouseFeign {
     Boolean checkProductAmount(@RequestBody List<ProductCheckDTO> productCheckDTOList);
 
     @PatchMapping("warehouses/reserve")
-    void reserveAll(@RequestBody List<ProductAmountDTO> reserveProductDTOList);
+    void reserveAll(@RequestBody List<ProductAmount> reserveProductDTOList);
 }

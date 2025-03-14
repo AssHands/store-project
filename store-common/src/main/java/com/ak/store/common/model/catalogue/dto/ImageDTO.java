@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ImageDTO {
     private Integer index;
-    private String imageKey;
+    private String key;
 }

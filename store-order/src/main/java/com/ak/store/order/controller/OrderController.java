@@ -1,6 +1,6 @@
 package com.ak.store.order.controller;
 
-import com.ak.store.common.model.order.dto.OrderDTO;
+import com.ak.store.common.model.order.form.OrderForm;
 import com.ak.store.common.model.order.view.OrderView;
 import com.ak.store.order.facade.OrderFacade;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +23,8 @@ public class OrderController {
     }
 
     @PostMapping("me")
-    public void createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody OrderDTO orderDTO) {
-        orderFacade.createOne(accessToken, orderDTO);
+    public void createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody OrderForm orderForm) {
+        orderFacade.createOne(accessToken, orderForm);
     }
 
     @GetMapping("me")

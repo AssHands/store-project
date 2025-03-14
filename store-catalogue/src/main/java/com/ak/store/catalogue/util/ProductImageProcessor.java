@@ -20,7 +20,7 @@ public abstract class ProductImageProcessor {
         LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, imageForm.getAddImages());
         for (String key : imagesForAdd.keySet()) {
             productImages.add(ProductImage.builder()
-                    .imageKey(key)
+                    .key(key)
                     .product(Product.builder()
                             .id(imageForm.getProductId())
                             .build())
@@ -44,7 +44,7 @@ public abstract class ProductImageProcessor {
                         .anyMatch(deletedIndex -> deletedIndex.equals(index));
 
                 if (isDeleted) {
-                    imageKeysForDelete.add(productImages.get(i).getImageKey());
+                    imageKeysForDelete.add(productImages.get(i).getKey());
                     productImages.set(i, null);
                 }
             }
