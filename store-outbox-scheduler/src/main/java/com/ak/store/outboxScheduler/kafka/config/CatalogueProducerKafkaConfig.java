@@ -1,6 +1,7 @@
 package com.ak.store.outboxScheduler.kafka.config;
 
 import com.ak.store.common.event.catalogue.CategoryEvent;
+import com.ak.store.common.event.catalogue.CharacteristicEvent;
 import com.ak.store.common.event.catalogue.ProductEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -45,7 +46,7 @@ public class CatalogueProducerKafkaConfig {
     private String maxInFlightRequests;
 
     @Bean
-    public ProducerFactory<Long, ProductEvent> producerFactoryForProduct() {
+    public ProducerFactory<String, ProductEvent> producerFactoryForProduct() {
         Map<String, Object> configProps = new HashMap<>();
 
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddresses);
@@ -64,7 +65,7 @@ public class CatalogueProducerKafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<Long, CategoryEvent> producerFactoryForCategory() {
+    public ProducerFactory<String, CategoryEvent> producerFactoryForCategory() {
         Map<String, Object> configProps = new HashMap<>();
 
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddresses);
@@ -83,12 +84,36 @@ public class CatalogueProducerKafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<Long, ProductEvent> productKafkaTemplate() {
+    public ProducerFactory<String, CharacteristicEvent> producerFactoryForCharacteristic() {
+        Map<String, Object> configProps = new HashMap<>();
+
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddresses);
+        configProps.put(ProducerConfig.ACKS_CONFIG, acks);
+        configProps.put(ProducerConfig.RETRIES_CONFIG, retries);
+        configProps.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, retryBackoffMs);
+        configProps.put(ProducerConfig.RETRY_BACKOFF_MAX_MS_CONFIG, retryBackoffMaxMs);
+        configProps.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeoutMs);
+        configProps.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeoutMs);
+        configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, enableIdempotence);
+        configProps.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, maxInFlightRequests);
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
+    @Bean
+    public KafkaTemplate<String, ProductEvent> productKafkaTemplate() {
         return new KafkaTemplate<>(producerFactoryForProduct());
     }
 
     @Bean
-    public KafkaTemplate<Long, CategoryEvent> categoryKafkaTemplate() {
+    public KafkaTemplate<String, CategoryEvent> categoryKafkaTemplate() {
         return new KafkaTemplate<>(producerFactoryForCategory());
+    }
+
+    @Bean
+    public KafkaTemplate<String, CharacteristicEvent> characteristicKafkaTemplate() {
+        return new KafkaTemplate<>(producerFactoryForCharacteristic());
     }
 }

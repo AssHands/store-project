@@ -1,8 +1,12 @@
 package com.ak.store.catalogue.facade;
 
+import com.ak.store.catalogue.model.entity.Category;
+import com.ak.store.catalogue.outbox.OutboxTaskService;
+import com.ak.store.catalogue.outbox.OutboxTaskType;
 import com.ak.store.catalogue.service.CategoryService;
 import com.ak.store.catalogue.util.CatalogueUtils;
 import com.ak.store.catalogue.util.mapper.CategoryMapper;
+import com.ak.store.common.model.catalogue.dto.CategoryDTO;
 import com.ak.store.common.model.catalogue.form.CategoryForm;
 import com.ak.store.common.model.catalogue.view.CategoryTreeView;
 import com.ak.store.common.model.catalogue.view.CategoryView;
@@ -14,9 +18,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class CategoryServiceFacade {
+public class CategoryFacade {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
+    private final OutboxTaskService<CategoryDTO> outboxTaskService;
 
     public List<CategoryView> findAll() {
         return categoryService.findAll().stream()
@@ -32,26 +37,35 @@ public class CategoryServiceFacade {
 
     @Transactional
     public Long createOne(CategoryForm categoryForm) {
-        return categoryService.createOne(categoryForm).getId();
+        var category = categoryService.createOne(categoryForm);
+        outboxTaskService.createOneTask(categoryMapper.toCategoryDTO(category), OutboxTaskType.CATEGORY_CREATED);
+        return category.getId();
     }
 
     @Transactional
     public void deleteOne(Long id) {
-        categoryService.deleteOne(id);
+        var category = categoryService.deleteOne(id);
+        outboxTaskService.createOneTask(categoryMapper.toCategoryDTO(category), OutboxTaskType.CATEGORY_DELETED);
     }
 
     @Transactional
     public Long updateOne(Long id, CategoryForm categoryForm) {
-        return categoryService.updateOne(id, categoryForm).getId();
+        var category = categoryService.updateOne(id, categoryForm);
+        outboxTaskService.createOneTask(categoryMapper.toCategoryDTO(category), OutboxTaskType.CATEGORY_UPDATED);
+        return category.getId();
     }
 
     @Transactional
     public Long addCharacteristicToCategory(Long categoryId, Long characteristicId) {
-        return categoryService.addCharacteristicToCategory(categoryId, characteristicId).getId();
+        var category =  categoryService.addCharacteristicToCategory(categoryId, characteristicId);
+        outboxTaskService.createOneTask(categoryMapper.toCategoryDTO(category), OutboxTaskType.CATEGORY_UPDATED);
+        return category.getId();
     }
 
     @Transactional
     public Long deleteCharacteristicFromCategory(Long categoryId, Long characteristicId) {
-        return categoryService.deleteCharacteristicFromCategory(categoryId, characteristicId).getId();
+        var category = categoryService.deleteCharacteristicFromCategory(categoryId, characteristicId);
+        outboxTaskService.createOneTask(categoryMapper.toCategoryDTO(category), OutboxTaskType.CATEGORY_UPDATED);
+        return category.getId();
     }
 }

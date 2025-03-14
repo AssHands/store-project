@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.controller;
 
-import com.ak.store.catalogue.facade.ProductServiceFacade;
+import com.ak.store.catalogue.facade.ProductFacade;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
 import com.ak.store.common.model.catalogue.view.ProductRichView;
@@ -21,57 +21,57 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/catalogue/products")
 public class ProductController {
-    private final ProductServiceFacade productServiceFacade;
+    private final ProductFacade productFacade;
 
     @GetMapping("{id}/rich")
     public ProductRichView getOneRich(@PathVariable Long id) {
-        return productServiceFacade.findOneRich(id);
+        return productFacade.findOneRich(id);
     }
 
     @GetMapping("{id}/poor")
     public ProductPoorView getOnePoor(@PathVariable Long id) {
-        return productServiceFacade.findOnePoor(id);
+        return productFacade.findOnePoor(id);
     }
 
     @PostMapping("poor")
     public List<ProductPoorView> getAllPoor(@RequestBody List<Long> ids) {
-        return productServiceFacade.findAllPoor(ids);
+        return productFacade.findAllPoor(ids);
     }
 
     @PostMapping("price")
     public List<ProductPriceDTO> getAllPrice(@RequestBody List<Long> ids) {
-        return productServiceFacade.getAllPrice(ids);
+        return productFacade.getAllPrice(ids);
     }
 
     @GetMapping("exist/{id}")
     public Boolean existOne(@PathVariable Long id) {
-        return productServiceFacade.existOne(id);
+        return productFacade.existOne(id);
     }
 
     @PostMapping("available")
     public Boolean availableAll(@RequestBody List<Long> ids) {
-        return productServiceFacade.availableAll(ids);
+        return productFacade.availableAll(ids);
     }
 
     @GetMapping("available/{id}")
     public Boolean availableOne(@PathVariable Long id) {
-        return productServiceFacade.availableOne(id);
+        return productFacade.availableOne(id);
     }
 
     @DeleteMapping("{id}")
     public void deleteOne(@PathVariable Long id) {
-        productServiceFacade.deleteOne(id);
+        productFacade.deleteOne(id);
     }
 
     @PostMapping
     public Long createOne(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
-        return productServiceFacade.createOne(productPayload);
+        return productFacade.createOne(productPayload);
     }
 
     @PatchMapping("{id}")
     public Long updateOne(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
                           @PathVariable("id") Long productId) {
-        return productServiceFacade.updateOne(productPayload, productId);
+        return productFacade.updateOne(productPayload, productId);
     }
 
     /**
@@ -127,7 +127,7 @@ public class ProductController {
                                       @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
         ImageForm imageForm = new ImageForm(productId, allImageIndexes, addImages, deleteImageIndexes);
 
-        return productServiceFacade.saveOrUpdateAllImage(imageForm);
+        return productFacade.saveOrUpdateAllImage(imageForm);
     }
 
 //    @PostMapping("search")

@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ProductProducerKafka {
     @Qualifier("productKafkaTemplate")
-    private final KafkaTemplate<Long, ProductEvent> kafkaProductTemplate;
+    private final KafkaTemplate<String, ProductEvent> kafkaProductTemplate;
 
     public void send(ProductDeletedEvent productDeletedEvent) {
         try {
-            SendResult<Long, ProductEvent> future = kafkaProductTemplate.send(
-                    "product-deleted-events", productDeletedEvent.getProductId(), productDeletedEvent).get();
+            SendResult<String, ProductEvent> future = kafkaProductTemplate.send("product-deleted-events",
+                    productDeletedEvent.getProduct().getId().toString(), productDeletedEvent).get();
         } catch (Exception e) {
             throw new RuntimeException("kafka product-deleted-events error");
         }
@@ -27,8 +27,8 @@ public class ProductProducerKafka {
 
     public void send(ProductCreatedEvent productCreatedEvent) {
         try {
-            SendResult<Long, ProductEvent> future = kafkaProductTemplate.send(
-                    "product-created-events", productCreatedEvent.getProduct().getId(), productCreatedEvent).get();
+            SendResult<String, ProductEvent> future = kafkaProductTemplate.send("product-created-events",
+                    productCreatedEvent.getProduct().getId().toString(), productCreatedEvent).get();
         } catch (Exception e) {
             throw new RuntimeException("kafka product-created-events error");
         }
@@ -36,8 +36,8 @@ public class ProductProducerKafka {
 
     public void send(ProductUpdatedEvent productUpdatedEvent) {
         try {
-            SendResult<Long, ProductEvent> future = kafkaProductTemplate.send(
-                    "product-updated-events", productUpdatedEvent.getProduct().getId(), productUpdatedEvent).get();
+            SendResult<String, ProductEvent> future = kafkaProductTemplate.send("product-updated-events",
+                    productUpdatedEvent.getProduct().getId().toString(), productUpdatedEvent).get();
         } catch (Exception e) {
             throw new RuntimeException("kafka product-updated-events error");
         }

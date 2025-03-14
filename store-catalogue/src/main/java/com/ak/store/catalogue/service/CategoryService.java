@@ -41,15 +41,14 @@ public class CategoryService {
     }
 
     public Category addCharacteristicToCategory(Long categoryId, Long characteristicId) {
-        Category category = findOneWithCharacteristics(categoryId);
-        //check for characteristic exists
-        characteristicService.findOne(characteristicId);
+        var category = findOneWithCharacteristics(categoryId);
         categoryBusinessValidator.validateAddCharacteristic(category, characteristicId);
+        var characteristic = characteristicService.findOne(characteristicId);
 
         category.getCharacteristics().add(
                 CategoryCharacteristic.builder()
-                        .category(Category.builder().id(categoryId).build())
-                        .characteristic(Characteristic.builder().id(characteristicId).build())
+                        .category(category)
+                        .characteristic(characteristic)
                         .build()
         );
         return categoryRepo.save(category);
@@ -70,10 +69,11 @@ public class CategoryService {
     }
 
     //todo: make check if product has this category
-    public void deleteOne(Long id) {
+    public Category deleteOne(Long id) {
         Category category = findOne(id);
         categoryBusinessValidator.validateDeletion(category);
         categoryRepo.delete(category);
+        return category;
     }
 
     public Category updateOne(Long id, CategoryForm categoryForm) {

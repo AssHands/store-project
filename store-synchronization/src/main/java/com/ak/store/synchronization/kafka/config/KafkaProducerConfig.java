@@ -1,4 +1,4 @@
-package com.ak.store.synchronization.kafka;
+package com.ak.store.synchronization.kafka.config;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;

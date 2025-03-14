@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.controller;
 
-import com.ak.store.catalogue.facade.CharacteristicServiceFacade;
+import com.ak.store.catalogue.facade.CharacteristicFacade;
 import com.ak.store.common.model.catalogue.form.CharacteristicForm;
 import com.ak.store.common.model.catalogue.form.RangeValueForm;
 import com.ak.store.common.model.catalogue.form.TextValueForm;
@@ -15,45 +15,45 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/catalogue/characteristics")
 public class CharacteristicController {
-    private final CharacteristicServiceFacade characteristicServiceFacade;
+    private final CharacteristicFacade characteristicFacade;
 
     @GetMapping
     public List<CharacteristicView> getAllByCategory(@RequestParam Long categoryId) {
-        return characteristicServiceFacade.findAllByCategoryId(categoryId);
+        return characteristicFacade.findAllByCategoryId(categoryId);
     }
 
     @PostMapping
     public Long createOne(@RequestBody @Valid CharacteristicForm characteristicForm) {
-        return characteristicServiceFacade.createOne(characteristicForm);
+        return characteristicFacade.createOne(characteristicForm);
     }
 
     @DeleteMapping("{id}")
     public void deleteOne(@PathVariable Long id) {
-        characteristicServiceFacade.deleteOne(id);
+        characteristicFacade.deleteOne(id);
     }
 
     @PatchMapping("{id}")
     public Long updateOne(@PathVariable Long id, @RequestBody CharacteristicForm characteristicForm) {
-        return characteristicServiceFacade.updateOne(id, characteristicForm);
+        return characteristicFacade.updateOne(id, characteristicForm);
     }
 
     @PostMapping("{id}/range")
     public Long createOneRangeValue(@PathVariable Long id, @RequestBody @Valid RangeValueForm rangeValueForm) {
-        return characteristicServiceFacade.createOneRangeValue(id, rangeValueForm);
+        return characteristicFacade.createOneRangeValue(id, rangeValueForm);
     }
 
     @PostMapping("{id}/text")
     public Long createOneTextValue(@PathVariable Long id, @RequestBody @Valid TextValueForm textValueForm) {
-        return characteristicServiceFacade.createOneTextValue(id, textValueForm);
+        return characteristicFacade.createOneTextValue(id, textValueForm);
     }
 
     @DeleteMapping("{id}/range")
     public Long deleteOneRangeValue(@PathVariable Long id, @RequestBody @Valid RangeValueForm rangeValueForm) {
-        return characteristicServiceFacade.deleteOneRangeValue(id, rangeValueForm);
+        return characteristicFacade.deleteOneRangeValue(id, rangeValueForm);
     }
 
     @DeleteMapping("{id}/text")
     public Long deleteOneRangeValue(@PathVariable Long id, @RequestBody @Valid TextValueForm textValueForm) {
-        return characteristicServiceFacade.deleteOneTextValue(id, textValueForm);
+        return characteristicFacade.deleteOneTextValue(id, textValueForm);
     }
 }

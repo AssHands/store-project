@@ -21,7 +21,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class ProductServiceFacade {
+public class ProductFacade {
     private final ProductService productService;
     private final S3Service s3Service;
     private final ProductMapper productMapper;

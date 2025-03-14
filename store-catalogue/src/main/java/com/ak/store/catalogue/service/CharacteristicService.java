@@ -49,16 +49,15 @@ public class CharacteristicService {
 
     public Characteristic createOne(CharacteristicForm characteristicForm) {
         characteristicBusinessValidator.validateCreation(characteristicForm);
-        var a = characteristicMapper.toCharacteristic(characteristicForm);
         return characteristicRepo.save(characteristicMapper.toCharacteristic(characteristicForm));
     }
 
-
     //todo: check if product use this characteristic before deleting
-    public void deleteOne(Long id) {
+    public Characteristic deleteOne(Long id) {
+        var characteristic = findOneWithRangeValues(id);
         characteristicRepo.deleteById(id);
+        return characteristic;
     }
-
 
     public Characteristic updateOne(Long id, CharacteristicForm characteristicForm) {
         Characteristic characteristic = findOne(id);

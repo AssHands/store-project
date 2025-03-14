@@ -1,6 +1,8 @@
 package com.ak.store.catalogue.util.mapper;
 
 import com.ak.store.catalogue.model.entity.*;
+import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
+import com.ak.store.common.model.catalogue.dto.RangeValueDTO;
 import com.ak.store.common.model.catalogue.form.CharacteristicForm;
 import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
 import com.ak.store.common.model.catalogue.form.RangeValueForm;
@@ -11,6 +13,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +43,8 @@ public interface CharacteristicMapper {
     ProductCharacteristic toProductCharacteristic(ProductCharacteristicForm productCharacteristicForm,
                                                   Characteristic characteristic, Product product);
 
+    CharacteristicDTO toCharacteristicDTO(Characteristic characteristic);
+
     default List<String> mapTextValues(List<TextValue> textValues) {
         if (textValues == null) {
             return Collections.emptyList();
@@ -47,5 +52,20 @@ public interface CharacteristicMapper {
         return textValues.stream()
                 .map(TextValue::getTextValue)
                 .toList();
+    }
+
+    default List<RangeValueDTO> mapRangeValues(List<RangeValue> rangeValues) {
+        if (rangeValues == null) {
+            return Collections.emptyList();
+        }
+
+        List<RangeValueDTO> rangeValueDTOs = new ArrayList<>();
+        for (RangeValue rangeValue : rangeValues) {
+            rangeValueDTOs.add(RangeValueDTO.builder()
+                    .to(rangeValue.getToValue())
+                    .from(rangeValue.getFromValue())
+                    .build());
+        }
+        return rangeValueDTOs;
     }
 }
