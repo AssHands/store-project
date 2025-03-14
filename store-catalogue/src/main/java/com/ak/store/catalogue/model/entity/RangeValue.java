@@ -11,6 +11,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @NoArgsConstructor
 @Entity
 @EqualsAndHashCode(of = { "fromValue", "toValue" })
+@ToString(exclude = { "characteristic" })
 @Builder
 @Table(name = "range_value")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "static-data")

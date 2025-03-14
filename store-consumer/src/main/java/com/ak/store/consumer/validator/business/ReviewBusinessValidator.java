@@ -14,8 +14,6 @@ import java.util.UUID;
 public class ReviewBusinessValidator {
     private final CatalogueFeign catalogueFeign;
 
-    private final ConsumerService consumerService;
-
     private final ReviewRepo reviewRepo;
 
     public void validateCreation(Long productId, String consumerId) {

@@ -22,11 +22,6 @@ public class WarehouseProjectApplication {
     }
 
     @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
-
-    @Bean
     public Validator validator() {
         return Validation.byProvider(HibernateValidator.class)
                 .configure()

@@ -1,6 +1,6 @@
 package com.ak.store.consumer.service;
 
-import com.ak.store.common.model.consumer.dto.ConsumerDTO;
+import com.ak.store.common.model.consumer.form.ConsumerForm;
 import jakarta.ws.rs.ClientErrorException;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.CreatedResponseUtil;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +26,13 @@ public class KeycloakService {
     @Value("${keycloak.realm}")
     private String realm;
 
-    public String createOneConsumer(ConsumerDTO consumerDTO) {
-        CredentialRepresentation credential = createPasswordCredentials(consumerDTO.getPassword());
+    public String createOneConsumer(ConsumerForm consumerForm) {
+        CredentialRepresentation credential = createPasswordCredentials(consumerForm.getPassword());
 
         UserRepresentation user = new UserRepresentation();
-        user.setEmail(consumerDTO.getEmail());
+        user.setEmail(consumerForm.getEmail());
         user.setCredentials(Collections.singletonList(credential));
-        user.setFirstName(consumerDTO.getName());
+        user.setFirstName(consumerForm.getName());
         user.setEnabled(true);
 
         UsersResource userResource = getUsersResource();
@@ -54,9 +53,9 @@ public class KeycloakService {
         usersResource.remove();
     }
 
-    public String updateOneConsumer(String consumerId, ConsumerDTO consumerDTO) {
+    public String updateOneConsumer(String consumerId, ConsumerForm consumerForm) {
         UserRepresentation user = new UserRepresentation();
-        updateUser(user, consumerDTO);
+        updateUser(user, consumerForm);
 
         UserResource userResource = getUsersResource().get(consumerId);
         try {
@@ -91,12 +90,12 @@ public class KeycloakService {
         return passwordCredentials;
     }
 
-    private void updateUser(UserRepresentation user, ConsumerDTO consumerDTO) {
-        if (consumerDTO.getName() != null) {
-            user.setFirstName(consumerDTO.getName());
+    private void updateUser(UserRepresentation user, ConsumerForm consumerForm) {
+        if (consumerForm.getName() != null) {
+            user.setFirstName(consumerForm.getName());
         }
-        if (consumerDTO.getPassword() != null) {
-            CredentialRepresentation credentialRepresentation = createPasswordCredentials(consumerDTO.getPassword());
+        if (consumerForm.getPassword() != null) {
+            CredentialRepresentation credentialRepresentation = createPasswordCredentials(consumerForm.getPassword());
             user.setCredentials(Collections.singletonList(credentialRepresentation));
         }
     }

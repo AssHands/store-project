@@ -1,7 +1,6 @@
 package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.service.CharacteristicService;
-import com.ak.store.catalogue.util.mapper.CatalogueMapper0;
 import com.ak.store.catalogue.util.mapper.CharacteristicMapper;
 import com.ak.store.common.model.catalogue.form.CharacteristicForm;
 import com.ak.store.common.model.catalogue.form.RangeValueForm;

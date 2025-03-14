@@ -45,11 +45,11 @@ public class TestCatalogueFactory {
         return CategoryView.builder().id(id).name(name).parentId(parentId).build();
     }
 
-    public static CategoryView createCategoryDTO(Long id, String name, List<CategoryView> childList) {
-        return CategoryView.builder().id(id).name(name).childCategories(childList).build();
-    }
-
-    public static CategoryView createCategoryDTO(Long id, String name, Long parentId, List<CategoryView> childList) {
-        return CategoryView.builder().id(id).name(name).parentId(parentId).childCategories(childList).build();
-    }
+//    public static CategoryView createCategoryDTO(Long id, String name, List<CategoryView> childList) {
+//        return CategoryView.builder().id(id).name(name) .childCategories(childList).build();
+//    }
+//
+//    public static CategoryView createCategoryDTO(Long id, String name, Long parentId, List<CategoryView> childList) {
+//        return CategoryView.builder().id(id).name(name).parentId(parentId).childCategories(childList).build();
+//    }
 }

@@ -19,5 +19,6 @@ public class CategoryDTO {
     private Long id;
     private String name;
     private Long parentId;
+    @Builder.Default
     private List<Long> characteristics = new ArrayList<>();
 }

@@ -17,7 +17,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = { "category", "textValues", "rangeValues" })
+@ToString(exclude = { "categories" })
 @EqualsAndHashCode(of = { "name", "isText" })
 @Builder
 @Entity
@@ -47,7 +47,7 @@ public class Characteristic {
     @Builder.Default
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "characteristic", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CategoryCharacteristic> category = new ArrayList<>();
+    private List<CategoryCharacteristic> categories = new ArrayList<>();
 
     public Characteristic(Long id) {
         this.id = id;

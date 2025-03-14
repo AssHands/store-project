@@ -1,6 +1,6 @@
 package com.ak.store.consumer.controller;
 
-import com.ak.store.common.model.consumer.dto.ConsumerDTO;
+import com.ak.store.common.model.consumer.form.ConsumerForm;
 import com.ak.store.common.model.consumer.view.ConsumerPoorView;
 import com.ak.store.common.validationGroup.Create;
 import com.ak.store.common.validationGroup.Update;
@@ -19,8 +19,8 @@ public class ConsumerController {
     private final ConsumerFacade consumerFacade;
 
     @PostMapping
-    public String createOne(@RequestBody @Validated(Create.class) ConsumerDTO consumerDTO) {
-        return consumerFacade.createOne(consumerDTO);
+    public String createOne(@RequestBody @Validated(Create.class) ConsumerForm consumerForm) {
+        return consumerFacade.createOne(consumerForm);
     }
 
     @GetMapping("{id}")
@@ -34,8 +34,8 @@ public class ConsumerController {
     }
 
     @PatchMapping("{id}")
-    public String updateOne(@PathVariable String id, @RequestBody @Validated(Update.class) ConsumerDTO consumerDTO) {
-        return consumerFacade.updateOne(id, consumerDTO);
+    public String updateOne(@PathVariable String id, @RequestBody @Validated(Update.class) ConsumerForm consumerForm) {
+        return consumerFacade.updateOne(id, consumerForm);
     }
 
     @GetMapping("exist/{id}")
@@ -57,8 +57,8 @@ public class ConsumerController {
 
     @PatchMapping("me")
     public String updateMe(@AuthenticationPrincipal Jwt accessToken,
-                           @RequestBody @Validated(Update.class) ConsumerDTO consumerDTO) {
-        return consumerFacade.updateOne(accessToken.getSubject(), consumerDTO);
+                           @RequestBody @Validated(Update.class) ConsumerForm consumerForm) {
+        return consumerFacade.updateOne(accessToken.getSubject(), consumerForm);
     }
 
     @DeleteMapping("me")

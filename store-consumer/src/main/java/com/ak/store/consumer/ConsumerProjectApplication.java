@@ -3,7 +3,6 @@ package com.ak.store.consumer;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
-import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -20,11 +19,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class ConsumerProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(ConsumerProjectApplication.class, args);
-    }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
     }
 
     @Bean

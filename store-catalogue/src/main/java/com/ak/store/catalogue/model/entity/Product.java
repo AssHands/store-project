@@ -11,7 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"category", "images", "characteristics"})
 @Entity
 public class Product {
     @Id

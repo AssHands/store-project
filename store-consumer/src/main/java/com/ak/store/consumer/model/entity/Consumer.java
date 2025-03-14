@@ -11,8 +11,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = { "carts", "reviews", "commentReviews" })
-@EqualsAndHashCode(exclude = { "carts", "reviews", "commentReviews" })
+@ToString(exclude = { "carts", "reviews", "comments" })
+@EqualsAndHashCode(exclude = { "carts", "reviews", "comments" })
 @Entity
 public class Consumer {
     @Id

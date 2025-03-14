@@ -1,4 +1,4 @@
-package com.ak.store.common.model.consumer.dto;
+package com.ak.store.common.model.consumer.form;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ConsumerDTO {
-    private String name;
-    private String email;
-    private String password;
+public class CommentForm {
+    private String text;
 }

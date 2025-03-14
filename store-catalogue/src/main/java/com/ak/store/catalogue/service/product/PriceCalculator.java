@@ -4,12 +4,11 @@ import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.common.model.catalogue.form.ProductForm;
 
 public abstract class PriceCalculator {
-     static public void updatePrice(Product product, ProductForm productForm) {
-         if (productForm.getFullPrice() != null && productForm.getFullPrice() != product.getFullPrice()) {
+     static public void definePrice(Product product, ProductForm productForm) {
+         if(productForm.getFullPrice() != null) {
              product.setFullPrice(productForm.getFullPrice());
          }
-
-         if (productForm.getDiscountPercentage() != null) {
+         if(productForm.getDiscountPercentage() != null) {
              product.setDiscountPercentage(productForm.getDiscountPercentage());
          }
 

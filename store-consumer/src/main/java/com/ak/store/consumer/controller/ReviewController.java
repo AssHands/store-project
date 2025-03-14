@@ -1,7 +1,7 @@
 package com.ak.store.consumer.controller;
 
-import com.ak.store.common.model.consumer.dto.CommentDTO;
-import com.ak.store.common.model.consumer.dto.ReviewDTO;
+import com.ak.store.common.model.consumer.form.CommentForm;
+import com.ak.store.common.model.consumer.form.ReviewForm;
 import com.ak.store.common.model.consumer.view.CommentView;
 import com.ak.store.common.model.consumer.view.ReviewView;
 import com.ak.store.consumer.facade.ReviewFacade;
@@ -31,13 +31,13 @@ public class ReviewController {
 
     @PostMapping("{productId}")
     public Long createOneReview(@PathVariable Long productId, @RequestParam String consumerId,
-                          @RequestBody @Valid ReviewDTO reviewDTO) {
-        return reviewFacade.createOneReview(consumerId, productId, reviewDTO);
+                          @RequestBody @Valid ReviewForm reviewForm) {
+        return reviewFacade.createOneReview(consumerId, productId, reviewForm);
     }
 
     @PatchMapping("{reviewId}")
-    public Long updateOneReview(@PathVariable Long reviewId, @RequestBody @Valid ReviewDTO reviewDTO) {
-        return reviewFacade.updateOneReview(reviewId, reviewDTO);
+    public Long updateOneReview(@PathVariable Long reviewId, @RequestBody @Valid ReviewForm reviewForm) {
+        return reviewFacade.updateOneReview(reviewId, reviewForm);
     }
 
     @DeleteMapping("{reviewId}")
@@ -47,13 +47,13 @@ public class ReviewController {
 
     @PostMapping("{reviewId}/comments")
     public Long createOneComment(@PathVariable Long reviewId, @RequestParam String consumerId,
-                                 @RequestBody @Valid CommentDTO commentDTO) {
-        return reviewFacade.createOneComment(consumerId, reviewId, commentDTO);
+                                 @RequestBody @Valid CommentForm commentForm) {
+        return reviewFacade.createOneComment(consumerId, reviewId, commentForm);
     }
 
     @PatchMapping("comments/{commentId}")
-    public Long updateOneComment(@PathVariable Long commentId, @RequestBody @Valid CommentDTO commentDTO) {
-        return reviewFacade.updateOneComment(commentId, commentDTO);
+    public Long updateOneComment(@PathVariable Long commentId, @RequestBody @Valid CommentForm commentForm) {
+        return reviewFacade.updateOneComment(commentId, commentForm);
     }
 
     @DeleteMapping("comments/{commentId}")
@@ -65,14 +65,14 @@ public class ReviewController {
 
     @PostMapping("me/{productId}")
     public Long createOneReviewMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long productId,
-                                @RequestBody @Valid ReviewDTO reviewDTO) {
-        return reviewFacade.createOneReview(accessToken.getSubject(), productId, reviewDTO);
+                                @RequestBody @Valid ReviewForm reviewForm) {
+        return reviewFacade.createOneReview(accessToken.getSubject(), productId, reviewForm);
     }
 
     @PatchMapping("me/{reviewId}")
     public Long updateOneReviewMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long reviewId,
-                          @RequestBody @Valid ReviewDTO reviewDTO) {
-        return reviewFacade.updateOneReview(reviewId, reviewDTO);
+                          @RequestBody @Valid ReviewForm reviewForm) {
+        return reviewFacade.updateOneReview(reviewId, reviewForm);
     }
 
     @DeleteMapping("me/{reviewId}")
@@ -82,14 +82,14 @@ public class ReviewController {
 
     @PostMapping("me/{reviewId}/comments")
     public Long createOneCommentMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long reviewId,
-                                 @RequestBody @Valid CommentDTO commentDTO) {
-        return reviewFacade.createOneComment(accessToken.getSubject(), reviewId, commentDTO);
+                                 @RequestBody @Valid CommentForm commentForm) {
+        return reviewFacade.createOneComment(accessToken.getSubject(), reviewId, commentForm);
     }
 
     @PatchMapping("me/comments/{commentId}")
     public Long updateOneCommentMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long commentId,
-                                   @RequestBody @Valid CommentDTO commentDTO) {
-        return reviewFacade.updateOneComment(commentId, commentDTO);
+                                   @RequestBody @Valid CommentForm commentForm) {
+        return reviewFacade.updateOneComment(commentId, commentForm);
     }
 
     @DeleteMapping("me/comments/{commentId}")

@@ -1,13 +1,13 @@
 package com.ak.store.consumer.facade;
 
 import com.ak.store.common.event.consumer.ConsumerVerifyEvent;
-import com.ak.store.common.model.consumer.dto.ConsumerDTO;
+import com.ak.store.common.model.consumer.form.ConsumerForm;
 import com.ak.store.common.model.consumer.view.ConsumerPoorView;
 import com.ak.store.consumer.kafka.ConsumerProducerKafka;
 import com.ak.store.consumer.model.entity.Consumer;
 import com.ak.store.consumer.service.ConsumerService;
 import com.ak.store.consumer.service.KeycloakService;
-import com.ak.store.consumer.util.ConsumerMapper;
+import com.ak.store.consumer.util.mapper.ConsumerMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,13 +23,13 @@ public class ConsumerFacade {
     private final ConsumerProducerKafka consumerProducerKafka;
 
     @Transactional
-    public String createOne(ConsumerDTO consumerDTO) {
+    public String createOne(ConsumerForm consumerForm) {
         String id = "";
         String verificationCode = UUID.randomUUID().toString();
 
         try {
-            id = keycloakService.createOneConsumer(consumerDTO);
-            Consumer consumer = consumerService.createOne(id, consumerDTO);
+            id = keycloakService.createOneConsumer(consumerForm);
+            Consumer consumer = consumerService.createOne(id, consumerForm);
             consumerService.makeVerificationCode(id, verificationCode, consumer.getEmail());
             consumerProducerKafka.send(new ConsumerVerifyEvent(verificationCode, consumer.getEmail()));
         } catch (Exception e) {
@@ -43,7 +43,7 @@ public class ConsumerFacade {
     }
 
     public ConsumerPoorView findOne(String id) {
-        return consumerMapper.mapToConsumerPoorView(consumerService.findOne(id));
+        return consumerMapper.toConsumerPoorView(consumerService.findOne(id));
     }
 
     @Transactional
@@ -54,9 +54,9 @@ public class ConsumerFacade {
     }
 
     @Transactional
-    public String updateOne(String id, ConsumerDTO consumerDTO) {
-        keycloakService.updateOneConsumer(id, consumerDTO);
-        return consumerService.updateOne(id, consumerDTO).getId().toString();
+    public String updateOne(String id, ConsumerForm consumerForm) {
+        keycloakService.updateOneConsumer(id, consumerForm);
+        return consumerService.updateOne(id, consumerForm).getId().toString();
     }
 
     @Transactional

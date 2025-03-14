@@ -4,7 +4,6 @@ import feign.okhttp.OkHttpClient;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
-import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -21,11 +20,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class OrderProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(OrderProjectApplication.class, args);
-    }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
     }
 
     @Bean

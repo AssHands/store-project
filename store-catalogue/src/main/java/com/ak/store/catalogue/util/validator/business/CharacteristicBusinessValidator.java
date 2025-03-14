@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.validator.business;
+package com.ak.store.catalogue.util.validator.business;
 
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CharacteristicRepo;

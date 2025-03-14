@@ -22,6 +22,7 @@ import java.util.Set;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductWritePayload {
     @Valid
+    @Builder.Default
     ProductForm product = new ProductForm();
 
     @Builder.Default

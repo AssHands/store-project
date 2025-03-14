@@ -8,7 +8,7 @@ import com.ak.store.order.feign.WarehouseFeign;
 import com.ak.store.order.kafka.OrderProducerKafka;
 import com.ak.store.order.model.Order;
 import com.ak.store.order.service.OrderService;
-import com.ak.store.order.util.OrderMapper;
+import com.ak.store.order.util.mapper.OrderMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -27,7 +27,7 @@ public class OrderFacade {
 
     public List<OrderView> findAllByConsumerId(String consumerId) {
         return orderService.findAllByConsumerId(consumerId).stream()
-                .map(orderMapper::mapToOrderView)
+                .map(orderMapper::toOrderView)
                 .toList();
     }
 

@@ -3,10 +3,10 @@ package com.ak.store.catalogue.service;
 import com.ak.store.catalogue.model.entity.*;
 import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
 import com.ak.store.catalogue.repository.ProductRepo;
-import com.ak.store.catalogue.util.mapper.CatalogueMapper0;
 import com.ak.store.catalogue.service.product.PriceCalculator;
-import com.ak.store.catalogue.validator.business.ProductBusinessValidator;
-import com.ak.store.catalogue.validator.ProductImageValidator;
+import com.ak.store.catalogue.util.mapper.ProductMapper;
+import com.ak.store.catalogue.util.validator.business.ProductBusinessValidator;
+import com.ak.store.catalogue.util.validator.ProductImageValidator;
 import com.ak.store.common.model.catalogue.form.ImageForm;
 import com.ak.store.common.model.catalogue.form.ProductForm;
 import com.ak.store.common.model.search.common.SortingType;
@@ -25,10 +25,10 @@ import static com.ak.store.catalogue.util.ProductImageProcessor.processProductIm
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepo productRepo;
-    private final CatalogueMapper0 catalogueMapper0;
+    private final ProductMapper productMapper;
     private final ProductImageValidator productImageValidator;
     private final ProductCharacteristicService productCharacteristicService;
-
+    private final CategoryService categoryService;
     private final ProductBusinessValidator productBusinessValidator;
 
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
@@ -106,16 +106,18 @@ public class ProductService {
     }
 
     public Product createOne(ProductWritePayload productPayload) {
-        productBusinessValidator.validateCreation(productPayload.getProduct());
-        Product product = catalogueMapper0.mapToProduct(productPayload.getProduct());
+        ProductForm productForm = productPayload.getProduct();
+        productBusinessValidator.validateCreation(productForm);
+        Product product = productMapper.toProduct(productForm, categoryService.findOne(productForm.getCategoryId()));
+        PriceCalculator.definePrice(product, productForm);
         productCharacteristicService.createAll(product, productPayload.getCreateCharacteristics());
-
         product.setIsDeleted(false);
 
         //flush for immediate validation
         productRepo.saveAndFlush(product);
         return product;
     }
+
     public Product updateOne(ProductWritePayload productPayload, Long productId) {
         Product updatedProduct = findOneWithCharacteristicsAndCategory(productId);
 
@@ -131,7 +133,7 @@ public class ProductService {
     }
 
     private void updateProduct(Product updatedProduct, ProductForm productForm) {
-        PriceCalculator.updatePrice(updatedProduct, productForm);
+        PriceCalculator.definePrice(updatedProduct, productForm);
         if (productForm.getTitle() != null) {
             updatedProduct.setTitle(productForm.getTitle());
         }

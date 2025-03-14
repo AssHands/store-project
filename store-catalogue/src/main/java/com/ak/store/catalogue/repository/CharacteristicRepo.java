@@ -16,7 +16,7 @@ public interface CharacteristicRepo extends JpaRepository<Characteristic, Long> 
     @EntityGraph(attributePaths = {"textValues"})
     @Query("""
             SELECT c FROM Characteristic c
-            JOIN c.category cc
+            JOIN c.categories cc
             WHERE cc.category.id = :categoryId
             """)
     List<Characteristic> findAllWithTextValuesByCategoryId(Long categoryId);

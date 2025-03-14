@@ -1,7 +1,10 @@
 package com.ak.store.catalogue.util.mapper;
 
-import com.ak.store.catalogue.model.entity.Characteristic;
-import com.ak.store.catalogue.model.entity.TextValue;
+import com.ak.store.catalogue.model.entity.*;
+import com.ak.store.common.model.catalogue.form.CharacteristicForm;
+import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
+import com.ak.store.common.model.catalogue.form.RangeValueForm;
+import com.ak.store.common.model.catalogue.form.TextValueForm;
 import com.ak.store.common.model.catalogue.view.CharacteristicView;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,6 +20,25 @@ public interface CharacteristicMapper {
 
     @Mapping(target = "textValues", source = "textValues")
     CharacteristicView toCharacteristicView(Characteristic characteristic);
+
+    Characteristic toCharacteristic(CharacteristicForm characteristicForm);
+
+    @Mapping(target = "fromValue", source = "rangeValueForm.from")
+    @Mapping(target = "toValue", source = "rangeValueForm.to")
+    @Mapping(target = "characteristic", expression = "java(characteristic)")
+    @Mapping(target = "id", ignore = true)
+    RangeValue toRangeValue(RangeValueForm rangeValueForm, Characteristic characteristic);
+
+    @Mapping(target = "textValue", source = "textValueForm.text")
+    @Mapping(target = "characteristic", expression = "java(characteristic)")
+    @Mapping(target = "id", ignore = true)
+    TextValue toTextValue(TextValueForm textValueForm, Characteristic characteristic);
+
+    @Mapping(target = "product", expression = "java(product)")
+    @Mapping(target = "characteristic", expression = "java(characteristic)")
+    @Mapping(target = "id", ignore = true)
+    ProductCharacteristic toProductCharacteristic(ProductCharacteristicForm productCharacteristicForm,
+                                                  Characteristic characteristic, Product product);
 
     default List<String> mapTextValues(List<TextValue> textValues) {
         if (textValues == null) {

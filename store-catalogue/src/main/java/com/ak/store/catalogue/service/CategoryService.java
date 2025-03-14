@@ -4,8 +4,8 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
-import com.ak.store.catalogue.validator.business.CategoryBusinessValidator;
-import com.ak.store.catalogue.util.mapper.CatalogueMapper0;
+import com.ak.store.catalogue.util.mapper.CategoryMapper;
+import com.ak.store.catalogue.util.validator.business.CategoryBusinessValidator;
 import com.ak.store.common.model.catalogue.form.CategoryForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class CategoryService {
-    private final CatalogueMapper0 catalogueMapper0;
+    private final CategoryMapper categoryMapper;
     private final CategoryRepo categoryRepo;
     private final CharacteristicService characteristicService;
     private final CategoryBusinessValidator categoryBusinessValidator;
@@ -26,7 +26,8 @@ public class CategoryService {
 
     public Category createOne(CategoryForm categoryForm) {
         categoryBusinessValidator.validateCreation(categoryForm);
-        return categoryRepo.save(catalogueMapper0.mapToCategory(categoryForm));
+        var a = categoryMapper.toCategory(categoryForm);
+        return categoryRepo.save(categoryMapper.toCategory(categoryForm));
     }
 
     private Category findOneWithCharacteristics(Long id) {

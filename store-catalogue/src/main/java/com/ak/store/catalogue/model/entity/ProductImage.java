@@ -13,7 +13,7 @@ import lombok.*;
 @Entity
 @Builder
 @EqualsAndHashCode(of = { "imageKey" })
-@ToString(of = { "imageKey", "index" })
+@ToString(exclude = { "product" })
 @Table(name = "product_image")
 public class ProductImage {
     @Id

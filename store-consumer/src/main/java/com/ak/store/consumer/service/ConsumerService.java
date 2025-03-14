@@ -1,10 +1,10 @@
 package com.ak.store.consumer.service;
 
-import com.ak.store.common.model.consumer.dto.ConsumerDTO;
+import com.ak.store.common.model.consumer.form.ConsumerForm;
 import com.ak.store.consumer.model.entity.Consumer;
 import com.ak.store.consumer.model.entity.VerificationCode;
 import com.ak.store.consumer.repository.ConsumerRepo;
-import com.ak.store.consumer.util.ConsumerMapper;
+import com.ak.store.consumer.util.mapper.ConsumerMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +17,9 @@ public class ConsumerService {
     private final ConsumerRepo consumerRepo;
     private final ConsumerMapper consumerMapper;
 
-    private UUID makeUUID(String id) {
-        return UUID.fromString(id);
-    }
-
-    public Consumer createOne(String id, ConsumerDTO consumerDTO) {
-        Consumer consumer = consumerMapper.mapToConsumer(consumerDTO);
-        consumer.setId(makeUUID(id));
+    public Consumer createOne(String id, ConsumerForm consumerForm) {
+        Consumer consumer = consumerMapper.toConsumer(consumerForm);
+        consumer.setId(UUID.fromString(id));
         consumer.setEnabled(false);
         return consumerRepo.save(consumer);
     }
@@ -34,26 +30,26 @@ public class ConsumerService {
     }
 
     public void deleteOne(String id) {
-        consumerRepo.deleteById(makeUUID(id));
+        consumerRepo.deleteById(UUID.fromString(id));
     }
 
-    public Consumer updateOne(String id, ConsumerDTO consumerDTO) {
+    public Consumer updateOne(String id, ConsumerForm consumerForm) {
         Consumer consumer = findOne(id);
-        updateConsumer(consumer, consumerDTO);
+        updateConsumer(consumer, consumerForm);
         return consumerRepo.save(consumer);
     }
 
-    private void updateConsumer(Consumer consumer, ConsumerDTO consumerDTO) {
-        if (consumerDTO.getName() != null) {
-            consumer.setName(consumerDTO.getName());
+    private void updateConsumer(Consumer consumer, ConsumerForm consumerForm) {
+        if (consumerForm.getName() != null) {
+            consumer.setName(consumerForm.getName());
         }
-        if (consumerDTO.getPassword() != null) {
-            consumer.setPassword(consumerDTO.getPassword());
+        if (consumerForm.getPassword() != null) {
+            consumer.setPassword(consumerForm.getPassword());
         }
     }
 
     public Boolean existOne(String id) {
-        return consumerRepo.existsOneById(makeUUID(id));
+        return consumerRepo.existsOneById(UUID.fromString(id));
     }
 
     public Consumer verifyOne(String code) {
@@ -73,12 +69,12 @@ public class ConsumerService {
     }
 
     public Consumer makeVerificationCode(String id, String verificationCode, String email) {
-        Consumer consumer = consumerRepo.findOneWithCodeById(makeUUID(id))
+        Consumer consumer = consumerRepo.findOneWithCodeById(UUID.fromString(id))
                 .orElseThrow(() -> new RuntimeException("product no found"));
 
         consumer.setVerificationCode(VerificationCode.builder()
                 .code(verificationCode)
-                .consumer(Consumer.builder().id(makeUUID(id)).build())
+                .consumer(Consumer.builder().id(UUID.fromString(id)).build())
                 .expiresAt(LocalDateTime.now().plusDays(1L))
                 .email(email)
                 .build()

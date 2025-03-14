@@ -1,14 +1,14 @@
 package com.ak.store.consumer.service;
 
-import com.ak.store.common.model.consumer.dto.CommentDTO;
-import com.ak.store.common.model.consumer.dto.ReviewDTO;
+import com.ak.store.common.model.consumer.form.CommentForm;
+import com.ak.store.common.model.consumer.form.ReviewForm;
 import com.ak.store.consumer.model.entity.Comment;
 import com.ak.store.consumer.model.entity.Consumer;
 import com.ak.store.consumer.model.entity.Review;
 import com.ak.store.consumer.model.projection.ReviewWithCommentCountProjection;
 import com.ak.store.consumer.repository.CommentRepo;
 import com.ak.store.consumer.repository.ReviewRepo;
-import com.ak.store.consumer.util.ConsumerMapper;
+import com.ak.store.consumer.util.mapper.ReviewMapper;
 import com.ak.store.consumer.validator.business.ReviewBusinessValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,8 @@ public class ReviewService {
     private final ReviewRepo reviewRepo;
     private final CommentRepo commentRepo;
     private final ReviewBusinessValidator reviewBusinessValidator;
-    private final ConsumerMapper consumerMapper;
+    private final ReviewMapper reviewMapper;
+    private final ConsumerService consumerService;
 
     public List<ReviewWithCommentCountProjection> findAllByProductId(Long productId) {
         return reviewRepo.findAllWithConsumerAndCommentCountByProductId(productId);
@@ -52,15 +53,16 @@ public class ReviewService {
         reviewRepo.deleteById(reviewId);
     }
 
-    public Review createOneReview(Long productId, String consumerId, ReviewDTO reviewDTO) {
+    public Review createOneReview(Long productId, String consumerId, ReviewForm reviewForm) {
         reviewBusinessValidator.validateCreation(productId, consumerId);
-        Review review = consumerMapper.mapToReview(reviewDTO, productId, consumerId);
+        Consumer consumer = consumerService.findOne(consumerId);
+        Review review = reviewMapper.toReview(reviewForm, consumer, productId);
         return reviewRepo.save(review);
     }
 
-    public Review updateOneReview(Long ReviewId, ReviewDTO reviewDTO) {
+    public Review updateOneReview(Long ReviewId, ReviewForm reviewForm) {
         Review review = findOneReview(ReviewId);
-        updateReview(review, reviewDTO);
+        updateReview(review, reviewForm);
         return reviewRepo.save(review);
     }
 
@@ -72,11 +74,11 @@ public class ReviewService {
         return commentRepo.findAllByReviewId(reviewId);
     }
 
-    public Comment createOneComment(String consumerId, Long reviewId, CommentDTO commentDTO) {
+    public Comment createOneComment(String consumerId, Long reviewId, CommentForm commentForm) {
         var commentReview = Comment.builder()
                 .review(Review.builder().id(reviewId).build())
                 .consumer(Consumer.builder().id(UUID.fromString(consumerId)).build())
-                .text(commentDTO.getText())
+                .text(commentForm.getText())
                 .build();
 
         return commentRepo.save(commentReview);
@@ -86,30 +88,30 @@ public class ReviewService {
         commentRepo.deleteById(commentId);
     }
 
-    public Comment updateOneComment(Long commentId, CommentDTO commentDTO) {
+    public Comment updateOneComment(Long commentId, CommentForm commentForm) {
         Comment comment = findOmeComment(commentId);
-        updateComment(comment, commentDTO);
+        updateComment(comment, commentForm);
         return commentRepo.save(comment);
     }
 
-    private void updateReview(Review review, ReviewDTO reviewDTO) {
-        if (reviewDTO.getAdvantages() != null) {
-            review.setAdvantages(reviewDTO.getAdvantages());
+    private void updateReview(Review review, ReviewForm reviewForm) {
+        if (reviewForm.getAdvantages() != null) {
+            review.setAdvantages(reviewForm.getAdvantages());
         }
-        if (reviewDTO.getDisadvantages() != null) {
-            review.setDisadvantages(reviewDTO.getDisadvantages());
+        if (reviewForm.getDisadvantages() != null) {
+            review.setDisadvantages(reviewForm.getDisadvantages());
         }
-        if (reviewDTO.getText() != null) {
-            review.setText(reviewDTO.getText());
+        if (reviewForm.getText() != null) {
+            review.setText(reviewForm.getText());
         }
-        if (reviewDTO.getGrade() != null) {
-            review.setGrade(reviewDTO.getGrade());
+        if (reviewForm.getGrade() != null) {
+            review.setGrade(reviewForm.getGrade());
         }
     }
 
-    private void updateComment(Comment comment, CommentDTO commentDTO) {
-        if (commentDTO.getText() != null) {
-            comment.setText(commentDTO.getText());
+    private void updateComment(Comment comment, CommentForm commentForm) {
+        if (commentForm.getText() != null) {
+            comment.setText(commentForm.getText());
         }
     }
 }

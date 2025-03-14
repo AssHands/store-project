@@ -1,13 +1,15 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
-import com.ak.store.catalogue.util.mapper.CatalogueMapper0;
-import com.ak.store.catalogue.validator.business.ProductCharacteristicBusinessValidator;
+import com.ak.store.catalogue.util.mapper.CharacteristicMapper;
+import com.ak.store.catalogue.util.validator.business.ProductCharacteristicBusinessValidator;
 import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -15,42 +17,44 @@ import java.util.Set;
 @Service
 public class ProductCharacteristicService {
 
-    private final CatalogueMapper0 catalogueMapper0;
+    private final CharacteristicMapper characteristicMapper;
+    private final CharacteristicService characteristicService;
     private final ProductCharacteristicBusinessValidator productCharacteristicBusinessValidator;
 
-    public void createAll(Product updatedProduct, Set<ProductCharacteristicForm> createCharacteristicsDTO) {
-        if(createCharacteristicsDTO.isEmpty()) return;
-        productCharacteristicBusinessValidator.validateCreation(createCharacteristicsDTO, updatedProduct);
+    public void createAll(Product product, Set<ProductCharacteristicForm> ProductCharacteristicForms) {
+        if(ProductCharacteristicForms.isEmpty()) return;
+        productCharacteristicBusinessValidator.validateCreation(ProductCharacteristicForms, product);
 
-        List<ProductCharacteristic> createdCharacteristics = createCharacteristicsDTO.stream()
-                .map(c -> catalogueMapper0.mapToProductCharacteristic(c, updatedProduct))
-                .toList();
+        List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
+        for(var productCharacteristic : ProductCharacteristicForms) {
+            Characteristic characteristic = characteristicService.findOne(productCharacteristic.getId());
+            productCharacteristics.add(
+                    characteristicMapper.toProductCharacteristic(productCharacteristic, characteristic, product)
+            );
+        }
 
-        updatedProduct.addCharacteristics(createdCharacteristics);
+        product.addCharacteristics(productCharacteristics);
     }
 
-    public void updateAll(Product updatedProduct, Set<ProductCharacteristicForm> updateCharacteristicsDTO) {
-        if(updateCharacteristicsDTO.isEmpty()) return;
-        productCharacteristicBusinessValidator.validateUpdate
-                (updateCharacteristicsDTO, updatedProduct.getCategory().getId());
+    public void updateAll(Product product, Set<ProductCharacteristicForm> ProductCharacteristicForms) {
+        if(ProductCharacteristicForms.isEmpty()) return;
+        productCharacteristicBusinessValidator.validateUpdate(ProductCharacteristicForms, product.getCategory().getId());
 
-        for(var characteristic : updateCharacteristicsDTO) {
-            int index = findProductCharacteristicIndexById(
-                    updatedProduct.getCharacteristics(), characteristic.getId());
+        for(var productCharacteristic : ProductCharacteristicForms) {
+            int index = findProductCharacteristicIndexById(product.getCharacteristics(), productCharacteristic.getId());
 
-            updatedProduct.getCharacteristics().get(index).setTextValue(characteristic.getTextValue());
-            updatedProduct.getCharacteristics().get(index).setNumericValue(characteristic.getNumericValue());
+            product.getCharacteristics().get(index).setTextValue(productCharacteristic.getTextValue());
+            product.getCharacteristics().get(index).setNumericValue(productCharacteristic.getNumericValue());
         }
     }
 
-    public void deleteAll(Product updatedProduct, Set<ProductCharacteristicForm> deleteCharacteristicsDTO) {
-        if(deleteCharacteristicsDTO.isEmpty()) return;
+    public void deleteAll(Product product, Set<ProductCharacteristicForm> ProductCharacteristicForms) {
+        if(ProductCharacteristicForms.isEmpty()) return;
 
-        for(var characteristic : deleteCharacteristicsDTO) {
-            int index = findProductCharacteristicIndexById(
-                    updatedProduct.getCharacteristics(), characteristic.getId());
+        for(var characteristic : ProductCharacteristicForms) {
+            int index = findProductCharacteristicIndexById(product.getCharacteristics(), characteristic.getId());
 
-            updatedProduct.getCharacteristics().remove(index);
+            product.getCharacteristics().remove(index);
         }
     }
 

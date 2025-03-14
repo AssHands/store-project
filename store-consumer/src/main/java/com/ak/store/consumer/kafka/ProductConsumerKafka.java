@@ -16,7 +16,7 @@ public class ProductConsumerKafka {
     @KafkaListener(topics = "product-deleted-events", groupId = "consumer-group")
     //todo: разные транзакции? чё делать
     public void handle(ProductDeletedEvent productDeletedEvent) {
-        cartFacade.deleteAllByProductId(productDeletedEvent.getId());
-        reviewFacade.deleteAllByProductId(productDeletedEvent.getId());
+        cartFacade.deleteAllByProductId(productDeletedEvent.getProduct().getId());
+        reviewFacade.deleteAllByProductId(productDeletedEvent.getProduct().getId());
     }
 }
