@@ -6,10 +6,11 @@ spring:
     bootstrap-servers: localhost:29092,localhost:39092
 
     consumer:
-      group-id: synchronization-product-group
+      group-id: synchronization-catalogue-group
       properties:
         spring.json.trusted.packages: "com.ak.store.*"
       auto-offset-reset: earliest
+      max-poll-records: 100
 
     producer:
       acks: all

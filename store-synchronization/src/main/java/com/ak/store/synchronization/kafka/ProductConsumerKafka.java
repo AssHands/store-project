@@ -13,17 +13,17 @@ import org.springframework.stereotype.Component;
 public class ProductConsumerKafka {
     private final ProductFacade productFacade;
 
-    @KafkaListener(topics = "product-created-events", groupId = "synchronization-product-group")
+    @KafkaListener(topics = "product-created-events", groupId = "synchronization-catalogue-group")
     public void handle(ProductCreatedEvent productCreatedEvent) {
         productFacade.createOneProduct(productCreatedEvent.getProduct());
     }
 
-    @KafkaListener(topics = "product-updated-events", groupId = "synchronization-product-group")
+    @KafkaListener(topics = "product-updated-events", groupId = "synchronization-catalogue-group")
     public void handle(ProductUpdatedEvent productUpdatedEvent) {
         productFacade.updateOneProduct(productUpdatedEvent.getProduct());
     }
 
-    @KafkaListener(topics = "product-deleted-events", groupId = "synchronization-product-group")
+    @KafkaListener(topics = "product-deleted-events", groupId = "synchronization-catalogue-group")
     public void handle(ProductDeletedEvent productDeletedEvent) {
         productFacade.deleteOneProduct(productDeletedEvent.getProduct().getId());
     }

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ElasticService {
+public class ProductElasticService {
     private final ElasticsearchClient esClient;
 
     public void compensateDeleteOneProduct(ProductDocument productDocument) {

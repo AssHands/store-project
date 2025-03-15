@@ -43,6 +43,9 @@ public class KafkaConsumerConfig {
         props.put(JsonDeserializer.TRUSTED_PACKAGES,
                 environment.getProperty("spring.kafka.consumer.properties.spring.json.trusted.packages"));
 
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,
+                environment.getProperty("spring.kafka.consumer.max-poll-records"));
+
         //todo: надо ли это, если я отправляю сообщения исключительно после сохранения в бд?
         // + проверить влияние на проивзодительность
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
@@ -53,8 +56,18 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
 
-
         return new DefaultKafkaConsumerFactory<>(props);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, Object> batchFactory(ConsumerFactory<String, Object> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory);
+        factory.setBatchListener(true);
+        factory.setConcurrency(1);
+        factory.getContainerProperties().setPollTimeout(3000);
+
+        return factory;
     }
 
     @Bean
