@@ -45,6 +45,9 @@ public class CatalogueProducerKafkaConfig {
     @Value("${spring.kafka.producer.properties.max.in.flight.requests.per.connection}")
     private String maxInFlightRequests;
 
+    @Value("${spring.kafka.producer.properties.linger.ms}")
+    private String lingerMs;
+
     @Bean
     public ProducerFactory<String, ProductEvent> producerFactoryForProduct() {
         Map<String, Object> configProps = new HashMap<>();
@@ -58,6 +61,7 @@ public class CatalogueProducerKafkaConfig {
         configProps.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeoutMs);
         configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, enableIdempotence);
         configProps.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, maxInFlightRequests);
+        configProps.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
@@ -77,6 +81,7 @@ public class CatalogueProducerKafkaConfig {
         configProps.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeoutMs);
         configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, enableIdempotence);
         configProps.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, maxInFlightRequests);
+        configProps.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
@@ -96,6 +101,7 @@ public class CatalogueProducerKafkaConfig {
         configProps.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeoutMs);
         configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, enableIdempotence);
         configProps.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, maxInFlightRequests);
+        configProps.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 

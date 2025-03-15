@@ -5,7 +5,8 @@ import com.ak.store.synchronization.elastic.ProductElasticService;
 import com.ak.store.synchronization.util.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -13,15 +14,27 @@ public class ProductFacade {
     private final ProductElasticService productElasticService;
     private final ProductMapper productMapper;
 
-    public void createOneProduct(ProductDTO product) {
-        productElasticService.createOneProduct(productMapper.toProductDocument(product));
+    public void createOne(ProductDTO product) {
+        productElasticService.createOne(productMapper.toProductDocument(product));
     }
 
-    public void updateOneProduct(ProductDTO product) {
-        productElasticService.updateOneProduct(productMapper.toProductDocument(product));
+    public void createAll(List<ProductDTO> products) {
+        productElasticService.createAll(productMapper.toProductDocument(products));
     }
 
-    public void deleteOneProduct(Long id) {
-        productElasticService.deleteOneProduct(id);
+    public void updateOne(ProductDTO product) {
+        productElasticService.updateOne(productMapper.toProductDocument(product));
+    }
+
+    public void updateAll(List<ProductDTO> products) {
+        productElasticService.updateAll(productMapper.toProductDocument(products));
+    }
+
+    public void deleteOne(Long id) {
+        productElasticService.deleteOne(id);
+    }
+
+    public void deleteAll(List<Long> ids) {
+        productElasticService.deleteAll(ids);
     }
 }

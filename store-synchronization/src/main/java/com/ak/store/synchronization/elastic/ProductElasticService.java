@@ -14,7 +14,7 @@ import java.util.List;
 public class ProductElasticService {
     private final ElasticsearchClient esClient;
 
-    public void compensateDeleteOneProduct(ProductDocument productDocument) {
+    public void compensateDeleteOne(ProductDocument productDocument) {
         var request = IndexRequest.of(i -> i
                 .index("product")
                 .id(productDocument.getId().toString())
@@ -27,7 +27,7 @@ public class ProductElasticService {
         }
     }
 
-    public void compensateCreateOneProduct(Long id) {
+    public void compensateCreateOne(Long id) {
         var request = DeleteRequest.of(d -> d
                 .index("product")
                 .id(id.toString()));
@@ -39,19 +39,7 @@ public class ProductElasticService {
         }
     }
 
-    public void deleteOneProduct(Long id) {
-        var request = DeleteRequest.of(d -> d
-                .index("product")
-                .id(id.toString()));
-
-        try {
-            esClient.delete(request);
-        } catch (Exception e) {
-            throw new RuntimeException("delete document error");
-        }
-    }
-
-    public void createOneProduct(ProductDocument productDocument) {
+    public void createOne(ProductDocument productDocument) {
         var request = IndexRequest.of(i -> i
                  .index("product")
                  .id(productDocument.getId().toString())
@@ -64,10 +52,10 @@ public class ProductElasticService {
         }
     }
 
-    public void createAllProduct(List<ProductDocument> productDocumentList) {
+    public void createAll(List<ProductDocument> productDocuments) {
         var br = new BulkRequest.Builder();
 
-        productDocumentList.forEach(product ->
+        productDocuments.forEach(product ->
                 br.operations(op -> op
                         .index(idx -> idx
                                 .index("product")
@@ -91,7 +79,7 @@ public class ProductElasticService {
         }
     }
 
-    public void updateOneProduct(ProductDocument productDocument) {
+    public void updateOne(ProductDocument productDocument) {
         var request = UpdateRequest.of(u -> u
                 .index("product")
                 .id(productDocument.getId().toString())
@@ -101,6 +89,71 @@ public class ProductElasticService {
             esClient.update(request, ProductDocument.class);
         } catch (Exception e) {
             throw new RuntimeException("update document error");
+        }
+    }
+
+    public void updateAll(List<ProductDocument> productDocuments) {
+        var br = new BulkRequest.Builder();
+
+        productDocuments.forEach(product ->
+                br.operations(op -> op
+                        .index(idx -> idx
+                                .index("product")
+                                .id(product.getId().toString())
+                                .document(product))));
+
+        BulkResponse result = null;
+
+        try {
+            result = esClient.bulk(br.build());
+        } catch (Exception e) {
+            throw new RuntimeException("bulk document error");
+        }
+
+        if (result.errors()) {
+            for (BulkResponseItem item: result.items()) {
+                if (item.error() != null) {
+                    throw new RuntimeException("bulk had errors\n" + item.error().reason());
+                }
+            }
+        }
+    }
+
+    public void deleteOne(Long id) {
+        var request = DeleteRequest.of(d -> d
+                .index("product")
+                .id(id.toString()));
+
+        try {
+            esClient.delete(request);
+        } catch (Exception e) {
+            throw new RuntimeException("delete document error");
+        }
+    }
+
+    public void deleteAll(List<Long> ids) {
+        var br = new BulkRequest.Builder();
+
+        ids.forEach(id ->
+                br.operations(op -> op
+                        .delete(idx -> idx
+                                .index("product")
+                                .id(id.toString()))));
+
+        BulkResponse result = null;
+
+        try {
+            result = esClient.bulk(br.build());
+        } catch (Exception e) {
+            throw new RuntimeException("bulk document error");
+        }
+
+        if (result.errors()) {
+            for (BulkResponseItem item: result.items()) {
+                if (item.error() != null) {
+                    throw new RuntimeException("bulk had errors\n" + item.error().reason());
+                }
+            }
         }
     }
 }
