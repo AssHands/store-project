@@ -188,6 +188,28 @@ services:
     ports:
       - "8070:8080"
 
+  redis-catalogue:
+    image: redis:7.4.2
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/root/redis
+#      - ./redis/config/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_USER=root
+      - REDIS_PASSWORD=root
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
+
+  redis-insight:
+    image: redis/redisinsight:2.66
+    restart: always
+    ports:
+      - "5540:5540"
+    volumes:
+      - ./redis-insight/data:/data
+
 #  hazelcast:
 #    image: hazelcast/hazelcast:5.5
 #    environment:

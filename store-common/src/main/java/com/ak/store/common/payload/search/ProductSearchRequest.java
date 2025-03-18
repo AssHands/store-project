@@ -21,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SearchProductRequest {
+public class ProductSearchRequest {
     @Min(1)
     @Max(100)
     private int limit = 20;

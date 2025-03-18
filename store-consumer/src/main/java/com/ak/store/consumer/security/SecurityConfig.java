@@ -29,9 +29,9 @@ public class SecurityConfig {
 
 //        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //        http.cors(AbstractHttpConfigurer::disable);
-        http.exceptionHandling(e -> e
-                .accessDeniedHandler((request, response, accessDeniedException) ->
-                        accessDeniedException.printStackTrace()));
+//        http.exceptionHandling(e -> e
+//                .accessDeniedHandler((request, response, accessDeniedException) ->
+//                        accessDeniedException.printStackTrace()));
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/v1/consumer/consumers/verify").permitAll()

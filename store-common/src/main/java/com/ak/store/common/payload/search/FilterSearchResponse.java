@@ -1,15 +1,14 @@
 package com.ak.store.common.payload.search;
 
-import com.ak.store.common.model.search.dto.FiltersDTO;
 import com.ak.store.common.model.search.common.NumericFilter;
 import com.ak.store.common.model.search.common.TextFilter;
+import com.ak.store.common.model.search.view.FiltersView;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,28 +17,27 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SearchAvailableFiltersRequest {
+public class FilterSearchResponse {
 
     private Long categoryId;
+    @Builder.Default
+    private FiltersView filtersView = new FiltersView();
 
-    private int priceFrom;
-
-    @Min(1)
-    private int priceTo;
-
-    private String text;
-
-    @Valid
-    @JsonProperty("filters")
-    private FiltersDTO filtersDTO = new FiltersDTO();
-
+    @JsonIgnore
     public List<NumericFilter> getNumericFilters() {
-        return filtersDTO.getNumericFilters();
+        return filtersView.getNumericFilters();
     }
 
+    @JsonIgnore
     public List<TextFilter> getTextFilters() {
-        return filtersDTO.getTextFilters();
+        return filtersView.getTextFilters();
+    }
+
+    @JsonIgnore
+    public FiltersView getAllFilters() {
+        return filtersView;
     }
 }

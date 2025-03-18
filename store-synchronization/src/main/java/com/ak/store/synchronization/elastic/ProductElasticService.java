@@ -3,7 +3,7 @@ package com.ak.store.synchronization.elastic;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
-import com.ak.store.common.document.ProductDocument;
+import com.ak.store.synchronization.model.document.ProductDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

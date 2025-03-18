@@ -1,7 +1,7 @@
 package com.ak.store.synchronization.util.mapper;
 
-import com.ak.store.common.document.CharacteristicDocument;
 import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
+import com.ak.store.synchronization.model.document.CharacteristicDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;

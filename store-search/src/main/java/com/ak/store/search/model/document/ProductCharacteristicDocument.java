@@ -1,4 +1,4 @@
-package com.ak.store.common.document;
+package com.ak.store.search.model.document;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -8,11 +8,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ImageDocument {
-    private Integer index;
-    private String key;
+public class ProductCharacteristicDocument {
+    private Long id;
+
+    private String textValue;
+
+    private Integer numericValue;
 }

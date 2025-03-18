@@ -47,7 +47,7 @@ public class KafkaConsumerConfig {
                 environment.getProperty("spring.kafka.consumer.max-poll-records"));
 
         //todo: надо ли это, если я отправляю сообщения исключительно после сохранения в бд?
-        // + проверить влияние на проивзодительность
+        // + проверить влияние на производительность
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
 
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
