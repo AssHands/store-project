@@ -26,5 +26,6 @@
         <module>store-email-sender</module>
         <module>store-outbox-scheduler</module>
         <module>store-search</module>
+        <module>store-recommendation</module>
     </modules>
 </project>

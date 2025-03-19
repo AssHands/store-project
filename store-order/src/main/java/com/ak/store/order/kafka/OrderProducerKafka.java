@@ -17,7 +17,7 @@ public class OrderProducerKafka {
             SendResult<String, OrderEvent> future = kafkaProductTemplate
                     .send("order-created-events", orderCreatedEvent).get();
         } catch (Exception e) {
-            throw new RuntimeException("kafka product-deleted-events error");
+            throw new RuntimeException("kafka order-created-events error");
         }
     }
 }

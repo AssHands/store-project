@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+/deploy/redis-insight/data/
+/deploy/redis/data/
+/deploy/minio/data/

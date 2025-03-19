@@ -1,8 +1,8 @@
 package com.ak.store.synchronization.facade;
 
 import com.ak.store.common.model.catalogue.dto.ProductDTO;
-import com.ak.store.synchronization.elastic.ProductElasticService;
-import com.ak.store.synchronization.redis.ProductRedisRepo;
+import com.ak.store.synchronization.service.ProductElasticService;
+import com.ak.store.synchronization.repo.redis.ProductRedisRepo;
 import com.ak.store.synchronization.util.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

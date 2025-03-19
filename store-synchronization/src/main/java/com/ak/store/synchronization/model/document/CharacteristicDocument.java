@@ -20,6 +20,8 @@ public class CharacteristicDocument {
 
     private String name;
 
+    private Boolean isText;
+
     private List<RangeValueDocument> rangeValues = new ArrayList<>();
 
     private List<String> textValues = new ArrayList<>();
