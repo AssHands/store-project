@@ -22,7 +22,7 @@ import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.search.model.document.CharacteristicDocument;
 import com.ak.store.search.model.document.ProductDocument;
-import com.ak.store.search.redis.CategoryDocument;
+import com.ak.store.search.model.document.CategoryDocument;
 import com.ak.store.search.redis.CategoryRedisRepo;
 import com.ak.store.search.redis.CharacteristicRedisRepo;
 import com.ak.store.search.util.mapper.ProductMapper;
