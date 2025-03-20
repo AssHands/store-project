@@ -7,7 +7,7 @@ import com.ak.store.common.payload.search.FilterSearchResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.search.kafka.SearchProducerKafka;
-import com.ak.store.search.service.ElasticService;
+import com.ak.store.search.service.SearchElasticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -15,15 +15,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SearchFacade {
-    private final ElasticService elasticService;
+    private final SearchElasticService searchElasticService;
     private final SearchProducerKafka searchProducerKafka;
 
     public ProductSearchResponse searchAllProduct(ProductSearchRequest productSearchRequest) {
-        return elasticService.searchAllProduct(productSearchRequest);
+        return searchElasticService.searchAllProduct(productSearchRequest);
     }
 
     public FilterSearchResponse searchAllFilter(Jwt accessToken, FilterSearchRequest filterSearchRequest) {
-        var response = elasticService.searchAllFilter(filterSearchRequest);
+        var response = searchElasticService.searchAllFilter(filterSearchRequest);
 
         if(accessToken == null) {
             return response;

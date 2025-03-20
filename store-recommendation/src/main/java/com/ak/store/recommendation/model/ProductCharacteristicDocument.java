@@ -1,4 +1,4 @@
-package com.ak.store.common.model.search.dto;
+package com.ak.store.recommendation.model;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -10,9 +10,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder
-public class ConsumerSearchDTO {
-    private String consumerId;
-    private Long categoryId;
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class ProductCharacteristicDocument {
+    private Long id;
+
+    private String textValue;
+
+    private Integer numericValue;
 }

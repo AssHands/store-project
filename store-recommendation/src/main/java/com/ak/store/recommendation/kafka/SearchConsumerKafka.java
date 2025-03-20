@@ -19,6 +19,6 @@ public class SearchConsumerKafka {
             batch = "true",
             containerFactory = "batchFactory")
     public void handleCreated(List<SearchAllEvent> searchAllEvents) {
-        recommendationFacade.putInHistory(searchAllEvents);
+        recommendationFacade.putInSearchHistory(searchAllEvents);
     }
 }

@@ -32,5 +32,7 @@ public class ProductPoorView {
 
     private Float grade;
 
+    private Long categoryId;
+
     private List<ImageView> images = new ArrayList<>();
 }

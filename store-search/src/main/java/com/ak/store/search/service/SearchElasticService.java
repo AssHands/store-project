@@ -34,7 +34,7 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Service
-public class ElasticService {
+public class SearchElasticService {
     private final ElasticsearchClient esClient;
     private final CategoryRedisRepo categoryRedisRepo;
     private final CharacteristicRedisRepo characteristicRedisRepo;
@@ -88,7 +88,7 @@ public class ElasticService {
         }
 
         return FilterSearchResponse.builder()
-                .filtersView(transformSearchFiltersResponseToFilters(response))
+                .filters(transformSearchFiltersResponseToFilters(response))
                 .categoryId(filterSearchRequest.getCategoryId())
                 .build();
     }
@@ -263,7 +263,7 @@ public class ElasticService {
         if (!productSearchRequest.getTextFilters().isEmpty())
             filters.addAll(makeTextFilters(productSearchRequest.getTextFilters(), null));
 
-        SearchRequest searchRequest = BuildSearchRequest(productSearchRequest,
+        SearchRequest searchRequest = buildSearchRequest(productSearchRequest,
                 makeSearchQuery(filters, productSearchRequest.getText()));
 
         SearchResponse<ProductDocument> response;
@@ -380,7 +380,7 @@ public class ElasticService {
         });
     }
 
-    private SearchRequest BuildSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {
+    private SearchRequest buildSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")

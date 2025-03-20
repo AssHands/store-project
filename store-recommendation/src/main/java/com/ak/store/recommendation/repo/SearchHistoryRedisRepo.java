@@ -1,8 +1,10 @@
-//package com.ak.store.recommendation.repo;
-//
-//import org.springframework.data.repository.CrudRepository;
-//
-//import java.util.UUID;
-//
-//public interface SearchHistoryRedisRepo extends CrudRepository<, UUID> {
-//}
+package com.ak.store.recommendation.repo;
+
+import java.util.List;
+import java.util.Set;
+
+public interface SearchHistoryRedisRepo {
+    Set<Long> findAllByConsumerId(String consumerId);
+    void putOne(String consumerId, Long categoryId);
+    void putAll(String consumerId, List<Long> categoryIds);
+}

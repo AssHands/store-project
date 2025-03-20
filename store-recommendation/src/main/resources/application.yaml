@@ -18,3 +18,12 @@ spring:
           keycloak:
             token-uri: http://localhost:8070/realms/store-realm/protocol/openid-connect/token
 
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:39092
+
+    consumer:
+      group-id: recommendation-group
+      properties:
+        spring.json.trusted.packages: "com.ak.store.*"
+      auto-offset-reset: earliest
+      max-poll-records: 100

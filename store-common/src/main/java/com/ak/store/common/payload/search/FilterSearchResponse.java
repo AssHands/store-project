@@ -24,20 +24,20 @@ public class FilterSearchResponse {
 
     private Long categoryId;
     @Builder.Default
-    private FiltersView filtersView = new FiltersView();
+    private FiltersView filters = new FiltersView();
 
     @JsonIgnore
     public List<NumericFilter> getNumericFilters() {
-        return filtersView.getNumericFilters();
+        return filters.getNumericFilters();
     }
 
     @JsonIgnore
     public List<TextFilter> getTextFilters() {
-        return filtersView.getTextFilters();
+        return filters.getTextFilters();
     }
 
     @JsonIgnore
     public FiltersView getAllFilters() {
-        return filtersView;
+        return filters;
     }
 }
