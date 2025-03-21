@@ -16,10 +16,6 @@ public class SearchHistoryRedisService {
         return searchHistoryRedisRepo.findAllByConsumerId(consumerId);
     }
 
-    public void putOne(String consumerId, Long categoryId) {
-        searchHistoryRedisRepo.putOne(consumerId, categoryId);
-    }
-
     public void putAll(String consumerId, List<Long> categoryIds) {
         searchHistoryRedisRepo.putAll(consumerId, categoryIds);
     }

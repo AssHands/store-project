@@ -24,12 +24,11 @@ import java.util.Set;
 public class RecommendationElasticService {
     private final ElasticsearchClient esClient;
     private final ProductMapper productMapper;
-
     private final int SIZE = 20;
 
     public RecommendationResponse getRecommendation(Set<Long> categoryIds) {
+        RecommendationResponse recommendationResponse = new RecommendationResponse();
         List<Query> filters = new ArrayList<>();
-
         for (Long categoryId : categoryIds) {
             filters.add(TermQuery.of(t -> t
                             .field("category_id")
@@ -37,71 +36,45 @@ public class RecommendationElasticService {
                     ._toQuery());
         }
 
-        SearchRequest searchRequest = buildSearchRequest(makeSearchQueryWithFilters(filters));
-
-        SearchResponse<ProductDocument> response;
-
-        try {
-            response = esClient.search(searchRequest, ProductDocument.class);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to get response from ElasticSearch server");
-        }
-
-        List<Hit<ProductDocument>> productHits = response.hits().hits();
-
-        System.out.println(searchRequest);
-        response.hits().hits().forEach(System.out::println);
-
-        RecommendationResponse recommendationResponse = new RecommendationResponse();
-
         recommendationResponse.getContent().addAll(
-                productHits.stream()
-                        .filter(doc -> doc.source() != null)
-                        .map(Hit::source)
-                        .map(productMapper::toProductPoorView)
-                        .toList());
+                getContent(
+                        sendRequest(
+                                buildSearchRequest(
+                                        buildBoolQuery(filters)
+                                )))
+        );
 
         if (recommendationResponse.getContent().size() >= SIZE) {
             return recommendationResponse;
         }
 
-        List<Long> ids = new ArrayList<>(
+        int size = SIZE - recommendationResponse.getContent().size();
+        List<Long> excludingIds = new ArrayList<>(
                 recommendationResponse.getContent().stream().map(ProductPoorView::getId).toList()
         );
 
-        int size = SIZE - recommendationResponse.getContent().size();
-        searchRequest = buildSearchRequest(makeSearchQueryExcludingIds(ids), size);
-
-        try {
-            response = esClient.search(searchRequest, ProductDocument.class);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to get response from ElasticSearch server");
-        }
-
-        productHits = response.hits().hits();
-        System.out.println(searchRequest);
-        response.hits().hits().forEach(System.out::println);
-
         recommendationResponse.getContent().addAll(
-                productHits.stream()
-                        .filter(doc -> doc.source() != null)
-                        .map(Hit::source)
-                        .map(productMapper::toProductPoorView)
-                        .toList());
+                getContent(
+                        sendRequest(
+                                buildSearchRequest(
+                                        buildBoolQueryExcludingIds(excludingIds), size
+                                )))
+        );
 
         return recommendationResponse;
     }
 
-    private BoolQuery makeSearchQueryWithFilters(List<Query> filters) {
+    private BoolQuery buildBoolQuery(List<Query> filters) {
         return BoolQuery.of(b -> {
-            if (filters != null && !filters.isEmpty())
+            if (filters != null && !filters.isEmpty()) {
                 b.should(filters);
+            }
 
             return b;
         });
     }
 
-    private BoolQuery makeSearchQueryExcludingIds(List<Long> ids) {
+    private BoolQuery buildBoolQueryExcludingIds(List<Long> ids) {
         return BoolQuery.of(b -> {
             for (Long id : ids) {
                 b.mustNot(TermQuery.of(t -> t
@@ -115,11 +88,11 @@ public class RecommendationElasticService {
         });
     }
 
-    private SearchRequest buildSearchRequest(BoolQuery searchQuery) {
+    private SearchRequest buildSearchRequest(BoolQuery boolQuery) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")
-                    .query(q -> q.bool(searchQuery))
+                    .query(q -> q.bool(boolQuery))
                     .size(SIZE);
 
             sr.sort(s -> s.field(sort -> sort.field("current_price")));
@@ -128,16 +101,32 @@ public class RecommendationElasticService {
         });
     }
 
-    private SearchRequest buildSearchRequest(BoolQuery searchQuery, int size) {
+    private SearchRequest buildSearchRequest(BoolQuery boolQuery, int size) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")
-                    .query(q -> q.bool(searchQuery))
+                    .query(q -> q.bool(boolQuery))
                     .size(size);
 
             sr.sort(s -> s.field(sort -> sort.field("current_price")));
 
             return sr;
         });
+    }
+
+    private SearchResponse<ProductDocument> sendRequest(SearchRequest searchRequest) {
+        try {
+            return esClient.search(searchRequest, ProductDocument.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to get response from ElasticSearch server");
+        }
+    }
+
+    private List<ProductPoorView> getContent(SearchResponse<ProductDocument> searchResponse) {
+        return searchResponse.hits().hits().stream()
+                .filter(doc -> doc.source() != null)
+                .map(Hit::source)
+                .map(productMapper::toProductPoorView)
+                .toList();
     }
 }

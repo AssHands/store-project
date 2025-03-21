@@ -28,11 +28,6 @@ public class SearchHistoryRedisRepoImpl implements SearchHistoryRedisRepo {
     }
 
     @Override
-    public void putOne(String consumerId, Long categoryId) {
-        stringRedisTemplate.opsForSet().add(consumerId, categoryId.toString());
-    }
-
-    @Override
     public void putAll(String consumerId, List<Long> categoryIds) {
         List<String> ids = categoryIds.stream().map(Object::toString).toList();
         stringRedisTemplate.opsForSet().add(consumerId, ids.toArray(new String[0]));

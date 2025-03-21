@@ -12,6 +12,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
+import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.search.common.NumericFilter;
 import com.ak.store.common.model.search.common.NumericFilterValue;
 import com.ak.store.common.model.search.common.TextFilter;
@@ -20,9 +21,9 @@ import com.ak.store.common.payload.search.FilterSearchRequest;
 import com.ak.store.common.payload.search.FilterSearchResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.payload.search.ProductSearchResponse;
+import com.ak.store.search.model.document.CategoryDocument;
 import com.ak.store.search.model.document.CharacteristicDocument;
 import com.ak.store.search.model.document.ProductDocument;
-import com.ak.store.search.model.document.CategoryDocument;
 import com.ak.store.search.redis.CategoryRedisRepo;
 import com.ak.store.search.redis.CharacteristicRedisRepo;
 import com.ak.store.search.util.mapper.ProductMapper;
@@ -37,64 +38,29 @@ import java.util.*;
 public class SearchElasticService {
     private final ElasticsearchClient esClient;
     private final CategoryRedisRepo categoryRedisRepo;
+
+    //todo: make service
     private final CharacteristicRedisRepo characteristicRedisRepo;
     private final ProductMapper productMapper;
 
     public FilterSearchResponse searchAllFilter(FilterSearchRequest filterSearchRequest) {
-        List<Query> filters = new ArrayList<>();
+        List<Query> filters = makeFiltersForFilterSearch(filterSearchRequest);
 
-        if (filterSearchRequest.getCategoryId() == null
-                && (filterSearchRequest.getText() == null || filterSearchRequest.getText().isBlank())) {
-            throw new RuntimeException("text and category_id are null when searching available filters");
-            //todo: move to controller validator
-        }
-
-        if (filterSearchRequest.getCategoryId() == null) {
-            //todo: catch error and send empty filters
-            filterSearchRequest.setCategoryId(defineCategory(filterSearchRequest.getText()));
-        }
-
-        filters.add(TermQuery.of(t -> t
-                        .field("category_id")
-                        .value(filterSearchRequest.getCategoryId()))
-                ._toQuery());
-
-        filters.add(TermQuery.of(t -> t
-                        .field("is_available")
-                        .value(true))
-                ._toQuery());
-
-        if (filterSearchRequest.getPriceTo() != 0) {
-            filters.add(RangeQuery.of(r -> r
-                            .field("current_price")
-                            .gte(JsonData.of(filterSearchRequest.getPriceFrom()))
-                            .lte(JsonData.of(filterSearchRequest.getPriceTo())))
-                    ._toQuery());
-        }
-
-        var request = SearchRequest.of(sr -> sr
-                .index("product")
-                .size(0)
-                .query(makeSearchQuery(filters, filterSearchRequest.getText())._toQuery())
-                .aggregations(buildAggregations(filterSearchRequest)));
-
-        SearchResponse<Void> response;
-        System.out.println(request);
-
-        try {
-            response = esClient.search(request, void.class);
-        } catch (IOException e) {
-            throw new RuntimeException("aggs error");
-        }
+        var response = sendRequest(
+                buildFilterSearchRequest(
+                        buildBoolQuery(filters, filterSearchRequest.getText()),
+                        buildAggregations(filterSearchRequest)
+                )
+        );
 
         return FilterSearchResponse.builder()
-                .filters(transformSearchFiltersResponseToFilters(response))
+                .filters(transformFilterSearchResponseToFiltersView(response))
                 .categoryId(filterSearchRequest.getCategoryId())
                 .build();
     }
 
     //todo: move to utils class?
-    private FiltersView transformSearchFiltersResponseToFilters(SearchResponse<Void> response) {
+    private FiltersView transformFilterSearchResponseToFiltersView(SearchResponse<ProductDocument> response) {
         FiltersView filtersView = new FiltersView();
 
         for (var allAggs : response.aggregations().entrySet()) {
@@ -165,22 +131,22 @@ public class SearchElasticService {
 
             List<Query> availableFilters = new ArrayList<>();
             if (!filterSearchRequest.getTextFilters().isEmpty()) {
-                availableFilters.addAll(makeTextFilters(
+                availableFilters.addAll(buildTextFilters(
                         filterSearchRequest.getTextFilters(), filter.getId()));
             }
 
             if (!filterSearchRequest.getNumericFilters().isEmpty()) {
-                availableFilters.addAll(makeNumericFilters(
+                availableFilters.addAll(buildNumericFilters(
                         filterSearchRequest.getNumericFilters(), filter.getId()));
             }
 
             if (availableFilters.isEmpty()) {
-                aggs.put(filter.getId() + "__" + filter.getName(), makeNestedAggregation(filter));
+                aggs.put(filter.getId() + "__" + filter.getName(), buildNestedAggregation(filter));
             } else {
                 aggs.put(filter.getId() + "__" + filter.getName(),
                         Aggregation.of(a -> {
                             a.filter(f -> f.bool(b -> b.filter(availableFilters)));
-                            a.aggregations("1", makeNestedAggregation(filter));
+                            a.aggregations("1", buildNestedAggregation(filter));
                             return a;
                         }));
             }
@@ -189,33 +155,39 @@ public class SearchElasticService {
         return aggs;
     }
 
-    private Aggregation makeNestedAggregation(CharacteristicDocument filter) {
+    private Aggregation buildNestedAggregation(CharacteristicDocument filter) {
         return Aggregation.of(a -> a
                 .nested(n -> n.path("characteristics"))
                 .aggregations("2", fa -> {
                     fa.filter(f -> f
                             .term(t -> t
                                     .field("characteristics.id")
-                                    .value(filter.getId())));
+                                    .value(filter.getId())
+                            )
+                    );
 
                     if (filter.getIsText()) {
                         fa.aggregations("text_values", tv -> tv
                                 .terms(t -> t
                                         .field("characteristics.text_value")
                                         .size(20)
-                                        .order(NamedValue.of("_key", SortOrder.Asc))));
+                                        .order(NamedValue.of("_key", SortOrder.Asc))
+                                )
+                        );
                     } else {
                         fa.aggregations("numeric_values", nv -> nv
                                 .range(r -> r
                                         .field("characteristics.numeric_value")
-                                        .ranges(makeAggregationRanges(filter))));
+                                        .ranges(buildAggregationRanges(filter))
+                                )
+                        );
                     }
 
                     return fa;
                 }));
     }
 
-    private List<AggregationRange> makeAggregationRanges(CharacteristicDocument filter) {
+    private List<AggregationRange> buildAggregationRanges(CharacteristicDocument filter) {
         List<AggregationRange> ranges = new ArrayList<>();
 
         for (var rangeValue : filter.getRangeValues()) {
@@ -235,6 +207,74 @@ public class SearchElasticService {
     }
 
     public ProductSearchResponse searchAllProduct(ProductSearchRequest productSearchRequest) {
+        List<Query> filters = makeFiltersForProductSearch(productSearchRequest);
+
+        var response = sendRequest(
+                buildProductSearchRequest(
+                        productSearchRequest,
+                        buildBoolQuery(filters, productSearchRequest.getText())
+                )
+        );
+
+        return ProductSearchResponse.builder()
+                .content(getContent(response))
+                .searchAfter(getSearchAfter(response))
+                .build();
+    }
+
+    private List<ProductPoorView> getContent(SearchResponse<ProductDocument> searchResponse) {
+        return searchResponse.hits().hits()
+                .stream()
+                .filter(doc -> doc.source() != null)
+                .map(Hit::source)
+                .map(productMapper::toProductPoorView)
+                .toList();
+    }
+
+    private List<Object> getSearchAfter(SearchResponse<ProductDocument> searchResponse) {
+        var hits = searchResponse.hits().hits();
+        return hits.get(hits.size() - 1).sort()
+                .stream()
+                .map(FieldValue::_get)
+                .toList();
+    }
+
+    private List<Query> makeFiltersForFilterSearch(FilterSearchRequest filterSearchRequest) {
+        List<Query> filters = new ArrayList<>();
+
+        if (filterSearchRequest.getCategoryId() == null
+                && (filterSearchRequest.getText() == null || filterSearchRequest.getText().isBlank())) {
+            throw new RuntimeException("text and category_id are null when searching available filters");
+            //todo: move to controller validator
+        }
+
+        if (filterSearchRequest.getCategoryId() == null) {
+            //todo: catch error and send empty filters
+            filterSearchRequest.setCategoryId(defineCategory(filterSearchRequest.getText()));
+        }
+
+        filters.add(TermQuery.of(t -> t
+                        .field("category_id")
+                        .value(filterSearchRequest.getCategoryId()))
+                ._toQuery());
+
+        filters.add(TermQuery.of(t -> t
+                        .field("is_available")
+                        .value(true))
+                ._toQuery());
+
+        if (filterSearchRequest.getPriceTo() != 0) {
+            filters.add(RangeQuery.of(r -> r
+                            .field("current_price")
+                            .gte(JsonData.of(filterSearchRequest.getPriceFrom()))
+                            .lte(JsonData.of(filterSearchRequest.getPriceTo())))
+                    ._toQuery());
+        }
+
+        return filters;
+    }
+
+    private List<Query> makeFiltersForProductSearch(ProductSearchRequest productSearchRequest) {
         List<Query> filters = new ArrayList<>();
 
         if (productSearchRequest.getPriceTo() != 0) {
@@ -258,82 +298,45 @@ public class SearchElasticService {
                 ._toQuery());
 
         if (!productSearchRequest.getNumericFilters().isEmpty())
-            filters.addAll(makeNumericFilters(productSearchRequest.getNumericFilters(), null));
+            filters.addAll(buildNumericFilters(productSearchRequest.getNumericFilters(), null));
 
         if (!productSearchRequest.getTextFilters().isEmpty())
-            filters.addAll(makeTextFilters(productSearchRequest.getTextFilters(), null));
+            filters.addAll(buildTextFilters(productSearchRequest.getTextFilters(), null));
 
-        SearchRequest searchRequest = buildSearchRequest(productSearchRequest,
-                makeSearchQuery(filters, productSearchRequest.getText()));
-
-        SearchResponse<ProductDocument> response;
-
-        try {
-            response = esClient.search(searchRequest, ProductDocument.class);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to get response from ElasticSearch server");
-        }
-
-        List<Hit<ProductDocument>> productHits = response.hits().hits();
-
-        System.out.println(searchRequest);
-        response.hits().hits().forEach(System.out::println);
-
-        ProductSearchResponse productSearchResponse = new ProductSearchResponse();
-
-        if (productHits.size() == 0) {
-            return productSearchResponse;
-        }
-
-        productSearchResponse.setContent(productHits
-                .stream()
-                .filter(doc -> doc.source() != null)
-                .map(Hit::source)
-                .map(productMapper::toProductPoorView)
-                .toList());
-
-        productSearchResponse.setSearchAfter(
-                productHits.get(productHits.size() - 1).sort()
-                        .stream()
-                        .map(FieldValue::_get)
-                        .toList());
-
-        return productSearchResponse;
+        return filters;
     }
 
     private Long defineCategory(String fullTextSearch) {
-        List<Query> filters = new ArrayList<>();
-        filters.add(TermQuery.of(t -> t
-                        .field("is_available")
-                        .value(true))
-                ._toQuery());
+        final String aggName = "most_frequent_category";
 
-        SearchRequest request = SearchRequest.of(sr -> sr
-                .index("product")
-                .query(q -> q.bool(makeSearchQuery(filters, fullTextSearch)))
-                .size(0)
-                .aggregations("most_frequent_category", a -> a
-                        .terms(t -> t
-                                .field("category_id")
-                                .size(1))));
-
-        System.out.println(request);
-        SearchResponse<Void> response;
-
-        try {
-            response = esClient.search(request, void.class);
-        } catch (IOException e) {
-            throw new RuntimeException("defineCategory error");
-        }
-
-        var mostFrequentCategory = response.aggregations().get("most_frequent_category")
-                .sterms().buckets().array();
+        var mostFrequentCategory = sendRequest(
+                buildCategoryDefineRequest(fullTextSearch, aggName)
+        ).aggregations().get(aggName).sterms().buckets().array();
 
         try {
             return Long.parseLong(mostFrequentCategory.get(0).key().stringValue());
         } catch (Exception e) {
             throw new RuntimeException("can not define category by text");
         }
+    }
+
+    private SearchRequest buildCategoryDefineRequest(String fullTextSearch, String aggName) {
+        List<Query> filters = new ArrayList<>();
+        filters.add(TermQuery.of(t -> t
+                        .field("is_available")
+                        .value(true))
+                ._toQuery());
+
+        return SearchRequest.of(sr -> sr
+                .index("product")
+                .query(q -> q.bool(buildBoolQuery(filters, fullTextSearch)))
+                .size(0)
+                .aggregations(aggName, a -> a
+                        .terms(t -> t
+                                .field("category_id")
+                                .size(1))
+                )
+        );
     }
 
     private String getFuzziness(String word) {
@@ -353,13 +356,14 @@ public class SearchElasticService {
         return "3";
     }
 
-    private BoolQuery makeSearchQuery(List<Query> filters, String fullTextSearch) {
-        return BoolQuery.of(b -> {
-            if (filters != null && !filters.isEmpty())
-                b.filter(filters);
+    private BoolQuery buildBoolQuery(List<Query> filters, String fullTextSearch) {
+        return BoolQuery.of(bool -> {
+            if (filters != null && !filters.isEmpty()) {
+                bool.filter(filters);
+            }
 
             if (fullTextSearch == null || fullTextSearch.isBlank()) {
-                return b;
+                return bool;
             }
 
             String[] words = Arrays.stream(fullTextSearch.split(" "))
@@ -367,24 +371,40 @@ public class SearchElasticService {
                     .toArray(String[]::new);
 
             for (String word : words) {
-                b.should(s -> s
+                bool.should(s -> s
                         .match(ma -> ma
                                 .field("title")
                                 .query(word)
                                 .fuzziness(getFuzziness(word))));
             }
 
-            b.minimumShouldMatch(getMinimumShouldMatch(words.length));
+            bool.minimumShouldMatch(getMinimumShouldMatch(words.length));
 
-            return b;
+            return bool;
         });
     }
 
-    private SearchRequest buildSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery searchQuery) {
+    private SearchResponse<ProductDocument> sendRequest(SearchRequest searchRequest) {
+        try {
+            return esClient.search(searchRequest, ProductDocument.class);
+        } catch (IOException e) {
+            throw new RuntimeException("send request error");
+        }
+    }
+
+    private SearchRequest buildFilterSearchRequest(BoolQuery boolQuery, Map<String, Aggregation> aggs) {
+        return SearchRequest.of(sr -> sr
+                .index("product")
+                .size(0)
+                .query(q -> q.bool(boolQuery))
+                .aggregations(aggs));
+    }
+
+    private SearchRequest buildProductSearchRequest(ProductSearchRequest productSearchRequest, BoolQuery boolQuery) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")
-                    .query(q -> q.bool(searchQuery))
+                    .query(q -> q.bool(boolQuery))
                     .size((productSearchRequest.getLimit() == 0) ? 20 : productSearchRequest.getLimit());
 
             if (!productSearchRequest.getSearchAfter().isEmpty()) {
@@ -412,14 +432,14 @@ public class SearchElasticService {
         });
     }
 
-    private List<Query> makeNumericFilters(List<NumericFilter> numericFilters, Long currentCharacteristicId) {
+    private List<Query> buildNumericFilters(List<NumericFilter> numericFilters, Long characteristicId) {
         List<RangeQuery> rangeList = new ArrayList<>();
         List<Query> filters = new ArrayList<>();
 
         for (var numericFilter : numericFilters) {
-            if (numericFilter.getId() != null
-                    && numericFilter.getId().equals(currentCharacteristicId))
+            if (numericFilter.getId() != null && numericFilter.getId().equals(characteristicId)) {
                 continue;
+            }
 
             for (var numericValue : numericFilter.getValues()) {
                 rangeList.add(RangeQuery.of(r -> r
@@ -431,17 +451,18 @@ public class SearchElasticService {
             filters.add(NestedQuery.of(n -> n
                             .path("characteristics")
                             .query(q -> q
-                                    .bool(bool -> {
-                                        bool.must(m -> m
+                                    .bool(b -> {
+                                        b.must(m -> m
                                                 .term(t -> t
                                                         .field("characteristics.id")
-                                                        .value(numericFilter.getId())));
+                                                        .value(numericFilter.getId()))
+                                        );
 
                                         for (RangeQuery rangeQuery : rangeList)
-                                            bool.should(s -> s.range(rangeQuery));
+                                            b.should(s -> s.range(rangeQuery));
 
-                                        bool.minimumShouldMatch("1");
-                                        return bool;
+                                        b.minimumShouldMatch("1");
+                                        return b;
                                     })))
                     ._toQuery());
         }
@@ -449,13 +470,13 @@ public class SearchElasticService {
         return filters;
     }
 
-    private List<Query> makeTextFilters(List<TextFilter> textFilters, Long currentCharacteristicId) {
+    private List<Query> buildTextFilters(List<TextFilter> textFilters, Long characteristicId) {
         List<Query> filters = new ArrayList<>();
 
         for (var textFilter : textFilters) {
-            if (textFilter.getId() != null
-                    && textFilter.getId().equals(currentCharacteristicId))
+            if (textFilter.getId() != null && textFilter.getId().equals(characteristicId)) {
                 continue;
+            }
 
             List<FieldValue> textValueList = new ArrayList<>();
             for (var textValue : textFilter.getValues()) {
@@ -471,11 +492,14 @@ public class SearchElasticService {
                                                 .must(m -> m
                                                         .term(t -> t
                                                                 .field("characteristics.id")
-                                                                .value(textFilter.getId())))
+                                                                .value(textFilter.getId()))
+                                                )
                                                 .must(m -> m
                                                         .terms(t -> t
                                                                 .field("characteristics.text_value")
-                                                                .terms(termsQuery))))))
+                                                                .terms(termsQuery))
+                                                )
+                                        )))
                         ._toQuery());
             }
         }
