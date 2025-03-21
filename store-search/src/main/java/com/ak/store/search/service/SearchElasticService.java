@@ -54,13 +54,13 @@ public class SearchElasticService {
         );
 
         return FilterSearchResponse.builder()
-                .filters(transformFilterSearchResponseToFiltersView(response))
+                .filters(getFiltersView(response))
                 .categoryId(filterSearchRequest.getCategoryId())
                 .build();
     }
 
     //todo: move to utils class?
-    private FiltersView transformFilterSearchResponseToFiltersView(SearchResponse<ProductDocument> response) {
+    private FiltersView getFiltersView(SearchResponse<ProductDocument> response) {
         FiltersView filtersView = new FiltersView();
 
         for (var allAggs : response.aggregations().entrySet()) {
