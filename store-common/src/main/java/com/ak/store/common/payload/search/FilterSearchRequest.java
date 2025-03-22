@@ -26,7 +26,6 @@ public class FilterSearchRequest {
 
     private int priceFrom;
 
-    @Min(1)
     private int priceTo;
 
     private String text;

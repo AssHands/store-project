@@ -84,7 +84,7 @@ public class SearchElasticService {
                         if (agg.docCount() == 0) continue;
                         rangeValues.add(NumericFilterValue.builder()
                                 .from(agg.from().intValue())
-                                .to(agg.to().intValue())
+                                .to(agg.to().intValue() - 1)
                                 .build());
                     }
 
@@ -195,8 +195,10 @@ public class SearchElasticService {
 
                 if (rangeValue.getFrom() != null)
                     ar.from(rangeValue.getFrom().toString());
-                if (rangeValue.getTo() != null)
-                    ar.to(rangeValue.getTo().toString());
+                if (rangeValue.getTo() != null) {
+                    Integer toValue = rangeValue.getTo() + 1;
+                    ar.to(toValue.toString());
+                }
 
                 return ar;
             }));
@@ -233,6 +235,11 @@ public class SearchElasticService {
 
     private List<Object> getSearchAfter(SearchResponse<ProductDocument> searchResponse) {
         var hits = searchResponse.hits().hits();
+
+        if(hits.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return hits.get(hits.size() - 1).sort()
                 .stream()
                 .map(FieldValue::_get)
@@ -263,6 +270,7 @@ public class SearchElasticService {
                         .value(true))
                 ._toQuery());
 
+        //todo: add filter for priceFrom
         if (filterSearchRequest.getPriceTo() != 0) {
             filters.add(RangeQuery.of(r -> r
                             .field("current_price")
@@ -277,6 +285,19 @@ public class SearchElasticService {
     private List<Query> makeFiltersForProductSearch(ProductSearchRequest productSearchRequest) {
         List<Query> filters = new ArrayList<>();
 
+        Long categoryId = productSearchRequest.getCategoryId() != null ?
+                productSearchRequest.getCategoryId() : defineCategory(productSearchRequest.getText());
+
+        filters.add(TermQuery.of(t -> t
+                        .field("category_id")
+                        .value(categoryId))
+                ._toQuery());
+
+        filters.add(TermQuery.of(t -> t
+                        .field("is_available")
+                        .value(true))
+                ._toQuery());
+
         if (productSearchRequest.getPriceTo() != 0) {
             filters.add(RangeQuery.of(r -> r
                             .field("current_price")
@@ -284,18 +305,6 @@ public class SearchElasticService {
                             .lte(JsonData.of(productSearchRequest.getPriceTo())))
                     ._toQuery());
         }
-
-        if (productSearchRequest.getCategoryId() != null) {
-            filters.add(TermQuery.of(t -> t
-                            .field("category_id")
-                            .value(productSearchRequest.getCategoryId()))
-                    ._toQuery());
-        }
-
-        filters.add(TermQuery.of(t -> t
-                        .field("is_available")
-                        .value(true))
-                ._toQuery());
 
         if (!productSearchRequest.getNumericFilters().isEmpty())
             filters.addAll(buildNumericFilters(productSearchRequest.getNumericFilters(), null));
@@ -415,16 +424,20 @@ public class SearchElasticService {
             switch (productSearchRequest.getSortingType()) {
                 case PRICE_UP -> {
                     sr.sort(s -> s.field(sort -> sort.field("current_price")));
+                    sr.sort(s -> s.field(sort -> sort.field("id")));
                 }
                 case PRICE_DOWN -> {
                     sr.sort(s -> s.field(sort -> sort.field("current_price").order(SortOrder.Desc)));
+                    sr.sort(s -> s.field(sort -> sort.field("id")));
                 }
                 case RATING -> {
                     sr.sort(s -> s.field(sort -> sort.field("grade").order(SortOrder.Desc)));
                     sr.sort(s -> s.field(sort -> sort.field("amount_reviews").order(SortOrder.Desc)));
+                    sr.sort(s -> s.field(sort -> sort.field("id")));
                 }
                 default -> { //POPULAR
                     sr.sort(s -> s.field(sort -> sort.field("amount_reviews").order(SortOrder.Desc)));
+                    sr.sort(s -> s.field(sort -> sort.field("id")));
                 }
             }
 
@@ -433,10 +446,11 @@ public class SearchElasticService {
     }
 
     private List<Query> buildNumericFilters(List<NumericFilter> numericFilters, Long characteristicId) {
-        List<RangeQuery> rangeList = new ArrayList<>();
         List<Query> filters = new ArrayList<>();
 
         for (var numericFilter : numericFilters) {
+            List<RangeQuery> rangeList = new ArrayList<>();
+
             if (numericFilter.getId() != null && numericFilter.getId().equals(characteristicId)) {
                 continue;
             }

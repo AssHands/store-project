@@ -118,7 +118,7 @@ public class RecommendationElasticService {
         try {
             return esClient.search(searchRequest, ProductDocument.class);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to get response from ElasticSearch server");
+            throw new RuntimeException("send request error");
         }
     }
 

@@ -105,6 +105,21 @@ public class ProductFacade {
                 .toList();
     }
 
+    public Long createAll(List<ProductWritePayload> productPayloads) {
+        Long id = null;
+
+        for(var payload : productPayloads) {
+            Long firstId = createOne(payload);
+
+            if(id == null) {
+                id = firstId;
+            }
+        }
+
+        System.out.println(productPayloads.size());
+        return id;
+    }
+
     //    @Transactional
 //    public SearchAvailableFiltersResponse findAllAvailableFilter(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
 //        return elasticService.searchAvailableFilters(searchAvailableFiltersRequest);

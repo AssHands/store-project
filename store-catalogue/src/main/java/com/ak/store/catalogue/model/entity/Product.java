@@ -19,7 +19,7 @@ public class Product {
     private Long id;
 
     @NotNull
-    @Size(min = 5, max = 50)
+    @Size(min = 5, max = 70)
     private String title;
 
     @NotBlank

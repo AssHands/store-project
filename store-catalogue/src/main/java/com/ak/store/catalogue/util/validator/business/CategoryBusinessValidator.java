@@ -14,7 +14,10 @@ public class CategoryBusinessValidator {
 
     public void validateCreation(CategoryForm categoryForm) {
         checkUniqName(categoryForm.getName());
-        checkParentExist(categoryForm.getParentId());
+
+        if (categoryForm.getParentId() != null) {
+            checkParentExist(categoryForm.getParentId());
+        }
     }
 
     public void validateUpdate(Category category, CategoryForm categoryForm) {
@@ -22,7 +25,10 @@ public class CategoryBusinessValidator {
             throw new RuntimeException("must category_id != parent_id");
         }
         checkUniqName(categoryForm.getName());
-        checkParentExist(categoryForm.getParentId());
+
+        if (categoryForm.getParentId() != null) {
+            checkParentExist(categoryForm.getParentId());
+        }
     }
 
     public void validateDeletion(Category category) {

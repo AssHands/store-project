@@ -68,6 +68,11 @@ public class ProductController {
         return productFacade.createOne(productPayload);
     }
 
+    @PostMapping("batch")
+    public Long createOne(@RequestBody List<ProductWritePayload> productPayloads) {
+        return productFacade.createAll(productPayloads);
+    }
+
     @PatchMapping("{id}")
     public Long updateOne(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
                           @PathVariable("id") Long productId) {
