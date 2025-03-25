@@ -12,6 +12,8 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
+import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
+import com.ak.store.common.model.catalogue.document.ProductDocument;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.search.common.NumericFilter;
 import com.ak.store.common.model.search.common.NumericFilterValue;
@@ -21,11 +23,7 @@ import com.ak.store.common.payload.search.FilterSearchRequest;
 import com.ak.store.common.payload.search.FilterSearchResponse;
 import com.ak.store.common.payload.search.ProductSearchRequest;
 import com.ak.store.common.payload.search.ProductSearchResponse;
-import com.ak.store.search.model.document.CategoryDocument;
-import com.ak.store.search.model.document.CharacteristicDocument;
-import com.ak.store.search.model.document.ProductDocument;
-import com.ak.store.search.redis.CategoryRedisRepo;
-import com.ak.store.search.redis.CharacteristicRedisRepo;
+import com.ak.store.search.repo.CharacteristicRedisRepo;
 import com.ak.store.search.util.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,13 +35,14 @@ import java.util.*;
 @Service
 public class SearchElasticService {
     private final ElasticsearchClient esClient;
-    private final CategoryRedisRepo categoryRedisRepo;
 
     //todo: make service
     private final CharacteristicRedisRepo characteristicRedisRepo;
     private final ProductMapper productMapper;
 
     public FilterSearchResponse searchAllFilter(FilterSearchRequest filterSearchRequest) {
+        characteristicRedisRepo.findAllCharacteristicByCategoryId(1L);
+
         List<Query> filters = makeFiltersForFilterSearch(filterSearchRequest);
 
         var response = sendRequest(
@@ -116,13 +115,11 @@ public class SearchElasticService {
     }
 
     private Map<String, Aggregation> buildAggregations(FilterSearchRequest filterSearchRequest) {
-        //todo: search in other place or throw exception
-        CategoryDocument category = categoryRedisRepo.findById(filterSearchRequest.getCategoryId()).get();
-
-        List<CharacteristicDocument> filters =
-                (List<CharacteristicDocument>) characteristicRedisRepo.findAllById(category.getCharacteristics());
-
         Map<String, Aggregation> aggs = new HashMap<>();
+
+        //todo: search in other place or throw exception
+        List<CharacteristicDocument> filters = characteristicRedisRepo
+                .findAllCharacteristicByCategoryId(1L);
 
         for (var filter : filters) {
             if (filter.getRangeValues().isEmpty() && filter.getTextValues().isEmpty()) {

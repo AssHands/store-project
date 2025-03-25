@@ -1,6 +1,6 @@
 package com.ak.store.synchronization.service;
 
-import com.ak.store.synchronization.model.document.CharacteristicDocument;
+import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
 import com.ak.store.synchronization.repo.redis.CharacteristicRedisRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class CharacteristicRedisService {
     }
 
     public List<CharacteristicDocument> createAll(List<CharacteristicDocument> characteristics) {
-        return (List<CharacteristicDocument>) characteristicRedisRepo.saveAll(characteristics);
+        return characteristicRedisRepo.saveAll(characteristics);
     }
 
     public CharacteristicDocument updateOne(CharacteristicDocument characteristic) {
@@ -25,7 +25,7 @@ public class CharacteristicRedisService {
     }
 
     public List<CharacteristicDocument> updateAll(List<CharacteristicDocument> characteristics) {
-        return (List<CharacteristicDocument>) characteristicRedisRepo.saveAll(characteristics);
+        return characteristicRedisRepo.saveAll(characteristics);
     }
 
     public void deleteOne(Long id) {

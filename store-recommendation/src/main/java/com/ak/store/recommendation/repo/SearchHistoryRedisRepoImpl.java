@@ -16,20 +16,23 @@ public class SearchHistoryRedisRepoImpl implements SearchHistoryRedisRepo {
 
     @Override
     public Set<Long> findAllByConsumerId(String consumerId) {
-        var set = stringRedisTemplate.opsForSet().members(consumerId);
+        Set<String> historySet = stringRedisTemplate.opsForSet().members(consumerId);
 
-        if (set == null) {
+        if (historySet == null) {
             return Collections.emptySet();
         }
 
-        return set.stream()
+        return historySet.stream()
                 .map(Long::parseLong)
                 .collect(Collectors.toSet());
     }
 
     @Override
     public void putAll(String consumerId, List<Long> categoryIds) {
-        List<String> ids = categoryIds.stream().map(Object::toString).toList();
-        stringRedisTemplate.opsForSet().add(consumerId, ids.toArray(new String[0]));
+        String[] ids = (String[]) categoryIds.stream()
+                .map(Object::toString)
+                .toArray();
+
+        stringRedisTemplate.opsForSet().add(consumerId, ids);
     }
 }

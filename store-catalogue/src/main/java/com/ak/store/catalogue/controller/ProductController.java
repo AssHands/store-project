@@ -69,7 +69,7 @@ public class ProductController {
     }
 
     @PostMapping("batch")
-    public Long createOne(@RequestBody List<ProductWritePayload> productPayloads) {
+    public Long createAll(@RequestBody List<ProductWritePayload> productPayloads) {
         return productFacade.createAll(productPayloads);
     }
 

@@ -1,4 +1,4 @@
-package com.ak.store.search.model.document;
+package com.ak.store.common.model.catalogue.document;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

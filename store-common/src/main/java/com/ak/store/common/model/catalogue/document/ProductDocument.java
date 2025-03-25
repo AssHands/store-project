@@ -1,4 +1,4 @@
-package com.ak.store.search.model.document;
+package com.ak.store.common.model.catalogue.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.redis.core.RedisHash;
 
 import java.util.List;
 
@@ -16,7 +15,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@RedisHash(value = "product")
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductDocument {
     private Long id;

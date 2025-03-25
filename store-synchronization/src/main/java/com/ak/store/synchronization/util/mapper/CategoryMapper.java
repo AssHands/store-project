@@ -1,7 +1,7 @@
 package com.ak.store.synchronization.util.mapper;
 
+import com.ak.store.common.model.catalogue.document.CategoryDocument;
 import com.ak.store.common.model.catalogue.dto.CategoryDTO;
-import com.ak.store.synchronization.model.document.CategoryDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;

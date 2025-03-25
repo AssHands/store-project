@@ -2,7 +2,6 @@ package com.ak.store.synchronization.facade;
 
 import com.ak.store.common.model.catalogue.dto.ProductDTO;
 import com.ak.store.synchronization.service.ProductElasticService;
-import com.ak.store.synchronization.repo.redis.ProductRedisRepo;
 import com.ak.store.synchronization.util.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,7 @@ import java.util.List;
 @Service
 public class ProductFacade {
     private final ProductElasticService productElasticService;
-    private final ProductRedisRepo productRedisRepo;
+    //private final ProductRedisRepo productRedisRepo;
     private final ProductMapper productMapper;
 
     public void createOne(ProductDTO product) {
@@ -22,7 +21,7 @@ public class ProductFacade {
 
     public void createAll(List<ProductDTO> products) {
         productElasticService.createAll(productMapper.toProductDocument(products));
-        productRedisRepo.saveAll(productMapper.toProductDocument(products));
+        //productRedisRepo.saveAll(productMapper.toProductDocument(products));
     }
 
     public void updateOne(ProductDTO product) {

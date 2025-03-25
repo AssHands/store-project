@@ -1,6 +1,6 @@
 package com.ak.store.synchronization.service;
 
-import com.ak.store.synchronization.model.document.ProductDocument;
+import com.ak.store.common.model.catalogue.document.ProductDocument;
 import com.ak.store.synchronization.repo.elastic.ProductElasticRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
