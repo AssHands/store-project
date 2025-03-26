@@ -9,17 +9,21 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
 @RequiredArgsConstructor
 public class CharacteristicRedisRepoImpl implements CharacteristicRedisRepo {
     private final StringRedisTemplate stringRedisTemplate;
-    private static final Gson gson = new Gson();
+    private final Gson gson;
+
+    private final String CHARACTERISTIC_KEY = "characteristic:";
+    private final String CATEGORY_CHARACTERISTIC_KEY = "category_characteristic:";
 
     @Override
     public List<CharacteristicDocument> findAllCharacteristicByCategoryId(Long categoryId) {
-        var characteristicIds = stringRedisTemplate.opsForSet().members("category_characteristic:" + categoryId);
+        Set<String> characteristicIds = stringRedisTemplate.opsForSet().members(CATEGORY_CHARACTERISTIC_KEY + categoryId);
 
         if (characteristicIds == null) {
             return Collections.emptyList();
@@ -27,10 +31,10 @@ public class CharacteristicRedisRepoImpl implements CharacteristicRedisRepo {
 
         List<String> keys = new ArrayList<>();
         for (var characteristicId : characteristicIds) {
-            keys.add("characteristic:" + characteristicId);
+            keys.add(CHARACTERISTIC_KEY + characteristicId);
         }
 
-        var characteristics = stringRedisTemplate.opsForValue().multiGet(keys);
+        List<String> characteristics = stringRedisTemplate.opsForValue().multiGet(keys);
 
         if (characteristics == null) {
             return Collections.emptyList();

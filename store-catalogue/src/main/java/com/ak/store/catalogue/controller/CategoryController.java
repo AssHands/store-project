@@ -46,4 +46,16 @@ public class CategoryController {
     public Long updateOne(@PathVariable Long id, @RequestBody @Valid CategoryForm categoryForm) {
         return categoryFacade.updateOne(id, categoryForm);
     }
+
+    @PostMapping("{id}/related")
+    public Long addRelatedToCategory(@PathVariable("id") Long categoryId,
+                                     @RequestParam("related") Long relatedId) {
+        return categoryFacade.addRelatedToCategory(categoryId, relatedId);
+    }
+
+    @DeleteMapping("{id}/related")
+    public Long deleteRelatedFromCategory(@PathVariable("id") Long categoryId,
+                                          @RequestParam("related") Long relatedId) {
+        return categoryFacade.deleteRelatedFromCategory(categoryId, relatedId);
+    }
 }

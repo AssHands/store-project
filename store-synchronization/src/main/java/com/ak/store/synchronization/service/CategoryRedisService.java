@@ -18,14 +18,18 @@ public class CategoryRedisService {
     public List<CategoryDocument> createAll(List<CategoryDTO> categories) {
         for(var category : categories) {
             categoryRedisRepo.saveAllCategoryCharacteristic(category.getId(), category.getCharacteristics());
+            categoryRedisRepo.saveAllRelatedCategory(category.getId(), category.getRelatedCategories());
         }
+
         return categoryRedisRepo.saveAll(categoryMapper.toCategoryDocument(categories));
     }
 
     public List<CategoryDocument> updateAll(List<CategoryDTO> categories) {
         for(var category : categories) {
             categoryRedisRepo.saveAllCategoryCharacteristic(category.getId(), category.getCharacteristics());
+            categoryRedisRepo.saveAllRelatedCategory(category.getId(), category.getRelatedCategories());
         }
+
         return categoryRedisRepo.saveAll(categoryMapper.toCategoryDocument(categories));
     }
 

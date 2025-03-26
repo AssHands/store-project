@@ -1,6 +1,5 @@
 package com.ak.store.catalogue.facade;
 
-import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.outbox.OutboxTaskService;
 import com.ak.store.catalogue.outbox.OutboxTaskType;
 import com.ak.store.catalogue.service.CategoryService;
@@ -57,7 +56,7 @@ public class CategoryFacade {
 
     @Transactional
     public Long addCharacteristicToCategory(Long categoryId, Long characteristicId) {
-        var category =  categoryService.addCharacteristicToCategory(categoryId, characteristicId);
+        var category = categoryService.addCharacteristicToCategory(categoryId, characteristicId);
         outboxTaskService.createOneTask(categoryMapper.toCategoryDTO(category), OutboxTaskType.CATEGORY_UPDATED);
         return category.getId();
     }
@@ -65,6 +64,20 @@ public class CategoryFacade {
     @Transactional
     public Long deleteCharacteristicFromCategory(Long categoryId, Long characteristicId) {
         var category = categoryService.deleteCharacteristicFromCategory(categoryId, characteristicId);
+        outboxTaskService.createOneTask(categoryMapper.toCategoryDTO(category), OutboxTaskType.CATEGORY_UPDATED);
+        return category.getId();
+    }
+
+    @Transactional
+    public Long addRelatedToCategory(Long categoryId, Long relatedId) {
+        var category = categoryService.addRelatedToCategory(categoryId, relatedId);
+        outboxTaskService.createOneTask(categoryMapper.toCategoryDTO(category), OutboxTaskType.CATEGORY_UPDATED);
+        return category.getId();
+    }
+
+    @Transactional
+    public Long deleteRelatedFromCategory(Long categoryId, Long relatedId) {
+        var category = categoryService.deleteRelatedFromCategory(categoryId, relatedId);
         outboxTaskService.createOneTask(categoryMapper.toCategoryDTO(category), OutboxTaskType.CATEGORY_UPDATED);
         return category.getId();
     }

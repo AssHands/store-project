@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class CategoryServiceValidator {
     private final CategoryRepo categoryRepo;
 
-    public void validateCreation(CategoryForm categoryForm) {
+    public void validateCreate(CategoryForm categoryForm) {
         checkUniqName(categoryForm.getName());
 
         if (categoryForm.getParentId() != null) {
@@ -21,7 +21,7 @@ public class CategoryServiceValidator {
     }
 
     public void validateUpdate(Category category, CategoryForm categoryForm) {
-        if(categoryForm.getParentId() != null && category.getId().equals(categoryForm.getParentId())) {
+        if (categoryForm.getParentId() != null && category.getId().equals(categoryForm.getParentId())) {
             throw new RuntimeException("must category_id != parent_id");
         }
         checkUniqName(categoryForm.getName());
@@ -31,8 +31,8 @@ public class CategoryServiceValidator {
         }
     }
 
-    public void validateDeletion(Category category) {
-        if(categoryRepo.existsByParentId(category.getParentId())) {
+    public void validateDelete(Category category) {
+        if (categoryRepo.existsByParentId(category.getParentId())) {
             throw new RuntimeException("this category has children. delete children first");
         }
     }
@@ -40,15 +40,14 @@ public class CategoryServiceValidator {
     public void validateDeleteCharacteristic(Category category, Long characteristicId) {
         boolean isCharacteristicExist = false;
         for (int i = 0; i < category.getCharacteristics().size(); i++) {
-            if(category.getCharacteristics().get(i).getCharacteristic().getId().equals(characteristicId)) {
+            if (category.getCharacteristics().get(i).getCharacteristic().getId().equals(characteristicId)) {
                 category.getCharacteristics().remove(i);
-                break;
+                return;
             }
         }
 
-        if(!isCharacteristicExist) {
-            throw new RuntimeException("characteristic with id=%d is not bound to category"
-                    .formatted(characteristicId));
+        if (!isCharacteristicExist) {
+            throw new RuntimeException("characteristic with id=%d is not bound to category".formatted(characteristicId));
         }
     }
 
@@ -60,8 +59,24 @@ public class CategoryServiceValidator {
         }
     }
 
+    public void validateAddRelated(Category category, Long relatedId) {
+        boolean isRelatedExist = relatedExist(category, relatedId);
+
+        if (isRelatedExist) {
+            throw new RuntimeException("this related is already bound to category");
+        }
+    }
+
+    public void validateDeleteRelated(Category category, Long relatedId) {
+        boolean isRelatedExist = relatedExist(category, relatedId);
+
+        if (!isRelatedExist) {
+            throw new RuntimeException("related with id=%d is not bound to category".formatted(relatedId));
+        }
+    }
+
     private void checkUniqName(String name) {
-        if(categoryRepo.existsByNameEqualsIgnoreCase(name)) {
+        if (categoryRepo.existsByNameEqualsIgnoreCase(name)) {
             throw new RuntimeException("not uniq name");
         }
     }
@@ -69,5 +84,15 @@ public class CategoryServiceValidator {
     private void checkParentExist(Long parentId) {
         categoryRepo.findById(parentId)
                 .orElseThrow(() -> new RuntimeException("parent is not exist"));
+    }
+
+    private boolean relatedExist(Category category, Long relatedId) {
+        for (var related : category.getRelatedCategories()) {
+            if (related.getId().equals(relatedId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -23,20 +23,27 @@ public class CategoryService {
         return categoryRepo.findAll();
     }
 
-    public Category createOne(CategoryForm categoryForm) {
-        categoryServiceValidator.validateCreation(categoryForm);
-        var a = categoryMapper.toCategory(categoryForm);
-        return categoryRepo.save(categoryMapper.toCategory(categoryForm));
+    public Category findOne(Long id) {
+        return categoryRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("no category found"));
     }
 
-    private Category findOneWithCharacteristics(Long id) {
+    public Category findOneWithCharacteristics(Long id) {
         return categoryRepo.findOneWithCharacteristicsById(id)
                 .orElseThrow(() -> new RuntimeException("no category found"));
     }
 
-    public Category findOne(Long id) {
-        return categoryRepo.findById(id)
+    public Category findOneWithAll(Long id) {
+        Category category = categoryRepo.findOneWithCharacteristicsById(id)
                 .orElseThrow(() -> new RuntimeException("no category found"));
+
+        category.getRelatedCategories().size();
+        return category;
+    }
+
+    public Category createOne(CategoryForm categoryForm) {
+        categoryServiceValidator.validateCreate(categoryForm);
+        return categoryRepo.save(categoryMapper.toCategory(categoryForm));
     }
 
     public Category addCharacteristicToCategory(Long categoryId, Long characteristicId) {
@@ -58,7 +65,7 @@ public class CategoryService {
         categoryServiceValidator.validateDeleteCharacteristic(category, characteristicId);
 
         for (int i = 0; i < category.getCharacteristics().size(); i++) {
-            if(category.getCharacteristics().get(i).getCharacteristic().getId().equals(characteristicId)) {
+            if (category.getCharacteristics().get(i).getCharacteristic().getId().equals(characteristicId)) {
                 category.getCharacteristics().remove(i);
                 break;
             }
@@ -70,7 +77,7 @@ public class CategoryService {
     //todo: make check if product has this category
     public Category deleteOne(Long id) {
         Category category = findOne(id);
-        categoryServiceValidator.validateDeletion(category);
+        categoryServiceValidator.validateDelete(category);
         categoryRepo.delete(category);
         return category;
     }
@@ -83,11 +90,27 @@ public class CategoryService {
     }
 
     private void updateCategory(Category category, CategoryForm categoryForm) {
-        if(categoryForm.getName() != null) {
+        if (categoryForm.getName() != null) {
             category.setName(categoryForm.getName());
         }
-        if(categoryForm.getParentId() != null) {
+        if (categoryForm.getParentId() != null) {
             category.setParentId(categoryForm.getParentId());
         }
+    }
+
+    public Category addRelatedToCategory(Long categoryId, Long relatedId) {
+        Category category = findOneWithAll(categoryId);
+        categoryServiceValidator.validateAddRelated(category, relatedId);
+
+        category.getRelatedCategories().add(Category.builder().id(relatedId).build());
+        return categoryRepo.save(category);
+    }
+
+    public Category deleteRelatedFromCategory(Long categoryId, Long relatedId) {
+        Category category = findOneWithAll(categoryId);
+        categoryServiceValidator.validateDeleteRelated(category, relatedId);
+
+        category.getRelatedCategories().remove(Category.builder().id(relatedId).build());
+        return categoryRepo.save(category);
     }
 }

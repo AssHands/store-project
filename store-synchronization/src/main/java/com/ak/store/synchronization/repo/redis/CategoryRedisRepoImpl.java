@@ -12,37 +12,62 @@ import java.util.List;
 @Repository
 public class CategoryRedisRepoImpl implements CategoryRedisRepo {
     private final StringRedisTemplate stringRedisTemplate;
-    private final static Gson gson = new Gson();
+    private final Gson gson;
+
+    private final String CATEGORY_KEY = "category:";
+    private final String CATEGORY_CHARACTERISTIC_KEY = "category_characteristic:";
+    private final String RELATED_CATEGORY_KEY = "related_category:";
 
     @Override
-    public CategoryDocument save(CategoryDocument category) {
-        stringRedisTemplate.opsForValue().set("category:" + category.getId(), gson.toJson(category));
+    public CategoryDocument saveOne(CategoryDocument category) {
+        stringRedisTemplate.opsForValue().set(CATEGORY_KEY + category.getId(), gson.toJson(category));
         return category;
     }
 
     @Override
     public List<CategoryDocument> saveAll(List<CategoryDocument> categories) {
         for(CategoryDocument category : categories) {
-            stringRedisTemplate.opsForValue().set("category:" + category.getId(), gson.toJson(category));
+            stringRedisTemplate.opsForValue().set(CATEGORY_KEY + category.getId(), gson.toJson(category));
         }
         return categories;
     }
 
     @Override
     public void saveAllCategoryCharacteristic(Long categoryId, List<Long> characteristicIds) {
-        stringRedisTemplate.delete("category_characteristic:" + categoryId);
+        stringRedisTemplate.delete(CATEGORY_CHARACTERISTIC_KEY + categoryId);
+
+        if(characteristicIds == null || characteristicIds.isEmpty()) {
+            stringRedisTemplate.delete(CATEGORY_CHARACTERISTIC_KEY + categoryId);
+            return;
+        }
 
         String[] stringIds = characteristicIds.stream()
                 .map(Object::toString)
                 .toArray(String[]::new);
 
-        stringRedisTemplate.opsForSet().add("category_characteristic:" + categoryId, stringIds);
+        stringRedisTemplate.opsForSet().add(CATEGORY_CHARACTERISTIC_KEY + categoryId, stringIds);
+    }
+
+    @Override
+    public void saveAllRelatedCategory(Long categoryId, List<Long> relatedCategories) {
+        stringRedisTemplate.delete(RELATED_CATEGORY_KEY + categoryId);
+
+        if(relatedCategories == null || relatedCategories.isEmpty()) {
+            stringRedisTemplate.delete(CATEGORY_CHARACTERISTIC_KEY + categoryId);
+            return;
+        }
+
+        String[] stringIds = relatedCategories.stream()
+                .map(Object::toString)
+                .toArray(String[]::new);
+
+        stringRedisTemplate.opsForSet().add(RELATED_CATEGORY_KEY + categoryId, stringIds);
     }
 
     @Override
     public void deleteAllById(List<Long> ids) {
         for(Long id : ids) {
-            stringRedisTemplate.delete("category:" + id);
+            stringRedisTemplate.delete(CATEGORY_KEY + id);
         }
     }
 }

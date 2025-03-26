@@ -63,7 +63,7 @@ public class TestProductFactory {
     public static ProductImage createProductImage(Integer index, String key) {
         return ProductImage.builder()
                 .index(index)
-                .imageKey(key)
+                //.imageKey(key)
                 .build();
     }
 

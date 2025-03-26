@@ -6,11 +6,11 @@ import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
 import java.util.List;
 
 public interface CharacteristicRedisRepo {
-    CharacteristicDocument save(CharacteristicDocument characteristic);
+    CharacteristicDocument saveOne(CharacteristicDocument characteristic);
 
     List<CharacteristicDocument> saveAll(List<CharacteristicDocument> characteristics);
 
-    void deleteById(Long id);
+    void deleteOneById(Long id);
 
     void deleteAllById(List<Long> ids);
 }

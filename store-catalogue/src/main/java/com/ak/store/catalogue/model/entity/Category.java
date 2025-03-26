@@ -7,15 +7,17 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Builder
-@ToString(exclude = { "characteristics" })
-@EqualsAndHashCode(of = { "name" })
+@ToString(exclude = { "characteristics", "relatedCategories" })
+@EqualsAndHashCode(of = { "id" })
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "static-data")
 public class Category {
     @Id
@@ -29,6 +31,14 @@ public class Category {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryCharacteristic> characteristics = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "related_category",
+            joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "related_id")
+    )
+    private Set<Category> relatedCategories = new HashSet<>();
 
     public Category(Long id) {
         this.id = id;
