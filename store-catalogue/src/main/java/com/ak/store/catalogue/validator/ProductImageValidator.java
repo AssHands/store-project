@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.util.validator;
+package com.ak.store.catalogue.validator;
 
 import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.common.model.catalogue.form.ImageForm;

@@ -7,6 +7,7 @@ import com.ak.store.catalogue.util.SagaBuilder;
 import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.catalogue.integration.S3Service;
+import com.ak.store.common.model.catalogue.dto.ImageDTO;
 import com.ak.store.common.model.catalogue.dto.ProductDTO;
 import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
@@ -25,13 +26,14 @@ public class ProductFacade {
     private final ProductService productService;
     private final S3Service s3Service;
     private final ProductMapper productMapper;
-    private final OutboxTaskService<ProductDTO> outboxTaskService;
+    private final OutboxTaskService<ProductDTO> productOutboxTaskService;
 
     @Transactional
     public Long saveOrUpdateAllImage(ImageForm imageForm) {
         var processedProductImages = productService.saveOrUpdateAllImage(imageForm);
         var product = productService.findOneWithImages(imageForm.getProductId());
-        outboxTaskService.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_UPDATED);
+
+        productOutboxTaskService.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_UPDATED);
 
         new SagaBuilder()
                 .step(() -> s3Service.putAllImage(processedProductImages.getImagesForAdd()))
@@ -46,14 +48,14 @@ public class ProductFacade {
     @Transactional
     public Long createOne(ProductWritePayload payload) {
         var product = productService.createOne(payload);
-        outboxTaskService.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_CREATED);
+        productOutboxTaskService.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_CREATED);
         return product.getId();
     }
 
     @Transactional
     public void deleteOne(Long id) {
         var product = productService.deleteOne(id);
-        outboxTaskService.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_DELETED);
+        productOutboxTaskService.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_DELETED);
 
         List<String> imageKeyList = product.getImages().stream()
                 .map(ProductImage::getKey)
@@ -68,7 +70,7 @@ public class ProductFacade {
     @Transactional
     public Long updateOne(ProductWritePayload productPayload, Long productId) {
         var product = productService.updateOne(productPayload, productId);
-        outboxTaskService.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_UPDATED);
+        productOutboxTaskService.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_UPDATED);
 
         return product.getId();
     }
@@ -116,27 +118,6 @@ public class ProductFacade {
             }
         }
 
-        System.out.println(productPayloads.size());
         return id;
     }
-
-    //    @Transactional
-//    public SearchAvailableFiltersResponse findAllAvailableFilter(SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
-//        return elasticService.searchAvailableFilters(searchAvailableFiltersRequest);
-//    }
-
-//    public ProductSearchResponse findAllBySearch(String consumerId, SearchProductRequest searchProductRequest) {
-//        var elasticSearchResult = elasticService.findAllProduct(searchProductRequest);
-//
-//        List<ProductPoorView> productPoorViewList = new ArrayList<>(
-//                elasticSearchResult.getContent().stream()
-//                        .map(catalogueMapper0::mapToProductPoorView)
-//                        .toList()
-//        );
-//
-//        return ProductSearchResponse.builder()
-//                .content(productPoorViewList)
-//                .searchAfter(elasticSearchResult.getSearchAfter())
-//                .build();
-//    }
 }

@@ -18,27 +18,27 @@ public class CharacteristicRedisRepoImpl implements CharacteristicRedisRepo {
     private static final Gson gson = new Gson();
 
     @Override
-    public List<CharacteristicDocument> findAllCharacteristicByCategoryId(Long id) {
-        var set = stringRedisTemplate.opsForSet().members("category_characteristic:" + id);
+    public List<CharacteristicDocument> findAllCharacteristicByCategoryId(Long categoryId) {
+        var characteristicIds = stringRedisTemplate.opsForSet().members("category_characteristic:" + categoryId);
 
-        if (set == null) {
+        if (characteristicIds == null) {
             return Collections.emptyList();
         }
 
         List<String> keys = new ArrayList<>();
-        for (var entry : set) {
-            keys.add("characteristic:" + entry);
+        for (var characteristicId : characteristicIds) {
+            keys.add("characteristic:" + characteristicId);
         }
 
-        var list = stringRedisTemplate.opsForValue().multiGet(keys);
+        var characteristics = stringRedisTemplate.opsForValue().multiGet(keys);
 
-        if (list == null) {
+        if (characteristics == null) {
             return Collections.emptyList();
         }
 
         List<CharacteristicDocument> values = new ArrayList<>();
-        for(var entry : list) {
-            values.add(gson.fromJson(entry, CharacteristicDocument.class));
+        for(var characteristic : characteristics) {
+            values.add(gson.fromJson(characteristic, CharacteristicDocument.class));
         }
 
         return values;

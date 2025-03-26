@@ -11,27 +11,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class CategoryFacade {
-    private final CategoryMapper categoryMapper;
     private final CategoryRedisService categoryRedisService;
 
-    public void createOne(CategoryDTO category) {
-        categoryRedisService.createOne(categoryMapper.toCategoryDocument(category));
-    }
-
     public void createAll(List<CategoryDTO> categories) {
-        categoryRedisService.createAll(categoryMapper.toCategoryDocument(categories));
-    }
-
-    public void updateOne(CategoryDTO category) {
-        categoryRedisService.updateOne(categoryMapper.toCategoryDocument(category));
+        categoryRedisService.createAll(categories);
     }
 
     public void updateAll(List<CategoryDTO> categories) {
-        categoryRedisService.updateAll(categoryMapper.toCategoryDocument(categories));
-    }
-
-    public void deleteOne(Long id) {
-        categoryRedisService.deleteOne(id);
+        categoryRedisService.updateAll(categories);
     }
 
     public void deleteAll(List<Long> ids) {

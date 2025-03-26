@@ -5,7 +5,7 @@ import com.ak.store.catalogue.model.entity.RangeValue;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.*;
 import com.ak.store.catalogue.util.mapper.CharacteristicMapper;
-import com.ak.store.catalogue.util.validator.business.CharacteristicBusinessValidator;
+import com.ak.store.catalogue.validator.service.CharacteristicServiceValidator;
 import com.ak.store.common.model.catalogue.form.CharacteristicForm;
 import com.ak.store.common.model.catalogue.form.RangeValueForm;
 import com.ak.store.common.model.catalogue.form.TextValueForm;
@@ -26,7 +26,7 @@ import java.util.*;
 public class CharacteristicService {
     private final CharacteristicMapper characteristicMapper;
     private final CharacteristicRepo characteristicRepo;
-    private final CharacteristicBusinessValidator characteristicBusinessValidator;
+    private final CharacteristicServiceValidator characteristicServiceValidator;
 
     public List<Characteristic> findAllByCategoryId(Long categoryId) {
         return characteristicRepo.findAllWithTextValuesByCategoryId(categoryId);
@@ -48,7 +48,7 @@ public class CharacteristicService {
     }
 
     public Characteristic createOne(CharacteristicForm characteristicForm) {
-        characteristicBusinessValidator.validateCreation(characteristicForm);
+        characteristicServiceValidator.validateCreation(characteristicForm);
         return characteristicRepo.save(characteristicMapper.toCharacteristic(characteristicForm));
     }
 
@@ -61,21 +61,21 @@ public class CharacteristicService {
 
     public Characteristic updateOne(Long id, CharacteristicForm characteristicForm) {
         Characteristic characteristic = findOne(id);
-        characteristicBusinessValidator.validateUpdate(characteristicForm);
+        characteristicServiceValidator.validateUpdate(characteristicForm);
         updateCharacteristic(characteristic, characteristicForm);
         return characteristicRepo.save(characteristic);
     }
 
     public Characteristic createRangeValue(Long id, RangeValueForm rangeValueForm) {
         Characteristic characteristic = findOneWithRangeValues(id);
-        characteristicBusinessValidator.validateCreationRangeValue(characteristic, rangeValueForm);
+        characteristicServiceValidator.validateCreationRangeValue(characteristic, rangeValueForm);
         characteristic.getRangeValues().add(characteristicMapper.toRangeValue(rangeValueForm, characteristic));
         return characteristicRepo.save(characteristic);
     }
 
     public Characteristic createTextValue(Long id, TextValueForm textValueForm) {
         Characteristic characteristic = findOneWithTextValues(id);
-        characteristicBusinessValidator.validateCreationTextValue(characteristic, textValueForm);
+        characteristicServiceValidator.validateCreationTextValue(characteristic, textValueForm);
         characteristic.getTextValues().add(characteristicMapper.toTextValue(textValueForm, characteristic));
         return characteristicRepo.save(characteristic);
     }

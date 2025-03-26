@@ -32,14 +32,6 @@ public class CharacteristicRedisRepoImpl implements CharacteristicRedisRepo {
     }
 
     @Override
-    public List<CharacteristicDocument> updateAll(List<CharacteristicDocument> characteristics) {
-        for (CharacteristicDocument characteristic : characteristics) {
-            stringRedisTemplate.opsForValue().set("characteristic:" + characteristic.getId(), gson.toJson(characteristic));
-        }
-        return characteristics;
-    }
-
-    @Override
     public void deleteById(Long id) {
         stringRedisTemplate.delete("characteristic:" + id);
     }

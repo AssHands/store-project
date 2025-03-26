@@ -10,8 +10,6 @@ public interface CharacteristicRedisRepo {
 
     List<CharacteristicDocument> saveAll(List<CharacteristicDocument> characteristics);
 
-    List<CharacteristicDocument> updateAll(List<CharacteristicDocument> characteristics);
-
     void deleteById(Long id);
 
     void deleteAllById(List<Long> ids);

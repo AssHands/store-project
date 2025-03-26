@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.util.validator.business;
+package com.ak.store.catalogue.validator.service;
 
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class CharacteristicBusinessValidator {
+public class CharacteristicServiceValidator {
     private final CharacteristicRepo characteristicRepo;
 
     public void validateCreation(CharacteristicForm characteristicForm) {

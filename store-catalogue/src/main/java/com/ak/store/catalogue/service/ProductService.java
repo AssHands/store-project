@@ -5,8 +5,8 @@ import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.service.product.PriceCalculator;
 import com.ak.store.catalogue.util.mapper.ProductMapper;
-import com.ak.store.catalogue.util.validator.business.ProductBusinessValidator;
-import com.ak.store.catalogue.util.validator.ProductImageValidator;
+import com.ak.store.catalogue.validator.service.ProductServiceValidator;
+import com.ak.store.catalogue.validator.ProductImageValidator;
 import com.ak.store.common.model.catalogue.form.ImageForm;
 import com.ak.store.common.model.catalogue.form.ProductForm;
 import com.ak.store.common.model.search.common.SortingType;
@@ -29,7 +29,7 @@ public class ProductService {
     private final ProductImageValidator productImageValidator;
     private final ProductCharacteristicService productCharacteristicService;
     private final CategoryService categoryService;
-    private final ProductBusinessValidator productBusinessValidator;
+    private final ProductServiceValidator productServiceValidator;
 
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     private int BATCH_SIZE;
@@ -107,7 +107,7 @@ public class ProductService {
 
     public Product createOne(ProductWritePayload productPayload) {
         ProductForm productForm = productPayload.getProduct();
-        productBusinessValidator.validateCreation(productForm);
+        productServiceValidator.validateCreation(productForm);
         Product product = productMapper.toProduct(productForm, categoryService.findOne(productForm.getCategoryId()));
         PriceCalculator.definePrice(product, productForm);
         productCharacteristicService.createAll(product, productPayload.getCreateCharacteristics());

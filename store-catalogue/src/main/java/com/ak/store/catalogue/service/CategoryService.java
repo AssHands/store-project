@@ -2,10 +2,9 @@ package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
-import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
 import com.ak.store.catalogue.util.mapper.CategoryMapper;
-import com.ak.store.catalogue.util.validator.business.CategoryBusinessValidator;
+import com.ak.store.catalogue.validator.service.CategoryServiceValidator;
 import com.ak.store.common.model.catalogue.form.CategoryForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,14 +17,14 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
     private final CategoryRepo categoryRepo;
     private final CharacteristicService characteristicService;
-    private final CategoryBusinessValidator categoryBusinessValidator;
+    private final CategoryServiceValidator categoryServiceValidator;
 
     public List<Category> findAll() {
         return categoryRepo.findAll();
     }
 
     public Category createOne(CategoryForm categoryForm) {
-        categoryBusinessValidator.validateCreation(categoryForm);
+        categoryServiceValidator.validateCreation(categoryForm);
         var a = categoryMapper.toCategory(categoryForm);
         return categoryRepo.save(categoryMapper.toCategory(categoryForm));
     }
@@ -42,7 +41,7 @@ public class CategoryService {
 
     public Category addCharacteristicToCategory(Long categoryId, Long characteristicId) {
         var category = findOneWithCharacteristics(categoryId);
-        categoryBusinessValidator.validateAddCharacteristic(category, characteristicId);
+        categoryServiceValidator.validateAddCharacteristic(category, characteristicId);
         var characteristic = characteristicService.findOne(characteristicId);
 
         category.getCharacteristics().add(
@@ -56,7 +55,7 @@ public class CategoryService {
 
     public Category deleteCharacteristicFromCategory(Long categoryId, Long characteristicId) {
         Category category = findOneWithCharacteristics(categoryId);
-        categoryBusinessValidator.validateDeleteCharacteristic(category, characteristicId);
+        categoryServiceValidator.validateDeleteCharacteristic(category, characteristicId);
 
         for (int i = 0; i < category.getCharacteristics().size(); i++) {
             if(category.getCharacteristics().get(i).getCharacteristic().getId().equals(characteristicId)) {
@@ -71,14 +70,14 @@ public class CategoryService {
     //todo: make check if product has this category
     public Category deleteOne(Long id) {
         Category category = findOne(id);
-        categoryBusinessValidator.validateDeletion(category);
+        categoryServiceValidator.validateDeletion(category);
         categoryRepo.delete(category);
         return category;
     }
 
     public Category updateOne(Long id, CategoryForm categoryForm) {
         Category category = findOne(id);
-        categoryBusinessValidator.validateUpdate(category, categoryForm);
+        categoryServiceValidator.validateUpdate(category, categoryForm);
         updateCategory(category, categoryForm);
         return categoryRepo.save(category);
     }

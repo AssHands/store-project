@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.util.validator.business;
+package com.ak.store.catalogue.validator.service;
 
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class ProductCharacteristicBusinessValidator {
+public class ProductCharacteristicServiceValidator {
     private final CharacteristicRepo characteristicRepo;
 
     public void validateCreation(Set<ProductCharacteristicForm> productCharacteristicForms, Product product) {

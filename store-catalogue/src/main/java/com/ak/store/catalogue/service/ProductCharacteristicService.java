@@ -4,7 +4,7 @@ import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.catalogue.util.mapper.CharacteristicMapper;
-import com.ak.store.catalogue.util.validator.business.ProductCharacteristicBusinessValidator;
+import com.ak.store.catalogue.validator.service.ProductCharacteristicServiceValidator;
 import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,11 +19,11 @@ public class ProductCharacteristicService {
 
     private final CharacteristicMapper characteristicMapper;
     private final CharacteristicService characteristicService;
-    private final ProductCharacteristicBusinessValidator productCharacteristicBusinessValidator;
+    private final ProductCharacteristicServiceValidator productCharacteristicServiceValidator;
 
     public void createAll(Product product, Set<ProductCharacteristicForm> ProductCharacteristicForms) {
         if(ProductCharacteristicForms.isEmpty()) return;
-        productCharacteristicBusinessValidator.validateCreation(ProductCharacteristicForms, product);
+        productCharacteristicServiceValidator.validateCreation(ProductCharacteristicForms, product);
 
         List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
         for(var productCharacteristic : ProductCharacteristicForms) {
@@ -38,7 +38,7 @@ public class ProductCharacteristicService {
 
     public void updateAll(Product product, Set<ProductCharacteristicForm> ProductCharacteristicForms) {
         if(ProductCharacteristicForms.isEmpty()) return;
-        productCharacteristicBusinessValidator.validateUpdate(ProductCharacteristicForms, product.getCategory().getId());
+        productCharacteristicServiceValidator.validateUpdate(ProductCharacteristicForms, product.getCategory().getId());
 
         for(var productCharacteristic : ProductCharacteristicForms) {
             int index = findProductCharacteristicIndexById(product.getCharacteristics(), productCharacteristic.getId());

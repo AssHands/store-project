@@ -6,5 +6,5 @@ import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
 import java.util.List;
 
 public interface CharacteristicRedisRepo {
-    List<CharacteristicDocument> findAllCharacteristicByCategoryId(Long id);
+    List<CharacteristicDocument> findAllCharacteristicByCategoryId(Long categoryId);
 }

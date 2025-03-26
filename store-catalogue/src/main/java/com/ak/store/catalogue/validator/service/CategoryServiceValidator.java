@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.util.validator.business;
+package com.ak.store.catalogue.validator.service;
 
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class CategoryBusinessValidator {
+public class CategoryServiceValidator {
     private final CategoryRepo categoryRepo;
 
     public void validateCreation(CategoryForm categoryForm) {
