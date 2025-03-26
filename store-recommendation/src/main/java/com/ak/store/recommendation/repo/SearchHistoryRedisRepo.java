@@ -1,9 +1,11 @@
 package com.ak.store.recommendation.repo;
 
 import java.util.List;
-import java.util.Set;
 
 public interface SearchHistoryRedisRepo {
-    Set<Long> findAllByConsumerId(String consumerId);
+    List<Long> findAllCategoryByConsumerId(String consumerId);
+
+    List<Long> findAllRelatedCategoryByConsumerId(String consumerId);
+
     void putAll(String consumerId, List<Long> categoryIds);
 }

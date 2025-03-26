@@ -12,8 +12,12 @@ import java.util.Set;
 public class SearchHistoryRedisService {
     private final SearchHistoryRedisRepo searchHistoryRedisRepo;
 
-    public Set<Long> getAllCategoryId(String consumerId) {
-        return searchHistoryRedisRepo.findAllByConsumerId(consumerId);
+    public List<Long> getAllCategoryId(String consumerId) {
+        return searchHistoryRedisRepo.findAllCategoryByConsumerId(consumerId);
+    }
+
+    public List<Long> getAllRelatedCategoryId(String consumerId) {
+        return searchHistoryRedisRepo.findAllCategoryByConsumerId(consumerId);
     }
 
     public void putAll(String consumerId, List<Long> categoryIds) {

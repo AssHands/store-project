@@ -26,7 +26,7 @@ public class RecommendationElasticService {
     private final ProductMapper productMapper;
     private final int SIZE = 20;
 
-    public RecommendationResponse getRecommendation(Set<Long> categoryIds) {
+    public RecommendationResponse getRecommendation(List<Long> categoryIds) {
         RecommendationResponse recommendationResponse = new RecommendationResponse();
         List<Query> filters = new ArrayList<>();
         for (Long categoryId : categoryIds) {

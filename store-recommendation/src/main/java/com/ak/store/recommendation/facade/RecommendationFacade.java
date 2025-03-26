@@ -35,7 +35,7 @@ public class RecommendationFacade {
         return recommendationElasticService.getRecommendation(set);
     }
 
-    public Set<Long> findSearchHistory(Jwt accessToken) {
+    public List<Long> findSearchHistory(Jwt accessToken) {
         return searchHistoryRedisService.getAllCategoryId(accessToken.getSubject());
     }
 }
