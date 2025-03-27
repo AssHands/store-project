@@ -1,9 +1,8 @@
 package com.ak.store.recommendation.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -29,37 +27,44 @@ public class RecommendationElasticService {
     public RecommendationResponse getRecommendation(List<Long> categoryIds) {
         RecommendationResponse recommendationResponse = new RecommendationResponse();
         List<Query> filters = new ArrayList<>();
-        for (Long categoryId : categoryIds) {
-            filters.add(TermQuery.of(t -> t
-                            .field("category_id")
-                            .value(categoryId))
-                    ._toQuery());
+
+        List<FieldValue> fieldValues = categoryIds.stream()
+                .map(FieldValue::of)
+                .toList();
+
+        TermsQueryField termsQueryField = TermsQueryField.of(t -> t.value(fieldValues));
+        filters.add(TermsQuery.of(tq -> tq
+                        .field("category_id")
+                        .terms(termsQueryField))
+                ._toQuery()
+        );
+
+        if (!categoryIds.isEmpty()) {
+            recommendationResponse.getContent().addAll(
+                    getContent(
+                            sendRequest(
+                                    buildSearchRequest(
+                                            buildBoolQuery(filters), SIZE
+                                    )))
+            );
         }
 
-        recommendationResponse.getContent().addAll(
-                getContent(
-                        sendRequest(
-                                buildSearchRequest(
-                                        buildBoolQuery(filters)
-                                )))
-        );
-
-        if (recommendationResponse.getContent().size() >= SIZE) {
-            return recommendationResponse;
-        }
-
-        int size = SIZE - recommendationResponse.getContent().size();
-        List<Long> excludingIds = new ArrayList<>(
-                recommendationResponse.getContent().stream().map(ProductPoorView::getId).toList()
-        );
-
-        recommendationResponse.getContent().addAll(
-                getContent(
-                        sendRequest(
-                                buildSearchRequest(
-                                        buildBoolQueryExcludingIds(excludingIds), size
-                                )))
-        );
+//        if (recommendationResponse.getContent().size() >= SIZE) {
+//            return recommendationResponse;
+//        }
+//
+//        int size = SIZE - recommendationResponse.getContent().size();
+//        List<Long> excludingIds = new ArrayList<>(
+//                recommendationResponse.getContent().stream().map(ProductPoorView::getId).toList()
+//        );
+//
+//        recommendationResponse.getContent().addAll(
+//                getContent(
+//                        sendRequest(
+//                                buildSearchRequest(
+//                                        buildBoolQueryExcludingIds(excludingIds), size
+//                                )))
+//        );
 
         return recommendationResponse;
     }
@@ -67,7 +72,7 @@ public class RecommendationElasticService {
     private BoolQuery buildBoolQuery(List<Query> filters) {
         return BoolQuery.of(b -> {
             if (filters != null && !filters.isEmpty()) {
-                b.should(filters);
+                b.filter(filters);
             }
 
             return b;
@@ -88,27 +93,25 @@ public class RecommendationElasticService {
         });
     }
 
-    private SearchRequest buildSearchRequest(BoolQuery boolQuery) {
-        return SearchRequest.of(sr -> {
-            sr
-                    .index("product")
-                    .query(q -> q.bool(boolQuery))
-                    .size(SIZE);
-
-            sr.sort(s -> s.field(sort -> sort.field("current_price")));
-
-            return sr;
-        });
-    }
-
     private SearchRequest buildSearchRequest(BoolQuery boolQuery, int size) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")
-                    .query(q -> q.bool(boolQuery))
+                    .query(q -> q
+                            .functionScore(FunctionScoreQuery.of(fs -> fs
+                                            .query(q2 -> q2
+                                                    .bool(boolQuery))
+                                            .functions(f -> f
+                                                    .randomScore(rs -> rs
+                                                            .field("id")
+                                                            .seed(String.valueOf(System.currentTimeMillis()))
+                                                    )
+                                            )
+                                            .boostMode(FunctionBoostMode.Replace)
+                                    )
+                            )
+                    )
                     .size(size);
-
-            sr.sort(s -> s.field(sort -> sort.field("current_price")));
 
             return sr;
         });

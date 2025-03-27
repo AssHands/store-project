@@ -1,23 +1,26 @@
 package com.ak.store.recommendation.repo;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Repository
 public class SearchHistoryRedisRepoImpl implements SearchHistoryRedisRepo {
     private final StringRedisTemplate stringRedisTemplate;
 
+    private static final String SEARCH_HISTORY_KEY = "search_history:";
+
+    public SearchHistoryRedisRepoImpl(@Qualifier("stringRedisTemplateForSearch") StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
+
     @Override
     public List<Long> findAllCategoryByConsumerId(String consumerId) {
-        Set<String> searchHistory = stringRedisTemplate.opsForSet().members("search_history:" + consumerId);
+        Set<String> searchHistory = stringRedisTemplate.opsForSet().members(SEARCH_HISTORY_KEY + consumerId);
 
         if (searchHistory == null) {
             return Collections.emptyList();
@@ -29,35 +32,11 @@ public class SearchHistoryRedisRepoImpl implements SearchHistoryRedisRepo {
     }
 
     @Override
-    public List<Long> findAllRelatedCategoryByConsumerId(String consumerId) {
-        Set<String> searchHistory = stringRedisTemplate.opsForSet().members("search_history:" + consumerId);
-
-        if (searchHistory == null) {
-            return Collections.emptyList();
-        }
-
-        Set<String> relatedCategories = new HashSet<>();
-        for(var id : searchHistory) {
-            Set<String> related = stringRedisTemplate.opsForSet().members("related_category:" + id);
-
-            if(related == null) {
-                continue;
-            }
-
-            relatedCategories.addAll(related);
-        }
-
-         return relatedCategories.stream()
-                 .map(Long::parseLong)
-                 .toList();
-    }
-
-    @Override
     public void putAll(String consumerId, List<Long> categoryIds) {
-        String[] ids = (String[]) categoryIds.stream()
+        String[] ids = categoryIds.stream()
                 .map(Object::toString)
-                .toArray();
+                .toArray(String[]::new);
 
-        stringRedisTemplate.opsForSet().add("search_history:" + consumerId, ids);
+        stringRedisTemplate.opsForSet().add(SEARCH_HISTORY_KEY + consumerId, ids);
     }
 }

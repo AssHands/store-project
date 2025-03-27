@@ -8,16 +8,6 @@
     "extension": "",
     "files": [
         {
-            "date": 1742472964811,
-            "name": "/data/logs/redisinsight-2025-03-20.log.0",
-            "hash": "14ba593a91674b33df1a0f372b47584666182f20978db855dc12503f1274af06"
-        },
-        {
-            "date": 1742481306942,
-            "name": "/data/logs/redisinsight-2025-03-20.log.2025",
-            "hash": "00dee20b6766dc00040aeeb9d9f107a0cbf15f05b107986ad0b7707b08b34795"
-        },
-        {
             "date": 1742558748010,
             "name": "/data/logs/redisinsight-2025-03-21.log.0",
             "hash": "e60ca429dcfadbbe081fa5f0b2cb4d80083b7a366ae973a2f4f8e2589af9edba"
@@ -36,6 +26,11 @@
             "date": 1743002947896,
             "name": "/data/logs/redisinsight-2025-03-26.log.0",
             "hash": "7a9475c6495247c6addd0c291120f87225dd0cc45c1f845a28ad0886d5b22278"
+        },
+        {
+            "date": 1743089825409,
+            "name": "/data/logs/redisinsight-2025-03-27.log.0",
+            "hash": "af09cf8dd952cab7c648d1e1f29ce236fcaef894e8b908be155dc661678b540c"
         }
     ]
 }

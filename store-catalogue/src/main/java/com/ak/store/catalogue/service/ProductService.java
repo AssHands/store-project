@@ -109,6 +109,7 @@ public class ProductService {
         ProductForm productForm = productPayload.getProduct();
         productServiceValidator.validateCreation(productForm);
         Product product = productMapper.toProduct(productForm, categoryService.findOne(productForm.getCategoryId()));
+
         PriceCalculator.definePrice(product, productForm);
         productCharacteristicService.createAll(product, productPayload.getCreateCharacteristics());
         product.setIsDeleted(false);

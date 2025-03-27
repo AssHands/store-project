@@ -41,8 +41,6 @@ public class SearchElasticService {
     private final ProductMapper productMapper;
 
     public FilterSearchResponse searchAllFilter(FilterSearchRequest filterSearchRequest) {
-        characteristicRedisRepo.findAllCharacteristicByCategoryId(1L);
-
         List<Query> filters = makeFiltersForFilterSearch(filterSearchRequest);
 
         var response = sendRequest(
@@ -118,8 +116,11 @@ public class SearchElasticService {
         Map<String, Aggregation> aggs = new HashMap<>();
 
         //todo: search in other place or throw exception
-        List<CharacteristicDocument> filters = characteristicRedisRepo
-                .findAllCharacteristicByCategoryId(1L);
+        List<CharacteristicDocument> filters = characteristicRedisRepo.findAllCharacteristicByCategoryId(1L);
+
+        if(filters.isEmpty()) {
+            return aggs;
+        }
 
         for (var filter : filters) {
             if (filter.getRangeValues().isEmpty() && filter.getTextValues().isEmpty()) {

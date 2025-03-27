@@ -15,7 +15,7 @@ public class SearchConsumerKafka {
 
     @KafkaListener(
             topics = "search-all-events",
-            groupId = "synchronization-catalogue-group",
+            groupId = "recommendation-group",
             batch = "true",
             containerFactory = "batchFactory")
     public void handleCreated(List<SearchAllEvent> searchAllEvents) {

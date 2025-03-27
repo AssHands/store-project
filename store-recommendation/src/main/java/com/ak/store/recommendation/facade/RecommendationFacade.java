@@ -3,7 +3,7 @@ package com.ak.store.recommendation.facade;
 import com.ak.store.common.event.search.SearchAllEvent;
 import com.ak.store.common.model.recommendation.RecommendationResponse;
 import com.ak.store.recommendation.service.RecommendationElasticService;
-import com.ak.store.recommendation.service.SearchHistoryRedisService;
+import com.ak.store.recommendation.service.RecommendationRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Service
 public class RecommendationFacade {
-    private final SearchHistoryRedisService searchHistoryRedisService;
+    private final RecommendationRedisService recommendationRedisService;
     private final RecommendationElasticService recommendationElasticService;
 
     public void putInSearchHistory(List<SearchAllEvent> searchAllEvents) {
@@ -26,16 +26,16 @@ public class RecommendationFacade {
         }
 
         for(var entry : map.entrySet()) {
-            searchHistoryRedisService.putAll(entry.getKey(), entry.getValue());
+            recommendationRedisService.putAll(entry.getKey(), entry.getValue());
         }
     }
 
     public RecommendationResponse getRecommendation(Jwt accessToken) {
-        var set = searchHistoryRedisService.getAllCategoryId(accessToken.getSubject());
-        return recommendationElasticService.getRecommendation(set);
+        var list = recommendationRedisService.getAllRelatedCategoryId(accessToken.getSubject());
+        return recommendationElasticService.getRecommendation(list);
     }
 
     public List<Long> findSearchHistory(Jwt accessToken) {
-        return searchHistoryRedisService.getAllCategoryId(accessToken.getSubject());
+        return recommendationRedisService.getAllCategoryId(accessToken.getSubject());
     }
 }
