@@ -53,7 +53,7 @@ public class CategoryRedisRepoImpl implements CategoryRedisRepo {
         stringRedisTemplate.delete(RELATED_CATEGORY_KEY + categoryId);
 
         if(relatedCategories == null || relatedCategories.isEmpty()) {
-            stringRedisTemplate.delete(CATEGORY_CHARACTERISTIC_KEY + categoryId);
+            stringRedisTemplate.delete(RELATED_CATEGORY_KEY + categoryId);
             return;
         }
 

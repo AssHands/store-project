@@ -33,6 +33,7 @@ public class CatalogueRedisRepoImpl implements CatalogueRedisRepo {
                         relatedCategories.stream()
                                 .map(Long::parseLong),
                         categoryIds.stream())
+                .distinct()
                 .toList();
     }
 }

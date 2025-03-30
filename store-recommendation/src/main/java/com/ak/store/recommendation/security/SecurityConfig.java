@@ -11,6 +11,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -23,6 +26,7 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         http.csrf(CsrfConfigurer::disable);
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
 //        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //        http.cors(AbstractHttpConfigurer::disable);
@@ -31,7 +35,7 @@ public class SecurityConfig {
 //                        accessDeniedException.printStackTrace()));
 
         http.authorizeHttpRequests(auth -> auth
-                .anyRequest().hasRole("CONSUMER"));
+                .anyRequest().permitAll());
 
         return http.build();
     }
@@ -54,5 +58,19 @@ public class SecurityConfig {
         });
 
         return converter;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("*")); // Разрешить запросы с любого origin
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Разрешить методы
+        configuration.setAllowedHeaders(List.of("*")); // Разрешить все заголовки
+        configuration.setAllowCredentials(false); // Отключить credentials (если не нужны)
+        configuration.setMaxAge(3600L); // Кэшировать preflight-запросы на 1 час
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", configuration); // Применить настройки CORS для /api/**
+        return source;
     }
 }

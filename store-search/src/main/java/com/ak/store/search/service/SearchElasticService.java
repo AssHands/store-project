@@ -116,7 +116,8 @@ public class SearchElasticService {
         Map<String, Aggregation> aggs = new HashMap<>();
 
         //todo: search in other place or throw exception
-        List<CharacteristicDocument> filters = characteristicRedisRepo.findAllCharacteristicByCategoryId(1L);
+        List<CharacteristicDocument> filters = characteristicRedisRepo
+                .findAllCharacteristicByCategoryId(filterSearchRequest.getCategoryId());
 
         if(filters.isEmpty()) {
             return aggs;

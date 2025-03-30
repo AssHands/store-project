@@ -1,12 +1,15 @@
 package com.ak.store.recommendation.repo;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 public class SearchHistoryRedisRepoImpl implements SearchHistoryRedisRepo {
@@ -20,7 +23,8 @@ public class SearchHistoryRedisRepoImpl implements SearchHistoryRedisRepo {
 
     @Override
     public List<Long> findAllCategoryByConsumerId(String consumerId) {
-        Set<String> searchHistory = stringRedisTemplate.opsForSet().members(SEARCH_HISTORY_KEY + consumerId);
+        Set<String> searchHistory = stringRedisTemplate.opsForZSet()
+                .distinctRandomMembers(SEARCH_HISTORY_KEY + consumerId, 5);
 
         if (searchHistory == null) {
             return Collections.emptyList();
@@ -33,10 +37,21 @@ public class SearchHistoryRedisRepoImpl implements SearchHistoryRedisRepo {
 
     @Override
     public void putAll(String consumerId, List<Long> categoryIds) {
-        String[] ids = categoryIds.stream()
-                .map(Object::toString)
-                .toArray(String[]::new);
+        String key = SEARCH_HISTORY_KEY + consumerId;
+        double timestamp = System.currentTimeMillis() / 1000.0;
 
-        stringRedisTemplate.opsForSet().add(SEARCH_HISTORY_KEY + consumerId, ids);
+        Set<ZSetOperations.TypedTuple<String>> tuples = categoryIds.stream()
+                .map(Object::toString)
+                .map(categoryId -> new DefaultTypedTuple<>(categoryId, timestamp))
+                .collect(Collectors.toSet());
+
+        stringRedisTemplate.opsForZSet().add(key, tuples);
+
+        //todo: вынести определение size в другое место
+        Long currentSize = stringRedisTemplate.opsForZSet().zCard(key);
+        if (currentSize != null && currentSize > 5) {
+            long elementsToRemove = currentSize - 5;
+            stringRedisTemplate.opsForZSet().removeRange(key, 0, elementsToRemove - 1);
+        }
     }
 }

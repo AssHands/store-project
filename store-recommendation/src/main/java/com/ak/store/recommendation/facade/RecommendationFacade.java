@@ -8,7 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -19,20 +22,25 @@ public class RecommendationFacade {
     public void putInSearchHistory(List<SearchAllEvent> searchAllEvents) {
         Map<String, List<Long>> map = new HashMap<>(searchAllEvents.size());
 
-        for(var searchEvent: searchAllEvents) {
+        for (var searchEvent : searchAllEvents) {
             String consumerId = searchEvent.getConsumerSearch().getConsumerId();
             Long categoryId = searchEvent.getConsumerSearch().getCategoryId();
             map.computeIfAbsent(consumerId, k -> new ArrayList<>()).add(categoryId);
         }
 
-        for(var entry : map.entrySet()) {
+        for (var entry : map.entrySet()) {
             recommendationRedisService.putAll(entry.getKey(), entry.getValue());
         }
     }
 
     public RecommendationResponse getRecommendation(Jwt accessToken) {
-        var list = recommendationRedisService.getAllRelatedCategoryId(accessToken.getSubject());
-        return recommendationElasticService.getRecommendation(list);
+        if (accessToken == null || accessToken.getClaims() == null) {
+            return recommendationElasticService.getRecommendation();
+        }
+
+        return recommendationElasticService.getRecommendation(
+                recommendationRedisService.getAllRelatedCategoryId(accessToken.getSubject())
+        );
     }
 
     public List<Long> findSearchHistory(Jwt accessToken) {

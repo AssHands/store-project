@@ -24,10 +24,24 @@ public class RecommendationElasticService {
     private final ProductMapper productMapper;
     private final int SIZE = 20;
 
+    public RecommendationResponse getRecommendation() {
+        RecommendationResponse recommendationResponse = new RecommendationResponse();
+
+        recommendationResponse.getContent().addAll(
+                getContent(
+                        sendRequest(
+                                buildSearchRequest()
+                        )
+                )
+        );
+
+        return recommendationResponse;
+    }
+
     public RecommendationResponse getRecommendation(List<Long> categoryIds) {
         RecommendationResponse recommendationResponse = new RecommendationResponse();
-        List<Query> filters = new ArrayList<>();
 
+        List<Query> filters = new ArrayList<>();
         List<FieldValue> fieldValues = categoryIds.stream()
                 .map(FieldValue::of)
                 .toList();
@@ -39,32 +53,15 @@ public class RecommendationElasticService {
                 ._toQuery()
         );
 
-        if (!categoryIds.isEmpty()) {
-            recommendationResponse.getContent().addAll(
-                    getContent(
-                            sendRequest(
-                                    buildSearchRequest(
-                                            buildBoolQuery(filters), SIZE
-                                    )))
-            );
-        }
-
-//        if (recommendationResponse.getContent().size() >= SIZE) {
-//            return recommendationResponse;
-//        }
-//
-//        int size = SIZE - recommendationResponse.getContent().size();
-//        List<Long> excludingIds = new ArrayList<>(
-//                recommendationResponse.getContent().stream().map(ProductPoorView::getId).toList()
-//        );
-//
-//        recommendationResponse.getContent().addAll(
-//                getContent(
-//                        sendRequest(
-//                                buildSearchRequest(
-//                                        buildBoolQueryExcludingIds(excludingIds), size
-//                                )))
-//        );
+        recommendationResponse.getContent().addAll(
+                getContent(
+                        sendRequest(
+                                buildSearchRequest(
+                                        buildBoolQuery(filters)
+                                )
+                        )
+                )
+        );
 
         return recommendationResponse;
     }
@@ -79,21 +76,7 @@ public class RecommendationElasticService {
         });
     }
 
-    private BoolQuery buildBoolQueryExcludingIds(List<Long> ids) {
-        return BoolQuery.of(b -> {
-            for (Long id : ids) {
-                b.mustNot(TermQuery.of(t -> t
-                                .field("id")
-                                .value(id))
-                        ._toQuery()
-                );
-            }
-
-            return b;
-        });
-    }
-
-    private SearchRequest buildSearchRequest(BoolQuery boolQuery, int size) {
+    private SearchRequest buildSearchRequest(BoolQuery boolQuery) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")
@@ -111,7 +94,29 @@ public class RecommendationElasticService {
                                     )
                             )
                     )
-                    .size(size);
+                    .size(SIZE);
+
+            return sr;
+        });
+    }
+
+    private SearchRequest buildSearchRequest() {
+        return SearchRequest.of(sr -> {
+            sr
+                    .index("product")
+                    .query(q -> q
+                            .functionScore(FunctionScoreQuery.of(fs -> fs
+                                            .functions(f -> f
+                                                    .randomScore(rs -> rs
+                                                            .field("id")
+                                                            .seed(String.valueOf(System.currentTimeMillis()))
+                                                    )
+                                            )
+                                            .boostMode(FunctionBoostMode.Replace)
+                                    )
+                            )
+                    )
+                    .size(SIZE);
 
             return sr;
         });
