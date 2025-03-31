@@ -11,8 +11,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = { "carts", "reviews", "comments" })
-@EqualsAndHashCode(exclude = { "carts", "reviews", "comments" })
+@ToString(exclude = { "reviews", "comments" })
+@EqualsAndHashCode(exclude = { "reviews", "comments" })
 @Entity
 public class Consumer {
     @Id
@@ -27,10 +27,6 @@ public class Consumer {
     private Boolean enabled;
 
     private String avatarKey;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Cart> carts = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "consumer", cascade = CascadeType.ALL, orphanRemoval = true)

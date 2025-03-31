@@ -1,18 +1,17 @@
 package com.ak.store.catalogue.facade;
 
+import com.ak.store.catalogue.integration.S3Service;
+import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.catalogue.outbox.OutboxTaskService;
 import com.ak.store.catalogue.outbox.OutboxTaskType;
-import com.ak.store.catalogue.util.mapper.ProductMapper;
-import com.ak.store.catalogue.util.SagaBuilder;
-import com.ak.store.catalogue.model.entity.ProductImage;
 import com.ak.store.catalogue.service.ProductService;
-import com.ak.store.catalogue.integration.S3Service;
-import com.ak.store.common.model.catalogue.dto.ImageDTO;
+import com.ak.store.catalogue.util.SagaBuilder;
+import com.ak.store.catalogue.util.mapper.ProductMapper;
 import com.ak.store.common.model.catalogue.dto.ProductDTO;
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
-import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.model.catalogue.form.ImageForm;
+import com.ak.store.common.model.catalogue.view.ProductPoorView;
+import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.payload.catalogue.ProductWritePayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -110,10 +109,10 @@ public class ProductFacade {
     public Long createAll(List<ProductWritePayload> productPayloads) {
         Long id = null;
 
-        for(var payload : productPayloads) {
+        for (var payload : productPayloads) {
             Long firstId = createOne(payload);
 
-            if(id == null) {
+            if (id == null) {
                 id = firstId;
             }
         }

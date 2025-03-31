@@ -30,12 +30,6 @@ spring:
   kafka:
     bootstrap-servers: localhost:29092,localhost:39092
 
-    consumer:
-      group-id: consumer-group
-      properties:
-        spring.json.trusted.packages: "com.ak.store.*"
-      auto-offset-reset: earliest
-
     producer:
       acks: all
       retries: 7

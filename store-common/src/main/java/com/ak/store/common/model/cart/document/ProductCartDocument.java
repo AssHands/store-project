@@ -1,6 +1,5 @@
-package com.ak.store.common.model.consumer.view;
+package com.ak.store.common.model.cart.document;
 
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -13,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CartView {
+public class ProductCartDocument {
     private Long productId;
     private Integer amount;
 }

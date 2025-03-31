@@ -1,23 +1,21 @@
-package com.ak.store.consumer.controller;
+package com.ak.store.cart.controller;
 
-import com.ak.store.common.model.consumer.view.CartView;
-import com.ak.store.consumer.facade.CartFacade;
+import com.ak.store.cart.facade.CartFacade;
+import com.ak.store.common.model.cart.view.CartView;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/consumer/cart")
+@RequestMapping("api/v1/cart")
 public class CartController {
     private final CartFacade cartFacade;
 
     @GetMapping("{consumerId}")
-    public List<CartView> findAll(@PathVariable String consumerId) {
+    public CartView findAll(@PathVariable String consumerId) {
         return cartFacade.findAll(consumerId);
     }
 
@@ -33,15 +31,15 @@ public class CartController {
 
     //TODO: CHECK
     @PatchMapping("{consumerId}/{productId}")
-    public CartView setProductAmount(@PathVariable String consumerId, @PathVariable Long productId,
-                                    @RequestParam @Positive int amount) {
-        return cartFacade.setProductAmount(consumerId, productId, amount);
+    public void setProductAmount(@PathVariable String consumerId, @PathVariable Long productId,
+                                 @RequestParam @Positive int amount) {
+        cartFacade.setProductAmount(consumerId, productId, amount);
     }
 
     //-------------------------
 
     @GetMapping("me")
-    public List<CartView> findAllMe(@AuthenticationPrincipal Jwt accessToken) {
+    public CartView findAllMe(@AuthenticationPrincipal Jwt accessToken) {
         return cartFacade.findAll(accessToken.getSubject());
     }
 
@@ -57,8 +55,8 @@ public class CartController {
 
     //TODO: CHECK
     @PatchMapping("me/{productId}")
-    public CartView setProductAmountMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long productId,
-                                      @RequestParam @Positive int amount) {
-        return cartFacade.setProductAmount(accessToken.getSubject(), productId, amount);
+    public void setProductAmountMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long productId,
+                                   @RequestParam @Positive int amount) {
+        cartFacade.setProductAmount(accessToken.getSubject(), productId, amount);
     }
 }

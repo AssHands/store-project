@@ -27,5 +27,6 @@
         <module>store-outbox-scheduler</module>
         <module>store-search</module>
         <module>store-recommendation</module>
+        <module>store-cart</module>
     </modules>
 </project>

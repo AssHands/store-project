@@ -38,6 +38,7 @@ public class ProductRichView {
 
     private CategoryView category;
 
+    @Builder.Default
     private List<ImageView> images = new ArrayList<>();
 
     @Builder.Default
