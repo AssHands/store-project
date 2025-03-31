@@ -28,5 +28,6 @@
         <module>store-search</module>
         <module>store-recommendation</module>
         <module>store-cart</module>
+        <module>store-review</module>
     </modules>
 </project>
