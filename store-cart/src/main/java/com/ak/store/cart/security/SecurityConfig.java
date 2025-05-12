@@ -32,6 +32,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/cart/me/*").hasRole("CONSUMER")
+                .requestMatchers("/api/v1/cart/me").hasRole("CONSUMER")
                 .requestMatchers("/api/v1/cart/{consumerId}/*").hasRole("MANAGER"));
 
         return http.build();

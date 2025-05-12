@@ -113,10 +113,12 @@ public class ProductFacade {
 
         productOutboxTaskService.createOneTask(snapshot, OutboxTaskType.PRODUCT_DELETED);
 
-        new SagaBuilder()
-                .step(() -> s3Service.deleteAllImage(imageKeys))
-                .compensate(() -> s3Service.compensateDeleteAllImage(imageKeys))
-                .execute();
+        try {
+            s3Service.deleteAllImage(imageKeys);
+        } catch (Exception e) {
+            s3Service.compensateDeleteAllImage(imageKeys);
+            throw e;
+        }
     }
 
     @Transactional

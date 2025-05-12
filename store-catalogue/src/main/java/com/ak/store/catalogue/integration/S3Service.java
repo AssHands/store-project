@@ -44,7 +44,6 @@ public class S3Service {
     }
 
     public void deleteAllImage(List<String> imageKeysForDelete) {
-        boolean a = false;
         for(var key : imageKeysForDelete) {
             copyOneImage("products-photos", "deleted-product-images", key);
 

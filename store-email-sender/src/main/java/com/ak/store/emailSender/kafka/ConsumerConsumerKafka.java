@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 public class ConsumerConsumerKafka {
     private final EmailSender emailSender;
 
+    //todo add batches
     @KafkaListener(topics = "consumer-verify-events", groupId = "email-consumer-group")
     public void handle(ConsumerVerifyEvent consumerVerifyEvent) {
         CompletableFuture.runAsync(() -> emailSender.sendVerificationEmail(

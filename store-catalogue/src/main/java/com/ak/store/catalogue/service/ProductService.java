@@ -128,6 +128,16 @@ public class ProductService {
         return productMapper.toProductDTOnew(productRepo.saveAndFlush(product));
     }
 
+    @Transactional
+    public ProductDTOnew deleteOne(Long id) {
+        Product product = findOneById(id);
+
+        product.setIsAvailable(false);
+        product.setIsDeleted(true);
+
+        return productMapper.toProductDTOnew(productRepo.save(product));
+    }
+
     private void updateOneFromDto(Product product, ProductWriteDTO request) {
         PriceCalculator.definePrice(product, request);
 
@@ -148,14 +158,5 @@ public class ProductService {
 
             product.getCharacteristics().clear();
         }
-    }
-
-    public ProductDTOnew deleteOne(Long id) {
-        Product product = findOneById(id);
-
-        product.setIsAvailable(false);
-        product.setIsDeleted(true);
-
-        return productMapper.toProductDTOnew(productRepo.save(product));
     }
 }

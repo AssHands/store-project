@@ -91,7 +91,9 @@ public class CartRedisRepoImpl implements CartRedisRepo {
         }
 
         stringRedisTemplate.opsForList().remove(CART_KEY + consumerId, 1, gson.toJson(product.get()));
+        product.get().setAmount(amount);
         stringRedisTemplate.opsForList().rightPush(CART_KEY + consumerId, gson.toJson(product.get()));
+
         return true;
     }
 }
