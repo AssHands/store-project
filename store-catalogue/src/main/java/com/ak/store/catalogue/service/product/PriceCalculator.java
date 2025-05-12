@@ -1,15 +1,17 @@
 package com.ak.store.catalogue.service.product;
 
+import com.ak.store.catalogue.model.dto.write.ProductWriteDTO;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.common.model.catalogue.form.ProductForm;
 
 public abstract class PriceCalculator {
-     static public void definePrice(Product product, ProductForm productForm) {
-         if(productForm.getFullPrice() != null) {
-             product.setFullPrice(productForm.getFullPrice());
+     static public void definePrice(Product product, ProductWriteDTO productDTO) {
+         if(productDTO.getFullPrice() != null) {
+             product.setFullPrice(productDTO.getFullPrice());
          }
-         if(productForm.getDiscountPercentage() != null) {
-             product.setDiscountPercentage(productForm.getDiscountPercentage());
+
+         if(productDTO.getDiscountPercentage() != null) {
+             product.setDiscountPercentage(productDTO.getDiscountPercentage());
          }
 
          int discount = product.getFullPrice() * product.getDiscountPercentage() / 100;

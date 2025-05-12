@@ -1,8 +1,15 @@
 package com.ak.store.catalogue.util.mapper;
 
+import com.ak.store.catalogue.model.dto.write.ProductWriteDTO;
+import com.ak.store.catalogue.model.dto.ProductDTOnew;
+import com.ak.store.catalogue.model.dto.write.ProductWritePayload;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
+import com.ak.store.catalogue.model.entity.Image;
+import com.ak.store.common.model.catalogue.formNew.ProductFormPayloadNew;
+import com.ak.store.common.model.catalogue.snapshot.ProductSnapshot;
+import com.ak.store.common.model.catalogue.viewNew.ProductViewNew;
 import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
 import com.ak.store.common.model.catalogue.dto.ProductDTO;
 import com.ak.store.common.model.catalogue.form.ProductForm;
@@ -14,6 +21,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
+
+import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ProductMapper {
@@ -39,4 +48,43 @@ public interface ProductMapper {
 
     @Mapping(target = "id", source = "characteristic.id")
     ProductCharacteristicDTO toProductCharacteristicDTO(ProductCharacteristic productCharacteristic);
+
+    //-------------------
+
+    ProductDTOnew toProductDTOnew(Product product);
+
+    List<ProductDTOnew>toProductDTOnew(List<Product> product);
+
+    default List<Long> toProductCharacteristicIds(List<ProductCharacteristic> productCharacteristics) {
+        if (productCharacteristics == null || productCharacteristics.isEmpty()) return null;
+        return productCharacteristics.stream()
+                .map(ProductCharacteristic::getId)
+                .toList();
+    }
+
+    default List<Long> toProductImageIds(List<Image> images) {
+        if (images == null || images.isEmpty()) return null;
+        return images.stream()
+                .map(Image::getId)
+                .toList();
+    }
+
+    default Long toCategoryId(Category category) {
+        if(category == null) return null;
+        return category.getId();
+    }
+
+    //-------------------------------
+
+    ProductViewNew toProductViewNew(ProductDTOnew p);
+
+    List<ProductViewNew> toProductViewNew(List<ProductDTOnew> p);
+
+    @Mapping(target = "category.id", source = "categoryId")
+    Product toProduct(ProductWriteDTO p);
+
+    ProductSnapshot toProductSnapshot(ProductDTOnew p);
+
+    //todo доработать метод
+    ProductWritePayload toProductWritePayload(ProductFormPayloadNew p);
 }

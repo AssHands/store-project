@@ -1,9 +1,10 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.ProductFacade;
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
+import com.ak.store.common.model.catalogue.formNew.ProductFormPayloadNew;
+import com.ak.store.common.model.catalogue.viewNew.ProductViewNew;
+import com.ak.store.catalogue.util.mapper.ProductMapper;
 import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
-import com.ak.store.common.model.catalogue.view.ProductRichView;
 import com.ak.store.common.model.catalogue.form.ImageForm;
 import com.ak.store.common.payload.catalogue.ProductWritePayload;
 import com.ak.store.common.validationGroup.Create;
@@ -22,61 +23,11 @@ import java.util.Map;
 @RequestMapping("api/v1/catalogue/products")
 public class ProductController {
     private final ProductFacade productFacade;
-
-    @GetMapping("{id}/rich")
-    public ProductRichView getOneRich(@PathVariable Long id) {
-        return productFacade.findOneRich(id);
-    }
-
-    @GetMapping("{id}/poor")
-    public ProductPoorView getOnePoor(@PathVariable Long id) {
-        return productFacade.findOnePoor(id);
-    }
-
-    @PostMapping("poor")
-    public List<ProductPoorView> getAllPoor(@RequestBody List<Long> ids) {
-        return productFacade.findAllPoor(ids);
-    }
+    private final ProductMapper productMapper;
 
     @PostMapping("price")
     public List<ProductPriceDTO> getAllPrice(@RequestBody List<Long> ids) {
         return productFacade.getAllPrice(ids);
-    }
-
-    @GetMapping("exist/{id}")
-    public Boolean existOne(@PathVariable Long id) {
-        return productFacade.existOne(id);
-    }
-
-    @PostMapping("available")
-    public Boolean availableAll(@RequestBody List<Long> ids) {
-        return productFacade.availableAll(ids);
-    }
-
-    @GetMapping("available/{id}")
-    public Boolean availableOne(@PathVariable Long id) {
-        return productFacade.availableOne(id);
-    }
-
-    @DeleteMapping("{id}")
-    public void deleteOne(@PathVariable Long id) {
-        productFacade.deleteOne(id);
-    }
-
-    @PostMapping
-    public Long createOne(@RequestBody @Validated(Create.class) ProductWritePayload productPayload) {
-        return productFacade.createOne(productPayload);
-    }
-
-    @PostMapping("batch")
-    public Long createAll(@RequestBody List<ProductWritePayload> productPayloads) {
-        return productFacade.createAll(productPayloads);
-    }
-
-    @PatchMapping("{id}")
-    public Long updateOne(@RequestBody @Validated(Update.class) ProductWritePayload productPayload,
-                          @PathVariable("id") Long productId) {
-        return productFacade.updateOne(productPayload, productId);
     }
 
     /**
@@ -135,14 +86,41 @@ public class ProductController {
         return productFacade.saveOrUpdateAllImage(imageForm);
     }
 
-//    @PostMapping("search")
-//    public ProductSearchResponse searchAllProduct(@AuthenticationPrincipal Jwt accessToken,
-//                                                  @RequestBody @Valid SearchProductRequest searchProductRequest) {
-//        return productServiceFacade.findAllBySearch(accessToken.getSubject(), searchProductRequest);
-//    }
-//
-//    @PostMapping("search/filters")
-//    public SearchAvailableFiltersResponse searchAllAvailableFilters(@RequestBody @Valid SearchAvailableFiltersRequest searchAvailableFiltersRequest) {
-//        return productServiceFacade.findAllAvailableFilter(searchAvailableFiltersRequest);
-//    }
+    //-------------------------
+
+    @GetMapping("{id}")
+    public ProductViewNew findOne(@PathVariable Long id) {
+        return productMapper.toProductViewNew(productFacade.findOne(id));
+    }
+
+    @PostMapping
+    public List<ProductViewNew> findAll(@RequestBody List<Long> ids) {
+        return productMapper.toProductViewNew(productFacade.findAll(ids));
+    }
+
+    @PostMapping("available")
+    public Boolean isAvailableAll(@RequestBody List<Long> ids) {
+        return productFacade.isAvailableAll(ids);
+    }
+
+    @PostMapping("exist")
+    public Boolean isExistAll(@RequestBody List<Long> ids) {
+        return productFacade.isExistAll(ids);
+    }
+
+    @PostMapping
+    public Long createOne(@RequestBody @Validated(Create.class) ProductFormPayloadNew request) {
+        return productFacade.createOne(productMapper.toProductWritePayload(request));
+    }
+
+    @PatchMapping("{id}")
+    public Long updateOne(@PathVariable("id") Long productId,
+                          @RequestBody @Validated(Update.class) ProductFormPayloadNew request) {
+        return productFacade.updateOne(productId, productMapper.toProductWritePayload(request));
+    }
+
+    @DeleteMapping("{id}")
+    public void deleteOne(@PathVariable Long id) {
+        productFacade.deleteOne(id);
+    }
 }

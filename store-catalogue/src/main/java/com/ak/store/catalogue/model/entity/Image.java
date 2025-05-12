@@ -14,8 +14,9 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode(of = { "key" })
 @ToString(exclude = { "product" })
-@Table(name = "product_image")
-public class ProductImage {
+//todo rename table
+@Table(name = "image")
+public class Image {
     @Id
     @GeneratedValue(generator = "pi_gen", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "pi_gen",sequenceName = "product_image_id_seq", allocationSize = 1)
@@ -27,7 +28,7 @@ public class ProductImage {
     private Product product;
 
     @NotBlank
-    @Column(name = "image_key")
+    //todo rename column to "key"
     private String key;
 
     @NotNull

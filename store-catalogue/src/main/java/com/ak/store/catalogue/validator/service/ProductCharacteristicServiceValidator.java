@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.validator.service;
 
+import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.TextValue;
@@ -88,5 +89,17 @@ public class ProductCharacteristicServiceValidator {
                 }
             }
         }
+    }
+
+    //-------------------
+
+    //todo make validation
+    public void validateCreationNew(Long productId, List<ProductCharacteristicWriteDTO> productCharacteristics) {
+
+    }
+
+    //todo make validation
+    public void validateUpdateNew(Long productId, List<ProductCharacteristicWriteDTO> productCharacteristics) {
+
     }
 }

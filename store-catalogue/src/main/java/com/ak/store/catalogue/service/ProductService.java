@@ -1,5 +1,7 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.model.dto.write.ProductWriteDTO;
+import com.ak.store.catalogue.model.dto.ProductDTOnew;
 import com.ak.store.catalogue.model.entity.*;
 import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
 import com.ak.store.catalogue.repository.ProductRepo;
@@ -59,115 +61,101 @@ public class ProductService {
         ProcessedProductImages processedProductImages = processProductImages(imageForm, updatedProduct);
 
         updatedProduct.getImages().clear();
-        updatedProduct.getImages().addAll(processedProductImages.getNewProductImages());
+        updatedProduct.getImages().addAll(processedProductImages.getNewImages());
         productRepo.saveAndFlush(updatedProduct);
 
         return processedProductImages;
     }
 
-    public List<Product> findAllPoor(List<Long> ids, SortingType sortingType) {
-        return productRepo.findAllWithImagesByIdIn(ids, getSort(sortingType));
+    public Boolean existOne(Long id) {
+        return productRepo.IsExistOneById(id);
     }
 
-    public List<Product> findAllPoor(List<Long> ids) {
-        return productRepo.findAllWithImagesByIdIn(ids);
+    public Boolean availableOne(Long id) {
+        return productRepo.isAvailableOneById(id);
     }
 
-    private Sort getSort(SortingType sortingType) {
-        Sort sort;
-
-        switch (sortingType) {
-            case PRICE_UP -> {
-                sort = Sort.by(Sort.Direction.ASC, "currentPrice");
-            }
-            case PRICE_DOWN -> {
-                sort = Sort.by(Sort.Direction.DESC, "currentPrice");
-            }
-            case RATING -> {
-                //todo: add amount_reviews
-                sort = Sort.by(Sort.Direction.DESC, "grade");
-            }
-            default -> { //POPULAR todo: сделать сортировку по популярности. данный вариант не работает
-                sort = Sort.by(Sort.Direction.DESC, "amount_reviews");
-            }
-        }
-
-        return sort;
+    public Boolean availableAll(List<Long> ids) {
+        return productRepo.isAvailableAllByIds(ids, ids.size());
     }
 
-    public Product deleteOne(Long id) {
-        //find with images for reduce queries to db
-        Product product = findOneWithImages(id);
-
-        product.setIsAvailable(false);
-        product.setIsDeleted(true);
-
-        return productRepo.save(product);
+    public List<Product> findAllOld(List<Long> ids) {
+        return productRepo.findAllById(ids);
     }
 
-    public Product createOne(ProductWritePayload productPayload) {
-        ProductForm productForm = productPayload.getProduct();
-        productServiceValidator.validateCreation(productForm);
-        Product product = productMapper.toProduct(productForm, categoryService.findOne(productForm.getCategoryId()));
+    //-----------------------------
 
-        PriceCalculator.definePrice(product, productForm);
-        productCharacteristicService.createAll(product, productPayload.getCreateCharacteristics());
+    private Product findOneById(Long id) {
+        return productRepo.findById(id).orElseThrow(() -> new RuntimeException("not found"));
+    }
+
+    private List<Product> findAllById(List<Long> ids) {
+        return productRepo.findAllById(ids);
+    }
+
+    public ProductDTOnew findOne(Long id) {
+        return productMapper.toProductDTOnew(findOneById(id));
+    }
+
+    public List<ProductDTOnew> findAll(List<Long> ids) {
+        return productMapper.toProductDTOnew(findAllById(ids));
+    }
+
+    public Boolean isExistAll(List<Long> ids) {
+        return productRepo.isExistAllByIds(ids, ids.size());
+    }
+
+    @Transactional
+    public ProductDTOnew createOne(ProductWriteDTO request) {
+        productServiceValidator.validateCreation(request);
+        Product product = productMapper.toProduct(request);
+
+        PriceCalculator.definePrice(product, request);
         product.setIsDeleted(false);
 
         //flush for immediate validation
         productRepo.saveAndFlush(product);
-        return product;
+        return productMapper.toProductDTOnew(product);
     }
 
-    public Product updateOne(ProductWritePayload productPayload, Long productId) {
-        Product updatedProduct = findOneWithCharacteristicsAndCategory(productId);
+    @Transactional
+    public ProductDTOnew updateOne(Long id, ProductWriteDTO request) {
+        Product product = findOneById(id);
 
-        updateProduct(updatedProduct, productPayload.getProduct());
-        productCharacteristicService.createAll(updatedProduct, productPayload.getCreateCharacteristics());
-        productCharacteristicService.updateAll(updatedProduct, productPayload.getUpdateCharacteristics());
-        productCharacteristicService.deleteAll(updatedProduct, productPayload.getDeleteCharacteristics());
+        updateOneFromDto(product, request);
 
         //flush for immediate validation
-        productRepo.saveAndFlush(updatedProduct);
-
-        return updatedProduct;
+        return productMapper.toProductDTOnew(productRepo.saveAndFlush(product));
     }
 
-    private void updateProduct(Product updatedProduct, ProductForm productForm) {
-        PriceCalculator.definePrice(updatedProduct, productForm);
-        if (productForm.getTitle() != null) {
-            updatedProduct.setTitle(productForm.getTitle());
+    private void updateOneFromDto(Product product, ProductWriteDTO request) {
+        PriceCalculator.definePrice(product, request);
+
+        if (request.getTitle() != null) {
+            product.setTitle(request.getTitle());
         }
-        if (productForm.getDescription() != null) {
-            updatedProduct.setDescription(productForm.getDescription());
+        if (request.getDescription() != null) {
+            product.setDescription(request.getDescription());
         }
-        if(productForm.getIsAvailable() != null) {
-            updatedProduct.setIsAvailable(productForm.getIsAvailable());
+        if(request.getIsAvailable() != null) {
+            product.setIsAvailable(request.getIsAvailable());
         }
-        if (productForm.getCategoryId() != null
-                && !updatedProduct.getCategory().getId().equals(productForm.getCategoryId())) {
-            updatedProduct.setCategory(
+        if (request.getCategoryId() != null && !product.getCategory().getId().equals(request.getCategoryId())) {
+            product.setCategory(
                     Category.builder()
-                            .id(productForm.getCategoryId())
-                            .build()
-            );
-            updatedProduct.getCharacteristics().clear();
+                            .id(request.getCategoryId())
+                            .build());
+
+            product.getCharacteristics().clear();
         }
     }
 
-    public Boolean existOne(Long id) {
-        return productRepo.existOneById(id);
-    }
+    public ProductDTOnew deleteOne(Long id) {
+        Product product = findOneById(id);
 
-    public Boolean availableOne(Long id) {
-        return productRepo.availableOneById(id);
-    }
+        product.setIsAvailable(false);
+        product.setIsDeleted(true);
 
-    public Boolean availableAll(List<Long> ids) {
-        return productRepo.availableAllById(ids, ids.size());
-    }
-
-    public List<Product> findAll(List<Long> ids) {
-        return productRepo.findAllById(ids);
+        return productMapper.toProductDTOnew(productRepo.save(product));
     }
 }

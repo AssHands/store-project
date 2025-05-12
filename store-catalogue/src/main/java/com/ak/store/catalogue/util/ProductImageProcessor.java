@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.util;
 
 import com.ak.store.catalogue.model.entity.Product;
-import com.ak.store.catalogue.model.entity.ProductImage;
+import com.ak.store.catalogue.model.entity.Image;
 import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
 import com.ak.store.common.model.catalogue.form.ImageForm;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,14 +12,14 @@ import java.util.regex.Pattern;
 public abstract class ProductImageProcessor {
     public static ProcessedProductImages processProductImages(ImageForm imageForm, Product updatedProduct) {
         ProcessedProductImages processedProductImages = new ProcessedProductImages();
-        List<ProductImage> productImages = updatedProduct.getImages();
+        List<Image> images = updatedProduct.getImages();
 
         processedProductImages.setImageKeysForDelete(
-                markImagesForDeleteAndGetKeys(productImages, imageForm.getDeleteImageIndexes()));
+                markImagesForDeleteAndGetKeys(images, imageForm.getDeleteImageIndexes()));
 
         LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, imageForm.getAddImages());
         for (String key : imagesForAdd.keySet()) {
-            productImages.add(ProductImage.builder()
+            images.add(Image.builder()
                     .key(key)
                     .product(Product.builder()
                             .id(imageForm.getProductId())
@@ -28,24 +28,24 @@ public abstract class ProductImageProcessor {
         }
         processedProductImages.setImagesForAdd(imagesForAdd);
 
-        processedProductImages.setNewProductImages(
-                createNewProductImageList(productImages, imageForm.getAllImageIndexes()));
+        processedProductImages.setNewImages(
+                createNewProductImageList(images, imageForm.getAllImageIndexes()));
 
         return processedProductImages;
     }
 
-    private static List<String> markImagesForDeleteAndGetKeys(List<ProductImage> productImages, List<String> deleteImageIndexes) {
+    private static List<String> markImagesForDeleteAndGetKeys(List<Image> images, List<String> deleteImageIndexes) {
         List<String> imageKeysForDelete = new ArrayList<>();
         if (deleteImageIndexes != null && !deleteImageIndexes.isEmpty()) {
-            for (int i = 0; i < productImages.size(); i++) {
-                var index = productImages.get(i).getIndex();
+            for (int i = 0; i < images.size(); i++) {
+                var index = images.get(i).getIndex();
                 boolean isDeleted = deleteImageIndexes.stream()
                         .map(Integer::parseInt)
                         .anyMatch(deletedIndex -> deletedIndex.equals(index));
 
                 if (isDeleted) {
-                    imageKeysForDelete.add(productImages.get(i).getKey());
-                    productImages.set(i, null);
+                    imageKeysForDelete.add(images.get(i).getKey());
+                    images.set(i, null);
                 }
             }
         }
@@ -72,14 +72,14 @@ public abstract class ProductImageProcessor {
         return imageKeys;
     }
 
-    private static List<ProductImage> createNewProductImageList(List<ProductImage> productImages, Map<String, String> allImageIndexes) {
-        int finalProductImagesSize = (int) productImages.stream()
+    private static List<Image> createNewProductImageList(List<Image> images, Map<String, String> allImageIndexes) {
+        int finalProductImagesSize = (int) images.stream()
                 .filter(Objects::nonNull)
                 .count();
 
-        List<ProductImage> newProductImages = new ArrayList<>(finalProductImagesSize);
+        List<Image> newImages = new ArrayList<>(finalProductImagesSize);
         for (int i = 0; i < finalProductImagesSize; i++) {
-            newProductImages.add(null);
+            newImages.add(null);
         }
 
         for (var entry : allImageIndexes.entrySet()) {
@@ -89,10 +89,10 @@ public abstract class ProductImageProcessor {
             int currentIndex = Integer.parseInt(entry.getKey().replaceAll("\\D", ""));
             int newIndex = Integer.parseInt(entry.getValue());
 
-            newProductImages.set(newIndex, productImages.get(currentIndex));
-            newProductImages.get(newIndex).setIndex(newIndex);
+            newImages.set(newIndex, images.get(currentIndex));
+            newImages.get(newIndex).setIndex(newIndex);
         }
 
-        return newProductImages;
+        return newImages;
     }
 }

@@ -1,5 +1,8 @@
 package com.ak.store.catalogue.util.mapper;
 
+import com.ak.store.catalogue.model.dto.CharacteristicDTOnew;
+import com.ak.store.catalogue.model.dto.ProductCharacteristicDTOnew;
+import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
 import com.ak.store.catalogue.model.entity.*;
 import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
 import com.ak.store.common.model.catalogue.dto.RangeValueDTO;
@@ -7,6 +10,7 @@ import com.ak.store.common.model.catalogue.form.CharacteristicForm;
 import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
 import com.ak.store.common.model.catalogue.form.RangeValueForm;
 import com.ak.store.common.model.catalogue.form.TextValueForm;
+import com.ak.store.common.model.catalogue.snapshot.ProductCharacteristicSnapshot;
 import com.ak.store.common.model.catalogue.view.CharacteristicView;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
-
 public interface CharacteristicMapper {
 
     @Mapping(target = "textValues", source = "textValues")
@@ -68,4 +71,9 @@ public interface CharacteristicMapper {
         }
         return rangeValueDTOs;
     }
+
+    //----------------------------------
+
+    CharacteristicDTOnew toCharacteristicDTOnew(Characteristic c);
+    List<CharacteristicDTOnew> toCharacteristicDTOnew(List<Characteristic> c);
 }

@@ -26,11 +26,14 @@ public interface ProductRepo extends JpaRepository<Product, Long>, ProductRepoCu
     Optional<Product> findOneWithImagesById(Long id);
 
     @Query("SELECT COUNT(p) > 0 FROM Product p WHERE p.id = :id AND p.isDeleted = false")
-    boolean existOneById(@NonNull Long id);
+    boolean IsExistOneById(@NonNull Long id);
 
     @Query("SELECT COUNT(p) > 0 FROM Product p WHERE p.id = :id AND p.isAvailable = true AND p.isDeleted = false")
-    boolean availableOneById(Long id);
+    boolean isAvailableOneById(Long id);
 
-    @Query("SELECT COUNT(p) = :size FROM Product p WHERE p.id IN :ids AND p.isAvailable = true AND p.isDeleted = false")
-    boolean availableAllById(List<Long> ids, long size);
+    @Query("SELECT COUNT(p) = :amount FROM Product p WHERE p.id IN :ids AND p.isDeleted = false")
+    boolean isExistAllByIds(List<Long> ids, long amount);
+
+    @Query("SELECT COUNT(p) = :amount FROM Product p WHERE p.id IN :ids AND p.isAvailable = true AND p.isDeleted = false")
+    boolean isAvailableAllByIds(List<Long> ids, long amount);
 }

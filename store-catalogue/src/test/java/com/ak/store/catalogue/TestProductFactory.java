@@ -60,8 +60,8 @@ public class TestProductFactory {
                 .build();
     }
 
-    public static ProductImage createProductImage(Integer index, String key) {
-        return ProductImage.builder()
+    public static Image createProductImage(Integer index, String key) {
+        return Image.builder()
                 .index(index)
                 //.imageKey(key)
                 .build();

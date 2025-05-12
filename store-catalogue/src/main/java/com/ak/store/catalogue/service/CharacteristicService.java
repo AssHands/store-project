@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.model.dto.CharacteristicDTOnew;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.RangeValue;
 import com.ak.store.catalogue.model.entity.TextValue;
@@ -32,7 +33,7 @@ public class CharacteristicService {
         return characteristicRepo.findAllWithTextValuesByCategoryId(categoryId);
     }
 
-    public Characteristic findOne(Long id) {
+    public Characteristic findOneOld(Long id) {
         return characteristicRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("no characteristic found"));
     }
@@ -60,7 +61,7 @@ public class CharacteristicService {
     }
 
     public Characteristic updateOne(Long id, CharacteristicForm characteristicForm) {
-        Characteristic characteristic = findOne(id);
+        Characteristic characteristic = findOneOld(id);
         characteristicServiceValidator.validateUpdate(characteristicForm);
         updateCharacteristic(characteristic, characteristicForm);
         return characteristicRepo.save(characteristic);
@@ -123,5 +124,24 @@ public class CharacteristicService {
         }
 
         throw new RuntimeException("text value didn't find");
+    }
+
+    //----------------
+
+    private Characteristic findOneById(Long id) {
+        return characteristicRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
+    }
+
+    private List<Characteristic> findAllByIds(List<Long> ids) {
+        return characteristicRepo.findAllById(ids);
+    }
+
+    public List<CharacteristicDTOnew> findAll(List<Long> ids) {
+        return characteristicMapper.toCharacteristicDTOnew(findAllByIds(ids));
+    }
+
+    public CharacteristicDTOnew findOne(Long id) {
+        return characteristicMapper.toCharacteristicDTOnew(findOneById(id));
     }
 }

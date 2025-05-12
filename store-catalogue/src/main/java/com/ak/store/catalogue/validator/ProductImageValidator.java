@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.validator;
 
-import com.ak.store.catalogue.model.entity.ProductImage;
+import com.ak.store.catalogue.model.entity.Image;
 import com.ak.store.common.model.catalogue.form.ImageForm;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 
 @Component
 public class ProductImageValidator {
-    public void validate(ImageForm imageForm, List<ProductImage> productImages) {
-        int expectedSize = productImages.size();
+    public void validate(ImageForm imageForm, List<Image> images) {
+        int expectedSize = images.size();
         if(imageForm.getAddImages() != null)
             expectedSize += imageForm.getAddImages().size();
         if(imageForm.getDeleteImageIndexes() != null)
@@ -30,22 +30,22 @@ public class ProductImageValidator {
                 .map(Integer::parseInt)
                 .toList();
 
-        validateDeleteImageIndexes(imageForm.getDeleteImageIndexes(), oldImageIndexes, productImages);
-        validateOldImageIndexes(imageForm.getDeleteImageIndexes(), imageForm.getAddImages(), productImages, oldImageIndexes);
+        validateDeleteImageIndexes(imageForm.getDeleteImageIndexes(), oldImageIndexes, images);
+        validateOldImageIndexes(imageForm.getDeleteImageIndexes(), imageForm.getAddImages(), images, oldImageIndexes);
         validateNewImageIndexes(imageForm.getAllImageIndexes(), expectedSize);
     }
 
     private void validateOldImageIndexes(List<String> deleteImageIndexes, List<MultipartFile> addImages,
-                                         List<ProductImage> productImages, List<Integer> oldImageIndexes) {
+                                         List<Image> images, List<Integer> oldImageIndexes) {
         List<Integer> existingImageIndexes = new ArrayList<>();
-        int lastIndex = productImages.stream()
-                .map(ProductImage::getIndex)
+        int lastIndex = images.stream()
+                .map(Image::getIndex)
                 .max(Integer::compareTo)
                 .orElse(-1);
 
         if(deleteImageIndexes != null) {
-            existingImageIndexes.addAll(productImages.stream()
-                    .map(ProductImage::getIndex)
+            existingImageIndexes.addAll(images.stream()
+                    .map(Image::getIndex)
                     .filter(index -> !deleteImageIndexes.contains(index.toString()))
                     .sorted()
                     .toList());
@@ -96,7 +96,7 @@ public class ProductImageValidator {
     }
 
     private void validateDeleteImageIndexes(List<String> deleteImageIndexes, List<Integer> oldImageIndexes,
-                                            List<ProductImage> productImages) {
+                                            List<Image> images) {
         if(deleteImageIndexes != null) {
             boolean isSpecifyDeletedIndex = oldImageIndexes.stream()
                     .anyMatch(index -> deleteImageIndexes.contains(index.toString()));
@@ -104,7 +104,7 @@ public class ProductImageValidator {
             if(isSpecifyDeletedIndex)
                 throw new RuntimeException("указан удалённый индекс в old positions");
 
-            int countExistingDeletedIndexes = (int) productImages.stream()
+            int countExistingDeletedIndexes = (int) images.stream()
                     .filter(image -> deleteImageIndexes.contains(image.getIndex().toString()))
                     .count();
 

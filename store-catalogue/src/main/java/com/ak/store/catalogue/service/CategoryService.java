@@ -49,7 +49,7 @@ public class CategoryService {
     public Category addCharacteristicToCategory(Long categoryId, Long characteristicId) {
         var category = findOneWithCharacteristics(categoryId);
         categoryServiceValidator.validateAddCharacteristic(category, characteristicId);
-        var characteristic = characteristicService.findOne(characteristicId);
+        var characteristic = characteristicService.findOneOld(characteristicId);
 
         category.getCharacteristics().add(
                 CategoryCharacteristic.builder()
