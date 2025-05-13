@@ -4,6 +4,7 @@ import com.ak.store.catalogue.integration.S3Service;
 import com.ak.store.catalogue.model.dto.ImageDTOnew;
 import com.ak.store.catalogue.model.dto.ProductCharacteristicDTOnew;
 import com.ak.store.catalogue.model.dto.ProductDTOnew;
+import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
 import com.ak.store.catalogue.model.dto.write.ProductWritePayload;
 import com.ak.store.catalogue.outbox.OutboxTaskService;
 import com.ak.store.catalogue.outbox.OutboxTaskType;
@@ -21,6 +22,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -31,8 +34,6 @@ public class ProductFacade {
     private final ProductCharacteristicService productCharacteristicService;
     private final OutboxTaskService<ProductSnapshotPayload> productOutboxTaskService;
     private final S3Service s3Service;
-
-    private final OutboxTaskService<ProductDTO> productOutboxTaskServiceOld;
 
     private final ProductMapper productMapper;
     private final ImageMapper imageMapper;
@@ -56,16 +57,13 @@ public class ProductFacade {
 
     @Transactional
     public Long createOne(ProductWritePayload request) {
-        //todo проверить синхронизацию продукта и характеристик
         ProductDTOnew product = productService.createOne(request.getProduct());
         List<ProductCharacteristicDTOnew> productCharacteristics =
-                productCharacteristicService.createAll(product.getId(), request.getCreateProductCharacteristics());
-        List<ImageDTOnew> images = imageService.findAll(product.getId());
+                productCharacteristicService.createAll(product.getId(), request.getCreateCharacteristics());
 
         ProductSnapshotPayload snapshot = ProductSnapshotPayload.builder()
                 .product(productMapper.toProductSnapshot(product))
                 .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
-                .productImages(imageMapper.toImageSnapshot(images))
                 .build();
 
         productOutboxTaskService.createOneTask(snapshot, OutboxTaskType.PRODUCT_CREATED);
@@ -76,17 +74,17 @@ public class ProductFacade {
     public Long updateOne(Long id, ProductWritePayload request) {
         ProductDTOnew product = productService.updateOne(id, request.getProduct());
 
-        productCharacteristicService.createAll(id, request.getCreateProductCharacteristics());
-        productCharacteristicService.updateAll(id, request.getUpdateProductCharacteristics());
+        productCharacteristicService.createAll(id, request.getCreateCharacteristics());
+        productCharacteristicService.updateAll(id, request.getUpdateCharacteristics());
         List<ProductCharacteristicDTOnew> productCharacteristics =
-                productCharacteristicService.deleteAll(id, request.getDeleteProductCharacteristicIds());
+                productCharacteristicService.deleteAll(id, request.getDeleteCharacteristicIds());
 
         List<ImageDTOnew> images = imageService.findAll(product.getId());
 
         ProductSnapshotPayload snapshot = ProductSnapshotPayload.builder()
                 .product(productMapper.toProductSnapshot(product))
                 .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
-                .productImages(imageMapper.toImageSnapshot(images))
+                .images(imageMapper.toImageSnapshot(images))
                 .build();
 
         productOutboxTaskService.createOneTask(snapshot, OutboxTaskType.PRODUCT_UPDATED);
@@ -107,7 +105,7 @@ public class ProductFacade {
         ProductSnapshotPayload snapshot = ProductSnapshotPayload.builder()
                 .product(productMapper.toProductSnapshot(product))
                 .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
-                .productImages(imageMapper.toImageSnapshot(images))
+                .images(imageMapper.toImageSnapshot(images))
                 .build();
 
         productOutboxTaskService.createOneTask(snapshot, OutboxTaskType.PRODUCT_DELETED);
@@ -121,11 +119,20 @@ public class ProductFacade {
     }
 
     @Transactional
-    public Long saveOrUpdateAllImage(ImageForm imageForm) {
-        var processedProductImages = productService.saveOrUpdateAllImage(imageForm);
-        var product = productService.findOneWithImages(imageForm.getProductId());
+    public Long saveOrUpdateAllImage(ImageWriteDTO request) {
+        var processedProductImages = imageService.saveOrUpdateAllImage(request);
 
-        productOutboxTaskServiceOld.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_UPDATED);
+        List<ProductCharacteristicDTOnew> productCharacteristics = productCharacteristicService.findAll(request.getProductId());
+        List<ImageDTOnew> images = imageService.findAll(request.getProductId());
+        var product = productService.findOne(request.getProductId());
+
+        ProductSnapshotPayload snapshot = ProductSnapshotPayload.builder()
+                .product(productMapper.toProductSnapshot(product))
+                .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
+                .images(imageMapper.toImageSnapshot(images))
+                .build();
+
+        productOutboxTaskService.createOneTask(snapshot, OutboxTaskType.PRODUCT_UPDATED);
 
         try {
             s3Service.putAllImage(processedProductImages.getImagesForAdd());

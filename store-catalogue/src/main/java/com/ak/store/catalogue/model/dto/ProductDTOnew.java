@@ -35,10 +35,4 @@ public class ProductDTOnew {
     private Boolean isAvailable;
 
     private Boolean isDeleted;
-
-    @Builder.Default
-    private List<Long> productCharacteristicIds = new ArrayList<>();
-
-    @Builder.Default
-    private List<Long> productImageIds = new ArrayList<>();
 }

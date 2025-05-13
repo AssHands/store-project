@@ -23,48 +23,9 @@ import java.util.Set;
 @Service
 public class ProductCharacteristicService {
 
-    private final CharacteristicMapper characteristicMapper;
     private final ProductCharacteristicMapper productCharacteristicMapper;
-    private final CharacteristicService characteristicService;
     private final ProductCharacteristicServiceValidator productCharacteristicServiceValidator;
     private final ProductCharacteristicRepo productCharacteristicRepo;
-
-    public void createAll(Product product, Set<ProductCharacteristicForm> ProductCharacteristicForms) {
-        if (ProductCharacteristicForms.isEmpty()) return;
-        productCharacteristicServiceValidator.validateCreation(ProductCharacteristicForms, product);
-
-        List<ProductCharacteristic> productCharacteristics = new ArrayList<>();
-        for (var productCharacteristic : ProductCharacteristicForms) {
-            Characteristic characteristic = characteristicService.findOneOld(productCharacteristic.getId());
-            productCharacteristics.add(
-                    characteristicMapper.toProductCharacteristic(productCharacteristic, characteristic, product)
-            );
-        }
-
-        product.addCharacteristics(productCharacteristics);
-    }
-
-    public void updateAll(Product product, Set<ProductCharacteristicForm> ProductCharacteristicForms) {
-        if (ProductCharacteristicForms.isEmpty()) return;
-        productCharacteristicServiceValidator.validateUpdate(ProductCharacteristicForms, product.getCategory().getId());
-
-        for (var productCharacteristic : ProductCharacteristicForms) {
-            int index = findProductCharacteristicIndexById(product.getCharacteristics(), productCharacteristic.getId());
-
-            product.getCharacteristics().get(index).setTextValue(productCharacteristic.getTextValue());
-            product.getCharacteristics().get(index).setNumericValue(productCharacteristic.getNumericValue());
-        }
-    }
-
-    public void deleteAll(Product product, Set<ProductCharacteristicForm> ProductCharacteristicForms) {
-        if (ProductCharacteristicForms.isEmpty()) return;
-
-        for (var characteristic : ProductCharacteristicForms) {
-            int index = findProductCharacteristicIndexById(product.getCharacteristics(), characteristic.getId());
-
-            product.getCharacteristics().remove(index);
-        }
-    }
 
     private int findProductCharacteristicIndexById(List<ProductCharacteristic> characteristics, Long id) {
         int index = 0;
@@ -121,7 +82,7 @@ public class ProductCharacteristicService {
     public List<ProductCharacteristicDTOnew> deleteAll(Long productId, List<Long> ids) {
         if (ids.isEmpty()) return Collections.emptyList();
 
-        productCharacteristicRepo.deleteAllByProductIdAndCharacteristicIdIn(ids);
+        productCharacteristicRepo.deleteAllByProductIdAndCharacteristicIdIn(productId, ids);
         return findAll(productId);
     }
 }

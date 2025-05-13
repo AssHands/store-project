@@ -23,5 +23,5 @@ public class ProductSnapshotPayload {
     private List<ProductCharacteristicSnapshot> productCharacteristics = new ArrayList<>();
 
     @Builder.Default
-    private List<ProductImageSnapshot> productImages = new ArrayList<>();
+    private List<ProductImageSnapshot> images = new ArrayList<>();
 }

@@ -1,5 +1,8 @@
-package com.ak.store.common.model.catalogue.formNew;
+package com.ak.store.catalogue.model.form;
 
+import com.ak.store.catalogue.model.annotation.UniqueElements;
+import com.ak.store.common.validationGroup.Create;
+import com.ak.store.common.validationGroup.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -10,9 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -25,12 +26,14 @@ public class ProductFormPayloadNew {
     @Builder.Default
     ProductFormNew product = new ProductFormNew();
 
+    @UniqueElements(groups = {Create.class, Update.class})
     @Builder.Default
     List<@Valid ProductCharacteristicFormNew> createCharacteristics = new ArrayList<>();
 
+    @UniqueElements(groups = {Create.class, Update.class})
     @Builder.Default
     List<@Valid ProductCharacteristicFormNew> updateCharacteristics = new ArrayList<>();
 
     @Builder.Default
-    Set<Long> deleteCharacteristicIds = new HashSet<>();
+    List<Long> deleteCharacteristicIds = new ArrayList<>();
 }

@@ -1,4 +1,4 @@
-package com.ak.store.common.model.catalogue.formNew;
+package com.ak.store.catalogue.model.form;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

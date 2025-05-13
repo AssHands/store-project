@@ -1,4 +1,4 @@
-package com.ak.store.common.model.catalogue.formNew;
+package com.ak.store.catalogue.model.form;
 
 import com.ak.store.common.validationGroup.Create;
 import com.ak.store.common.validationGroup.Update;

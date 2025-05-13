@@ -3,7 +3,7 @@ package com.ak.store.catalogue.service;
 import com.ak.store.catalogue.model.dto.write.ProductWriteDTO;
 import com.ak.store.catalogue.model.dto.ProductDTOnew;
 import com.ak.store.catalogue.model.entity.*;
-import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
+import com.ak.store.catalogue.model.pojo.ProcessedImages;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.service.product.PriceCalculator;
 import com.ak.store.catalogue.util.mapper.ProductMapper;
@@ -16,35 +16,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.ak.store.catalogue.util.ProductImageProcessor.processProductImages;
+
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepo productRepo;
-
     private final ProductMapper productMapper;
-
-    private final ImageValidator imageValidator;
     private final ProductServiceValidator productServiceValidator;
-
-    public Product findOneWithImages(Long id) {
-        return productRepo.findOneWithImagesById(id)
-                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id)));
-    }
-
-    @Transactional
-    public ProcessedProductImages saveOrUpdateAllImage(ImageForm imageForm) {
-        Product updatedProduct = findOneWithImages(imageForm.getProductId());
-        imageValidator.validate(imageForm, updatedProduct.getImages());
-        ProcessedProductImages processedProductImages = processProductImages(imageForm, updatedProduct);
-
-        updatedProduct.getImages().clear();
-        updatedProduct.getImages().addAll(processedProductImages.getNewImages());
-        productRepo.saveAndFlush(updatedProduct);
-
-        return processedProductImages;
-    }
 
     public List<Product> findAllOld(List<Long> ids) {
         return productRepo.findAllById(ids);

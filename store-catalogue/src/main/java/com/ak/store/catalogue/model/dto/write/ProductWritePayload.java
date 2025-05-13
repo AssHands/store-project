@@ -20,11 +20,11 @@ public class ProductWritePayload {
     ProductWriteDTO product = new ProductWriteDTO();
 
     @Builder.Default
-    List<ProductCharacteristicWriteDTO> createProductCharacteristics = new ArrayList<>();
+    List<ProductCharacteristicWriteDTO> createCharacteristics = new ArrayList<>();
 
     @Builder.Default
-    List<ProductCharacteristicWriteDTO> updateProductCharacteristics = new ArrayList<>();
+    List<ProductCharacteristicWriteDTO> updateCharacteristics = new ArrayList<>();
 
     @Builder.Default
-    List<Long> deleteProductCharacteristicIds = new ArrayList<>();
+    List<Long> deleteCharacteristicIds = new ArrayList<>();
 }

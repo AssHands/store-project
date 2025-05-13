@@ -5,6 +5,7 @@ import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
+import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,16 +19,9 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class ProductCharacteristicServiceValidator {
+    //todo заменить на сервис
     private final CharacteristicRepo characteristicRepo;
-
-    public void validateCreation(Set<ProductCharacteristicForm> productCharacteristicForms, Product product) {
-        validateProductCharacteristics(productCharacteristicForms, product.getCategory().getId());
-        validateExistingProductCharacteristic(product, productCharacteristicForms);
-    }
-
-    public void validateUpdate(Set<ProductCharacteristicForm> productCharacteristicForms, Long categoryId) {
-        validateProductCharacteristics(productCharacteristicForms, categoryId);
-    }
+    private final ProductService productService;
 
     private void validateExistingProductCharacteristic(Product product, Set<ProductCharacteristicForm> productCharacteristicForms) {
         List<Long> existingCharacteristicIds = product.getCharacteristics().stream()
@@ -50,42 +44,42 @@ public class ProductCharacteristicServiceValidator {
         }
     }
 
-    private void validateProductCharacteristics(Set<ProductCharacteristicForm> productCharacteristicForms, Long categoryId) {
+    private void validateProductCharacteristics(List<ProductCharacteristicWriteDTO> productCharacteristics, Long categoryId) {
         var availableTextValues = characteristicRepo.findAllWithTextValuesByCategoryId(categoryId).stream()
                 .collect(Collectors.toMap(
                         Characteristic::getId,
                         characteristic -> characteristic.getTextValues().stream().map(TextValue::getTextValue).toList())
                 );
 
-        for (var productCharacteristic : productCharacteristicForms) {
-            List<String> textValues = availableTextValues.get(productCharacteristic.getId());
+        for (var pc : productCharacteristics) {
+            List<String> textValues = availableTextValues.get(pc.getCharacteristicId());
 
             if (textValues == null) {
                 throw new RuntimeException("characteristic with id=%s is not available"
-                        .formatted(productCharacteristic.getId()));
+                        .formatted(pc.getCharacteristicId()));
             }
 
-            if (productCharacteristic.getTextValue() != null) {
-                if (productCharacteristic.getNumericValue() != null) {
+            if (pc.getTextValue() != null) {
+                if (pc.getNumericValue() != null) {
                     throw new RuntimeException("characteristic with id=%s has both text value and numeric value"
-                            .formatted(productCharacteristic.getId()));
+                            .formatted(pc.getCharacteristicId()));
                 }
 
                 if (textValues.isEmpty()) {
                     throw new RuntimeException("characteristic with id=%s is not a text one"
-                            .formatted(productCharacteristic.getId()));
+                            .formatted(pc.getCharacteristicId()));
                 }
 
-                if (!textValues.contains(productCharacteristic.getTextValue())) {
+                if (!textValues.contains(pc.getTextValue())) {
                     throw new RuntimeException("not valid text value for characteristic with id=%s"
-                            .formatted(productCharacteristic.getId()));
+                            .formatted(pc.getCharacteristicId()));
                 }
             }
 
-            if (productCharacteristic.getNumericValue() != null) {
+            if (pc.getNumericValue() != null) {
                 if (!textValues.isEmpty()) {
                     throw new RuntimeException("characteristic with id=%s is not a numeric one"
-                            .formatted(productCharacteristic.getId()));
+                            .formatted(pc.getCharacteristicId()));
                 }
             }
         }
@@ -95,11 +89,14 @@ public class ProductCharacteristicServiceValidator {
 
     //todo make validation
     public void validateCreationNew(Long productId, List<ProductCharacteristicWriteDTO> productCharacteristics) {
-
+        Long categoryId = productService.findOne(productId).getCategoryId();
+        validateProductCharacteristics(productCharacteristics, categoryId);
     }
 
     //todo make validation
-    public void validateUpdateNew(Long productId, List<ProductCharacteristicWriteDTO> productCharacteristics) {
-
+    public void validateUpdateNew(Long productId, List<ProductCharacteristicWriteDTO> creatproductCharacteristics) {
+        Long categoryId = productService.findOne(productId).getCategoryId();
+        validateProductCharacteristics(productCharacteristics, categoryId);
+        validateExistingProductCharacteristic(product, productCharacteristicForms);
     }
 }

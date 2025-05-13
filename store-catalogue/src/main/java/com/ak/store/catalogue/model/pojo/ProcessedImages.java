@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ProcessedProductImages {
+public class ProcessedImages {
     List<Image> newImages = new ArrayList<>();
     LinkedHashMap<String, MultipartFile> imagesForAdd = new LinkedHashMap<>();
     List<String> imageKeysForDelete = new ArrayList<>();

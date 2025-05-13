@@ -1,12 +1,11 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.ProductFacade;
-import com.ak.store.common.model.catalogue.formNew.ProductFormPayloadNew;
+import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
+import com.ak.store.catalogue.model.form.ProductFormPayloadNew;
 import com.ak.store.common.model.catalogue.viewNew.ProductViewNew;
 import com.ak.store.catalogue.util.mapper.ProductMapper;
 import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
-import com.ak.store.common.model.catalogue.form.ImageForm;
-import com.ak.store.common.payload.catalogue.ProductWritePayload;
 import com.ak.store.common.validationGroup.Create;
 import com.ak.store.common.validationGroup.Update;
 import lombok.RequiredArgsConstructor;
@@ -81,9 +80,8 @@ public class ProductController {
                                       @RequestParam Map<String, String> allImageIndexes,
                                       @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,
                                       @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
-        ImageForm imageForm = new ImageForm(productId, allImageIndexes, addImages, deleteImageIndexes);
-
-        return productFacade.saveOrUpdateAllImage(imageForm);
+        ImageWriteDTO request = new ImageWriteDTO(productId, allImageIndexes, addImages, deleteImageIndexes);
+        return productFacade.saveOrUpdateAllImage(request);
     }
 
     //-------------------------
@@ -93,7 +91,7 @@ public class ProductController {
         return productMapper.toProductViewNew(productFacade.findOne(id));
     }
 
-    @PostMapping
+    @PostMapping("find")
     public List<ProductViewNew> findAll(@RequestBody List<Long> ids) {
         return productMapper.toProductViewNew(productFacade.findAll(ids));
     }

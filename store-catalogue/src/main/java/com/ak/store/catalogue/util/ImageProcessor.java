@@ -1,40 +1,48 @@
 package com.ak.store.catalogue.util;
 
+import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.Image;
-import com.ak.store.catalogue.model.pojo.ProcessedProductImages;
-import com.ak.store.common.model.catalogue.form.ImageForm;
+import com.ak.store.catalogue.model.pojo.ProcessedImages;
+import com.ak.store.catalogue.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
-public abstract class ProductImageProcessor {
-    public static ProcessedProductImages processProductImages(ImageForm imageForm, Product updatedProduct) {
-        ProcessedProductImages processedProductImages = new ProcessedProductImages();
-        List<Image> images = updatedProduct.getImages();
+@RequiredArgsConstructor
+@Service
+public class ImageProcessor {
+    private final ProductService productService;
 
-        processedProductImages.setImageKeysForDelete(
-                markImagesForDeleteAndGetKeys(images, imageForm.getDeleteImageIndexes()));
+    public ProcessedImages processImages(ImageWriteDTO request, List<Image> images) {
+        ProcessedImages processedImages = new ProcessedImages();
 
-        LinkedHashMap<String, MultipartFile> imagesForAdd = prepareImagesForAdd(updatedProduct, imageForm.getAddImages());
+        processedImages.setImageKeysForDelete(
+                markImagesForDeleteAndGetKeys(images, request.getDeleteImageIndexes()));
+
+        LinkedHashMap<String, MultipartFile> imagesForAdd =
+                prepareImagesForAdd(request.getProductId(), request.getAddImages());
+
         for (String key : imagesForAdd.keySet()) {
             images.add(Image.builder()
                     .key(key)
                     .product(Product.builder()
-                            .id(imageForm.getProductId())
+                            .id(request.getProductId())
                             .build())
                     .build());
         }
-        processedProductImages.setImagesForAdd(imagesForAdd);
+        processedImages.setImagesForAdd(imagesForAdd);
 
-        processedProductImages.setNewImages(
-                createNewProductImageList(images, imageForm.getAllImageIndexes()));
+        processedImages.setNewImages(
+                createNewImages(images, request.getAllImageIndexes()));
 
-        return processedProductImages;
+        return processedImages;
     }
 
-    private static List<String> markImagesForDeleteAndGetKeys(List<Image> images, List<String> deleteImageIndexes) {
+    private List<String> markImagesForDeleteAndGetKeys(List<Image> images, List<String> deleteImageIndexes) {
         List<String> imageKeysForDelete = new ArrayList<>();
         if (deleteImageIndexes != null && !deleteImageIndexes.isEmpty()) {
             for (int i = 0; i < images.size(); i++) {
@@ -52,27 +60,28 @@ public abstract class ProductImageProcessor {
         return imageKeysForDelete;
     }
 
-    private static LinkedHashMap<String, MultipartFile> prepareImagesForAdd(Product updatedProduct, List<MultipartFile> addImages) {
+    private LinkedHashMap<String, MultipartFile> prepareImagesForAdd(Long productId, List<MultipartFile> addImages) {
         //LinkedHashMap for save order
         LinkedHashMap<String, MultipartFile> imagesForAdd = new LinkedHashMap<>();
         if (addImages != null && !addImages.isEmpty()) {
-            imagesForAdd = generateImageKeys(updatedProduct, addImages);
+            imagesForAdd = generateImageKeys(productId, addImages);
         }
         return imagesForAdd;
     }
 
     //LinkedHashMap for save order
-    private static LinkedHashMap<String, MultipartFile> generateImageKeys(Product product, List<MultipartFile> images) {
+    private LinkedHashMap<String, MultipartFile> generateImageKeys(Long productId, List<MultipartFile> images) {
         LinkedHashMap<String, MultipartFile> imageKeys = new LinkedHashMap<>();
+        var product = productService.findOne(productId);
         for(var image : images) {
-            imageKeys.put("category_%s/product_%s/%s".formatted(product.getCategory().getId(),
+            imageKeys.put("category_%s/product_%s/%s".formatted(product.getCategoryId(),
                     product.getId(), UUID.randomUUID() + "." + image.getContentType().split("/")[1]), image);
         }
 
         return imageKeys;
     }
 
-    private static List<Image> createNewProductImageList(List<Image> images, Map<String, String> allImageIndexes) {
+    private List<Image> createNewImages(List<Image> images, Map<String, String> allImageIndexes) {
         int finalProductImagesSize = (int) images.stream()
                 .filter(Objects::nonNull)
                 .count();

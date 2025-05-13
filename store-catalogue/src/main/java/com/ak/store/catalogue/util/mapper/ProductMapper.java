@@ -7,7 +7,7 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.catalogue.model.entity.Image;
-import com.ak.store.common.model.catalogue.formNew.ProductFormPayloadNew;
+import com.ak.store.catalogue.model.form.ProductFormPayloadNew;
 import com.ak.store.common.model.catalogue.snapshot.ProductSnapshot;
 import com.ak.store.common.model.catalogue.viewNew.ProductViewNew;
 import com.ak.store.common.model.catalogue.dto.ProductCharacteristicDTO;
@@ -51,6 +51,7 @@ public interface ProductMapper {
 
     //-------------------
 
+    @Mapping(target = "categoryId", source = "category.id")
     ProductDTOnew toProductDTOnew(Product product);
 
     List<ProductDTOnew>toProductDTOnew(List<Product> product);
@@ -85,6 +86,5 @@ public interface ProductMapper {
 
     ProductSnapshot toProductSnapshot(ProductDTOnew p);
 
-    //todo доработать метод
     ProductWritePayload toProductWritePayload(ProductFormPayloadNew p);
 }

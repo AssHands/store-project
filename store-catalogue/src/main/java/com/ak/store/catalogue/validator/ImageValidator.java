@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.validator;
 
+import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
 import com.ak.store.catalogue.model.entity.Image;
 import com.ak.store.common.model.catalogue.form.ImageForm;
 import org.springframework.stereotype.Component;
@@ -12,27 +13,27 @@ import java.util.regex.Pattern;
 
 @Component
 public class ImageValidator {
-    public void validate(ImageForm imageForm, List<Image> images) {
+    public void validate(ImageWriteDTO request, List<Image> images) {
         int expectedSize = images.size();
-        if(imageForm.getAddImages() != null)
-            expectedSize += imageForm.getAddImages().size();
-        if(imageForm.getDeleteImageIndexes() != null)
-            expectedSize -= imageForm.getDeleteImageIndexes().size();
+        if(request.getAddImages() != null)
+            expectedSize += request.getAddImages().size();
+        if(request.getDeleteImageIndexes() != null)
+            expectedSize -= request.getDeleteImageIndexes().size();
 
         if(expectedSize > 9)
             throw new RuntimeException("индекс больше 9");
 
-        validateKeysAndValues(imageForm.getAllImageIndexes());
+        validateKeysAndValues(request.getAllImageIndexes());
 
-        List<Integer> oldImageIndexes = imageForm.getAllImageIndexes().keySet().stream()
+        List<Integer> oldImageIndexes = request.getAllImageIndexes().keySet().stream()
                 .filter(k -> Pattern.compile("image\\[\\d]").matcher(k).matches())
                 .map(k -> k.replaceAll("\\D", ""))
                 .map(Integer::parseInt)
                 .toList();
 
-        validateDeleteImageIndexes(imageForm.getDeleteImageIndexes(), oldImageIndexes, images);
-        validateOldImageIndexes(imageForm.getDeleteImageIndexes(), imageForm.getAddImages(), images, oldImageIndexes);
-        validateNewImageIndexes(imageForm.getAllImageIndexes(), expectedSize);
+        validateDeleteImageIndexes(request.getDeleteImageIndexes(), oldImageIndexes, images);
+        validateOldImageIndexes(request.getDeleteImageIndexes(), request.getAddImages(), images, oldImageIndexes);
+        validateNewImageIndexes(request.getAllImageIndexes(), expectedSize);
     }
 
     private void validateOldImageIndexes(List<String> deleteImageIndexes, List<MultipartFile> addImages,

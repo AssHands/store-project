@@ -29,9 +29,11 @@ public class Category {
     @NotBlank
     private String name;
 
+    @Builder.Default
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryCharacteristic> characteristics = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "related_category",

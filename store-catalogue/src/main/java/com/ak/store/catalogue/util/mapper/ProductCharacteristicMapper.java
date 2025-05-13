@@ -16,13 +16,23 @@ public interface ProductCharacteristicMapper {
     @Mapping(target = "characteristicId", source = "characteristic.id")
     @Mapping(target = "productId", source = "product.id")
     ProductCharacteristicDTOnew toProductCharacteristicDTOnew(ProductCharacteristic pc);
+
     List<ProductCharacteristicDTOnew> toProductCharacteristicDTOnew(List<ProductCharacteristic> pc);
 
     @Mapping(target = "characteristic.id", source = "pc.characteristicId")
     @Mapping(target = "product.id", source = "productId")
     ProductCharacteristic toProductCharacteristic(ProductCharacteristicWriteDTO pc, Long productId);
-    List<ProductCharacteristic> toProductCharacteristic(List<ProductCharacteristicWriteDTO> pc, Long productId);
+
+    default List<ProductCharacteristic> toProductCharacteristic(List<ProductCharacteristicWriteDTO> pc, Long productId) {
+        if (pc == null) {
+            return null;
+        }
+        return pc.stream()
+                .map(v -> toProductCharacteristic(v, productId))
+                .toList();
+    }
 
     ProductCharacteristicSnapshot toProductCharacteristicSnapshot(ProductCharacteristicDTOnew pc);
+
     List<ProductCharacteristicSnapshot> toProductCharacteristicSnapshot(List<ProductCharacteristicDTOnew> pc);
 }
