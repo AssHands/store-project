@@ -8,15 +8,10 @@ import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.service.product.PriceCalculator;
 import com.ak.store.catalogue.util.mapper.ProductMapper;
 import com.ak.store.catalogue.validator.service.ProductServiceValidator;
-import com.ak.store.catalogue.validator.ProductImageValidator;
+import com.ak.store.catalogue.validator.ImageValidator;
 import com.ak.store.common.model.catalogue.form.ImageForm;
-import com.ak.store.common.model.catalogue.form.ProductForm;
-import com.ak.store.common.model.search.common.SortingType;
-import com.ak.store.common.payload.catalogue.ProductWritePayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,37 +22,21 @@ import static com.ak.store.catalogue.util.ProductImageProcessor.processProductIm
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepo productRepo;
+
     private final ProductMapper productMapper;
-    private final ProductImageValidator productImageValidator;
-    private final ProductCharacteristicService productCharacteristicService;
-    private final CategoryService categoryService;
+
+    private final ImageValidator imageValidator;
     private final ProductServiceValidator productServiceValidator;
-
-    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
-    private int BATCH_SIZE;
-
-    @Transactional
-    public Product findOneWithAll(Long id) {
-        Product product = productRepo.findOneWithCharacteristicsAndCategoryById(id)
-                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id)));
-
-        product.getImages().size();
-        return product;
-    }
-
-    public Product findOneWithCharacteristicsAndCategory(Long id) {
-        return productRepo.findOneWithCharacteristicsAndCategoryById(id)
-                .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id)));
-    }
 
     public Product findOneWithImages(Long id) {
         return productRepo.findOneWithImagesById(id)
                 .orElseThrow(() -> new RuntimeException("product with id %s didnt find".formatted(id)));
     }
 
+    @Transactional
     public ProcessedProductImages saveOrUpdateAllImage(ImageForm imageForm) {
         Product updatedProduct = findOneWithImages(imageForm.getProductId());
-        productImageValidator.validate(imageForm, updatedProduct.getImages());
+        imageValidator.validate(imageForm, updatedProduct.getImages());
         ProcessedProductImages processedProductImages = processProductImages(imageForm, updatedProduct);
 
         updatedProduct.getImages().clear();
@@ -65,18 +44,6 @@ public class ProductService {
         productRepo.saveAndFlush(updatedProduct);
 
         return processedProductImages;
-    }
-
-    public Boolean existOne(Long id) {
-        return productRepo.IsExistOneById(id);
-    }
-
-    public Boolean availableOne(Long id) {
-        return productRepo.isAvailableOneById(id);
-    }
-
-    public Boolean availableAll(List<Long> ids) {
-        return productRepo.isAvailableAllByIds(ids, ids.size());
     }
 
     public List<Product> findAllOld(List<Long> ids) {
@@ -105,6 +72,10 @@ public class ProductService {
         return productRepo.isExistAllByIds(ids, ids.size());
     }
 
+    public Boolean isAvailableAll(List<Long> ids) {
+        return productRepo.isAvailableAllByIds(ids, ids.size());
+    }
+
     @Transactional
     public ProductDTOnew createOne(ProductWriteDTO request) {
         productServiceValidator.validateCreation(request);
@@ -122,7 +93,7 @@ public class ProductService {
     public ProductDTOnew updateOne(Long id, ProductWriteDTO request) {
         Product product = findOneById(id);
 
-        updateOneFromDto(product, request);
+        updateOneFromDTO(product, request);
 
         //flush for immediate validation
         return productMapper.toProductDTOnew(productRepo.saveAndFlush(product));
@@ -138,7 +109,7 @@ public class ProductService {
         return productMapper.toProductDTOnew(productRepo.save(product));
     }
 
-    private void updateOneFromDto(Product product, ProductWriteDTO request) {
+    private void updateOneFromDTO(Product product, ProductWriteDTO request) {
         PriceCalculator.definePrice(product, request);
 
         if (request.getTitle() != null) {

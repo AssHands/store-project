@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 @Component
-public class ProductImageValidator {
+public class ImageValidator {
     public void validate(ImageForm imageForm, List<Image> images) {
         int expectedSize = images.size();
         if(imageForm.getAddImages() != null)

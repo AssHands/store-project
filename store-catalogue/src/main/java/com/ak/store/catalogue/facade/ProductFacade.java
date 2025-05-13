@@ -10,7 +10,6 @@ import com.ak.store.catalogue.outbox.OutboxTaskType;
 import com.ak.store.catalogue.service.ImageService;
 import com.ak.store.catalogue.service.ProductCharacteristicService;
 import com.ak.store.catalogue.service.ProductService;
-import com.ak.store.catalogue.util.SagaBuilder;
 import com.ak.store.catalogue.util.mapper.ImageMapper;
 import com.ak.store.catalogue.util.mapper.ProductCharacteristicMapper;
 import com.ak.store.catalogue.util.mapper.ProductMapper;
@@ -52,7 +51,7 @@ public class ProductFacade {
     }
 
     public Boolean isAvailableAll(List<Long> ids) {
-        return productService.availableAll(ids);
+        return productService.isAvailableAll(ids);
     }
 
     @Transactional
@@ -128,12 +127,14 @@ public class ProductFacade {
 
         productOutboxTaskServiceOld.createOneTask(productMapper.toProductDTO(product), OutboxTaskType.PRODUCT_UPDATED);
 
-        new SagaBuilder()
-                .step(() -> s3Service.putAllImage(processedProductImages.getImagesForAdd()))
-                .compensate(() -> s3Service.compensatePutAllImage(processedProductImages.getImagesForAdd().keySet()))
-                .step(() -> s3Service.deleteAllImage(processedProductImages.getImageKeysForDelete()))
-                .compensate(() -> s3Service.compensateDeleteAllImage(processedProductImages.getImageKeysForDelete()))
-                .execute();
+        try {
+            s3Service.putAllImage(processedProductImages.getImagesForAdd());
+            s3Service.deleteAllImage(processedProductImages.getImageKeysForDelete());
+        } catch(Exception e) {
+            s3Service.compensatePutAllImage(processedProductImages.getImagesForAdd().keySet());
+            s3Service.compensateDeleteAllImage(processedProductImages.getImageKeysForDelete());
+            throw e;
+        }
 
         return product.getId();
     }
