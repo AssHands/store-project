@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.model.dto;
+package com.ak.store.common.model.catalogue.snapshot;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -15,24 +15,13 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductDTOnew {
-    private Long id;
+public class CategorySnapshotPayload {
+    @Builder.Default
+    private CategorySnapshot category = new CategorySnapshot();
 
-    private String title;
+    @Builder.Default
+    private List<Long> characteristics = new ArrayList<>();
 
-    private String description;
-
-    private Integer currentPrice;
-
-    private Integer fullPrice;
-
-    private Integer discountPercentage;
-
-    private Long categoryId;
-
-    private Float grade;
-
-    private Boolean isAvailable;
-
-    private Boolean isDeleted;
+    @Builder.Default
+    private List<Long> relatedCategories = new ArrayList<>();
 }

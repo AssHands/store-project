@@ -1,4 +1,4 @@
-package com.ak.store.common.model.catalogue.viewNew;
+package com.ak.store.catalogue.model.view;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -7,15 +7,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductViewNew {
+public class ProductView {
     private Long id;
 
     private String title;
@@ -35,10 +32,4 @@ public class ProductViewNew {
     private Boolean isAvailable;
 
     private Boolean isDeleted;
-
-    @Builder.Default
-    private List<Long> productCharacteristicIds = new ArrayList<>();
-
-    @Builder.Default
-    private List<Long> productImageIds = new ArrayList<>();
 }

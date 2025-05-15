@@ -1,21 +1,18 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.model.dto.ProductDTO;
 import com.ak.store.catalogue.model.dto.write.ProductWriteDTO;
-import com.ak.store.catalogue.model.dto.ProductDTOnew;
-import com.ak.store.catalogue.model.entity.*;
-import com.ak.store.catalogue.model.pojo.ProcessedImages;
+import com.ak.store.catalogue.model.entity.Category;
+import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.service.product.PriceCalculator;
 import com.ak.store.catalogue.util.mapper.ProductMapper;
 import com.ak.store.catalogue.validator.service.ProductServiceValidator;
-import com.ak.store.catalogue.validator.ImageValidator;
-import com.ak.store.common.model.catalogue.form.ImageForm;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
+import java.util.List;
 
 
 @Service
@@ -25,12 +22,6 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final ProductServiceValidator productServiceValidator;
 
-    public List<Product> findAllOld(List<Long> ids) {
-        return productRepo.findAllById(ids);
-    }
-
-    //-----------------------------
-
     private Product findOneById(Long id) {
         return productRepo.findById(id).orElseThrow(() -> new RuntimeException("not found"));
     }
@@ -39,12 +30,12 @@ public class ProductService {
         return productRepo.findAllById(ids);
     }
 
-    public ProductDTOnew findOne(Long id) {
-        return productMapper.toProductDTOnew(findOneById(id));
+    public ProductDTO findOne(Long id) {
+        return productMapper.toProductDTO(findOneById(id));
     }
 
-    public List<ProductDTOnew> findAll(List<Long> ids) {
-        return productMapper.toProductDTOnew(findAllById(ids));
+    public List<ProductDTO> findAll(List<Long> ids) {
+        return productMapper.toProductDTO(findAllById(ids));
     }
 
     public Boolean isExistAll(List<Long> ids) {
@@ -56,40 +47,40 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDTOnew createOne(ProductWriteDTO request) {
-        productServiceValidator.validateCreation(request);
-        Product product = productMapper.toProduct(request);
+    public ProductDTO createOne(ProductWriteDTO request) {
+        productServiceValidator.validateCreating(request);
+        var product = productMapper.toProduct(request);
 
-        PriceCalculator.definePrice(product, request);
+        PriceCalculator.setPrice(product, request);
         product.setIsDeleted(false);
 
         //flush for immediate validation
         productRepo.saveAndFlush(product);
-        return productMapper.toProductDTOnew(product);
+        return productMapper.toProductDTO(product);
     }
 
     @Transactional
-    public ProductDTOnew updateOne(Long id, ProductWriteDTO request) {
-        Product product = findOneById(id);
+    public ProductDTO updateOne(Long id, ProductWriteDTO request) {
+        var product = findOneById(id);
 
         updateOneFromDTO(product, request);
 
         //flush for immediate validation
-        return productMapper.toProductDTOnew(productRepo.saveAndFlush(product));
+        return productMapper.toProductDTO(productRepo.saveAndFlush(product));
     }
 
     @Transactional
-    public ProductDTOnew deleteOne(Long id) {
-        Product product = findOneById(id);
+    public ProductDTO deleteOne(Long id) {
+        var product = findOneById(id);
 
         product.setIsAvailable(false);
         product.setIsDeleted(true);
 
-        return productMapper.toProductDTOnew(productRepo.save(product));
+        return productMapper.toProductDTO(productRepo.save(product));
     }
 
     private void updateOneFromDTO(Product product, ProductWriteDTO request) {
-        PriceCalculator.definePrice(product, request);
+        PriceCalculator.setPrice(product, request);
 
         if (request.getTitle() != null) {
             product.setTitle(request.getTitle());
@@ -97,7 +88,7 @@ public class ProductService {
         if (request.getDescription() != null) {
             product.setDescription(request.getDescription());
         }
-        if(request.getIsAvailable() != null) {
+        if (request.getIsAvailable() != null) {
             product.setIsAvailable(request.getIsAvailable());
         }
         if (request.getCategoryId() != null && !product.getCategory().getId().equals(request.getCategoryId())) {

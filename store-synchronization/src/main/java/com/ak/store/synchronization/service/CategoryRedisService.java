@@ -1,7 +1,6 @@
 package com.ak.store.synchronization.service;
 
 import com.ak.store.common.model.catalogue.document.CategoryDocument;
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
 import com.ak.store.synchronization.repo.redis.CategoryRedisRepo;
 import com.ak.store.synchronization.util.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;

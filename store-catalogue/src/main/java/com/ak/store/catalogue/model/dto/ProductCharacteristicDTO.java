@@ -1,21 +1,25 @@
-package com.ak.store.catalogue.model.form;
+package com.ak.store.catalogue.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "characteristicId")
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductCharacteristicFormNew {
+public class ProductCharacteristicDTO {
+    private Long id;
+
     private Long characteristicId;
 
-    private Integer numericValue;
+    private Long productId;
 
     private String textValue;
+
+    private Integer numericValue;
 }

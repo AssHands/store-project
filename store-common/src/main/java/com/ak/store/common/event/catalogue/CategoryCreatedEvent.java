@@ -1,7 +1,6 @@
 package com.ak.store.common.event.catalogue;
 
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
-import com.ak.store.common.model.catalogue.view.CategoryView;
+import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -18,5 +17,5 @@ import java.util.UUID;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CategoryCreatedEvent implements CategoryEvent {
     private UUID taskId;
-    private CategoryDTO category;
+    private CategorySnapshotPayload category;
 }

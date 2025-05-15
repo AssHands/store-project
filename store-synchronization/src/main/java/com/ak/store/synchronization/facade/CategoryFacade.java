@@ -1,6 +1,5 @@
 package com.ak.store.synchronization.facade;
 
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
 import com.ak.store.synchronization.service.CategoryRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

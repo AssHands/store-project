@@ -1,18 +1,16 @@
 package com.ak.store.catalogue.validator.service;
 
+import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
 import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
 import com.ak.store.catalogue.model.entity.Characteristic;
-import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.service.ProductService;
-import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -23,14 +21,15 @@ public class ProductCharacteristicServiceValidator {
     private final CharacteristicRepo characteristicRepo;
     private final ProductService productService;
 
-    private void validateExistingProductCharacteristic(Product product, Set<ProductCharacteristicForm> productCharacteristicForms) {
-        List<Long> existingCharacteristicIds = product.getCharacteristics().stream()
-                .map(pc -> pc.getCharacteristic().getId())
+    private void validateExistingProductCharacteristics(List<ProductCharacteristicWriteDTO> creatingProductCharacteristics,
+                                                        List<ProductCharacteristicDTO> existingProductCharacteristics) {
+        List<Long> existingCharacteristicIds = existingProductCharacteristics.stream()
+                .map(ProductCharacteristicDTO::getCharacteristicId)
                 .toList();
 
         if(!existingCharacteristicIds.isEmpty()) {
-            List<Long> creatingCharacteristicIds = productCharacteristicForms.stream()
-                    .map(ProductCharacteristicForm::getId)
+            List<Long> creatingCharacteristicIds = creatingProductCharacteristics.stream()
+                    .map(ProductCharacteristicWriteDTO::getCharacteristicId)
                     .toList();
 
             Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
@@ -44,15 +43,15 @@ public class ProductCharacteristicServiceValidator {
         }
     }
 
-    private void validateProductCharacteristics(List<ProductCharacteristicWriteDTO> productCharacteristics, Long categoryId) {
-        var availableTextValues = characteristicRepo.findAllWithTextValuesByCategoryId(categoryId).stream()
+    private void validateNewProductCharacteristics(List<ProductCharacteristicWriteDTO> productCharacteristics, Long categoryId) {
+        var textValueMap = characteristicRepo.findAllWithTextValuesByCategoryId(categoryId).stream()
                 .collect(Collectors.toMap(
                         Characteristic::getId,
                         characteristic -> characteristic.getTextValues().stream().map(TextValue::getTextValue).toList())
                 );
 
         for (var pc : productCharacteristics) {
-            List<String> textValues = availableTextValues.get(pc.getCharacteristicId());
+            List<String> textValues = textValueMap.get(pc.getCharacteristicId());
 
             if (textValues == null) {
                 throw new RuntimeException("characteristic with id=%s is not available"
@@ -87,16 +86,16 @@ public class ProductCharacteristicServiceValidator {
 
     //-------------------
 
-    //todo make validation
-    public void validateCreationNew(Long productId, List<ProductCharacteristicWriteDTO> productCharacteristics) {
+    public void validateCreating(Long productId, List<ProductCharacteristicWriteDTO> creatingProductCharacteristics,
+                                 List<ProductCharacteristicDTO> existingProductCharacteristics) {
         Long categoryId = productService.findOne(productId).getCategoryId();
-        validateProductCharacteristics(productCharacteristics, categoryId);
+        validateNewProductCharacteristics(creatingProductCharacteristics, categoryId);
+        validateExistingProductCharacteristics(creatingProductCharacteristics, existingProductCharacteristics);
     }
 
     //todo make validation
-    public void validateUpdateNew(Long productId, List<ProductCharacteristicWriteDTO> creatproductCharacteristics) {
+    public void validateUpdating(Long productId, List<ProductCharacteristicWriteDTO> creatingProductCharacteristics) {
         Long categoryId = productService.findOne(productId).getCategoryId();
-        validateProductCharacteristics(productCharacteristics, categoryId);
-        validateExistingProductCharacteristic(product, productCharacteristicForms);
+        validateNewProductCharacteristics(creatingProductCharacteristics, categoryId);
     }
 }

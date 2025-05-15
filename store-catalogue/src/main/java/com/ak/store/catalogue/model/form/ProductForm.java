@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductFormNew {
+public class ProductForm {
     @Size(min = 5, max = 70, groups = {Create.class, Update.class})
     @NotBlank(groups = Create.class)
     private String title;

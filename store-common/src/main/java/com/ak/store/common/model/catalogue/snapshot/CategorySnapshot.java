@@ -7,10 +7,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
-//@AllArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CategorySnapshot {
+    private Long id;
+
+    private String name;
+
+    private Long parentId;
 }

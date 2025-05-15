@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.util.mapper;
 
-import com.ak.store.catalogue.model.dto.ProductCharacteristicDTOnew;
+import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
 import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.common.model.catalogue.snapshot.ProductCharacteristicSnapshot;
@@ -15,9 +15,9 @@ import java.util.List;
 public interface ProductCharacteristicMapper {
     @Mapping(target = "characteristicId", source = "characteristic.id")
     @Mapping(target = "productId", source = "product.id")
-    ProductCharacteristicDTOnew toProductCharacteristicDTOnew(ProductCharacteristic pc);
+    ProductCharacteristicDTO toProductCharacteristicDTOnew(ProductCharacteristic pc);
 
-    List<ProductCharacteristicDTOnew> toProductCharacteristicDTOnew(List<ProductCharacteristic> pc);
+    List<ProductCharacteristicDTO> toProductCharacteristicDTOnew(List<ProductCharacteristic> pc);
 
     @Mapping(target = "characteristic.id", source = "pc.characteristicId")
     @Mapping(target = "product.id", source = "productId")
@@ -32,7 +32,7 @@ public interface ProductCharacteristicMapper {
                 .toList();
     }
 
-    ProductCharacteristicSnapshot toProductCharacteristicSnapshot(ProductCharacteristicDTOnew pc);
+    ProductCharacteristicSnapshot toProductCharacteristicSnapshot(ProductCharacteristicDTO pc);
 
-    List<ProductCharacteristicSnapshot> toProductCharacteristicSnapshot(List<ProductCharacteristicDTOnew> pc);
+    List<ProductCharacteristicSnapshot> toProductCharacteristicSnapshot(List<ProductCharacteristicDTO> pc);
 }

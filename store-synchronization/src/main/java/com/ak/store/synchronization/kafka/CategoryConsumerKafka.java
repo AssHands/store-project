@@ -3,7 +3,6 @@ package com.ak.store.synchronization.kafka;
 import com.ak.store.common.event.catalogue.CategoryCreatedEvent;
 import com.ak.store.common.event.catalogue.CategoryDeletedEvent;
 import com.ak.store.common.event.catalogue.CategoryUpdatedEvent;
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
 import com.ak.store.synchronization.facade.CategoryFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;

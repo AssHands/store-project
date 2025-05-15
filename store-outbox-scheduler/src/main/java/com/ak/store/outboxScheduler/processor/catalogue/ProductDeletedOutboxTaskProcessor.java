@@ -1,7 +1,6 @@
 package com.ak.store.outboxScheduler.processor.catalogue;
 
 import com.ak.store.common.event.catalogue.ProductDeletedEvent;
-import com.ak.store.common.model.catalogue.dto.ProductDTO;
 import com.ak.store.outboxScheduler.kafka.catalogue.ProductProducerKafka;
 import com.ak.store.outboxScheduler.model.OutboxTask;
 import com.ak.store.outboxScheduler.model.OutboxTaskType;

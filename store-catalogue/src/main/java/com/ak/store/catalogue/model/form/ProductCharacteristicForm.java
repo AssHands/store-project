@@ -1,4 +1,4 @@
-package com.ak.store.common.model.catalogue.form;
+package com.ak.store.catalogue.model.form;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -8,13 +8,14 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "characteristicId")
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductCharacteristicForm {
-    private Long id; //characteristic id
-    private String name;
+    private Long characteristicId;
+
     private Integer numericValue;
+
     private String textValue;
 }

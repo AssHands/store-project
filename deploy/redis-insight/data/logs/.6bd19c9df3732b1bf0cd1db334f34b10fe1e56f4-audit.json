@@ -8,14 +8,14 @@
     "extension": "",
     "files": [
         {
-            "date": 1746628749000,
-            "name": "/data/logs/redisinsight-2025-05-07.log.0",
-            "hash": "67f4c79490ff9e390f980e6bf4a45d84d26f068b0af956bd575702dc54f59203"
-        },
-        {
             "date": 1747152366104,
             "name": "/data/logs/redisinsight-2025-05-13.log.0",
             "hash": "0d37e02be28329a00ee8de42e5d13c65735156d89e4d7e27862d464d354662ef"
+        },
+        {
+            "date": 1747312941928,
+            "name": "/data/logs/redisinsight-2025-05-15.log.0",
+            "hash": "9a2389fb50d2a4b428a53b785618b7945a6f66b044590d64c751b6bd99158348"
         }
     ]
 }

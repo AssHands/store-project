@@ -1,8 +1,7 @@
 package com.ak.store.catalogue.util;
 
+import com.ak.store.catalogue.model.dto.ImageDTO;
 import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
-import com.ak.store.catalogue.model.entity.Product;
-import com.ak.store.catalogue.model.entity.Image;
 import com.ak.store.catalogue.model.pojo.ProcessedImages;
 import com.ak.store.catalogue.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,7 @@ import java.util.regex.Pattern;
 public class ImageProcessor {
     private final ProductService productService;
 
-    public ProcessedImages processImages(ImageWriteDTO request, List<Image> images) {
+    public ProcessedImages processImages(ImageWriteDTO request, List<ImageDTO> images) {
         ProcessedImages processedImages = new ProcessedImages();
 
         processedImages.setImageKeysForDelete(
@@ -27,22 +26,19 @@ public class ImageProcessor {
                 prepareImagesForAdd(request.getProductId(), request.getAddImages());
 
         for (String key : imagesForAdd.keySet()) {
-            images.add(Image.builder()
+            images.add(ImageDTO.builder()
                     .key(key)
-                    .product(Product.builder()
-                            .id(request.getProductId())
-                            .build())
                     .build());
         }
         processedImages.setImagesForAdd(imagesForAdd);
 
-        processedImages.setNewImages(
+        processedImages.setAllImages(
                 createNewImages(images, request.getAllImageIndexes()));
 
         return processedImages;
     }
 
-    private List<String> markImagesForDeleteAndGetKeys(List<Image> images, List<String> deleteImageIndexes) {
+    private List<String> markImagesForDeleteAndGetKeys(List<ImageDTO> images, List<String> deleteImageIndexes) {
         List<String> imageKeysForDelete = new ArrayList<>();
         if (deleteImageIndexes != null && !deleteImageIndexes.isEmpty()) {
             for (int i = 0; i < images.size(); i++) {
@@ -81,12 +77,12 @@ public class ImageProcessor {
         return imageKeys;
     }
 
-    private List<Image> createNewImages(List<Image> images, Map<String, String> allImageIndexes) {
+    private List<ImageDTO> createNewImages(List<ImageDTO> images, Map<String, String> allImageIndexes) {
         int finalProductImagesSize = (int) images.stream()
                 .filter(Objects::nonNull)
                 .count();
 
-        List<Image> newImages = new ArrayList<>(finalProductImagesSize);
+        List<ImageDTO> newImages = new ArrayList<>(finalProductImagesSize);
         for (int i = 0; i < finalProductImagesSize; i++) {
             newImages.add(null);
         }

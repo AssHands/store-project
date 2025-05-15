@@ -12,14 +12,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductCharacteristicDTOnew {
+public class ProductDTO {
     private Long id;
 
-    private Long characteristicId;
+    private String title;
 
-    private Long productId;
+    private String description;
 
-    private String textValue;
+    private Integer currentPrice;
 
-    private Integer numericValue;
+    private Integer fullPrice;
+
+    private Integer discountPercentage;
+
+    private Long categoryId;
+
+    private Float grade;
+
+    private Boolean isAvailable;
+
+    private Boolean isDeleted;
 }

@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.model.pojo;
 
-import com.ak.store.catalogue.model.entity.Image;
+import com.ak.store.catalogue.model.dto.ImageDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class ProcessedImages {
-    List<Image> newImages = new ArrayList<>();
+    List<ImageDTO> allImages = new ArrayList<>();
     LinkedHashMap<String, MultipartFile> imagesForAdd = new LinkedHashMap<>();
     List<String> imageKeysForDelete = new ArrayList<>();
 }

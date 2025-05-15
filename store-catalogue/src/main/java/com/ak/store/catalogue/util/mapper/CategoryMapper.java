@@ -1,48 +1,30 @@
 package com.ak.store.catalogue.util.mapper;
 
+import com.ak.store.catalogue.model.dto.CategoryDTO;
+import com.ak.store.catalogue.model.dto.write.CategoryWriteDTO;
 import com.ak.store.catalogue.model.entity.Category;
-import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
-import com.ak.store.common.model.catalogue.form.CategoryForm;
+import com.ak.store.catalogue.model.form.CategoryForm;
+import com.ak.store.common.model.catalogue.snapshot.CategorySnapshot;
 import com.ak.store.common.model.catalogue.view.CategoryTreeView;
 import com.ak.store.common.model.catalogue.view.CategoryView;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface CategoryMapper {
+    CategoryView toCategoryView(Category c);
 
-    CategoryView toCategoryView(Category category);
+    Category toCategory(CategoryWriteDTO c);
 
-    Category toCategory(CategoryForm categoryForm);
+    CategoryTreeView toCategoryTreeView(CategoryDTO c);
 
-    CategoryTreeView toCategoryTreeView(Category category);
+    CategoryDTO toCategoryDTO(Category c);
+    List<CategoryDTO> toCategoryDTO(List<Category> c);
 
-    CategoryDTO toCategoryDTO(Category category);
+    CategoryWriteDTO toCategoryWriteDTO(CategoryForm c);
 
-    default List<Long> mapCategoryCharacteristics(List<CategoryCharacteristic> categoryCharacteristics) {
-        if (categoryCharacteristics == null) {
-            return Collections.emptyList();
-        }
-
-        return categoryCharacteristics.stream()
-                .map(cc -> cc.getCharacteristic().getId())
-                .toList();
-    }
-
-    default List<Long> mapRelatedCategories(Set<Category> relatedCategories) {
-        if (relatedCategories == null) {
-            return Collections.emptyList();
-        }
-
-        return relatedCategories.stream()
-                .map(Category::getId)
-                .toList();
-    }
+    CategorySnapshot toCategorySnapshot(CategoryDTO category);
 }

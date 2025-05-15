@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.service;
 
-import com.ak.store.catalogue.model.dto.CharacteristicDTOnew;
+import com.ak.store.catalogue.model.dto.CharacteristicDTO;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.RangeValue;
 import com.ak.store.catalogue.model.entity.TextValue;
@@ -137,11 +137,11 @@ public class CharacteristicService {
         return characteristicRepo.findAllById(ids);
     }
 
-    public List<CharacteristicDTOnew> findAll(List<Long> ids) {
+    public List<CharacteristicDTO> findAll(List<Long> ids) {
         return characteristicMapper.toCharacteristicDTOnew(findAllByIds(ids));
     }
 
-    public CharacteristicDTOnew findOne(Long id) {
+    public CharacteristicDTO findOne(Long id) {
         return characteristicMapper.toCharacteristicDTOnew(findOneById(id));
     }
 }

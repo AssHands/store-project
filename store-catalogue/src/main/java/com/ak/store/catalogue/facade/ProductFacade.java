@@ -1,9 +1,8 @@
 package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.integration.S3Service;
-import com.ak.store.catalogue.model.dto.ImageDTOnew;
-import com.ak.store.catalogue.model.dto.ProductCharacteristicDTOnew;
-import com.ak.store.catalogue.model.dto.ProductDTOnew;
+import com.ak.store.catalogue.model.dto.ImageDTO;
+import com.ak.store.catalogue.model.dto.ProductDTO;
 import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
 import com.ak.store.catalogue.model.dto.write.ProductWritePayload;
 import com.ak.store.catalogue.outbox.OutboxTaskService;
@@ -14,16 +13,11 @@ import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.catalogue.util.mapper.ImageMapper;
 import com.ak.store.catalogue.util.mapper.ProductCharacteristicMapper;
 import com.ak.store.catalogue.util.mapper.ProductMapper;
-import com.ak.store.common.model.catalogue.dto.ProductDTO;
-import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
-import com.ak.store.common.model.catalogue.form.ImageForm;
 import com.ak.store.common.model.catalogue.snapshot.ProductSnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -39,11 +33,11 @@ public class ProductFacade {
     private final ImageMapper imageMapper;
     private final ProductCharacteristicMapper productCharacteristicMapper;
 
-    public ProductDTOnew findOne(Long id) {
+    public ProductDTO findOne(Long id) {
         return productService.findOne(id);
     }
 
-    public List<ProductDTOnew> findAll(List<Long> ids) {
+    public List<ProductDTO> findAll(List<Long> ids) {
         return productService.findAll(ids);
     }
 
@@ -57,11 +51,11 @@ public class ProductFacade {
 
     @Transactional
     public Long createOne(ProductWritePayload request) {
-        ProductDTOnew product = productService.createOne(request.getProduct());
-        List<ProductCharacteristicDTOnew> productCharacteristics =
+        var product = productService.createOne(request.getProduct());
+        var productCharacteristics =
                 productCharacteristicService.createAll(product.getId(), request.getCreateCharacteristics());
 
-        ProductSnapshotPayload snapshot = ProductSnapshotPayload.builder()
+        var snapshot = ProductSnapshotPayload.builder()
                 .product(productMapper.toProductSnapshot(product))
                 .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
                 .build();
@@ -72,16 +66,16 @@ public class ProductFacade {
 
     @Transactional
     public Long updateOne(Long id, ProductWritePayload request) {
-        ProductDTOnew product = productService.updateOne(id, request.getProduct());
+        var product = productService.updateOne(id, request.getProduct());
 
         productCharacteristicService.createAll(id, request.getCreateCharacteristics());
         productCharacteristicService.updateAll(id, request.getUpdateCharacteristics());
-        List<ProductCharacteristicDTOnew> productCharacteristics =
-                productCharacteristicService.deleteAll(id, request.getDeleteCharacteristicIds());
+        var productCharacteristics =
+                productCharacteristicService.deleteAllByCharacteristicIds(id, request.getDeleteCharacteristicIds());
 
-        List<ImageDTOnew> images = imageService.findAll(product.getId());
+        var images = imageService.findAll(product.getId());
 
-        ProductSnapshotPayload snapshot = ProductSnapshotPayload.builder()
+        var snapshot = ProductSnapshotPayload.builder()
                 .product(productMapper.toProductSnapshot(product))
                 .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
                 .images(imageMapper.toImageSnapshot(images))
@@ -93,16 +87,11 @@ public class ProductFacade {
 
     @Transactional
     public void deleteOne(Long id) {
-        List<ProductCharacteristicDTOnew> productCharacteristics = productCharacteristicService.findAll(id);
-        List<ImageDTOnew> images = imageService.findAll(id);
-        List<String> imageKeys = images.stream()
-                .map(ImageDTOnew::getKey)
-                .toList();
+        var images = imageService.deleteAll(id);
+        var productCharacteristics = productCharacteristicService.deleteAll(id);
+        var product = productService.deleteOne(id);
 
-        ProductDTOnew product = productService.deleteOne(id);
-        imageService.deleteAll(id);
-
-        ProductSnapshotPayload snapshot = ProductSnapshotPayload.builder()
+        var snapshot = ProductSnapshotPayload.builder()
                 .product(productMapper.toProductSnapshot(product))
                 .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
                 .images(imageMapper.toImageSnapshot(images))
@@ -110,6 +99,9 @@ public class ProductFacade {
 
         productOutboxTaskService.createOneTask(snapshot, OutboxTaskType.PRODUCT_DELETED);
 
+        List<String> imageKeys = images.stream()
+                .map(ImageDTO::getKey)
+                .toList();
         try {
             s3Service.deleteAllImage(imageKeys);
         } catch (Exception e) {
@@ -122,11 +114,11 @@ public class ProductFacade {
     public Long saveOrUpdateAllImage(ImageWriteDTO request) {
         var processedProductImages = imageService.saveOrUpdateAllImage(request);
 
-        List<ProductCharacteristicDTOnew> productCharacteristics = productCharacteristicService.findAll(request.getProductId());
-        List<ImageDTOnew> images = imageService.findAll(request.getProductId());
+        var productCharacteristics = productCharacteristicService.findAll(request.getProductId());
+        var images = imageService.findAll(request.getProductId());
         var product = productService.findOne(request.getProductId());
 
-        ProductSnapshotPayload snapshot = ProductSnapshotPayload.builder()
+        var snapshot = ProductSnapshotPayload.builder()
                 .product(productMapper.toProductSnapshot(product))
                 .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
                 .images(imageMapper.toImageSnapshot(images))
@@ -137,18 +129,12 @@ public class ProductFacade {
         try {
             s3Service.putAllImage(processedProductImages.getImagesForAdd());
             s3Service.deleteAllImage(processedProductImages.getImageKeysForDelete());
-        } catch(Exception e) {
+        } catch (Exception e) {
             s3Service.compensatePutAllImage(processedProductImages.getImagesForAdd().keySet());
             s3Service.compensateDeleteAllImage(processedProductImages.getImageKeysForDelete());
             throw e;
         }
 
         return product.getId();
-    }
-
-    public List<ProductPriceDTO> getAllPrice(List<Long> ids) {
-        return productService.findAllOld(ids).stream()
-                .map(productMapper::toProductPriceDTO)
-                .toList();
     }
 }

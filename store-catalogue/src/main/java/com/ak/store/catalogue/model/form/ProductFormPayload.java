@@ -21,18 +21,18 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductFormPayloadNew {
+public class ProductFormPayload {
     @Valid
     @Builder.Default
-    ProductFormNew product = new ProductFormNew();
+    ProductForm product = new ProductForm();
 
     @UniqueElements(groups = {Create.class, Update.class})
     @Builder.Default
-    List<@Valid ProductCharacteristicFormNew> createCharacteristics = new ArrayList<>();
+    List<@Valid ProductCharacteristicForm> createCharacteristics = new ArrayList<>();
 
     @UniqueElements(groups = {Create.class, Update.class})
     @Builder.Default
-    List<@Valid ProductCharacteristicFormNew> updateCharacteristics = new ArrayList<>();
+    List<@Valid ProductCharacteristicForm> updateCharacteristics = new ArrayList<>();
 
     @Builder.Default
     List<Long> deleteCharacteristicIds = new ArrayList<>();

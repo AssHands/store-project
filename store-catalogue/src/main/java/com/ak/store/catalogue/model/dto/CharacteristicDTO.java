@@ -12,7 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ImageDTOnew {
-    private Integer index;
-    private String key;
+public class CharacteristicDTO {
+    private Long id;
+
+    private String name;
+
+    private Boolean isText;
 }

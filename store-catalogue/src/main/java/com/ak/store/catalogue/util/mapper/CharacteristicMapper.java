@@ -1,16 +1,12 @@
 package com.ak.store.catalogue.util.mapper;
 
-import com.ak.store.catalogue.model.dto.CharacteristicDTOnew;
-import com.ak.store.catalogue.model.dto.ProductCharacteristicDTOnew;
-import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
+import com.ak.store.catalogue.model.dto.CharacteristicDTO;
 import com.ak.store.catalogue.model.entity.*;
-import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
+import com.ak.store.catalogue.model.form.ProductCharacteristicForm;
 import com.ak.store.common.model.catalogue.dto.RangeValueDTO;
 import com.ak.store.common.model.catalogue.form.CharacteristicForm;
-import com.ak.store.common.model.catalogue.form.ProductCharacteristicForm;
 import com.ak.store.common.model.catalogue.form.RangeValueForm;
 import com.ak.store.common.model.catalogue.form.TextValueForm;
-import com.ak.store.common.model.catalogue.snapshot.ProductCharacteristicSnapshot;
 import com.ak.store.common.model.catalogue.view.CharacteristicView;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -46,7 +42,7 @@ public interface CharacteristicMapper {
     ProductCharacteristic toProductCharacteristic(ProductCharacteristicForm productCharacteristicForm,
                                                   Characteristic characteristic, Product product);
 
-    CharacteristicDTO toCharacteristicDTO(Characteristic characteristic);
+    com.ak.store.common.model.catalogue.dto.CharacteristicDTO toCharacteristicDTO(Characteristic characteristic);
 
     default List<String> mapTextValues(List<TextValue> textValues) {
         if (textValues == null) {
@@ -74,6 +70,6 @@ public interface CharacteristicMapper {
 
     //----------------------------------
 
-    CharacteristicDTOnew toCharacteristicDTOnew(Characteristic c);
-    List<CharacteristicDTOnew> toCharacteristicDTOnew(List<Characteristic> c);
+    CharacteristicDTO toCharacteristicDTOnew(Characteristic c);
+    List<CharacteristicDTO> toCharacteristicDTOnew(List<Characteristic> c);
 }

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductCharacteristicSnapshot {
-    private Long id;
+    private Long characteristicId;
 
     private String textValue;
 

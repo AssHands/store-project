@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.service;
 
-import com.ak.store.catalogue.model.dto.ImageDTOnew;
+import com.ak.store.catalogue.model.dto.ImageDTO;
 import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
 import com.ak.store.catalogue.model.entity.Image;
 import com.ak.store.catalogue.model.pojo.ProcessedImages;
@@ -29,23 +29,25 @@ public class ImageService {
         return imageRepo.findAllByProductId(productId);
     }
 
-    public List<ImageDTOnew> findAll(Long productIde) {
-        return imageMapper.toImageDTOnew(findAllByProductId(productIde));
+    public List<ImageDTO> findAll(Long productId) {
+        return imageMapper.toImageDTOnew(findAllByProductId(productId));
     }
 
     @Transactional
-    public void deleteAll(Long productId) {
+    public List<ImageDTO> deleteAll(Long productId) {
+        var images = findAll(productId);
         imageRepo.deleteAllByProductId(productId);
+        return images;
     }
 
     @Transactional
     public ProcessedImages saveOrUpdateAllImage(ImageWriteDTO request) {
-        List<Image> images = findAllByProductId(request.getProductId());
+        List<ImageDTO> images = findAll(request.getProductId());
         imageValidator.validate(request, images);
         ProcessedImages processedImages = imageProcessor.processImages(request, images);
 
         deleteAll(request.getProductId());
-        imageRepo.saveAll(processedImages.getNewImages());
+        imageRepo.saveAll(imageMapper.toImage(processedImages.getAllImages(), request.getProductId()));
         return processedImages;
     }
 }

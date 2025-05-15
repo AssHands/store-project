@@ -1,8 +1,7 @@
 package com.ak.store.catalogue.validator;
 
+import com.ak.store.catalogue.model.dto.ImageDTO;
 import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
-import com.ak.store.catalogue.model.entity.Image;
-import com.ak.store.common.model.catalogue.form.ImageForm;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +12,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class ImageValidator {
-    public void validate(ImageWriteDTO request, List<Image> images) {
+    public void validate(ImageWriteDTO request, List<ImageDTO> images) {
         int expectedSize = images.size();
         if(request.getAddImages() != null)
             expectedSize += request.getAddImages().size();
@@ -37,16 +36,16 @@ public class ImageValidator {
     }
 
     private void validateOldImageIndexes(List<String> deleteImageIndexes, List<MultipartFile> addImages,
-                                         List<Image> images, List<Integer> oldImageIndexes) {
+                                         List<ImageDTO> images, List<Integer> oldImageIndexes) {
         List<Integer> existingImageIndexes = new ArrayList<>();
         int lastIndex = images.stream()
-                .map(Image::getIndex)
+                .map(ImageDTO::getIndex)
                 .max(Integer::compareTo)
                 .orElse(-1);
 
         if(deleteImageIndexes != null) {
             existingImageIndexes.addAll(images.stream()
-                    .map(Image::getIndex)
+                    .map(ImageDTO::getIndex)
                     .filter(index -> !deleteImageIndexes.contains(index.toString()))
                     .sorted()
                     .toList());
@@ -97,7 +96,7 @@ public class ImageValidator {
     }
 
     private void validateDeleteImageIndexes(List<String> deleteImageIndexes, List<Integer> oldImageIndexes,
-                                            List<Image> images) {
+                                            List<ImageDTO> images) {
         if(deleteImageIndexes != null) {
             boolean isSpecifyDeletedIndex = oldImageIndexes.stream()
                     .anyMatch(index -> deleteImageIndexes.contains(index.toString()));

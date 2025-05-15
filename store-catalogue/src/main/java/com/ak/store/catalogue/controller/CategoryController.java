@@ -1,7 +1,9 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.CategoryFacade;
-import com.ak.store.common.model.catalogue.form.CategoryForm;
+import com.ak.store.catalogue.model.form.CategoryForm;
+import com.ak.store.catalogue.util.CatalogueUtils;
+import com.ak.store.catalogue.util.mapper.CategoryMapper;
 import com.ak.store.common.model.catalogue.view.CategoryTreeView;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,15 +16,19 @@ import java.util.List;
 @RequestMapping("api/v1/catalogue/categories")
 public class CategoryController {
     private final CategoryFacade categoryFacade;
+    private final CategoryMapper categoryMapper;
 
     @GetMapping
-    public List<CategoryTreeView> getAll() {
-        return categoryFacade.findAllAsTree();
+    public List<CategoryTreeView> findAll() {
+        var categories = categoryFacade.findAll();
+        return CatalogueUtils.buildCategoryTree(categories.stream()
+                .map(categoryMapper::toCategoryTreeView)
+                .toList());
     }
 
     @PostMapping
-    public Long createOne(@RequestBody @Valid CategoryForm categoryForm) {
-        return categoryFacade.createOne(categoryForm);
+    public Long createOne(@RequestBody @Valid CategoryForm request) {
+        return categoryFacade.createOne(categoryMapper.toCategoryWriteDTO(request));
     }
 
     @DeleteMapping("{id}")
@@ -30,32 +36,32 @@ public class CategoryController {
         categoryFacade.deleteOne(id);
     }
 
-    @PostMapping("{id}/characteristics")
-    public Long addCharacteristicToCategory(@PathVariable("id") Long categoryId,
-                                            @RequestParam("characteristic") Long characteristicId) {
-        return categoryFacade.addCharacteristicToCategory(categoryId, characteristicId);
-    }
-
-    @DeleteMapping("{id}/characteristics")
-    public Long deleteCharacteristicFromCategory(@PathVariable("id") Long categoryId,
-                                                 @RequestParam("characteristic") Long characteristicId) {
-        return categoryFacade.deleteCharacteristicFromCategory(categoryId, characteristicId);
-    }
-
     @PatchMapping("{id}")
-    public Long updateOne(@PathVariable Long id, @RequestBody @Valid CategoryForm categoryForm) {
-        return categoryFacade.updateOne(id, categoryForm);
+    public Long updateOne(@PathVariable Long id, @RequestBody @Valid CategoryForm request) {
+        return categoryFacade.updateOne(id, categoryMapper.toCategoryWriteDTO(request));
     }
 
-    @PostMapping("{id}/related")
-    public Long addRelatedToCategory(@PathVariable("id") Long categoryId,
-                                     @RequestParam("related") Long relatedId) {
-        return categoryFacade.addRelatedToCategory(categoryId, relatedId);
+    @PostMapping("{id}/characteristics/{characteristicId}")
+    public Long addCharacteristic(@PathVariable("id") Long categoryId,
+                                  @PathVariable("characteristicId") Long characteristicId) {
+        return categoryFacade.addCharacteristic(categoryId, characteristicId);
     }
 
-    @DeleteMapping("{id}/related")
-    public Long deleteRelatedFromCategory(@PathVariable("id") Long categoryId,
-                                          @RequestParam("related") Long relatedId) {
-        return categoryFacade.deleteRelatedFromCategory(categoryId, relatedId);
+    @DeleteMapping("{id}/characteristics/{characteristicId}")
+    public Long removeCharacteristic(@PathVariable("id") Long categoryId,
+                                     @PathVariable("characteristicId") Long characteristicId) {
+        return categoryFacade.removeCharacteristic(categoryId, characteristicId);
+    }
+
+    @PostMapping("{id}/related/{relatedId}")
+    public Long addRelatedCategory(@PathVariable("id") Long categoryId,
+                                   @PathVariable("relatedId") Long relatedId) {
+        return categoryFacade.addRelatedCategory(categoryId, relatedId);
+    }
+
+    @DeleteMapping("{id}/related/{relatedId}")
+    public Long removeRelatedCategory(@PathVariable("id") Long categoryId,
+                                      @PathVariable("relatedId") Long relatedId) {
+        return categoryFacade.removeRelatedFromCategory(categoryId, relatedId);
     }
 }

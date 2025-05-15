@@ -1,9 +1,10 @@
 package com.ak.store.catalogue.util.mapper;
 
-import com.ak.store.catalogue.model.dto.ImageDTOnew;
+import com.ak.store.catalogue.model.dto.ImageDTO;
 import com.ak.store.catalogue.model.entity.Image;
 import com.ak.store.common.model.catalogue.snapshot.ProductImageSnapshot;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
@@ -11,9 +12,23 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ImageMapper {
-    ImageDTOnew toImageDTOnew(Image i);
-    List<ImageDTOnew> toImageDTOnew(List<Image> i);
+    ImageDTO toImageDTOnew(Image i);
 
-    ProductImageSnapshot toImageSnapshot(ImageDTOnew i);
-    List<ProductImageSnapshot> toImageSnapshot(List<ImageDTOnew> i);
+    @Mapping(target = "product.id", source = "productId")
+    Image toImage(ImageDTO i, Long productId);
+    default List<Image> toImage(List<ImageDTO> i, Long productId) {
+        if (i == null) {
+            return null;
+        }
+
+        return i.stream()
+                .map(v -> toImage(v, productId))
+                .toList();
+    }
+
+    List<ImageDTO> toImageDTOnew(List<Image> i);
+
+    ProductImageSnapshot toImageSnapshot(ImageDTO i);
+
+    List<ProductImageSnapshot> toImageSnapshot(List<ImageDTO> i);
 }

@@ -1,4 +1,4 @@
-package com.ak.store.common.model.catalogue.dto;
+package com.ak.store.catalogue.model.dto.write;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductCharacteristicDTO {
-    private Long id;
-    private String textValue;
-    private Integer numericValue;
+public class CategoryWriteDTO {
+    private String name;
+
+    private Long parentId;
 }
