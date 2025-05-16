@@ -1,8 +1,8 @@
 package com.ak.store.catalogue.model.form;
 
 import com.ak.store.catalogue.model.annotation.UniqueElements;
-import com.ak.store.common.validationGroup.Create;
-import com.ak.store.common.validationGroup.Update;
+import com.ak.store.catalogue.model.validationGroup.Create;
+import com.ak.store.catalogue.model.validationGroup.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

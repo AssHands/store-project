@@ -1,4 +1,4 @@
-package com.ak.store.common.model.catalogue.form;
+package com.ak.store.catalogue.model.dto.write;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TextValueForm {
-    private String text;
+public class NumericValueWriteDTO {
+    private Integer fromValue;
+
+    private Integer toValue;
 }

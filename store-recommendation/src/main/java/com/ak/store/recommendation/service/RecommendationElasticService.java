@@ -7,7 +7,6 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.ak.store.common.model.catalogue.document.ProductDocument;
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.recommendation.RecommendationResponse;
 import com.ak.store.recommendation.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;

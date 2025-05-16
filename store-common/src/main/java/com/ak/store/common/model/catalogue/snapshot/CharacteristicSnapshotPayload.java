@@ -1,4 +1,4 @@
-package com.ak.store.common.model.catalogue.dto;
+package com.ak.store.common.model.catalogue.snapshot;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -15,14 +15,12 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CharacteristicDTO {
-    private Long id;
-    private String name;
-    private Boolean isText;
-
-    @Builder.Default
-    private List<RangeValueDTO> rangeValues = new ArrayList<>();
+public class CharacteristicSnapshotPayload {
+    private CharacteristicSnapshot characteristic;
 
     @Builder.Default
     private List<String> textValues = new ArrayList<>();
+
+    @Builder.Default
+    private List<NumericValueSnapshot> numericValues = new ArrayList<>();
 }

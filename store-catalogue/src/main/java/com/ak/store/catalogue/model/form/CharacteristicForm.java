@@ -1,7 +1,7 @@
-package com.ak.store.common.model.catalogue.form;
+package com.ak.store.catalogue.model.form;
 
-import com.ak.store.common.validationGroup.Create;
-import com.ak.store.common.validationGroup.Update;
+import com.ak.store.catalogue.model.validationGroup.Create;
+import com.ak.store.catalogue.model.validationGroup.Update;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotBlank;

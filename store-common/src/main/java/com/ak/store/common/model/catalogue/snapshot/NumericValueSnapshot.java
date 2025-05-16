@@ -1,4 +1,4 @@
-package com.ak.store.common.model.catalogue.view;
+package com.ak.store.common.model.catalogue.snapshot;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ImageView {
-    private Integer index;
-    private String key;
+public class NumericValueSnapshot {
+    private Integer fromValue;
+
+    private Integer toValue;
 }

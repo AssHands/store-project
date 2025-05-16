@@ -1,7 +1,6 @@
 package com.ak.store.synchronization.kafka;
 
 import com.ak.store.common.event.catalogue.*;
-import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
 import com.ak.store.synchronization.facade.CharacteristicFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -44,7 +43,7 @@ public class CharacteristicConsumerKafka {
     public void handleDeleted(List<CharacteristicDeletedEvent> characteristicDeletedEvents) {
         characteristicFacade.deleteAll(characteristicDeletedEvents.stream()
                 .map(CharacteristicDeletedEvent::getCharacteristic)
-                .map(CharacteristicDTO::getId)
+                .map(CharacteristicDTOold::getId)
                 .toList());
     }
 }

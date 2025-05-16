@@ -1,7 +1,6 @@
 package com.ak.store.synchronization.service;
 
 import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
-import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
 import com.ak.store.synchronization.repo.redis.CharacteristicRedisRepo;
 import com.ak.store.synchronization.util.mapper.CharacteristicMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +14,11 @@ public class CharacteristicRedisService {
     private final CharacteristicRedisRepo characteristicRedisRepo;
     private final CharacteristicMapper characteristicMapper;
 
-    public List<CharacteristicDocument> createAll(List<CharacteristicDTO> characteristics) {
+    public List<CharacteristicDocument> createAll(List<CharacteristicDTOold> characteristics) {
         return characteristicRedisRepo.saveAll(characteristicMapper.toCharacteristicDocument(characteristics));
     }
 
-    public List<CharacteristicDocument> updateAll(List<CharacteristicDTO> characteristics) {
+    public List<CharacteristicDocument> updateAll(List<CharacteristicDTOold> characteristics) {
         return characteristicRedisRepo.saveAll(characteristicMapper.toCharacteristicDocument(characteristics));
     }
 

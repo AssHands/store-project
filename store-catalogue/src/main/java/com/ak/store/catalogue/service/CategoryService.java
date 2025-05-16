@@ -74,8 +74,18 @@ public class CategoryService {
         return categoryMapper.toCategoryDTO(categoryRepo.save(category));
     }
 
+    //todo: make check if product has this category
     @Transactional
-    public CategoryDTO addCharacteristic(Long id, Long characteristicId) {
+    public CategoryDTO deleteOne(Long id) {
+        var category = findOneById(id);
+        categoryServiceValidator.validateDeleting(id);
+
+        categoryRepo.delete(category);
+        return categoryMapper.toCategoryDTO(category);
+    }
+
+    @Transactional
+    public CategoryDTO addOneCharacteristic(Long id, Long characteristicId) {
         var category = findOneWithCharacteristics(id);
         categoryServiceValidator.validateAddingCharacteristic(findAllCharacteristic(id), characteristicId);
         characteristicService.findOne(characteristicId);
@@ -92,7 +102,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDTO removeCharacteristic(Long id, Long characteristicId) {
+    public CategoryDTO removeOneCharacteristic(Long id, Long characteristicId) {
         var category = findOneWithCharacteristics(id);
         categoryServiceValidator.validateRemovingCharacteristic(findAllCharacteristic(id), characteristicId);
 
@@ -102,7 +112,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDTO addRelatedCategory(Long id, Long relatedId) {
+    public CategoryDTO addOneRelatedCategory(Long id, Long relatedId) {
         var category = findOneWithRelatedCategories(id);
         categoryServiceValidator.validateAddingRelatedCategory(id, relatedId, findAllRelatedCategory(id));
 
@@ -111,22 +121,12 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDTO removeRelatedCategory(Long id, Long relatedId) {
+    public CategoryDTO removeOneRelatedCategory(Long id, Long relatedId) {
         Category category = findOneWithRelatedCategories(id);
         categoryServiceValidator.validateRemovingRelatedCategory(findAllRelatedCategory(id), relatedId);
 
         category.getRelatedCategories().remove(Category.builder().id(relatedId).build());
         return categoryMapper.toCategoryDTO(categoryRepo.save(category));
-    }
-
-    //todo: make check if product has this category
-    @Transactional
-    public CategoryDTO deleteOne(Long id) {
-        var category = findOneById(id);
-        categoryServiceValidator.validateDeleting(id);
-
-        categoryRepo.delete(category);
-        return categoryMapper.toCategoryDTO(category);
     }
 
     private void updateOneFromDTO(Category category, CategoryWriteDTO request) {

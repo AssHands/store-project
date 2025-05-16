@@ -1,6 +1,5 @@
 package com.ak.store.order.feign;
 
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

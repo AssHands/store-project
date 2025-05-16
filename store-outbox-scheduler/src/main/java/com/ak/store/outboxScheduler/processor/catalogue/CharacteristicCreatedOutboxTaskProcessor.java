@@ -1,7 +1,6 @@
 package com.ak.store.outboxScheduler.processor.catalogue;
 
 import com.ak.store.common.event.catalogue.CharacteristicCreatedEvent;
-import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
 import com.ak.store.outboxScheduler.kafka.catalogue.CharacteristicProducerKafka;
 import com.ak.store.outboxScheduler.model.OutboxTask;
 import com.ak.store.outboxScheduler.model.OutboxTaskType;
@@ -21,7 +20,7 @@ public class CharacteristicCreatedOutboxTaskProcessor implements OutboxTaskProce
     public void process(List<OutboxTask> tasks) {
         for (OutboxTask task : tasks) {
             CharacteristicCreatedEvent characteristicCreatedEvent = new CharacteristicCreatedEvent(
-                    task.getId(), new Gson().fromJson(task.getPayload(), CharacteristicDTO.class)
+                    task.getId(), new Gson().fromJson(task.getPayload(), CharacteristicDTOold.class)
             );
 
             characteristicProducerKafka.send(characteristicCreatedEvent);

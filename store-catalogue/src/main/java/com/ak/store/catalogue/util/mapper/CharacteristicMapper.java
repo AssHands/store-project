@@ -1,75 +1,51 @@
 package com.ak.store.catalogue.util.mapper;
 
 import com.ak.store.catalogue.model.dto.CharacteristicDTO;
+import com.ak.store.catalogue.model.dto.NumericValueDTO;
+import com.ak.store.catalogue.model.dto.write.CharacteristicWriteDTO;
+import com.ak.store.catalogue.model.dto.write.NumericValueWriteDTO;
+import com.ak.store.catalogue.model.dto.write.TextValueWriteDTO;
 import com.ak.store.catalogue.model.entity.*;
-import com.ak.store.catalogue.model.form.ProductCharacteristicForm;
-import com.ak.store.common.model.catalogue.dto.RangeValueDTO;
-import com.ak.store.common.model.catalogue.form.CharacteristicForm;
-import com.ak.store.common.model.catalogue.form.RangeValueForm;
-import com.ak.store.common.model.catalogue.form.TextValueForm;
-import com.ak.store.common.model.catalogue.view.CharacteristicView;
+import com.ak.store.catalogue.model.form.CharacteristicForm;
+import com.ak.store.catalogue.model.form.NumericValueForm;
+import com.ak.store.catalogue.model.form.TextValueForm;
+import com.ak.store.catalogue.model.view.CharacteristicView;
+import com.ak.store.common.model.catalogue.snapshot.CharacteristicSnapshot;
+import com.ak.store.common.model.catalogue.snapshot.NumericValueSnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface CharacteristicMapper {
+    CharacteristicDTO toCharacteristicDTO(Characteristic c);
+    List<CharacteristicDTO> toCharacteristicDTO(List<Characteristic> c);
 
-    @Mapping(target = "textValues", source = "textValues")
-    CharacteristicView toCharacteristicView(Characteristic characteristic);
+    CharacteristicView toCharacteristicView(CharacteristicDTO c);
+    List<CharacteristicView> toCharacteristicView(List<CharacteristicDTO> c);
 
-    Characteristic toCharacteristic(CharacteristicForm characteristicForm);
+    Characteristic toCharacteristic(CharacteristicWriteDTO c);
 
-    @Mapping(target = "fromValue", source = "rangeValueForm.from")
-    @Mapping(target = "toValue", source = "rangeValueForm.to")
-    @Mapping(target = "characteristic", expression = "java(characteristic)")
-    @Mapping(target = "id", ignore = true)
-    RangeValue toRangeValue(RangeValueForm rangeValueForm, Characteristic characteristic);
+    CharacteristicSnapshot toCharacteristicSnapshot(CharacteristicDTO c);
 
-    @Mapping(target = "textValue", source = "textValueForm.text")
-    @Mapping(target = "characteristic", expression = "java(characteristic)")
-    @Mapping(target = "id", ignore = true)
-    TextValue toTextValue(TextValueForm textValueForm, Characteristic characteristic);
+    CharacteristicWriteDTO toCharacteristicWriteDTO(CharacteristicForm c);
 
-    @Mapping(target = "product", expression = "java(product)")
-    @Mapping(target = "characteristic", expression = "java(characteristic)")
-    @Mapping(target = "id", ignore = true)
-    ProductCharacteristic toProductCharacteristic(ProductCharacteristicForm productCharacteristicForm,
-                                                  Characteristic characteristic, Product product);
+    NumericValueDTO toNumericValueDTO(NumericValue nv);
+    List<NumericValueDTO> toNumericValueDTO(List<NumericValue> nv);
 
-    com.ak.store.common.model.catalogue.dto.CharacteristicDTO toCharacteristicDTO(Characteristic characteristic);
+    NumericValueSnapshot toNumericValueSnapshot(NumericValueDTO nv);
+    List<NumericValueSnapshot> toNumericValueSnapshot(List<NumericValueDTO> nv);
 
-    default List<String> mapTextValues(List<TextValue> textValues) {
-        if (textValues == null) {
-            return Collections.emptyList();
-        }
-        return textValues.stream()
-                .map(TextValue::getTextValue)
-                .toList();
-    }
+    NumericValueWriteDTO toNumericValueWriteDTO(NumericValueForm nv);
 
-    default List<RangeValueDTO> mapRangeValues(List<RangeValue> rangeValues) {
-        if (rangeValues == null) {
-            return Collections.emptyList();
-        }
+    @Mapping(target = "characteristic.id", source = "characteristicId")
+    NumericValue toNumericValue(NumericValueWriteDTO nv, Long characteristicId);
 
-        List<RangeValueDTO> rangeValueDTOs = new ArrayList<>();
-        for (RangeValue rangeValue : rangeValues) {
-            rangeValueDTOs.add(RangeValueDTO.builder()
-                    .to(rangeValue.getToValue())
-                    .from(rangeValue.getFromValue())
-                    .build());
-        }
-        return rangeValueDTOs;
-    }
+    TextValueWriteDTO toTextValueWriteDTO(TextValueForm tv);
 
-    //----------------------------------
-
-    CharacteristicDTO toCharacteristicDTOnew(Characteristic c);
-    List<CharacteristicDTO> toCharacteristicDTOnew(List<Characteristic> c);
+    @Mapping(target = "characteristic.id", source = "characteristicId")
+    TextValue toTextValue(TextValueWriteDTO tv, Long characteristicId);
 }

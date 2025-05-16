@@ -1,8 +1,6 @@
 package com.ak.store.consumer.feign;
 
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.cloud.openfeign.FeignClientProperties;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

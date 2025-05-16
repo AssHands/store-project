@@ -1,7 +1,6 @@
 package com.ak.store.emailSender.service;
 
 import com.ak.store.common.event.order.OrderCreatedEvent;
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.emailSender.feign.CatalogueFeign;
 import jakarta.mail.internet.MimeMessage;

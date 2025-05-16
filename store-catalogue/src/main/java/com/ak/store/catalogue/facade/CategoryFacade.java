@@ -67,8 +67,8 @@ public class CategoryFacade {
     }
 
     @Transactional
-    public Long addCharacteristic(Long categoryId, Long characteristicId) {
-        var category = categoryService.addCharacteristic(categoryId, characteristicId);
+    public Long addOneCharacteristic(Long categoryId, Long characteristicId) {
+        var category = categoryService.addOneCharacteristic(categoryId, characteristicId);
 
         var snapshot = CategorySnapshotPayload.builder()
                 .category(categoryMapper.toCategorySnapshot(category))
@@ -81,8 +81,8 @@ public class CategoryFacade {
     }
 
     @Transactional
-    public Long removeCharacteristic(Long categoryId, Long characteristicId) {
-        var category = categoryService.removeCharacteristic(categoryId, characteristicId);
+    public Long removeOneCharacteristic(Long categoryId, Long characteristicId) {
+        var category = categoryService.removeOneCharacteristic(categoryId, characteristicId);
 
         var snapshot = CategorySnapshotPayload.builder()
                 .category(categoryMapper.toCategorySnapshot(category))
@@ -95,8 +95,8 @@ public class CategoryFacade {
     }
 
     @Transactional
-    public Long addRelatedCategory(Long categoryId, Long relatedId) {
-        var category = categoryService.addRelatedCategory(categoryId, relatedId);
+    public Long addOneRelatedCategory(Long categoryId, Long relatedId) {
+        var category = categoryService.addOneRelatedCategory(categoryId, relatedId);
 
         var snapshot = CategorySnapshotPayload.builder()
                 .category(categoryMapper.toCategorySnapshot(category))
@@ -109,8 +109,8 @@ public class CategoryFacade {
     }
 
     @Transactional
-    public Long removeRelatedFromCategory(Long categoryId, Long relatedId) {
-        var category = categoryService.removeRelatedCategory(categoryId, relatedId);
+    public Long removeOneRelatedFromCategory(Long categoryId, Long relatedId) {
+        var category = categoryService.removeOneRelatedCategory(categoryId, relatedId);
 
         var snapshot = CategorySnapshotPayload.builder()
                 .category(categoryMapper.toCategorySnapshot(category))

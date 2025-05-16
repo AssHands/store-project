@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.util;
 
-import com.ak.store.common.model.catalogue.view.CategoryTreeView;
+import com.ak.store.catalogue.model.view.CategoryTreeView;
 
 import java.util.*;
 

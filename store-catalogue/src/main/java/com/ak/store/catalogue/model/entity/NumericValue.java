@@ -13,9 +13,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @EqualsAndHashCode(of = { "fromValue", "toValue" })
 @ToString(exclude = { "characteristic" })
 @Builder
-@Table(name = "range_value")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "static-data")
-public class RangeValue {
+public class NumericValue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

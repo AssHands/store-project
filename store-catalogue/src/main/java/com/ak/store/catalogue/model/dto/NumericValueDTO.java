@@ -1,4 +1,4 @@
-package com.ak.store.common.model.catalogue.dto;
+package com.ak.store.catalogue.model.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class RangeValueDTO {
-    private Integer from;
-    private Integer to;
+public class NumericValueDTO {
+    private Integer fromValue;
+
+    private Integer toValue;
 }

@@ -1,19 +1,20 @@
 package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.model.dto.CharacteristicDTO;
+import com.ak.store.catalogue.model.dto.NumericValueDTO;
+import com.ak.store.catalogue.model.dto.write.CharacteristicWriteDTO;
+import com.ak.store.catalogue.model.dto.write.NumericValueWriteDTO;
+import com.ak.store.catalogue.model.dto.write.TextValueWriteDTO;
 import com.ak.store.catalogue.model.entity.Characteristic;
-import com.ak.store.catalogue.model.entity.RangeValue;
 import com.ak.store.catalogue.model.entity.TextValue;
-import com.ak.store.catalogue.repository.*;
+import com.ak.store.catalogue.repository.CharacteristicRepo;
 import com.ak.store.catalogue.util.mapper.CharacteristicMapper;
 import com.ak.store.catalogue.validator.service.CharacteristicServiceValidator;
-import com.ak.store.common.model.catalogue.form.CharacteristicForm;
-import com.ak.store.common.model.catalogue.form.RangeValueForm;
-import com.ak.store.common.model.catalogue.form.TextValueForm;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
 
 
 //    Session session = entityManager.unwrap(Session.class);
@@ -29,105 +30,6 @@ public class CharacteristicService {
     private final CharacteristicRepo characteristicRepo;
     private final CharacteristicServiceValidator characteristicServiceValidator;
 
-    public List<Characteristic> findAllByCategoryId(Long categoryId) {
-        return characteristicRepo.findAllWithTextValuesByCategoryId(categoryId);
-    }
-
-    public Characteristic findOneOld(Long id) {
-        return characteristicRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("no characteristic found"));
-    }
-
-    public Characteristic findOneWithRangeValues(Long id) {
-        return characteristicRepo.findOneWithRangeValuesById(id)
-                .orElseThrow(() -> new RuntimeException("no characteristic found"));
-    }
-
-    public Characteristic findOneWithTextValues(Long id) {
-        return characteristicRepo.findOneWithTextValuesById(id)
-                .orElseThrow(() -> new RuntimeException("no characteristic found"));
-    }
-
-    public Characteristic createOne(CharacteristicForm characteristicForm) {
-        characteristicServiceValidator.validateCreation(characteristicForm);
-        return characteristicRepo.save(characteristicMapper.toCharacteristic(characteristicForm));
-    }
-
-    //todo: check if product use this characteristic before deleting
-    public Characteristic deleteOne(Long id) {
-        var characteristic = findOneWithRangeValues(id);
-        characteristicRepo.deleteById(id);
-        return characteristic;
-    }
-
-    public Characteristic updateOne(Long id, CharacteristicForm characteristicForm) {
-        Characteristic characteristic = findOneOld(id);
-        characteristicServiceValidator.validateUpdate(characteristicForm);
-        updateCharacteristic(characteristic, characteristicForm);
-        return characteristicRepo.save(characteristic);
-    }
-
-    public Characteristic createRangeValue(Long id, RangeValueForm rangeValueForm) {
-        Characteristic characteristic = findOneWithRangeValues(id);
-        characteristicServiceValidator.validateCreationRangeValue(characteristic, rangeValueForm);
-        characteristic.getRangeValues().add(characteristicMapper.toRangeValue(rangeValueForm, characteristic));
-        return characteristicRepo.save(characteristic);
-    }
-
-    public Characteristic createTextValue(Long id, TextValueForm textValueForm) {
-        Characteristic characteristic = findOneWithTextValues(id);
-        characteristicServiceValidator.validateCreationTextValue(characteristic, textValueForm);
-        characteristic.getTextValues().add(characteristicMapper.toTextValue(textValueForm, characteristic));
-        return characteristicRepo.save(characteristic);
-    }
-
-    public Characteristic deleteOneRangeValue(Long id, RangeValueForm rangeValueForm) {
-        Characteristic characteristic = findOneWithRangeValues(id);
-        int index = findRangeValueIndex(characteristic, rangeValueForm);
-        characteristic.getRangeValues().remove(index);
-        return characteristicRepo.save(characteristic);
-    }
-
-    public Characteristic deleteOneTextValue(Long id, TextValueForm textValueForm) {
-        Characteristic characteristic = findOneWithTextValues(id);
-        int index = findTextValueIndex(characteristic, textValueForm);
-        characteristic.getTextValues().remove(index);
-        return characteristicRepo.save(characteristic);
-    }
-
-    private void updateCharacteristic(Characteristic characteristic, CharacteristicForm characteristicForm) {
-        if(characteristicForm.getName() != null) {
-            characteristic.setName(characteristicForm.getName());
-        }
-    }
-
-    private int findRangeValueIndex(Characteristic characteristic, RangeValueForm rangeValueForm) {
-        int index = 0;
-        for(RangeValue rangeValue : characteristic.getRangeValues()) {
-            if(rangeValue.getFromValue().equals(rangeValueForm.getFrom())
-                    && rangeValue.getToValue().equals(rangeValueForm.getTo())) {
-                return index;
-            }
-            index++;
-        }
-
-        throw new RuntimeException("range value didn't find");
-    }
-
-    private int findTextValueIndex(Characteristic characteristic, TextValueForm textValueForm) {
-        int index = 0;
-        for(TextValue textValue : characteristic.getTextValues()) {
-            if(textValue.getTextValue().equals(textValueForm.getText())) {
-                return index;
-            }
-            index++;
-        }
-
-        throw new RuntimeException("text value didn't find");
-    }
-
-    //----------------
-
     private Characteristic findOneById(Long id) {
         return characteristicRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("not found"));
@@ -137,11 +39,133 @@ public class CharacteristicService {
         return characteristicRepo.findAllById(ids);
     }
 
-    public List<CharacteristicDTO> findAll(List<Long> ids) {
-        return characteristicMapper.toCharacteristicDTOnew(findAllByIds(ids));
+
+    private Characteristic findOneByIdWithTextValues(Long id) {
+        return characteristicRepo.findOneByIdWithTextValues(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
+    }
+
+    private Characteristic findOneByIdWithNumericValues(Long id) {
+        return characteristicRepo.findOneByIdWithNumericValues(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
     }
 
     public CharacteristicDTO findOne(Long id) {
-        return characteristicMapper.toCharacteristicDTOnew(findOneById(id));
+        return characteristicMapper.toCharacteristicDTO(findOneById(id));
+    }
+
+    public List<CharacteristicDTO> findAll(List<Long> ids) {
+        return characteristicMapper.toCharacteristicDTO(findAllByIds(ids));
+    }
+
+    public List<CharacteristicDTO> findAllByCategoryId(Long categoryId) {
+        return characteristicMapper.toCharacteristicDTO(
+                characteristicRepo.findAllByCategoryId(categoryId)
+        );
+    }
+
+    public List<String> findAllTextValue(Long id) {
+        return findOneByIdWithTextValues(id).getTextValues().stream()
+                .map(TextValue::getTextValue)
+                .toList();
+    }
+
+    public List<NumericValueDTO> findAllNumericValue(Long id) {
+        return characteristicMapper.toNumericValueDTO(findOneByIdWithNumericValues(id).getNumericValues());
+    }
+
+    @Transactional
+    public CharacteristicDTO createOne(CharacteristicWriteDTO request) {
+        characteristicServiceValidator.validateCreating(request);
+        var characteristic = characteristicMapper.toCharacteristic(request);
+        return characteristicMapper.toCharacteristicDTO(characteristicRepo.save(characteristic));
+    }
+
+    @Transactional
+    public CharacteristicDTO updateOne(Long id, CharacteristicWriteDTO request) {
+        var characteristic = findOneById(id);
+        characteristicServiceValidator.validateUpdating(request);
+
+        updateOneFromDTO(characteristic, request);
+        return characteristicMapper.toCharacteristicDTO(characteristicRepo.save(characteristic));
+    }
+
+    //todo: check if product use this characteristic before deleting
+    @Transactional
+    public CharacteristicDTO deleteOne(Long id) {
+        var characteristic = findOneById(id);
+        characteristicRepo.delete(characteristic);
+        return characteristicMapper.toCharacteristicDTO(characteristic);
+    }
+
+    @Transactional
+    public CharacteristicDTO addOneNumericValue(Long id, NumericValueWriteDTO request) {
+        var characteristic = findOneByIdWithNumericValues(id);
+        characteristicServiceValidator.validateAddingNumericValue(
+                characteristicMapper.toCharacteristicDTO(characteristic), findAllNumericValue(id), request);
+
+        characteristic.getNumericValues().add(characteristicMapper.toNumericValue(request, characteristic.getId()));
+        return characteristicMapper.toCharacteristicDTO(characteristicRepo.save(characteristic));
+    }
+
+    @Transactional
+    public CharacteristicDTO removeOneNumericValue(Long id, NumericValueWriteDTO request) {
+        var characteristic = findOneByIdWithNumericValues(id);
+        int index = findRangeValueIndex(characteristic, request);
+
+        characteristic.getNumericValues().remove(index);
+        return characteristicMapper.toCharacteristicDTO(characteristicRepo.save(characteristic));
+    }
+
+    @Transactional
+    public CharacteristicDTO addOneTextValue(Long id, TextValueWriteDTO request) {
+        var characteristic = findOneByIdWithTextValues(id);
+        characteristicServiceValidator.validateCreatingTextValue(
+                characteristicMapper.toCharacteristicDTO(characteristic), findAllTextValue(id), request);
+
+        characteristic.getTextValues().add(characteristicMapper.toTextValue(request, characteristic.getId()));
+        return characteristicMapper.toCharacteristicDTO(characteristicRepo.save(characteristic));
+    }
+
+    @Transactional
+    public CharacteristicDTO removeOneTextValue(Long id, TextValueWriteDTO request) {
+        var characteristic = findOneByIdWithTextValues(id);
+        int index = findTextValueIndex(characteristic, request);
+
+        characteristic.getTextValues().remove(index);
+        return characteristicMapper.toCharacteristicDTO(characteristicRepo.save(characteristic));
+    }
+
+    private void updateOneFromDTO(Characteristic characteristic, CharacteristicWriteDTO request) {
+        if (request.getName() != null) {
+            characteristic.setName(request.getName());
+        }
+    }
+
+    private int findRangeValueIndex(Characteristic characteristic, NumericValueWriteDTO request) {
+        int index = 0;
+        for (var nv : characteristic.getNumericValues()) {
+            if (nv.getFromValue().equals(request.getFromValue())
+                    && nv.getToValue().equals(request.getToValue())) {
+                return index;
+            }
+            index++;
+        }
+
+        //todo перенести в слой валидации
+        throw new RuntimeException("range value didn't find");
+    }
+
+    private int findTextValueIndex(Characteristic characteristic, TextValueWriteDTO request) {
+        int index = 0;
+        for (var tv : characteristic.getTextValues()) {
+            if (tv.getTextValue().equals(request.getTextValue())) {
+                return index;
+            }
+            index++;
+        }
+
+        //todo перенести в слой валидации
+        throw new RuntimeException("text value didn't find");
     }
 }

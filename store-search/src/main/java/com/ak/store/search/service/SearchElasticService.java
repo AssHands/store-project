@@ -14,7 +14,6 @@ import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
 import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
 import com.ak.store.common.model.catalogue.document.ProductDocument;
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.ak.store.common.model.search.common.NumericFilter;
 import com.ak.store.common.model.search.common.NumericFilterValue;
 import com.ak.store.common.model.search.common.TextFilter;

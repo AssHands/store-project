@@ -1,6 +1,7 @@
 package com.ak.store.catalogue.repository;
 
 import com.ak.store.catalogue.model.entity.Characteristic;
+import com.ak.store.catalogue.model.entity.TextValue;
 import jakarta.persistence.QueryHint;
 import org.hibernate.jpa.AvailableHints;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -21,17 +22,25 @@ public interface CharacteristicRepo extends JpaRepository<Characteristic, Long> 
             """)
     List<Characteristic> findAllWithTextValuesByCategoryId(Long categoryId);
 
+    Boolean existsByNameEqualsIgnoreCase(String name);
+
+    //------------------
+
+    @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
+    @Query("""
+            SELECT c FROM Characteristic c
+            JOIN c.categories cc
+            WHERE cc.category.id = :categoryId
+            """)
+    List<Characteristic> findAllByCategoryId(Long categoryId);
+
     @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
     @EntityGraph(attributePaths = {"textValues"})
-    Optional<Characteristic> findOneWithTextValuesById(Long id);
+    @Query("SELECT c FROM Characteristic c WHERE c.id = :id")
+    Optional<Characteristic> findOneByIdWithTextValues(Long id);
 
     @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
-    @EntityGraph(attributePaths = {"rangeValues"})
-    List<Characteristic> findAllWithRangeValuesById(Long id);
-
-    @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
-    @EntityGraph(attributePaths = {"rangeValues"})
-    Optional<Characteristic> findOneWithRangeValuesById(Long id);
-
-    Boolean existsByNameEqualsIgnoreCase(String name);
+    @EntityGraph(attributePaths = {"numericValues"})
+    @Query("SELECT c FROM Characteristic c WHERE c.id = :id")
+    Optional<Characteristic> findOneByIdWithNumericValues(Long id);
 }

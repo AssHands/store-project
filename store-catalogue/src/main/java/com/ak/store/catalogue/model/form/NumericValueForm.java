@@ -1,24 +1,22 @@
-package com.ak.store.common.model.catalogue.view;
+package com.ak.store.catalogue.model.form;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CharacteristicView {
-    private Long id;
-    private String name;
-    private Boolean isText;
-    private List<String> textValues;
+public class NumericValueForm {
+    @NotNull
+    private Integer fromValue;
+
+    @NotNull
+    private Integer toValue;
 }

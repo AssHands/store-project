@@ -1,6 +1,5 @@
 package com.ak.store.common.payload.search;
 
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -18,8 +17,9 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductSearchResponse {
 
-    @Builder.Default
-    private List<ProductPoorView> content = new ArrayList<>();
+    //@Builder.Default
+    //private List<ProductPoorView> content = new ArrayList<>();
 
-    private List<Object> searchAfter;
+    @Builder.Default
+    private List<Object> searchAfter = new ArrayList<>();
 }

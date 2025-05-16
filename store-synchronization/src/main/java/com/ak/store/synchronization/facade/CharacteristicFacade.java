@@ -1,8 +1,6 @@
 package com.ak.store.synchronization.facade;
 
-import com.ak.store.common.model.catalogue.dto.CharacteristicDTO;
 import com.ak.store.synchronization.service.CharacteristicRedisService;
-import com.ak.store.synchronization.util.mapper.CharacteristicMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,11 +11,11 @@ import java.util.List;
 public class CharacteristicFacade {
     private final CharacteristicRedisService characteristicRedisService;
 
-    public void createAll(List<CharacteristicDTO> characteristics) {
+    public void createAll(List<CharacteristicDTOold> characteristics) {
         characteristicRedisService.createAll(characteristics);
     }
 
-    public void updateAll(List<CharacteristicDTO> characteristics) {
+    public void updateAll(List<CharacteristicDTOold> characteristics) {
         characteristicRedisService.updateAll(characteristics);
     }
 
