@@ -1,7 +1,8 @@
 package com.ak.store.emailSender.kafka;
 
 import com.ak.store.common.event.consumer.ConsumerVerifyEvent;
-import com.ak.store.emailSender.service.EmailSender;
+import com.ak.store.emailSender.facade.EmailFacade;
+import com.ak.store.emailSender.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -11,12 +12,12 @@ import java.util.concurrent.CompletableFuture;
 @Component
 @RequiredArgsConstructor
 public class ConsumerConsumerKafka {
-    private final EmailSender emailSender;
+    private final EmailFacade emailFacade;
 
     //todo add batches
-    @KafkaListener(topics = "consumer-verify-events", groupId = "email-consumer-group")
+    @KafkaListener(topics = "${kafka.topics.consumer-verify}", groupId = "${kafka.group-id}")
     public void handle(ConsumerVerifyEvent consumerVerifyEvent) {
-        CompletableFuture.runAsync(() -> emailSender.sendVerificationEmail(
+        CompletableFuture.runAsync(() -> emailFacade.sendVerification(
                 consumerVerifyEvent.getEmail(), consumerVerifyEvent.getVerificationCode()));
     }
 }

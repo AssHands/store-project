@@ -1,4 +1,4 @@
-package com.ak.store.catalogue.model.view;
+package com.ak.store.order.model.view;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -8,8 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -17,10 +17,14 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CharacteristicView {
+public class OrderView {
     private Long id;
 
-    private String name;
+    private String consumerId;
 
-    private Boolean isText;
+    private Integer totalPrice;
+
+    @Builder.Default
+    Map<Long, Integer> productAmountMap = new HashMap<>();
 }
+

@@ -33,7 +33,7 @@ public class CategoryService {
     }
 
     private Category findOneWithRelatedCategories(Long id) {
-        //todo если метод закеширован, то  кидается другая ошибка
+        //todo если метод закеширован, то кидается другая ошибка
         return categoryRepo.findOneWithRelatedCategoriesById(id)
                 .orElseThrow(() -> new RuntimeException("not found"));
     }
@@ -68,7 +68,7 @@ public class CategoryService {
     @Transactional
     public CategoryDTO updateOne(Long id, CategoryWriteDTO request) {
         var category = findOneById(id);
-        categoryServiceValidator.validateUpdating(findOne(id), request);
+        categoryServiceValidator.validateUpdating(id, request);
 
         updateOneFromDTO(category, request);
         return categoryMapper.toCategoryDTO(categoryRepo.save(category));
@@ -87,7 +87,8 @@ public class CategoryService {
     @Transactional
     public CategoryDTO addOneCharacteristic(Long id, Long characteristicId) {
         var category = findOneWithCharacteristics(id);
-        categoryServiceValidator.validateAddingCharacteristic(findAllCharacteristic(id), characteristicId);
+        categoryServiceValidator.validateAddingCharacteristic(id, characteristicId);
+        //todo переместить в валидатор
         characteristicService.findOne(characteristicId);
 
         category.getCharacteristics().add(
@@ -104,7 +105,7 @@ public class CategoryService {
     @Transactional
     public CategoryDTO removeOneCharacteristic(Long id, Long characteristicId) {
         var category = findOneWithCharacteristics(id);
-        categoryServiceValidator.validateRemovingCharacteristic(findAllCharacteristic(id), characteristicId);
+        categoryServiceValidator.validateRemovingCharacteristic(id, characteristicId);
 
         int index = findCharacteristicIndex(category.getCharacteristics(), characteristicId);
         category.getCharacteristics().remove(index);
@@ -114,7 +115,7 @@ public class CategoryService {
     @Transactional
     public CategoryDTO addOneRelatedCategory(Long id, Long relatedId) {
         var category = findOneWithRelatedCategories(id);
-        categoryServiceValidator.validateAddingRelatedCategory(id, relatedId, findAllRelatedCategory(id));
+        categoryServiceValidator.validateAddingRelatedCategory(id, relatedId);
 
         category.getRelatedCategories().add(Category.builder().id(relatedId).build());
         return categoryMapper.toCategoryDTO(categoryRepo.save(category));
@@ -123,7 +124,7 @@ public class CategoryService {
     @Transactional
     public CategoryDTO removeOneRelatedCategory(Long id, Long relatedId) {
         Category category = findOneWithRelatedCategories(id);
-        categoryServiceValidator.validateRemovingRelatedCategory(findAllRelatedCategory(id), relatedId);
+        categoryServiceValidator.validateRemovingRelatedCategory(id, relatedId);
 
         category.getRelatedCategories().remove(Category.builder().id(relatedId).build());
         return categoryMapper.toCategoryDTO(categoryRepo.save(category));

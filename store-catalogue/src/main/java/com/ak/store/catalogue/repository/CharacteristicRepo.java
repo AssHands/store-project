@@ -22,8 +22,6 @@ public interface CharacteristicRepo extends JpaRepository<Characteristic, Long> 
             """)
     List<Characteristic> findAllWithTextValuesByCategoryId(Long categoryId);
 
-    Boolean existsByNameEqualsIgnoreCase(String name);
-
     //------------------
 
     @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
@@ -43,4 +41,6 @@ public interface CharacteristicRepo extends JpaRepository<Characteristic, Long> 
     @EntityGraph(attributePaths = {"numericValues"})
     @Query("SELECT c FROM Characteristic c WHERE c.id = :id")
     Optional<Characteristic> findOneByIdWithNumericValues(Long id);
+
+    Boolean existsByNameEqualsIgnoreCase(String name);
 }

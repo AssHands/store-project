@@ -6,7 +6,7 @@ import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.common.model.order.view.OrderView;
 import com.ak.store.order.feign.WarehouseFeign;
 import com.ak.store.order.kafka.OrderProducerKafka;
-import com.ak.store.order.model.Order;
+import com.ak.store.order.model.entity.Order;
 import com.ak.store.order.service.OrderService;
 import com.ak.store.order.util.mapper.OrderMapper;
 import jakarta.transaction.Transactional;

@@ -3,6 +3,7 @@ package com.ak.store.order.controller;
 import com.ak.store.common.model.order.form.OrderForm;
 import com.ak.store.common.model.order.view.OrderView;
 import com.ak.store.order.facade.OrderFacade;
+import com.ak.store.order.model.view.OrderView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -18,7 +19,7 @@ public class OrderController {
     private final OrderFacade orderFacade;
 
     @GetMapping
-    public List<OrderView> findAllOrder(@RequestParam String consumerId) {
+    public List<OrderView> findAll(@RequestParam String consumerId) {
         return orderFacade.findAllByConsumerId(consumerId);
     }
 

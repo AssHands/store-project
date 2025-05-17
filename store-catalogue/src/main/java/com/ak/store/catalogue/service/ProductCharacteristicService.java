@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class ProductCharacteristicService {
-
     private final ProductCharacteristicMapper productCharacteristicMapper;
     private final ProductCharacteristicServiceValidator productCharacteristicServiceValidator;
     private final ProductCharacteristicRepo productCharacteristicRepo;
@@ -32,7 +31,7 @@ public class ProductCharacteristicService {
     public List<ProductCharacteristicDTO> createAll(Long productId,
                                                     List<ProductCharacteristicWriteDTO> productCharacteristics) {
         if (productCharacteristics.isEmpty()) return findAll(productId);
-        productCharacteristicServiceValidator.validateCreating(productId, productCharacteristics, findAll(productId));
+        productCharacteristicServiceValidator.validateCreating(productId, productCharacteristics);
 
         List<ProductCharacteristic> existingProductCharacteristics =
                 productCharacteristicMapper.toProductCharacteristic(productCharacteristics, productId);

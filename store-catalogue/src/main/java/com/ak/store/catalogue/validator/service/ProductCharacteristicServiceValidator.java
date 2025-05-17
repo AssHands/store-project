@@ -3,9 +3,11 @@ package com.ak.store.catalogue.validator.service;
 import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
 import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
 import com.ak.store.catalogue.model.entity.Characteristic;
+import com.ak.store.catalogue.model.entity.Product;
+import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
-import com.ak.store.catalogue.service.ProductService;
+import com.ak.store.catalogue.repository.ProductRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,17 +19,17 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class ProductCharacteristicServiceValidator {
-    //todo заменить на сервис
     private final CharacteristicRepo characteristicRepo;
-    private final ProductService productService;
+    private final ProductRepo productRepo;
 
     private void validateExistingProductCharacteristics(List<ProductCharacteristicWriteDTO> creatingProductCharacteristics,
-                                                        List<ProductCharacteristicDTO> existingProductCharacteristics) {
+                                                        List<ProductCharacteristic> existingProductCharacteristics) {
         List<Long> existingCharacteristicIds = existingProductCharacteristics.stream()
-                .map(ProductCharacteristicDTO::getCharacteristicId)
+                .map(ProductCharacteristic::getCharacteristic)
+                .map(Characteristic::getId)
                 .toList();
 
-        if(!existingCharacteristicIds.isEmpty()) {
+        if (!existingCharacteristicIds.isEmpty()) {
             List<Long> creatingCharacteristicIds = creatingProductCharacteristics.stream()
                     .map(ProductCharacteristicWriteDTO::getCharacteristicId)
                     .toList();
@@ -36,7 +38,7 @@ public class ProductCharacteristicServiceValidator {
                     .filter(existingCharacteristicIds::contains)
                     .findFirst();
 
-            if(notUniqCharacteristicId.isPresent()) {
+            if (notUniqCharacteristicId.isPresent()) {
                 throw new RuntimeException("characteristic with id=%s already exists"
                         .formatted(notUniqCharacteristicId.get()));
             }
@@ -84,18 +86,21 @@ public class ProductCharacteristicServiceValidator {
         }
     }
 
-    //-------------------
+    public void validateCreating(Long productId, List<ProductCharacteristicWriteDTO> creatingProductCharacteristics) {
+        var product = findOneProductWithCharacteristicsAndCategory(productId);
 
-    public void validateCreating(Long productId, List<ProductCharacteristicWriteDTO> creatingProductCharacteristics,
-                                 List<ProductCharacteristicDTO> existingProductCharacteristics) {
-        Long categoryId = productService.findOne(productId).getCategoryId();
-        validateNewProductCharacteristics(creatingProductCharacteristics, categoryId);
-        validateExistingProductCharacteristics(creatingProductCharacteristics, existingProductCharacteristics);
+        validateNewProductCharacteristics(creatingProductCharacteristics, product.getCategory().getId());
+        validateExistingProductCharacteristics(creatingProductCharacteristics, product.getCharacteristics());
     }
 
-    //todo make validation
     public void validateUpdating(Long productId, List<ProductCharacteristicWriteDTO> creatingProductCharacteristics) {
-        Long categoryId = productService.findOne(productId).getCategoryId();
+        Long categoryId = findOneProductWithCharacteristicsAndCategory(productId).getCategory().getId();
+
         validateNewProductCharacteristics(creatingProductCharacteristics, categoryId);
+    }
+
+    private Product findOneProductWithCharacteristicsAndCategory(Long id) {
+        return productRepo.findOneWithCharacteristicsAndCategoryById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
     }
 }

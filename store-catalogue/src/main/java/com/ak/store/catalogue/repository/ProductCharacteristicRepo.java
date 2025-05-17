@@ -12,9 +12,7 @@ import java.util.List;
 public interface ProductCharacteristicRepo extends JpaRepository<ProductCharacteristic, Long> {
     List<ProductCharacteristic> findAllByProductId(Long productId);
 
-    //todo check sql query
     void deleteAllByProductIdAndCharacteristicIdIn(Long productId, List<Long> characteristicIds);
 
-    //todo check sql query
     void deleteAllByProductId(Long productId);
 }

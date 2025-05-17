@@ -1,8 +1,8 @@
 package com.ak.store.emailSender.kafka;
 
-import com.ak.store.common.event.consumer.ConsumerVerifyEvent;
 import com.ak.store.common.event.order.OrderCreatedEvent;
-import com.ak.store.emailSender.service.EmailSender;
+import com.ak.store.emailSender.facade.EmailFacade;
+import com.ak.store.emailSender.mapper.EmailMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -12,10 +12,14 @@ import java.util.concurrent.CompletableFuture;
 @Component
 @RequiredArgsConstructor
 public class OrderConsumerKafka {
-    private final EmailSender emailSender;
+    private final EmailFacade emailFacade;
+    private final EmailMapper emailMapper;
 
-    @KafkaListener(topics = "order-created-events", groupId = "email-sender-group")
+    //todo add batches
+    @KafkaListener(topics = "${kafka.topics.order-created}", groupId = "${kafka.group-id}")
     public void handle(OrderCreatedEvent orderCreatedEvent) {
-        CompletableFuture.runAsync(() -> emailSender.sendOrderCreatedNotification(orderCreatedEvent));
+        CompletableFuture.runAsync(() -> emailFacade.sendOrderCreated(
+                emailMapper.toOrderCreatedWriteDTO(orderCreatedEvent))
+        );
     }
 }

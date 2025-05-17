@@ -1,29 +1,28 @@
 package com.ak.store.catalogue.validator.service;
 
-import com.ak.store.catalogue.model.dto.CategoryDTO;
 import com.ak.store.catalogue.model.dto.write.CategoryWriteDTO;
 import com.ak.store.catalogue.model.entity.Category;
+import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
+import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Component
 public class CategoryServiceValidator {
-    //todo поменять на сервис
     private final CategoryRepo categoryRepo;
 
-    public void validateCreating(CategoryWriteDTO category) {
-        checkUniqName(category.getName());
+    public void validateCreating(CategoryWriteDTO request) {
+        checkUniqName(request.getName());
 
-        if (category.getParentId() != null) {
-            checkParentExist(category.getParentId());
+        if (request.getParentId() != null) {
+            findOne(request.getParentId());
         }
     }
 
-    public void validateUpdating(CategoryDTO category, CategoryWriteDTO request) {
+    public void validateUpdating(Long id, CategoryWriteDTO request) {
+        var category = findOne(id);
         if (request.getParentId() != null && category.getId().equals(request.getParentId())) {
             throw new RuntimeException("must category_id != parent_id");
         }
@@ -31,7 +30,7 @@ public class CategoryServiceValidator {
         checkUniqName(request.getName());
 
         if (request.getParentId() != null && !category.getParentId().equals(request.getParentId())) {
-            checkParentExist(request.getParentId());
+            findOne(request.getParentId());
         }
     }
 
@@ -41,32 +40,38 @@ public class CategoryServiceValidator {
         }
     }
 
-    public void validateRemovingCharacteristic(List<Long> existingCharacteristics, Long characteristicId) {
-        if(!existingCharacteristics.contains(characteristicId)) {
+    public void validateRemovingCharacteristic(Long id, Long characteristicId) {
+        var category = findOneWithCharacteristics(id);
+
+        if (!isCategoryContainsCharacteristic(category, characteristicId)) {
             throw new RuntimeException("characteristic is not bound to category");
         }
     }
 
-    public void validateAddingCharacteristic(List<Long> existingCharacteristics, Long characteristicId) {
-        if(existingCharacteristics.contains(characteristicId)) {
+    public void validateAddingCharacteristic(Long id, Long characteristicId) {
+        var category = findOneWithCharacteristics(id);
+
+        if (isCategoryContainsCharacteristic(category, characteristicId)) {
             throw new RuntimeException("characteristic is already bound to category");
         }
     }
 
-    public void validateRemovingRelatedCategory(List<Long> existingRelatedCategories, Long relatedId) {
-        boolean isRelatedExist = isRelatedExist(existingRelatedCategories, relatedId);
+    public void validateRemovingRelatedCategory(Long id, Long relatedId) {
+        var category = findOneWithRelatedCategories(id);
+        boolean isRelatedExist = isCategoryContainsRelatedCategory(category, relatedId);
 
         if (!isRelatedExist) {
             throw new RuntimeException("related with id=%d is not bound to category".formatted(relatedId));
         }
     }
 
-    public void validateAddingRelatedCategory(Long id, Long relatedId, List<Long> existingRelatedCategories) {
-        if(id.equals(relatedId)) {
+    public void validateAddingRelatedCategory(Long id, Long relatedId) {
+        if (id.equals(relatedId)) {
             throw new RuntimeException("id and related id must not be equal");
         }
 
-        boolean isRelatedExist = isRelatedExist(existingRelatedCategories, relatedId);
+        var category = findOneWithRelatedCategories(id);
+        boolean isRelatedExist = isCategoryContainsRelatedCategory(category, relatedId);
 
         if (isRelatedExist) {
             throw new RuntimeException("this related is already bound to category");
@@ -74,23 +79,36 @@ public class CategoryServiceValidator {
     }
 
     private void checkUniqName(String name) {
-        // todo если имя отправляется такое же, то будет ошибка
         if (categoryRepo.existsByNameEqualsIgnoreCase(name)) {
             throw new RuntimeException("not uniq name");
         }
     }
 
-    private void checkParentExist(Long parentId) {
-        categoryRepo.findById(parentId)
-                .orElseThrow(() -> new RuntimeException("parent is not exist"));
+    private boolean isCategoryContainsRelatedCategory(Category category, Long relatedId) {
+        return category.getRelatedCategories().stream()
+                .map(Category::getId)
+                .anyMatch(v -> v.equals(relatedId));
     }
 
-    private boolean isRelatedExist(List<Long> existingRelatedCategories, Long relatedId) {
-        for (var related : existingRelatedCategories) {
-            if (related.equals(relatedId)) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isCategoryContainsCharacteristic(Category category, Long characteristicId) {
+        return category.getCharacteristics().stream()
+                .map(CategoryCharacteristic::getCharacteristic)
+                .map(Characteristic::getId)
+                .anyMatch(v -> v.equals(characteristicId));
+    }
+
+    private Category findOne(Long id) {
+        return categoryRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
+    }
+
+    private Category findOneWithRelatedCategories(Long id) {
+        return categoryRepo.findOneWithRelatedCategoriesById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
+    }
+
+    private Category findOneWithCharacteristics(Long id) {
+        return categoryRepo.findOneWithCharacteristicsById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
     }
 }

@@ -24,7 +24,6 @@ public class ImageService {
     private final ImageValidator imageValidator;
     private final ImageProcessor imageProcessor;
 
-
     private List<Image> findAllByProductId(Long productId) {
         return imageRepo.findAllByProductId(productId);
     }

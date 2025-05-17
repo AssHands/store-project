@@ -40,3 +40,26 @@ spring:
           default:
             connectTimeout: 7000
             readTimeout: 7000
+
+kafka:
+  group-id: email-sender-group
+  topics:
+    order-created: order-created
+    consumer-verify: consumer-verify
+
+email:
+  verify:
+    url: http://localhost:8081/api/v1/consumer/consumers/verify?code=%s
+    subject: Please verify your registration
+    content: >
+      Please click the link below to verify your registration:<br>
+      <h3><a href="%s" target="_self">VERIFY</a></h3>
+      Thank you,<br>
+      Store.
+  order:
+    subject: Your order
+    content: >
+      Your order %d:<br>
+      <h2>%s</h2><br>
+      Thank you,<br>
+      Store.

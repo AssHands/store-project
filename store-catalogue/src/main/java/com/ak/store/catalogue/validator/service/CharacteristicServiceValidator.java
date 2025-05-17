@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 public class CharacteristicServiceValidator {
-    //todo поменять на сервис
     private final CharacteristicRepo characteristicRepo;
 
     //todo добавить валидацию чтобы toValue было всегда больше или равно, чем fromValue
