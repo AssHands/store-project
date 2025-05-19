@@ -1,6 +1,5 @@
 package com.ak.store.warehouse.facade;
 
-import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.warehouse.serivce.WarehouseService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

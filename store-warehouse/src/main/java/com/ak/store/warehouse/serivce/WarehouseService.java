@@ -1,6 +1,5 @@
 package com.ak.store.warehouse.serivce;
 
-import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.warehouse.model.Warehouse;
 import com.ak.store.warehouse.repostitory.WarehouseRepo;
 import lombok.RequiredArgsConstructor;

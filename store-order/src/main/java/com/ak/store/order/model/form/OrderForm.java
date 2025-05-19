@@ -1,5 +1,6 @@
-package com.ak.store.common.event.order;
+package com.ak.store.order.model.form;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -14,14 +15,9 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrderCreatedEvent implements OrderEvent {
-    private Long orderId;
-
-    private String userEmail;
-
-    private Integer totalPrice;
-
+public class OrderForm {
     @Builder.Default
     private Map<Long, Integer> productAmount = new HashMap<>();
 }

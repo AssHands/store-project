@@ -1,4 +1,4 @@
-package com.ak.store.common.model.order.dto;
+package com.ak.store.order.model.view;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -14,7 +14,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductAmount {
+public class OrderProductView {
+    private Long orderId;
+
     private Long productId;
+
     private Integer amount;
+
+    private Integer pricePerOne;
 }

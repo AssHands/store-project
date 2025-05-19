@@ -1,6 +1,5 @@
 package com.ak.store.warehouse.controller;
 
-import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.warehouse.facade.WarehouseFacade;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;

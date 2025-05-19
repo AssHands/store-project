@@ -1,5 +1,6 @@
-package com.ak.store.common.event.order;
+package com.ak.store.order.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -7,21 +8,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrderCreatedEvent implements OrderEvent {
-    private Long orderId;
-
-    private String userEmail;
-
-    private Integer totalPrice;
+public class OrderDTOPayload {
+    private OrderDTO order;
 
     @Builder.Default
-    private Map<Long, Integer> productAmount = new HashMap<>();
+    private List<OrderProductDTO> products = new ArrayList<>();
 }

@@ -1,53 +1,43 @@
 package com.ak.store.order.facade;
 
 import com.ak.store.common.event.order.OrderCreatedEvent;
-import com.ak.store.common.model.order.form.OrderForm;
-import com.ak.store.common.model.order.dto.ProductAmount;
-import com.ak.store.common.model.order.view.OrderView;
 import com.ak.store.order.feign.WarehouseFeign;
 import com.ak.store.order.kafka.OrderProducerKafka;
-import com.ak.store.order.model.entity.Order;
+import com.ak.store.order.model.dto.OrderDTOPayload;
+import com.ak.store.order.model.dto.UserAuthContext;
+import com.ak.store.order.model.dto.write.OrderWriteDTO;
 import com.ak.store.order.service.OrderService;
-import com.ak.store.order.util.mapper.OrderMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class OrderFacade {
-
     private final OrderService orderService;
-    private final OrderMapper orderMapper;
     private final WarehouseFeign warehouseFeign;
     private final OrderProducerKafka orderProducerKafka;
 
-    public List<OrderView> findAllByConsumerId(String consumerId) {
-        return orderService.findAllByConsumerId(consumerId).stream()
-                .map(orderMapper::toOrderView)
-                .toList();
+    public List<OrderDTOPayload> findAllByUserId(UUID userId) {
+        return orderService.findAllByUserId(userId);
     }
 
     @Transactional
-    public void createOne(Jwt accessToken, OrderForm orderForm) {
-        Order order = orderService.createOne(accessToken.getSubject(), orderForm);
+    public void createOne(UserAuthContext authContext, OrderWriteDTO request) {
+        var orderPayload = orderService.createOne(authContext.getId(), request);
 
-        List<ProductAmount> orderProductList = new ArrayList<>();
-        for (var orderProduct : orderForm.getProducts()) {
-            orderProductList.add(new ProductAmount(
-                    orderProduct.getProductId(), orderProduct.getAmount()));
-        }
+        warehouseFeign.reserveAll(request.getProductAmount());
 
-        warehouseFeign.reserveAll(orderProductList);
+        var orderCreatedEvent = OrderCreatedEvent.builder()
+                .orderId(orderPayload.getOrder().getId())
+                .userEmail(authContext.getEmail())
+                .productAmount(request.getProductAmount())
+                .totalPrice(orderPayload.getOrder().getTotalPrice())
+                .build();
 
-        orderProducerKafka.send(OrderCreatedEvent.builder()
-                .orderId(order.getId())
-                .consumerEmail(accessToken.getClaimAsString("email"))
-                .orderProducts(orderProductList)
-                .totalPrice(order.getTotalPrice())
-                .build());
+        orderProducerKafka.send(orderCreatedEvent);
     }
 }

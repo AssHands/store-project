@@ -1,35 +1,44 @@
 package com.ak.store.order.controller;
 
-import com.ak.store.common.model.order.form.OrderForm;
-import com.ak.store.common.model.order.view.OrderView;
 import com.ak.store.order.facade.OrderFacade;
-import com.ak.store.order.model.view.OrderView;
+import com.ak.store.order.model.dto.UserAuthContext;
+import com.ak.store.order.model.form.OrderForm;
+import com.ak.store.order.model.view.OrderViewPayload;
+import com.ak.store.order.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/order/orders")
 public class OrderController {
-
     private final OrderFacade orderFacade;
+    private final OrderMapper orderMapper;
 
     @GetMapping
-    public List<OrderView> findAll(@RequestParam String consumerId) {
-        return orderFacade.findAllByConsumerId(consumerId);
+    //todo сделать пагинацию
+    public List<OrderViewPayload> findAll(@RequestParam UUID userId) {
+        return orderMapper.toOrderViewPayload(orderFacade.findAllByUserId(userId));
     }
 
     @PostMapping("me")
-    public void createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody OrderForm orderForm) {
-        orderFacade.createOne(accessToken, orderForm);
+    public void createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody OrderForm request) {
+        var authContext = new UserAuthContext(
+                UUID.fromString(accessToken.getSubject()),
+                accessToken.getClaimAsString("email")
+        );
+
+        orderFacade.createOne(authContext, orderMapper.toOrderWriteDTO(request));
     }
 
     @GetMapping("me")
-    public List<OrderView> getAllOrderMe(@AuthenticationPrincipal Jwt accessToken) {
-        return orderFacade.findAllByConsumerId(accessToken.getSubject());
+    public List<OrderViewPayload> getAllOrderMe(@AuthenticationPrincipal Jwt accessToken) {
+        UUID userId = UUID.fromString(accessToken.getSubject());
+        return orderMapper.toOrderViewPayload(orderFacade.findAllByUserId(userId));
     }
 }

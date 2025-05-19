@@ -1,5 +1,5 @@
-package com.ak.store.order.feign;//package com.ak.store.consumer.feign;
-//
+package com.ak.store.order.feign;
+
 //import feign.Response;
 //import feign.codec.ErrorDecoder;
 //import org.antlr.v4.runtime.CharStreams;

@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ak.store.consumer</groupId>
-    <artifactId>store-consumer</artifactId>
+    <groupId>com.ak.store.user</groupId>
+    <artifactId>store-user</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

@@ -16,7 +16,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan("com.ak.store.*")
 @EnableFeignClients
 @SpringBootApplication
-public class ConsumerProjectApplication {
+public class UserProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(ConsumerProjectApplication.class, args);
     }
