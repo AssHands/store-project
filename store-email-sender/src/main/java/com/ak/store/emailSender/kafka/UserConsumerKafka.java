@@ -2,7 +2,6 @@ package com.ak.store.emailSender.kafka;
 
 import com.ak.store.common.event.consumer.ConsumerVerifyEvent;
 import com.ak.store.emailSender.facade.EmailFacade;
-import com.ak.store.emailSender.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -11,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Component
 @RequiredArgsConstructor
-public class ConsumerConsumerKafka {
+public class UserConsumerKafka {
     private final EmailFacade emailFacade;
 
     //todo add batches

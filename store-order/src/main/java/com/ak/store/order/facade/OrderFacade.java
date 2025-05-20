@@ -6,11 +6,13 @@ import com.ak.store.order.kafka.OrderProducerKafka;
 import com.ak.store.order.model.dto.OrderDTOPayload;
 import com.ak.store.order.model.dto.UserAuthContext;
 import com.ak.store.order.model.dto.write.OrderWriteDTO;
+import com.ak.store.order.model.form.werehouse.ReserveInventoryForm;
 import com.ak.store.order.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,7 +31,15 @@ public class OrderFacade {
     public void createOne(UserAuthContext authContext, OrderWriteDTO request) {
         var orderPayload = orderService.createOne(authContext.getId(), request);
 
-        warehouseFeign.reserveAll(request.getProductAmount());
+        List<ReserveInventoryForm> reserveForm = new ArrayList<>();
+        for (var entry : request.getProductAmount().entrySet()) {
+            reserveForm.add(ReserveInventoryForm.builder()
+                    .productId(entry.getKey())
+                    .amount(entry.getValue())
+                    .build());
+        }
+
+        warehouseFeign.reserveAll(reserveForm);
 
         var orderCreatedEvent = OrderCreatedEvent.builder()
                 .orderId(orderPayload.getOrder().getId())

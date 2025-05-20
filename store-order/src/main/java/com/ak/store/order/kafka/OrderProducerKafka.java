@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class OrderProducerKafka {
     private final KafkaTemplate<String, OrderEvent> kafkaProductTemplate;
 
-    @Value("${kafka.order-created}")
+    @Value("${kafka.topics.order-created}")
     private String ORDER_CREATED_TOPIC;
 
     public void send(OrderCreatedEvent orderCreatedEvent) {

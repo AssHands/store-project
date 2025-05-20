@@ -11,7 +11,7 @@ import java.util.UUID;
 @Repository
 public interface OrderRepo extends JpaRepository<Order, Long> {
     @EntityGraph(attributePaths = {"products"})
-    List<Order> findAllWithProductsByConsumerId(UUID consumerId);
+    List<Order> findAllWithProductsByUserId(UUID userId);
 
-    List<Order> findAllByConsumerId(UUID consumerId);
+    List<Order> findAllByUserId(UUID userId);
 }

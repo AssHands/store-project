@@ -9,9 +9,11 @@ import com.ak.store.order.model.view.catalogue.ProductView;
 import com.ak.store.order.repository.OrderRepo;
 import com.ak.store.order.mapper.OrderMapper;
 import com.ak.store.order.validator.service.OrderServiceValidator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,12 +28,14 @@ public class OrderService {
     private final OrderMapper orderMapper;
 
     public List<OrderDTOPayload> findAllByUserId(UUID userId) {
-        return orderMapper.toOrderDTOPayload(orderRepo.findAllByConsumerId(userId));
+        return orderMapper.toOrderDTOPayload(orderRepo.findAllWithProductsByUserId(userId));
     }
 
+    @Transactional
     public OrderDTOPayload createOne(UUID userId, OrderWriteDTO request) {
         orderServiceValidator.validateCreating(request);
 
+        var timestamp = LocalDateTime.now();
         var productIds = new ArrayList<>(request.getProductAmount().keySet());
         var productPriceMap = catalogueFeign.findAllProduct(productIds).stream()
                 .collect(Collectors.toMap(ProductView::getId, ProductView::getCurrentPrice));
@@ -58,6 +62,7 @@ public class OrderService {
 
         order.setTotalPrice(totalPrice);
         order.setProducts(orderProductList);
+        order.setTime(timestamp);
 
         return orderMapper.toOrderDTOPayload(orderRepo.save(order));
     }

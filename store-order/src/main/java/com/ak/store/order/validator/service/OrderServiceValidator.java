@@ -4,6 +4,7 @@ package com.ak.store.order.validator.service;
 import com.ak.store.order.feign.CatalogueFeign;
 import com.ak.store.order.feign.WarehouseFeign;
 import com.ak.store.order.model.dto.write.OrderWriteDTO;
+import com.ak.store.order.model.form.werehouse.AvailableInventoryForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,15 @@ public class OrderServiceValidator {
             throw new RuntimeException("some of the product are not available");
         }
 
-        if (!warehouseFeign.checkProductAmount(request.getProductAmount())) {
+        List<AvailableInventoryForm> availableForm = new ArrayList<>();
+        for (var entry : request.getProductAmount().entrySet()) {
+            availableForm.add(AvailableInventoryForm.builder()
+                    .productId(entry.getKey())
+                    .amount(entry.getValue())
+                    .build());
+        }
+
+        if (!warehouseFeign.isAvailableAll(availableForm)) {
             throw new RuntimeException("some of the product are not exist on warehouse");
         }
     }

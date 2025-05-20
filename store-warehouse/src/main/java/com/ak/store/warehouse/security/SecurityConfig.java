@@ -27,10 +27,10 @@ public class SecurityConfig {
 //        http.cors(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/warehouse/warehouses/check").permitAll()
-                .requestMatchers("/api/v1/warehouse/warehouses/reserve").hasRole("CONSUMER")
-                .requestMatchers("/api/v1/warehouse/warehouses/{productId}/amount").permitAll()
-                .requestMatchers("/api/v1/warehouse/warehouses/{productId}/amount/*").hasRole("MANAGER")
+//                .requestMatchers("/api/v1/warehouse/warehouses/check").permitAll()
+//                .requestMatchers("/api/v1/warehouse/warehouses/reserve").hasRole("CONSUMER")
+//                .requestMatchers("/api/v1/warehouse/warehouses/{productId}/amount").permitAll()
+//                .requestMatchers("/api/v1/warehouse/warehouses/{productId}/amount/*").hasRole("MANAGER")
 
                 .anyRequest().permitAll());
 

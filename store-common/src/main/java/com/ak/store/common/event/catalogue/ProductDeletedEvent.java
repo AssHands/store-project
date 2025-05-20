@@ -17,5 +17,6 @@ import java.util.UUID;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductDeletedEvent implements ProductEvent {
     private UUID taskId;
-    private ProductSnapshotPayload product;
+
+    private ProductSnapshotPayload payload;
 }

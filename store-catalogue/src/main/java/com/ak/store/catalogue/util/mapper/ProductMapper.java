@@ -16,9 +16,6 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ProductMapper {
-    @Mapping(target = "price", source = "currentPrice")
-    ProductPriceDTO toProductPriceDTO(Product product);
-
     @Mapping(target = "categoryId", source = "category.id")
     ProductDTO toProductDTO(Product product);
     List<ProductDTO> toProductDTO(List<Product> product);

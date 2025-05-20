@@ -17,5 +17,6 @@ import java.util.UUID;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CategoryCreatedEvent implements CategoryEvent {
     private UUID taskId;
-    private CategorySnapshotPayload category;
+
+    private CategorySnapshotPayload payload;
 }

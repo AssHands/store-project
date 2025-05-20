@@ -24,15 +24,15 @@ BF.RESERVE user:778:bought_products 0.001 50 // create new bloom filter at key "
 
 Next, add some products for user 778.
 
-```redis:[run_confirmation=true] Add all bought product IDs to a Bloom filter
+```redis:[run_confirmation=true] Add all bought inventory IDs to a Bloom filter
 BF.MADD user:778:bought_products 4545667 9026875 3178945 4848754 1242449 // Add five items to user 778's list
 ```
 
 Next, run a couple of queries.
 
-```redis Has a user bought this product?
-BF.EXISTS  user:778:bought_products 1234567  // No, the user has not bought this product
-BF.EXISTS  user:778:bought_products 3178945  // The user might have bought this product
+```redis Has a user bought this inventory?
+BF.EXISTS  user:778:bought_products 1234567  // No, the user has not bought this inventory
+BF.EXISTS  user:778:bought_products 3178945  // The user might have bought this inventory
 BF.MEXISTS user:778:bought_products 01234567 4545667 // determines if one or more items exist in the filter
 ```
 

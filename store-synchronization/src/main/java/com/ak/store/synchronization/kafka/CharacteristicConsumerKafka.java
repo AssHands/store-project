@@ -20,7 +20,7 @@ public class CharacteristicConsumerKafka {
             containerFactory = "batchFactory")
     public void handleCreated(List<CharacteristicCreatedEvent> characteristicCreatedEvents) {
         characteristicFacade.createAll(characteristicCreatedEvents.stream()
-                .map(CharacteristicCreatedEvent::getCharacteristic)
+                .map(CharacteristicCreatedEvent::getPayload)
                 .toList());
     }
 
@@ -31,7 +31,7 @@ public class CharacteristicConsumerKafka {
             containerFactory = "batchFactory")
     public void handleUpdated(List<CharacteristicUpdatedEvent> characteristicUpdatedEvents) {
         characteristicFacade.updateAll(characteristicUpdatedEvents.stream()
-                .map(CharacteristicUpdatedEvent::getCharacteristic)
+                .map(CharacteristicUpdatedEvent::getPayload)
                 .toList());
     }
 
@@ -42,7 +42,7 @@ public class CharacteristicConsumerKafka {
             containerFactory = "batchFactory")
     public void handleDeleted(List<CharacteristicDeletedEvent> characteristicDeletedEvents) {
         characteristicFacade.deleteAll(characteristicDeletedEvents.stream()
-                .map(CharacteristicDeletedEvent::getCharacteristic)
+                .map(CharacteristicDeletedEvent::getPayload)
                 .map(CharacteristicDTOold::getId)
                 .toList());
     }

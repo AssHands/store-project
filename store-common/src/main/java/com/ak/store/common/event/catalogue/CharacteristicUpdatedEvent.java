@@ -18,5 +18,5 @@ import java.util.UUID;
 public class CharacteristicUpdatedEvent implements CharacteristicEvent {
     private UUID taskId;
 
-    private CharacteristicSnapshotPayload characteristic;
+    private CharacteristicSnapshotPayload payload;
 }

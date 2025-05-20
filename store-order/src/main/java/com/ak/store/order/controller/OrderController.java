@@ -26,7 +26,13 @@ public class OrderController {
         return orderMapper.toOrderViewPayload(orderFacade.findAllByUserId(userId));
     }
 
-    @PostMapping("me")
+    @GetMapping("me")
+    public List<OrderViewPayload> findMyAll(@AuthenticationPrincipal Jwt accessToken) {
+        UUID userId = UUID.fromString(accessToken.getSubject());
+        return orderMapper.toOrderViewPayload(orderFacade.findAllByUserId(userId));
+    }
+
+    @PostMapping
     public void createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody OrderForm request) {
         var authContext = new UserAuthContext(
                 UUID.fromString(accessToken.getSubject()),
@@ -34,11 +40,5 @@ public class OrderController {
         );
 
         orderFacade.createOne(authContext, orderMapper.toOrderWriteDTO(request));
-    }
-
-    @GetMapping("me")
-    public List<OrderViewPayload> getAllOrderMe(@AuthenticationPrincipal Jwt accessToken) {
-        UUID userId = UUID.fromString(accessToken.getSubject());
-        return orderMapper.toOrderViewPayload(orderFacade.findAllByUserId(userId));
     }
 }

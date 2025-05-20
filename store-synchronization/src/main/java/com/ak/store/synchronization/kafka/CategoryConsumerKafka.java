@@ -22,7 +22,7 @@ public class CategoryConsumerKafka {
             containerFactory = "batchFactory")
     public void handleCreated(List<CategoryCreatedEvent> categoryCreatedEvents) {
         categoryFacade.createAll(categoryCreatedEvents.stream()
-                .map(CategoryCreatedEvent::getCategory)
+                .map(CategoryCreatedEvent::getPayload)
                 .toList());
     }
 
@@ -33,7 +33,7 @@ public class CategoryConsumerKafka {
             containerFactory = "batchFactory")
     public void handleUpdated(List<CategoryUpdatedEvent> categoryUpdatedEvents) {
         categoryFacade.updateAll(categoryUpdatedEvents.stream()
-                .map(CategoryUpdatedEvent::getCategory)
+                .map(CategoryUpdatedEvent::getPayload)
                 .toList());
     }
 
@@ -44,7 +44,7 @@ public class CategoryConsumerKafka {
             containerFactory = "batchFactory")
     public void handleDeleted(List<CategoryDeletedEvent> categoryDeletedEvents) {
         categoryFacade.deleteAll(categoryDeletedEvents.stream()
-                .map(CategoryDeletedEvent::getCategory)
+                .map(CategoryDeletedEvent::getPayload)
                 .map(CategoryDTO::getId)
                 .toList());
     }

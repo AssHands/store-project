@@ -20,8 +20,8 @@ import java.util.Map;
 public class OrderCreatedWriteDTO {
     private Long orderId;
 
-    private String consumerEmail;
+    private String userEmail;
 
     @Builder.Default
-    private Map<Long, Integer> productAmountMap = new HashMap<>();
+    private Map<Long, Integer> productAmount = new HashMap<>();
 }

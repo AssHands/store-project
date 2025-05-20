@@ -1,6 +1,7 @@
 package com.ak.store.outboxScheduler.processor.catalogue;
 
 import com.ak.store.common.event.catalogue.CategoryCreatedEvent;
+import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
 import com.ak.store.outboxScheduler.kafka.catalogue.CategoryProducerKafka;
 import com.ak.store.outboxScheduler.model.OutboxTask;
 import com.ak.store.outboxScheduler.model.OutboxTaskType;
@@ -19,7 +20,7 @@ public class CategoryCreatedOutboxTaskProcessor implements OutboxTaskProcessor {
     public void process(List<OutboxTask> tasks) {
         for (OutboxTask task : tasks) {
             CategoryCreatedEvent categoryCreatedEvent = new CategoryCreatedEvent(
-                    task.getId(), new Gson().fromJson(task.getPayload(), CategoryDTO.class)
+                    task.getId(), new Gson().fromJson(task.getPayload(), CategorySnapshotPayload.class)
             );
 
             categoryProducerKafka.send(categoryCreatedEvent);

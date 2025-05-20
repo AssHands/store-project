@@ -45,7 +45,7 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
         try {
-            helper.setTo(request.getConsumerEmail());
+            helper.setTo(request.getUserEmail());
             helper.setSubject(emailProperties.getOrder().getSubject());
 
             String content = emailProperties.getOrder().getContent()
@@ -61,11 +61,11 @@ public class EmailService {
 
     //todo вынести в отдельный класс?
     private String getOrderContent(OrderCreatedWriteDTO request) {
-        var ids = new ArrayList<>(request.getProductAmountMap().keySet());
+        var ids = new ArrayList<>(request.getProductAmount().keySet());
         var products = catalogueFeign.findAllProduct(ids);
         Map<Integer, ProductView> orderContent = new HashMap<>();
 
-        for (var productAmount : request.getProductAmountMap().entrySet()) {
+        for (var productAmount : request.getProductAmount().entrySet()) {
             orderContent.put(
                     productAmount.getValue(),
                     products.stream()
