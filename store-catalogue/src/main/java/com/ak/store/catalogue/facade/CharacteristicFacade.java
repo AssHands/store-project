@@ -81,19 +81,11 @@ public class CharacteristicFacade {
     @Transactional
     public Long addOneNumericValue(Long id, NumericValueWriteDTO request) {
         var characteristic = characteristicService.addOneNumericValue(id, request);
-        List<String> textValues = new ArrayList<>();
-        List<NumericValueDTO> numericValues = new ArrayList<>();
-
-        if(characteristic.getIsText()) {
-            textValues = characteristicService.findAllTextValue(characteristic.getId());
-        } else {
-            numericValues = characteristicService.findAllNumericValue(characteristic.getId());
-        }
+        List<NumericValueDTO> numericValues = characteristicService.findAllNumericValue(characteristic.getId());
 
         var snapshot = CharacteristicSnapshotPayload.builder()
                 .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
                 .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
-                .textValues(textValues)
                 .build();
 
         outboxTaskService.createOneTask(snapshot, OutboxTaskType.CHARACTERISTIC_UPDATED);
@@ -103,19 +95,11 @@ public class CharacteristicFacade {
     @Transactional
     public Long removeOneNumericValue(Long id, NumericValueWriteDTO request) {
         var characteristic = characteristicService.removeOneNumericValue(id, request);
-        List<String> textValues = new ArrayList<>();
-        List<NumericValueDTO> numericValues = new ArrayList<>();
-
-        if(characteristic.getIsText()) {
-            textValues = characteristicService.findAllTextValue(characteristic.getId());
-        } else {
-            numericValues = characteristicService.findAllNumericValue(characteristic.getId());
-        }
+        List<NumericValueDTO> numericValues = characteristicService.findAllNumericValue(characteristic.getId());
 
         var snapshot = CharacteristicSnapshotPayload.builder()
                 .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
                 .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
-                .textValues(textValues)
                 .build();
 
         outboxTaskService.createOneTask(snapshot, OutboxTaskType.CHARACTERISTIC_UPDATED);
@@ -125,18 +109,10 @@ public class CharacteristicFacade {
     @Transactional
     public Long addOneTextValue(Long id, TextValueWriteDTO request) {
         var characteristic = characteristicService.addOneTextValue(id, request);
-        List<String> textValues = new ArrayList<>();
-        List<NumericValueDTO> numericValues = new ArrayList<>();
-
-        if(characteristic.getIsText()) {
-            textValues = characteristicService.findAllTextValue(characteristic.getId());
-        } else {
-            numericValues = characteristicService.findAllNumericValue(characteristic.getId());
-        }
+        List<String> textValues = characteristicService.findAllTextValue(characteristic.getId());
 
         var snapshot = CharacteristicSnapshotPayload.builder()
                 .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
-                .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
                 .textValues(textValues)
                 .build();
 
@@ -147,18 +123,10 @@ public class CharacteristicFacade {
     @Transactional
     public Long removeOneTextValue(Long id, TextValueWriteDTO request) {
         var characteristic = characteristicService.removeOneTextValue(id, request);
-        List<String> textValues = new ArrayList<>();
-        List<NumericValueDTO> numericValues = new ArrayList<>();
-
-        if(characteristic.getIsText()) {
-            textValues = characteristicService.findAllTextValue(characteristic.getId());
-        } else {
-            numericValues = characteristicService.findAllNumericValue(characteristic.getId());
-        }
+        List<String> textValues = characteristicService.findAllTextValue(characteristic.getId());
 
         var snapshot = CharacteristicSnapshotPayload.builder()
                 .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
-                .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
                 .textValues(textValues)
                 .build();
 

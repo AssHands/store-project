@@ -23,17 +23,19 @@ public class ProductDocument {
 
     private String description;
 
-    private int currentPrice;
+    private Integer currentPrice;
 
-    private int discountPercentage;
+    private Integer fullPrice;
+
+    private Integer discountPercentage;
 
     private Long categoryId;
 
-    private int amountSales;
+    private Integer amountSales;
 
-    private int amountReviews;
+    private Integer amountReviews;
 
-    private float grade;
+    private Float grade;
 
     private Boolean isAvailable;
 

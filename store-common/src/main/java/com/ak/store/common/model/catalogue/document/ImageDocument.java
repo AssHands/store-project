@@ -14,5 +14,6 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ImageDocument {
     private Integer index;
+
     private String key;
 }

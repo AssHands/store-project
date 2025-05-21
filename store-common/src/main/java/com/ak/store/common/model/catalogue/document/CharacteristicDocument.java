@@ -20,7 +20,7 @@ public class CharacteristicDocument {
 
     private Boolean isText;
 
-    private List<RangeValueDocument> rangeValues = new ArrayList<>();
-
     private List<String> textValues = new ArrayList<>();
+
+    private List<NumericValueDocument> numericValues = new ArrayList<>();
 }

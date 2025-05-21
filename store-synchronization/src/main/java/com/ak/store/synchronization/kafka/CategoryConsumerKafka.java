@@ -16,8 +16,8 @@ public class CategoryConsumerKafka {
     private final CategoryFacade categoryFacade;
 
     @KafkaListener(
-            topics = "category-created-events",
-            groupId = "synchronization-catalogue-group",
+            topics = "${kafka.topics.category-created}",
+            groupId = "${kafka.group-id}",
             batch = "true",
             containerFactory = "batchFactory")
     public void handleCreated(List<CategoryCreatedEvent> categoryCreatedEvents) {
@@ -27,8 +27,8 @@ public class CategoryConsumerKafka {
     }
 
     @KafkaListener(
-            topics = "category-updated-events",
-            groupId = "synchronization-catalogue-group",
+            topics = "${kafka.topics.category-updated}",
+            groupId = "${kafka.group-id}",
             batch = "true",
             containerFactory = "batchFactory")
     public void handleUpdated(List<CategoryUpdatedEvent> categoryUpdatedEvents) {
@@ -38,14 +38,13 @@ public class CategoryConsumerKafka {
     }
 
     @KafkaListener(
-            topics = "category-deleted-events",
-            groupId = "synchronization-catalogue-group",
+            topics = "${kafka.topics.category-deleted}",
+            groupId = "${kafka.group-id}",
             batch = "true",
             containerFactory = "batchFactory")
     public void handleDeleted(List<CategoryDeletedEvent> categoryDeletedEvents) {
         categoryFacade.deleteAll(categoryDeletedEvents.stream()
-                .map(CategoryDeletedEvent::getPayload)
-                .map(CategoryDTO::getId)
+                .map(v -> v.getPayload().getCategory().getId())
                 .toList());
     }
 }

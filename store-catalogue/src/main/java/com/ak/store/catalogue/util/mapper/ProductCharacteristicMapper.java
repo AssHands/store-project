@@ -15,9 +15,9 @@ import java.util.List;
 public interface ProductCharacteristicMapper {
     @Mapping(target = "characteristicId", source = "characteristic.id")
     @Mapping(target = "productId", source = "product.id")
-    ProductCharacteristicDTO toProductCharacteristicDTOnew(ProductCharacteristic pc);
+    ProductCharacteristicDTO toProductCharacteristicDTO(ProductCharacteristic pc);
 
-    List<ProductCharacteristicDTO> toProductCharacteristicDTOnew(List<ProductCharacteristic> pc);
+    List<ProductCharacteristicDTO> toProductCharacteristicDTO(List<ProductCharacteristic> pc);
 
     @Mapping(target = "characteristic.id", source = "pc.characteristicId")
     @Mapping(target = "product.id", source = "productId")
@@ -32,6 +32,7 @@ public interface ProductCharacteristicMapper {
                 .toList();
     }
 
+    @Mapping(target = "id", source = "characteristicId")
     ProductCharacteristicSnapshot toProductCharacteristicSnapshot(ProductCharacteristicDTO pc);
 
     List<ProductCharacteristicSnapshot> toProductCharacteristicSnapshot(List<ProductCharacteristicDTO> pc);

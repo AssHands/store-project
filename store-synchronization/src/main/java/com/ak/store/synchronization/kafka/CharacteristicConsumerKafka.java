@@ -14,8 +14,8 @@ public class CharacteristicConsumerKafka {
     private final CharacteristicFacade characteristicFacade;
 
     @KafkaListener(
-            topics = "characteristic-created-events",
-            groupId = "synchronization-catalogue-group",
+            topics = "${kafka.topics.characteristic-created}",
+            groupId = "${kafka.group-id}",
             batch = "true",
             containerFactory = "batchFactory")
     public void handleCreated(List<CharacteristicCreatedEvent> characteristicCreatedEvents) {
@@ -25,8 +25,8 @@ public class CharacteristicConsumerKafka {
     }
 
     @KafkaListener(
-            topics = "characteristic-updated-events",
-            groupId = "synchronization-catalogue-group",
+            topics = "${kafka.topics.characteristic-updated}",
+            groupId = "${kafka.group-id}",
             batch = "true",
             containerFactory = "batchFactory")
     public void handleUpdated(List<CharacteristicUpdatedEvent> characteristicUpdatedEvents) {
@@ -36,14 +36,13 @@ public class CharacteristicConsumerKafka {
     }
 
     @KafkaListener(
-            topics = "characteristic-deleted-events",
-            groupId = "synchronization-catalogue-group",
+            topics = "${kafka.topics.characteristic-deleted}",
+            groupId = "${kafka.group-id}",
             batch = "true",
             containerFactory = "batchFactory")
     public void handleDeleted(List<CharacteristicDeletedEvent> characteristicDeletedEvents) {
         characteristicFacade.deleteAll(characteristicDeletedEvents.stream()
-                .map(CharacteristicDeletedEvent::getPayload)
-                .map(CharacteristicDTOold::getId)
+                .map(v -> v.getPayload().getCharacteristic().getId())
                 .toList());
     }
 }

@@ -24,7 +24,7 @@ public class ProductCharacteristicService {
     }
 
     public List<ProductCharacteristicDTO> findAll(Long productId) {
-        return productCharacteristicMapper.toProductCharacteristicDTOnew(findAllByProductId(productId));
+        return productCharacteristicMapper.toProductCharacteristicDTO(findAllByProductId(productId));
     }
 
     @Transactional
