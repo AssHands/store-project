@@ -1,6 +1,6 @@
 package com.ak.store.common.event.catalogue;
 
-import com.ak.store.common.model.catalogue.dto.ProductDTO;
+import com.ak.store.common.model.catalogue.snapshot.ProductSnapshotPayload;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -17,5 +17,6 @@ import java.util.UUID;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductCreatedEvent implements ProductEvent {
     private UUID taskId;
-    private ProductDTO product;
+
+    private ProductSnapshotPayload payload;
 }

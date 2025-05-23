@@ -38,3 +38,7 @@ spring:
         delivery.timeout.ms: 20000
         max.in.flight.requests.per.connection: 5
         linger.ms: 5000
+
+elasticsearch:
+  indexes:
+    product: "product"

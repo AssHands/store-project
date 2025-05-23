@@ -15,5 +15,5 @@ import java.util.List;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CartView {
-    private List<ProductCartView> products;
+    private List<ProductCartView> content;
 }

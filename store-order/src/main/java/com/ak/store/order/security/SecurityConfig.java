@@ -27,8 +27,10 @@ public class SecurityConfig {
 //        http.cors(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/order/orders/me").hasRole("CONSUMER")
-                .requestMatchers("/api/v1/order/orders").hasRole("MANAGER"));
+//                .requestMatchers("/api/v1/order/orders/me").hasRole("CONSUMER")
+//                .requestMatchers("/api/v1/order/orders").hasRole("MANAGER")
+                        .anyRequest().permitAll()
+        );
 
         return http.build();
     }

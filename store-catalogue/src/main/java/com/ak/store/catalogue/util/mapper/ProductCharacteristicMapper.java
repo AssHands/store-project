@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.util.mapper;
 
-import com.ak.store.catalogue.model.dto.ProductCharacteristicDTOnew;
+import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
 import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.common.model.catalogue.snapshot.ProductCharacteristicSnapshot;
@@ -15,14 +15,25 @@ import java.util.List;
 public interface ProductCharacteristicMapper {
     @Mapping(target = "characteristicId", source = "characteristic.id")
     @Mapping(target = "productId", source = "product.id")
-    ProductCharacteristicDTOnew toProductCharacteristicDTOnew(ProductCharacteristic pc);
-    List<ProductCharacteristicDTOnew> toProductCharacteristicDTOnew(List<ProductCharacteristic> pc);
+    ProductCharacteristicDTO toProductCharacteristicDTO(ProductCharacteristic pc);
+
+    List<ProductCharacteristicDTO> toProductCharacteristicDTO(List<ProductCharacteristic> pc);
 
     @Mapping(target = "characteristic.id", source = "pc.characteristicId")
     @Mapping(target = "product.id", source = "productId")
     ProductCharacteristic toProductCharacteristic(ProductCharacteristicWriteDTO pc, Long productId);
-    List<ProductCharacteristic> toProductCharacteristic(List<ProductCharacteristicWriteDTO> pc, Long productId);
 
-    ProductCharacteristicSnapshot toProductCharacteristicSnapshot(ProductCharacteristicDTOnew pc);
-    List<ProductCharacteristicSnapshot> toProductCharacteristicSnapshot(List<ProductCharacteristicDTOnew> pc);
+    default List<ProductCharacteristic> toProductCharacteristic(List<ProductCharacteristicWriteDTO> pc, Long productId) {
+        if (pc == null) {
+            return null;
+        }
+        return pc.stream()
+                .map(v -> toProductCharacteristic(v, productId))
+                .toList();
+    }
+
+    @Mapping(target = "id", source = "characteristicId")
+    ProductCharacteristicSnapshot toProductCharacteristicSnapshot(ProductCharacteristicDTO pc);
+
+    List<ProductCharacteristicSnapshot> toProductCharacteristicSnapshot(List<ProductCharacteristicDTO> pc);
 }

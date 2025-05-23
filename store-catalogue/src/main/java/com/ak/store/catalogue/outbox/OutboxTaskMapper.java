@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class OutboxTaskMapper<T> {
-    private final Gson gson = new Gson();
+    private final Gson gson;
 
     public OutboxTask mapToOutboxTask(T payload) {
         return OutboxTask.builder()

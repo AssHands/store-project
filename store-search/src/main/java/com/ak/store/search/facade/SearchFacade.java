@@ -1,12 +1,10 @@
 package com.ak.store.search.facade;
 
-import com.ak.store.common.event.search.SearchAllEvent;
-import com.ak.store.common.model.search.dto.ConsumerSearchDTO;
-import com.ak.store.common.payload.search.FilterSearchRequest;
-import com.ak.store.common.payload.search.FilterSearchResponse;
-import com.ak.store.common.payload.search.ProductSearchRequest;
-import com.ak.store.common.payload.search.ProductSearchResponse;
 import com.ak.store.search.kafka.SearchProducerKafka;
+import com.ak.store.search.model.dto.request.FilterSearchRequestDTO;
+import com.ak.store.search.model.dto.request.ProductSearchRequestDTO;
+import com.ak.store.search.model.dto.response.FilterSearchResponseDTO;
+import com.ak.store.search.model.dto.response.ProductSearchResponseDTO;
 import com.ak.store.search.service.SearchElasticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -18,24 +16,24 @@ public class SearchFacade {
     private final SearchElasticService searchElasticService;
     private final SearchProducerKafka searchProducerKafka;
 
-    public ProductSearchResponse searchAllProduct(ProductSearchRequest productSearchRequest) {
-        return searchElasticService.searchAllProduct(productSearchRequest);
+    public ProductSearchResponseDTO searchAllProduct(ProductSearchRequestDTO request) {
+        return searchElasticService.searchAllProduct(request);
     }
 
-    public FilterSearchResponse searchAllFilter(Jwt accessToken, FilterSearchRequest filterSearchRequest) {
-        var response = searchElasticService.searchAllFilter(filterSearchRequest);
+    public FilterSearchResponseDTO searchAllFilter(Jwt accessToken, FilterSearchRequestDTO request) {
+        var response = searchElasticService.searchAllFilter(request);
 
-        if(accessToken == null) {
+        if (accessToken == null) {
             return response;
         }
 
         //todo: make async
-        searchProducerKafka.send(SearchAllEvent.builder()
-                .consumerSearch(ConsumerSearchDTO.builder()
-                        .consumerId(accessToken.getSubject())
-                        .categoryId(response.getCategoryId())
-                        .build())
-                .build());
+//        searchProducerKafka.send(SearchAllEvent.builder()
+//                .consumerSearch(ConsumerSearchDTO.builder()
+//                        .consumerId(accessToken.getSubject())
+//                        .categoryId(response.getCategoryId())
+//                        .build())
+//                .build());
 
         return response;
     }

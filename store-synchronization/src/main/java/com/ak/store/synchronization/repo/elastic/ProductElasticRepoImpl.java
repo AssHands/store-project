@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import com.ak.store.common.model.catalogue.document.ProductDocument;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,11 +15,13 @@ import java.util.List;
 public class ProductElasticRepoImpl implements ProductElasticRepo {
     private final ElasticsearchClient esClient;
 
+    @Value("${elasticsearch.indexes.product}")
+    private String PRODUCT_INDEX;
 
     @Override
     public void saveOne(ProductDocument productDocument) {
         var request = IndexRequest.of(i -> i
-                .index("product")
+                .index(PRODUCT_INDEX)
                 .id(productDocument.getId().toString())
                 .document(productDocument));
 
@@ -36,7 +39,7 @@ public class ProductElasticRepoImpl implements ProductElasticRepo {
         productDocuments.forEach(product ->
                 br.operations(op -> op
                         .index(idx -> idx
-                                .index("product")
+                                .index(PRODUCT_INDEX)
                                 .id(product.getId().toString())
                                 .document(product))));
 
@@ -60,7 +63,7 @@ public class ProductElasticRepoImpl implements ProductElasticRepo {
     @Override
     public void updateOne(ProductDocument productDocument) {
         var request = UpdateRequest.of(u -> u
-                .index("product")
+                .index(PRODUCT_INDEX)
                 .id(productDocument.getId().toString())
                 .doc(productDocument));
 
@@ -78,7 +81,7 @@ public class ProductElasticRepoImpl implements ProductElasticRepo {
         productDocuments.forEach(product ->
                 br.operations(op -> op
                         .index(idx -> idx
-                                .index("product")
+                                .index(PRODUCT_INDEX)
                                 .id(product.getId().toString())
                                 .document(product))));
 
@@ -102,7 +105,7 @@ public class ProductElasticRepoImpl implements ProductElasticRepo {
     @Override
     public void deleteOne(Long id) {
         var request = DeleteRequest.of(d -> d
-                .index("product")
+                .index(PRODUCT_INDEX)
                 .id(id.toString()));
 
         try {

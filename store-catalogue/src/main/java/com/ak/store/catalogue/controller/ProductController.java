@@ -1,14 +1,12 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.ProductFacade;
-import com.ak.store.common.model.catalogue.formNew.ProductFormPayloadNew;
-import com.ak.store.common.model.catalogue.viewNew.ProductViewNew;
+import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
+import com.ak.store.catalogue.model.form.ProductFormPayload;
+import com.ak.store.catalogue.model.view.ProductView;
 import com.ak.store.catalogue.util.mapper.ProductMapper;
-import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
-import com.ak.store.common.model.catalogue.form.ImageForm;
-import com.ak.store.common.payload.catalogue.ProductWritePayload;
-import com.ak.store.common.validationGroup.Create;
-import com.ak.store.common.validationGroup.Update;
+import com.ak.store.catalogue.model.validationGroup.Create;
+import com.ak.store.catalogue.model.validationGroup.Update;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -25,9 +23,40 @@ public class ProductController {
     private final ProductFacade productFacade;
     private final ProductMapper productMapper;
 
-    @PostMapping("price")
-    public List<ProductPriceDTO> getAllPrice(@RequestBody List<Long> ids) {
-        return productFacade.getAllPrice(ids);
+    @GetMapping("{id}")
+    public ProductView findOne(@PathVariable Long id) {
+        return productMapper.toProductView(productFacade.findOne(id));
+    }
+
+    @PostMapping("find")
+    public List<ProductView> findAll(@RequestBody List<Long> ids) {
+        return productMapper.toProductView(productFacade.findAll(ids));
+    }
+
+    @PostMapping("available")
+    public Boolean isAvailableAll(@RequestBody List<Long> ids) {
+        return productFacade.isAvailableAll(ids);
+    }
+
+    @PostMapping("exist")
+    public Boolean isExistAll(@RequestBody List<Long> ids) {
+        return productFacade.isExistAll(ids);
+    }
+
+    @PostMapping
+    public Long createOne(@RequestBody @Validated(Create.class) ProductFormPayload request) {
+        return productFacade.createOne(productMapper.toProductWritePayload(request));
+    }
+
+    @PatchMapping("{id}")
+    public Long updateOne(@PathVariable("id") Long productId,
+                          @RequestBody @Validated(Update.class) ProductFormPayload request) {
+        return productFacade.updateOne(productId, productMapper.toProductWritePayload(request));
+    }
+
+    @DeleteMapping("{id}")
+    public void deleteOne(@PathVariable Long id) {
+        productFacade.deleteOne(id);
     }
 
     /**
@@ -81,46 +110,7 @@ public class ProductController {
                                       @RequestParam Map<String, String> allImageIndexes,
                                       @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,
                                       @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
-        ImageForm imageForm = new ImageForm(productId, allImageIndexes, addImages, deleteImageIndexes);
-
-        return productFacade.saveOrUpdateAllImage(imageForm);
-    }
-
-    //-------------------------
-
-    @GetMapping("{id}")
-    public ProductViewNew findOne(@PathVariable Long id) {
-        return productMapper.toProductViewNew(productFacade.findOne(id));
-    }
-
-    @PostMapping
-    public List<ProductViewNew> findAll(@RequestBody List<Long> ids) {
-        return productMapper.toProductViewNew(productFacade.findAll(ids));
-    }
-
-    @PostMapping("available")
-    public Boolean isAvailableAll(@RequestBody List<Long> ids) {
-        return productFacade.isAvailableAll(ids);
-    }
-
-    @PostMapping("exist")
-    public Boolean isExistAll(@RequestBody List<Long> ids) {
-        return productFacade.isExistAll(ids);
-    }
-
-    @PostMapping
-    public Long createOne(@RequestBody @Validated(Create.class) ProductFormPayloadNew request) {
-        return productFacade.createOne(productMapper.toProductWritePayload(request));
-    }
-
-    @PatchMapping("{id}")
-    public Long updateOne(@PathVariable("id") Long productId,
-                          @RequestBody @Validated(Update.class) ProductFormPayloadNew request) {
-        return productFacade.updateOne(productId, productMapper.toProductWritePayload(request));
-    }
-
-    @DeleteMapping("{id}")
-    public void deleteOne(@PathVariable Long id) {
-        productFacade.deleteOne(id);
+        var request = new ImageWriteDTO(productId, allImageIndexes, addImages, deleteImageIndexes);
+        return productFacade.saveOrUpdateAllImage(request);
     }
 }

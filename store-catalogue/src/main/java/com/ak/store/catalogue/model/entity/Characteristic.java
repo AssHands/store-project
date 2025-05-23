@@ -10,9 +10,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -42,7 +40,7 @@ public class Characteristic {
     @OrderBy("fromValue")
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "characteristic", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RangeValue> rangeValues = new ArrayList<>();
+    private List<NumericValue> numericValues = new ArrayList<>();
 
     @Builder.Default
     @Fetch(FetchMode.SUBSELECT)

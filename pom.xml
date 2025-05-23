@@ -19,7 +19,7 @@
 	<modules>
 		<module>store-common</module>
         <module>store-catalogue</module>
-        <module>store-consumer</module>
+        <module>store-user</module>
         <module>store-order</module>
         <module>store-warehouse</module>
         <module>store-synchronization</module>

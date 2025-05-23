@@ -64,12 +64,4 @@ public class Product {
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
-
-    public void addCharacteristics(List<ProductCharacteristic> characteristics) {
-        this.characteristics.addAll(characteristics);
-    }
-
-    public void addCharacteristic(ProductCharacteristic characteristic) {
-        this.characteristics.add(characteristic);
-    }
 }

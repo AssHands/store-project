@@ -1,16 +1,19 @@
 package com.ak.store.order.service;
 
-import com.ak.store.common.model.catalogue.dto.ProductPriceDTO;
-import com.ak.store.common.model.order.form.OrderForm;
-import com.ak.store.common.model.order.dto.ProductAmount;
 import com.ak.store.order.feign.CatalogueFeign;
-import com.ak.store.order.model.Order;
-import com.ak.store.order.model.OrderProduct;
+import com.ak.store.order.model.dto.OrderDTOPayload;
+import com.ak.store.order.model.dto.write.OrderWriteDTO;
+import com.ak.store.order.model.entity.Order;
+import com.ak.store.order.model.entity.OrderProduct;
+import com.ak.store.order.model.view.catalogue.ProductView;
 import com.ak.store.order.repository.OrderRepo;
-import com.ak.store.order.validator.business.OrderBusinessValidator;
+import com.ak.store.order.mapper.OrderMapper;
+import com.ak.store.order.validator.service.OrderServiceValidator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,43 +23,47 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepo orderRepo;
-    private final OrderBusinessValidator orderBusinessValidator;
+    private final OrderServiceValidator orderServiceValidator;
     private final CatalogueFeign catalogueFeign;
+    private final OrderMapper orderMapper;
 
-    public List<Order> findAllByConsumerId(String consumerId) {
-        return orderRepo.findAllWithProductsByConsumerId(UUID.fromString(consumerId));
+    public List<OrderDTOPayload> findAllByUserId(UUID userId) {
+        return orderMapper.toOrderDTOPayload(orderRepo.findAllWithProductsByUserId(userId));
     }
 
-    public Order createOne(String consumerId, OrderForm orderForm) {
-        orderBusinessValidator.validateCreation(orderForm);
+    @Transactional
+    public OrderDTOPayload createOne(UUID userId, OrderWriteDTO request) {
+        orderServiceValidator.validateCreating(request);
 
-        var productIds = orderForm.getProducts().stream()
-                .map(ProductAmount::getProductId)
-                .toList();
-
-        var productPriceMap = catalogueFeign.getAllPrice(productIds).stream()
-                .collect(Collectors.toMap(ProductPriceDTO::getId, ProductPriceDTO::getPrice));
+        var timestamp = LocalDateTime.now();
+        var productIds = new ArrayList<>(request.getProductAmount().keySet());
+        var productPriceMap = catalogueFeign.findAllProduct(productIds).stream()
+                .collect(Collectors.toMap(ProductView::getId, ProductView::getCurrentPrice));
 
         var order = Order.builder()
-                .consumerId(UUID.fromString(consumerId))
+                .userId(userId)
                 .build();
 
         int totalPrice = 0;
         List<OrderProduct> orderProductList = new ArrayList<>();
-        for (var orderProductDTO : orderForm.getProducts()) {
-            totalPrice += orderProductDTO.getAmount() * productPriceMap.get(orderProductDTO.getProductId());
+        for (var product : request.getProductAmount().entrySet()) {
+            Long productId = product.getKey();
+            Integer productAmount = product.getValue();
+
+            totalPrice += productPriceMap.get(productId) * productAmount;
 
             orderProductList.add(OrderProduct.builder()
-                    .productId(orderProductDTO.getProductId())
-                    .amount(orderProductDTO.getAmount())
-                    .pricePerOne(productPriceMap.get(orderProductDTO.getProductId()))
+                    .productId(productId)
+                    .amount(productAmount)
+                    .pricePerOne(productPriceMap.get(productId))
                     .order(order)
                     .build());
         }
 
         order.setTotalPrice(totalPrice);
         order.setProducts(orderProductList);
+        order.setTime(timestamp);
 
-        return orderRepo.save(order);
+        return orderMapper.toOrderDTOPayload(orderRepo.save(order));
     }
 }

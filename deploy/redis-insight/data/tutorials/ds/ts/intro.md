@@ -10,7 +10,7 @@ Common examples for applications that use time series databases:
 
 * IoT & Sensor Monitoring: monitor and react to a stream of events emitted by devices.
 * Application Performance/Health Monitoring: monitor the performance and availability of applications and services.
-* Real-time Analytics: process, analyze, and react in real-time (e.g., for selling equities, performing predictive maintenance, product recommendations, or price adjustments).
+* Real-time Analytics: process, analyze, and react in real-time (e.g., for selling equities, performing predictive maintenance, inventory recommendations, or price adjustments).
 
 You can ingest and query millions of samples and events at the speed of Redis. 
 

@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CategoryDocument {
     private Long id;
+
     private String name;
+
     private Long parentId;
 }

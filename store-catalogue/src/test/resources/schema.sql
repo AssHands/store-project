@@ -12,8 +12,8 @@ create table characteristic (
     is_text boolean
 );
 
-DROP TABLE IF EXISTS product;
-create table product (
+DROP TABLE IF EXISTS inventory;
+create table inventory (
     id serial primary key,
     title varchar,
     description varchar,
@@ -32,7 +32,7 @@ create table product_image (
     product_id int,
     image_key varchar(60),
     number int,
-    foreign key (product_id) references product (id)
+    foreign key (product_id) references inventory (id)
 );
 
 DROP TABLE IF EXISTS product_characteristic;
@@ -42,7 +42,7 @@ create table product_characteristic (
     characteristic_id int,
     numeric_value int,
     text_value varchar(60),
-    foreign key(product_id) REFERENCES product (id),
+    foreign key(product_id) REFERENCES inventory (id),
     foreign key(characteristic_id) REFERENCES characteristic (id)
 );
 

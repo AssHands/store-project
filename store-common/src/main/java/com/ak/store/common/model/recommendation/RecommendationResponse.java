@@ -1,6 +1,5 @@
 package com.ak.store.common.model.recommendation;
 
-import com.ak.store.common.model.catalogue.view.ProductPoorView;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -13,10 +12,10 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RecommendationResponse {
-    @Builder.Default
-    private List<ProductPoorView> content = new ArrayList<>();
+    //@Builder.Default
+    //private List<ProductPoorView> content = new ArrayList<>();
 }

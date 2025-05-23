@@ -1,6 +1,6 @@
 package com.ak.store.synchronization.facade;
 
-import com.ak.store.common.model.catalogue.dto.CategoryDTO;
+import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
 import com.ak.store.synchronization.service.CategoryRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,12 +12,12 @@ import java.util.List;
 public class CategoryFacade {
     private final CategoryRedisService categoryRedisService;
 
-    public void createAll(List<CategoryDTO> categories) {
-        categoryRedisService.createAll(categories);
+    public void createAll(List<CategorySnapshotPayload> request) {
+        categoryRedisService.createAll(request);
     }
 
-    public void updateAll(List<CategoryDTO> categories) {
-        categoryRedisService.updateAll(categories);
+    public void updateAll(List<CategorySnapshotPayload> request) {
+        categoryRedisService.updateAll(request);
     }
 
     public void deleteAll(List<Long> ids) {

@@ -2,7 +2,7 @@ A Redis list is a data type that contains a series of ordered string values. Use
 
 - implementing stacks (LIFO data structures)
 - implementing queues (FIFO data structures)
-- implementing producer-consumer patterns
+- implementing producer-user patterns
 
 You interact with lists using commands such as:
 

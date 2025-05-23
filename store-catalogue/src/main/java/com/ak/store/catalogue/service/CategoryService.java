@@ -1,11 +1,14 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.model.dto.CategoryDTO;
+import com.ak.store.catalogue.model.dto.write.CategoryWriteDTO;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
+import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
 import com.ak.store.catalogue.util.mapper.CategoryMapper;
 import com.ak.store.catalogue.validator.service.CategoryServiceValidator;
-import com.ak.store.common.model.catalogue.form.CategoryForm;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,98 +22,130 @@ public class CategoryService {
     private final CharacteristicService characteristicService;
     private final CategoryServiceValidator categoryServiceValidator;
 
-    public List<Category> findAll() {
-        return categoryRepo.findAll();
-    }
-
-    public Category findOne(Long id) {
+    private Category findOneById(Long id) {
         return categoryRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("no category found"));
+                .orElseThrow(() -> new RuntimeException("not found"));
     }
 
-    public Category findOneWithCharacteristics(Long id) {
+    private Category findOneWithCharacteristics(Long id) {
         return categoryRepo.findOneWithCharacteristicsById(id)
-                .orElseThrow(() -> new RuntimeException("no category found"));
+                .orElseThrow(() -> new RuntimeException("not found"));
     }
 
-    public Category findOneWithAll(Long id) {
-        Category category = categoryRepo.findOneWithCharacteristicsById(id)
-                .orElseThrow(() -> new RuntimeException("no category found"));
-
-        category.getRelatedCategories().size();
-        return category;
+    private Category findOneWithRelatedCategories(Long id) {
+        //todo если метод закеширован, то кидается другая ошибка
+        return categoryRepo.findOneWithRelatedCategoriesById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
     }
 
-    public Category createOne(CategoryForm categoryForm) {
-        categoryServiceValidator.validateCreate(categoryForm);
-        return categoryRepo.save(categoryMapper.toCategory(categoryForm));
+    public List<CategoryDTO> findAll() {
+        return categoryMapper.toCategoryDTO(categoryRepo.findAll());
     }
 
-    public Category addCharacteristicToCategory(Long categoryId, Long characteristicId) {
-        var category = findOneWithCharacteristics(categoryId);
-        categoryServiceValidator.validateAddCharacteristic(category, characteristicId);
-        var characteristic = characteristicService.findOneOld(characteristicId);
+    public CategoryDTO findOne(Long id) {
+        return categoryMapper.toCategoryDTO(findOneById(id));
+    }
+
+    public List<Long> findAllCharacteristic(Long id) {
+        return findOneWithCharacteristics(id).getCharacteristics().stream()
+                .map(v -> v.getCharacteristic().getId())
+                .toList();
+    }
+
+    public List<Long> findAllRelatedCategory(Long id) {
+        return findOneWithRelatedCategories(id).getRelatedCategories().stream()
+                .map(Category::getId)
+                .toList();
+    }
+
+    @Transactional
+    public CategoryDTO createOne(CategoryWriteDTO request) {
+        categoryServiceValidator.validateCreating(request);
+        var category = categoryRepo.save(categoryMapper.toCategory(request));
+        return categoryMapper.toCategoryDTO(category);
+    }
+
+    @Transactional
+    public CategoryDTO updateOne(Long id, CategoryWriteDTO request) {
+        var category = findOneById(id);
+        categoryServiceValidator.validateUpdating(id, request);
+
+        updateOneFromDTO(category, request);
+        return categoryMapper.toCategoryDTO(categoryRepo.save(category));
+    }
+
+    //todo: make check if product has this category
+    @Transactional
+    public CategoryDTO deleteOne(Long id) {
+        var category = findOneById(id);
+        categoryServiceValidator.validateDeleting(id);
+
+        categoryRepo.delete(category);
+        return categoryMapper.toCategoryDTO(category);
+    }
+
+    @Transactional
+    public CategoryDTO addOneCharacteristic(Long id, Long characteristicId) {
+        var category = findOneWithCharacteristics(id);
+        categoryServiceValidator.validateAddingCharacteristic(id, characteristicId);
+        //todo переместить в валидатор
+        characteristicService.findOne(characteristicId);
 
         category.getCharacteristics().add(
                 CategoryCharacteristic.builder()
                         .category(category)
-                        .characteristic(characteristic)
+                        .characteristic(Characteristic.builder()
+                                .id(characteristicId)
+                                .build())
                         .build()
         );
-        return categoryRepo.save(category);
+        return categoryMapper.toCategoryDTO(categoryRepo.save(category));
     }
 
-    public Category deleteCharacteristicFromCategory(Long categoryId, Long characteristicId) {
-        Category category = findOneWithCharacteristics(categoryId);
-        categoryServiceValidator.validateDeleteCharacteristic(category, characteristicId);
+    @Transactional
+    public CategoryDTO removeOneCharacteristic(Long id, Long characteristicId) {
+        var category = findOneWithCharacteristics(id);
+        categoryServiceValidator.validateRemovingCharacteristic(id, characteristicId);
 
-        for (int i = 0; i < category.getCharacteristics().size(); i++) {
-            if (category.getCharacteristics().get(i).getCharacteristic().getId().equals(characteristicId)) {
-                category.getCharacteristics().remove(i);
-                break;
-            }
-        }
-
-        return categoryRepo.save(category);
+        int index = findCharacteristicIndex(category.getCharacteristics(), characteristicId);
+        category.getCharacteristics().remove(index);
+        return categoryMapper.toCategoryDTO(categoryRepo.save(category));
     }
 
-    //todo: make check if product has this category
-    public Category deleteOne(Long id) {
-        Category category = findOne(id);
-        categoryServiceValidator.validateDelete(category);
-        categoryRepo.delete(category);
-        return category;
-    }
-
-    public Category updateOne(Long id, CategoryForm categoryForm) {
-        Category category = findOne(id);
-        categoryServiceValidator.validateUpdate(category, categoryForm);
-        updateCategory(category, categoryForm);
-        return categoryRepo.save(category);
-    }
-
-    private void updateCategory(Category category, CategoryForm categoryForm) {
-        if (categoryForm.getName() != null) {
-            category.setName(categoryForm.getName());
-        }
-        if (categoryForm.getParentId() != null) {
-            category.setParentId(categoryForm.getParentId());
-        }
-    }
-
-    public Category addRelatedToCategory(Long categoryId, Long relatedId) {
-        Category category = findOneWithAll(categoryId);
-        categoryServiceValidator.validateAddRelated(category, relatedId);
+    @Transactional
+    public CategoryDTO addOneRelatedCategory(Long id, Long relatedId) {
+        var category = findOneWithRelatedCategories(id);
+        categoryServiceValidator.validateAddingRelatedCategory(id, relatedId);
 
         category.getRelatedCategories().add(Category.builder().id(relatedId).build());
-        return categoryRepo.save(category);
+        return categoryMapper.toCategoryDTO(categoryRepo.save(category));
     }
 
-    public Category deleteRelatedFromCategory(Long categoryId, Long relatedId) {
-        Category category = findOneWithAll(categoryId);
-        categoryServiceValidator.validateDeleteRelated(category, relatedId);
+    @Transactional
+    public CategoryDTO removeOneRelatedCategory(Long id, Long relatedId) {
+        Category category = findOneWithRelatedCategories(id);
+        categoryServiceValidator.validateRemovingRelatedCategory(id, relatedId);
 
         category.getRelatedCategories().remove(Category.builder().id(relatedId).build());
-        return categoryRepo.save(category);
+        return categoryMapper.toCategoryDTO(categoryRepo.save(category));
+    }
+
+    private void updateOneFromDTO(Category category, CategoryWriteDTO request) {
+        if (request.getName() != null) {
+            category.setName(request.getName());
+        }
+        if (request.getParentId() != null) {
+            category.setParentId(request.getParentId());
+        }
+    }
+
+    private int findCharacteristicIndex(List<CategoryCharacteristic> categoryCharacteristics, Long id) {
+        int index = 0;
+        for (var cc : categoryCharacteristics) {
+            if (cc.getCharacteristic().getId().equals(id))
+                return index;
+            index++;
+        }
+        return -1;
     }
 }

@@ -1,9 +1,10 @@
 package com.ak.store.catalogue.validator.service;
 
+import com.ak.store.catalogue.model.dto.write.CategoryWriteDTO;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
+import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
-import com.ak.store.common.model.catalogue.form.CategoryForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,66 +13,68 @@ import org.springframework.stereotype.Component;
 public class CategoryServiceValidator {
     private final CategoryRepo categoryRepo;
 
-    public void validateCreate(CategoryForm categoryForm) {
-        checkUniqName(categoryForm.getName());
+    public void validateCreating(CategoryWriteDTO request) {
+        checkUniqName(request.getName());
 
-        if (categoryForm.getParentId() != null) {
-            checkParentExist(categoryForm.getParentId());
+        if (request.getParentId() != null) {
+            findOne(request.getParentId());
         }
     }
 
-    public void validateUpdate(Category category, CategoryForm categoryForm) {
-        if (categoryForm.getParentId() != null && category.getId().equals(categoryForm.getParentId())) {
+    public void validateUpdating(Long id, CategoryWriteDTO request) {
+        var category = findOne(id);
+        if (request.getParentId() != null && category.getId().equals(request.getParentId())) {
             throw new RuntimeException("must category_id != parent_id");
         }
-        checkUniqName(categoryForm.getName());
 
-        if (categoryForm.getParentId() != null) {
-            checkParentExist(categoryForm.getParentId());
+        checkUniqName(request.getName());
+
+        if (request.getParentId() != null && !category.getParentId().equals(request.getParentId())) {
+            findOne(request.getParentId());
         }
     }
 
-    public void validateDelete(Category category) {
-        if (categoryRepo.existsByParentId(category.getParentId())) {
+    public void validateDeleting(Long id) {
+        if (categoryRepo.existsByParentId(id)) {
             throw new RuntimeException("this category has children. delete children first");
         }
     }
 
-    public void validateDeleteCharacteristic(Category category, Long characteristicId) {
-        boolean isCharacteristicExist = false;
-        for (int i = 0; i < category.getCharacteristics().size(); i++) {
-            if (category.getCharacteristics().get(i).getCharacteristic().getId().equals(characteristicId)) {
-                category.getCharacteristics().remove(i);
-                return;
-            }
-        }
+    public void validateRemovingCharacteristic(Long id, Long characteristicId) {
+        var category = findOneWithCharacteristics(id);
 
-        if (!isCharacteristicExist) {
-            throw new RuntimeException("characteristic with id=%d is not bound to category".formatted(characteristicId));
+        if (!isCategoryContainsCharacteristic(category, characteristicId)) {
+            throw new RuntimeException("characteristic is not bound to category");
         }
     }
 
-    public void validateAddCharacteristic(Category category, Long characteristicId) {
-        for (CategoryCharacteristic cc : category.getCharacteristics()) {
-            if (cc.getCharacteristic().getId().equals(characteristicId)) {
-                throw new RuntimeException("this characteristic is already bound to category");
-            }
+    public void validateAddingCharacteristic(Long id, Long characteristicId) {
+        var category = findOneWithCharacteristics(id);
+
+        if (isCategoryContainsCharacteristic(category, characteristicId)) {
+            throw new RuntimeException("characteristic is already bound to category");
         }
     }
 
-    public void validateAddRelated(Category category, Long relatedId) {
-        boolean isRelatedExist = relatedExist(category, relatedId);
-
-        if (isRelatedExist) {
-            throw new RuntimeException("this related is already bound to category");
-        }
-    }
-
-    public void validateDeleteRelated(Category category, Long relatedId) {
-        boolean isRelatedExist = relatedExist(category, relatedId);
+    public void validateRemovingRelatedCategory(Long id, Long relatedId) {
+        var category = findOneWithRelatedCategories(id);
+        boolean isRelatedExist = isCategoryContainsRelatedCategory(category, relatedId);
 
         if (!isRelatedExist) {
             throw new RuntimeException("related with id=%d is not bound to category".formatted(relatedId));
+        }
+    }
+
+    public void validateAddingRelatedCategory(Long id, Long relatedId) {
+        if (id.equals(relatedId)) {
+            throw new RuntimeException("id and related id must not be equal");
+        }
+
+        var category = findOneWithRelatedCategories(id);
+        boolean isRelatedExist = isCategoryContainsRelatedCategory(category, relatedId);
+
+        if (isRelatedExist) {
+            throw new RuntimeException("this related is already bound to category");
         }
     }
 
@@ -81,18 +84,31 @@ public class CategoryServiceValidator {
         }
     }
 
-    private void checkParentExist(Long parentId) {
-        categoryRepo.findById(parentId)
-                .orElseThrow(() -> new RuntimeException("parent is not exist"));
+    private boolean isCategoryContainsRelatedCategory(Category category, Long relatedId) {
+        return category.getRelatedCategories().stream()
+                .map(Category::getId)
+                .anyMatch(v -> v.equals(relatedId));
     }
 
-    private boolean relatedExist(Category category, Long relatedId) {
-        for (var related : category.getRelatedCategories()) {
-            if (related.getId().equals(relatedId)) {
-                return true;
-            }
-        }
+    private boolean isCategoryContainsCharacteristic(Category category, Long characteristicId) {
+        return category.getCharacteristics().stream()
+                .map(CategoryCharacteristic::getCharacteristic)
+                .map(Characteristic::getId)
+                .anyMatch(v -> v.equals(characteristicId));
+    }
 
-        return false;
+    private Category findOne(Long id) {
+        return categoryRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
+    }
+
+    private Category findOneWithRelatedCategories(Long id) {
+        return categoryRepo.findOneWithRelatedCategoriesById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
+    }
+
+    private Category findOneWithCharacteristics(Long id) {
+        return categoryRepo.findOneWithCharacteristicsById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
     }
 }
