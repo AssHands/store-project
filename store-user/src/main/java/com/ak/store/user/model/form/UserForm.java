@@ -1,4 +1,4 @@
-package com.ak.store.common.model.consumer.form;
+package com.ak.store.user.model.form;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

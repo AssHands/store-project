@@ -1,6 +1,6 @@
 package com.ak.store.user.mapper;
 
-import com.ak.store.common.model.consumer.form.UserForm;
+import com.ak.store.user.model.form.UserForm;
 import com.ak.store.user.model.dto.UserDTO;
 import com.ak.store.user.model.dto.write.UserWriteDTO;
 import com.ak.store.user.model.entity.User;

@@ -1,6 +1,6 @@
 package com.ak.store.user.controller;
 
-import com.ak.store.common.model.consumer.form.UserForm;
+import com.ak.store.user.model.form.UserForm;
 import com.ak.store.user.facade.UserFacade;
 import com.ak.store.user.model.validationGroup.Create;
 import com.ak.store.user.model.validationGroup.Update;
