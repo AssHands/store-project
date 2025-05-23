@@ -71,7 +71,7 @@ spring:
 
 keycloak:
   auth-server-url: http://localhost:8070/
-  resource: store-consumer-service-client
+  resource: store-user-service-client
   realm: store-realm
   ssl-required: external
   use-resource-role-mapping: true

@@ -1,4 +1,4 @@
-package com.ak.store.consumer.security;
+package com.ak.store.user.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -6,9 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -34,15 +32,15 @@ public class SecurityConfig {
 //                        accessDeniedException.printStackTrace()));
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "/api/v1/consumer/consumers/verify").permitAll()
-                .requestMatchers(HttpMethod.PATCH, "/api/v1/consumer/consumers/email").hasRole("CONSUMER")
-                .requestMatchers("/api/v1/consumer/consumers/me").hasRole("CONSUMER")
-                .requestMatchers("/api/v1/consumer/consumers/{id}").hasRole("MANAGER")
-                .requestMatchers(HttpMethod.POST, "/api/v1/consumer/consumers").anonymous()
-
-                .requestMatchers(HttpMethod.GET, "/api/v1/consumer/reviews/{productId}/*").permitAll()
-                .requestMatchers("/api/v1/consumer/reviews/me/**").hasRole("CONSUMER")
-                .requestMatchers("/api/v1/consumer/reviews/{productId}/*").hasRole("MANAGER")
+//                .requestMatchers(HttpMethod.POST, "/api/v1/consumer/consumers/verify").permitAll()
+//                .requestMatchers(HttpMethod.PATCH, "/api/v1/consumer/consumers/email").hasRole("CONSUMER")
+//                .requestMatchers("/api/v1/consumer/consumers/me").hasRole("CONSUMER")
+//                .requestMatchers("/api/v1/consumer/consumers/{id}").hasRole("MANAGER")
+//                .requestMatchers(HttpMethod.POST, "/api/v1/consumer/consumers").anonymous()
+//
+//                .requestMatchers(HttpMethod.GET, "/api/v1/consumer/reviews/{productId}/*").permitAll()
+//                .requestMatchers("/api/v1/consumer/reviews/me/**").hasRole("CONSUMER")
+//                .requestMatchers("/api/v1/consumer/reviews/{productId}/*").hasRole("MANAGER")
 
                 .anyRequest().permitAll());
 

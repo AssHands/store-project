@@ -1,6 +1,7 @@
-package com.ak.store.search.model.form;
+package com.ak.store.search.model.form.request;
 
 import com.ak.store.search.model.common.SortingType;
+import com.ak.store.search.model.form.FiltersForm;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

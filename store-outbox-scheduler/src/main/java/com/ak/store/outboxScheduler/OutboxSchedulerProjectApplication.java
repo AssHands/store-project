@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EntityScan("com.ak.store.*")
 @EnableScheduling
 @SpringBootApplication
-public class OutboxSchedulerApplication {
+public class OutboxSchedulerProjectApplication {
     public static void main(String[] args) {
-        SpringApplication.run(OutboxSchedulerApplication.class, args);
+        SpringApplication.run(OutboxSchedulerProjectApplication.class, args);
     }
 }

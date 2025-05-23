@@ -1,4 +1,4 @@
-package com.ak.store.consumer.kafka;
+package com.ak.store.user.kafka;
 
 import com.ak.store.common.event.consumer.ConsumerEvent;
 import com.ak.store.common.event.consumer.ConsumerVerifyEvent;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ConsumerProducerKafka {
+public class UserProducerKafka {
     private final KafkaTemplate<String, ConsumerEvent> kafkaProductTemplate;
 
     public void send(ConsumerVerifyEvent consumerVerifyEvent) {

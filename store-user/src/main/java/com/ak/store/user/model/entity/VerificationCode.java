@@ -1,4 +1,4 @@
-package com.ak.store.consumer.model.entity;
+package com.ak.store.user.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,16 +13,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Builder
-@Table(name = "consumer_verification_code")
 public class VerificationCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
-    private Consumer consumer;
+    private User user;
 
-    private LocalDateTime expiresAt;
+    private LocalDateTime expireTime;
 
     private String code;
 

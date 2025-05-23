@@ -2,14 +2,14 @@ package com.ak.store.review.service;
 
 import com.ak.store.common.model.consumer.form.CommentForm;
 import com.ak.store.common.model.consumer.form.ReviewForm;
-import com.ak.store.consumer.model.entity.Comment;
-import com.ak.store.consumer.model.entity.Consumer;
-import com.ak.store.consumer.model.entity.Review;
-import com.ak.store.consumer.model.projection.ReviewWithCommentCountProjection;
-import com.ak.store.consumer.repository.CommentRepo;
-import com.ak.store.consumer.repository.ReviewRepo;
-import com.ak.store.consumer.util.mapper.ReviewMapper;
-import com.ak.store.consumer.validator.business.ReviewBusinessValidator;
+import com.ak.store.user.model.entity.Comment;
+import com.ak.store.user.model.entity.Consumer;
+import com.ak.store.user.model.entity.Review;
+import com.ak.store.user.model.projection.ReviewWithCommentCountProjection;
+import com.ak.store.user.repository.CommentRepo;
+import com.ak.store.user.repository.ReviewRepo;
+import com.ak.store.user.util.mapper.ReviewMapper;
+import com.ak.store.user.validator.service.ReviewBusinessValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

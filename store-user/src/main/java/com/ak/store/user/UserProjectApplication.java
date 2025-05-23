@@ -1,4 +1,4 @@
-package com.ak.store.consumer;
+package com.ak.store.user;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -18,7 +18,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 public class UserProjectApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ConsumerProjectApplication.class, args);
+        SpringApplication.run(UserProjectApplication.class, args);
     }
 
     @Bean

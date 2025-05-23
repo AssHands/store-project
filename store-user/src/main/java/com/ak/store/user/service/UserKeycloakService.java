@@ -1,6 +1,6 @@
-package com.ak.store.consumer.service;
+package com.ak.store.user.service;
 
-import com.ak.store.common.model.consumer.form.ConsumerForm;
+import com.ak.store.user.model.dto.write.UserWriteDTO;
 import jakarta.ws.rs.ClientErrorException;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.CreatedResponseUtil;
@@ -17,22 +17,23 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class KeycloakService {
+public class UserKeycloakService {
     private final Keycloak keycloak;
 
     @Value("${keycloak.realm}")
     private String realm;
 
-    public String createOneConsumer(ConsumerForm consumerForm) {
-        CredentialRepresentation credential = createPasswordCredentials(consumerForm.getPassword());
+    public UUID createOne(UserWriteDTO request) {
+        CredentialRepresentation credential = createPasswordCredentials(request.getPassword());
 
         UserRepresentation user = new UserRepresentation();
-        user.setEmail(consumerForm.getEmail());
+        user.setEmail(request.getEmail());
         user.setCredentials(Collections.singletonList(credential));
-        user.setFirstName(consumerForm.getName());
+        user.setFirstName(request.getName());
         user.setEnabled(true);
 
         UsersResource userResource = getUsersResource();
@@ -42,39 +43,41 @@ public class KeycloakService {
             throw new RuntimeException("email already exists");
         }
 
-        String consumerId = CreatedResponseUtil.getCreatedId(response);
-        addRealmRoleToUser(consumerId, List.of("ROLE_CONSUMER"));
+        UUID userId = UUID.fromString(CreatedResponseUtil.getCreatedId(response));
+        addRealmRoleToUser(userId, List.of("ROLE_CONSUMER"));
 
-        return consumerId;
+        return userId;
     }
 
-    public void deleteOneConsumer(String consumerId) {
-        UserResource usersResource = getUsersResource().get(consumerId);
+    public void deleteOne(UUID id) {
+        UserResource usersResource = getUsersResource().get(id.toString());
         usersResource.remove();
     }
 
-    public String updateOneConsumer(String consumerId, ConsumerForm consumerForm) {
+    public UUID updateOne(UUID id, UserWriteDTO request) {
         UserRepresentation user = new UserRepresentation();
-        updateUser(user, consumerForm);
 
-        UserResource userResource = getUsersResource().get(consumerId);
+        updateOneFromDTO(user, request);
+        UserResource userResource = getUsersResource().get(id.toString());
+
         try {
             userResource.update(user);
         } catch (ClientErrorException e) {
+            //todo catch 404 or 409 and send error
             throw new RuntimeException("email already exists");
         }
 
-        return consumerId;
+        return id;
     }
 
-    private void addRealmRoleToUser(String consumerId, List<String> roles) {
+    private void addRealmRoleToUser(UUID id, List<String> roles) {
         List<RoleRepresentation> kcRoles = new ArrayList<>();
         for (String role : roles) {
             RoleRepresentation roleRep = keycloak.realm(realm).roles().get(role).toRepresentation();
             kcRoles.add(roleRep);
         }
 
-        UserResource userResource = getUsersResource().get(consumerId);
+        UserResource userResource = getUsersResource().get(id.toString());
         userResource.roles().realmLevel().add(kcRoles);
     }
 
@@ -84,28 +87,32 @@ public class KeycloakService {
 
     private CredentialRepresentation createPasswordCredentials(String password) {
         CredentialRepresentation passwordCredentials = new CredentialRepresentation();
+
         passwordCredentials.setTemporary(false);
         passwordCredentials.setType(CredentialRepresentation.PASSWORD);
         passwordCredentials.setValue(password);
+
         return passwordCredentials;
     }
 
-    private void updateUser(UserRepresentation user, ConsumerForm consumerForm) {
-        if (consumerForm.getName() != null) {
-            user.setFirstName(consumerForm.getName());
+    private void updateOneFromDTO(UserRepresentation user, UserWriteDTO request) {
+        if (request.getName() != null) {
+            user.setFirstName(request.getName());
         }
-        if (consumerForm.getPassword() != null) {
-            CredentialRepresentation credentialRepresentation = createPasswordCredentials(consumerForm.getPassword());
+
+        if (request.getPassword() != null) {
+            CredentialRepresentation credentialRepresentation = createPasswordCredentials(request.getPassword());
             user.setCredentials(Collections.singletonList(credentialRepresentation));
         }
     }
 
-    public void verifyOneConsumer(String consumerId, String email) {
+    public void verifyOne(UUID id, String email) {
         UserRepresentation user = new UserRepresentation();
+
         user.setEmailVerified(true);
         user.setEmail(email);
 
-        UserResource userResource = getUsersResource().get(consumerId);
+        UserResource userResource = getUsersResource().get(id.toString());
         try {
             userResource.update(user);
         } catch (ClientErrorException e) {

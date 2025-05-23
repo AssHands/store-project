@@ -1,6 +1,5 @@
-package com.ak.store.search.model.view;
+package com.ak.store.common.model.consumer.form;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -12,11 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class FilterSearchResponseView {
-    private Long categoryId;
+//todo add validation (groups)
+public class UserForm {
+    private String name;
 
-    @Builder.Default
-    private FiltersView filters = new FiltersView();
+    private String email;
+
+    private String password;
 }

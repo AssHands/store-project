@@ -2,10 +2,10 @@ package com.ak.store.search.controller;
 
 import com.ak.store.search.facade.SearchFacade;
 import com.ak.store.search.mapper.SearchMapper;
-import com.ak.store.search.model.form.FilterSearchRequestForm;
-import com.ak.store.search.model.form.ProductSearchRequestForm;
-import com.ak.store.search.model.view.FilterSearchResponseView;
-import com.ak.store.search.model.view.ProductSearchResponseView;
+import com.ak.store.search.model.form.request.FilterSearchRequestForm;
+import com.ak.store.search.model.form.request.ProductSearchRequestForm;
+import com.ak.store.search.model.view.response.FilterSearchResponseView;
+import com.ak.store.search.model.view.response.ProductSearchResponseView;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
