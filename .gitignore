@@ -31,6 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
-/deploy/redis-insight/data/
-/deploy/redis/data/
-/deploy/minio/data/
+
+### Project ###
+/deploy/keycloak/
+/deploy/logstash/
+/deploy/minio/
+/deploy/redis/
+/deploy/redis-insight/

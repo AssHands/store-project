@@ -11,7 +11,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ak.store</groupId>
-	<artifactId>pet-project</artifactId>
+	<artifactId>store-project</artifactId>
 
 	<packaging>pom</packaging>
 	<version>0.0.1-SNAPSHOT</version>
