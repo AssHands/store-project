@@ -12,15 +12,15 @@ import java.util.List;
 public class CharacteristicFacade {
     private final CharacteristicRedisService characteristicRedisService;
 
-    public void createAll(List<CharacteristicSnapshotPayload> request) {
-        characteristicRedisService.createAll(request);
+    public void createOne(CharacteristicSnapshotPayload request) {
+        characteristicRedisService.createOne(request);
     }
 
-    public void updateAll(List<CharacteristicSnapshotPayload> request) {
-        characteristicRedisService.updateAll(request);
+    public void updateOne(CharacteristicSnapshotPayload request) {
+        characteristicRedisService.updateOne(request);
     }
 
-    public void deleteAll(List<Long> ids) {
-        characteristicRedisService.deleteAll(ids);
+    public void deleteOne(Long id) {
+        characteristicRedisService.deleteOne(id);
     }
 }

@@ -1,13 +1,10 @@
 package com.ak.store.synchronization.service;
 
-import com.ak.store.common.model.catalogue.document.CategoryDocument;
 import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
-import com.ak.store.synchronization.repo.redis.CategoryRedisRepo;
 import com.ak.store.synchronization.mapper.CategoryMapper;
+import com.ak.store.synchronization.repo.redis.CategoryRedisRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -15,27 +12,23 @@ public class CategoryRedisService {
     private final CategoryRedisRepo categoryRedisRepo;
     private final CategoryMapper categoryMapper;
 
-    public List<CategoryDocument> createAll(List<CategorySnapshotPayload> request) {
-        for(var payload : request) {
-            categoryRedisRepo.saveAllCategoryCharacteristic(payload.getCategory().getId(), payload.getCharacteristics());
-            categoryRedisRepo.saveAllRelatedCategory(payload.getCategory().getId(), payload.getRelatedCategories());
-        }
+    public void createOne(CategorySnapshotPayload request) {
+        Long categoryId = request.getCategory().getId();
 
-        var categories = request.stream().map(CategorySnapshotPayload::getCategory).toList();
-        return categoryRedisRepo.saveAll(categoryMapper.toCategoryDocument(categories));
+        categoryRedisRepo.saveOne(categoryMapper.toCategoryDocument(request.getCategory()));
+        categoryRedisRepo.saveAllCategoryCharacteristic(categoryId, request.getCharacteristics());
+        categoryRedisRepo.saveAllRelatedCategory(categoryId, request.getRelatedCategories());
     }
 
-    public List<CategoryDocument> updateAll(List<CategorySnapshotPayload> request) {
-        for(var payload : request) {
-            categoryRedisRepo.saveAllCategoryCharacteristic(payload.getCategory().getId(), payload.getCharacteristics());
-            categoryRedisRepo.saveAllRelatedCategory(payload.getCategory().getId(), payload.getRelatedCategories());
-        }
+    public void updateOne(CategorySnapshotPayload request) {
+        Long categoryId = request.getCategory().getId();
 
-        var categories = request.stream().map(CategorySnapshotPayload::getCategory).toList();
-        return categoryRedisRepo.saveAll(categoryMapper.toCategoryDocument(categories));
+        categoryRedisRepo.saveOne(categoryMapper.toCategoryDocument(request.getCategory()));
+        categoryRedisRepo.saveAllCategoryCharacteristic(categoryId, request.getCharacteristics());
+        categoryRedisRepo.saveAllRelatedCategory(categoryId, request.getRelatedCategories());
     }
 
-    public void deleteAll(List<Long> ids) {
-        categoryRedisRepo.deleteAllById(ids);
+    public void deleteOne(Long id) {
+        categoryRedisRepo.deleteOne(id);
     }
 }

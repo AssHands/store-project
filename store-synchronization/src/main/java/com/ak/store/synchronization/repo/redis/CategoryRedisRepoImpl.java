@@ -19,17 +19,8 @@ public class CategoryRedisRepoImpl implements CategoryRedisRepo {
     private final String RELATED_CATEGORY_KEY = "related_category:";
 
     @Override
-    public CategoryDocument saveOne(CategoryDocument category) {
+    public void saveOne(CategoryDocument category) {
         stringRedisTemplate.opsForValue().set(CATEGORY_KEY + category.getId(), gson.toJson(category));
-        return category;
-    }
-
-    @Override
-    public List<CategoryDocument> saveAll(List<CategoryDocument> categories) {
-        for(CategoryDocument category : categories) {
-            stringRedisTemplate.opsForValue().set(CATEGORY_KEY + category.getId(), gson.toJson(category));
-        }
-        return categories;
     }
 
     @Override
@@ -65,9 +56,7 @@ public class CategoryRedisRepoImpl implements CategoryRedisRepo {
     }
 
     @Override
-    public void deleteAllById(List<Long> ids) {
-        for(Long id : ids) {
-            stringRedisTemplate.delete(CATEGORY_KEY + id);
-        }
+    public void deleteOne(Long id) {
+        stringRedisTemplate.delete(CATEGORY_KEY + id);
     }
 }

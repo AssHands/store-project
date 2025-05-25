@@ -6,7 +6,7 @@ import com.ak.store.outboxScheduler.model.OutboxTaskType;
 import java.util.List;
 
 public interface OutboxTaskProcessor {
-    void process(List<OutboxTask> tasks);
+    void process(OutboxTask task);
 
     OutboxTaskType getType();
 }

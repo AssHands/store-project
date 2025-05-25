@@ -1,5 +1,6 @@
 package com.ak.store.common.event.catalogue;
 
+import com.ak.store.common.event.KafkaEvent;
 import com.ak.store.common.model.catalogue.snapshot.ProductSnapshotPayload;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductUpdatedEvent implements ProductEvent {
+public class ProductUpdatedEvent implements KafkaEvent {
     private UUID taskId;
 
     private ProductSnapshotPayload payload;

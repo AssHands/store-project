@@ -1,4 +1,4 @@
-package com.ak.store.synchronization.config;
+package com.ak.store.outboxScheduler.config;
 
 import com.ak.store.common.event.KafkaEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaProducerConfig {
+public class ProducerKafkaConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapAddresses;
 
@@ -43,6 +43,9 @@ public class KafkaProducerConfig {
     @Value("${spring.kafka.producer.properties.max.in.flight.requests.per.connection}")
     private String maxInFlightRequests;
 
+    @Value("${spring.kafka.producer.properties.linger.ms}")
+    private String lingerMs;
+
     @Bean
     public ProducerFactory<String, KafkaEvent> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
@@ -56,6 +59,7 @@ public class KafkaProducerConfig {
         configProps.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeoutMs);
         configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, enableIdempotence);
         configProps.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, maxInFlightRequests);
+        configProps.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
@@ -63,7 +67,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, KafkaEvent> kafkaTemplate() {
+    public KafkaTemplate<String, KafkaEvent> productKafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }

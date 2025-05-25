@@ -25,6 +25,7 @@ spring:
 
 kafka:
   group-id: synchronization-group
+  dlt-prefix: .dlt
   topics:
     category-created: category-created
     category-updated: category-updated

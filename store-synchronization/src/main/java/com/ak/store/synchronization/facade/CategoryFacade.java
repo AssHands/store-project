@@ -1,5 +1,6 @@
 package com.ak.store.synchronization.facade;
 
+import com.ak.store.common.event.catalogue.CategoryCreatedEvent;
 import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
 import com.ak.store.synchronization.service.CategoryRedisService;
 import lombok.RequiredArgsConstructor;
@@ -12,15 +13,15 @@ import java.util.List;
 public class CategoryFacade {
     private final CategoryRedisService categoryRedisService;
 
-    public void createAll(List<CategorySnapshotPayload> request) {
-        categoryRedisService.createAll(request);
+    public void createOne(CategorySnapshotPayload request) {
+        categoryRedisService.createOne(request);
     }
 
-    public void updateAll(List<CategorySnapshotPayload> request) {
-        categoryRedisService.updateAll(request);
+    public void updateOne(CategorySnapshotPayload request) {
+        categoryRedisService.updateOne(request);
     }
 
-    public void deleteAll(List<Long> ids) {
-        categoryRedisService.deleteAll(ids);
+    public void deleteOne(Long id) {
+        categoryRedisService.deleteOne(id);
     }
 }

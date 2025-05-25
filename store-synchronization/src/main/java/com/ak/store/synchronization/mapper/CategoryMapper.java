@@ -11,6 +11,6 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface CategoryMapper {
-
+    CategoryDocument toCategoryDocument(CategorySnapshot cs);
     List<CategoryDocument> toCategoryDocument(List<CategorySnapshot> cs);
 }

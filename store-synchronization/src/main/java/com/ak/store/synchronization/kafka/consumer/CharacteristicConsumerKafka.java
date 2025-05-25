@@ -1,6 +1,9 @@
-package com.ak.store.synchronization.kafka;
+package com.ak.store.synchronization.kafka.consumer;
 
-import com.ak.store.common.event.catalogue.*;
+import com.ak.store.common.event.catalogue.CharacteristicCreatedEvent;
+import com.ak.store.common.event.catalogue.CharacteristicDeletedEvent;
+import com.ak.store.common.event.catalogue.CharacteristicUpdatedEvent;
+import com.ak.store.synchronization.errorHandler.CharacteristicKafkaErrorHandler;
 import com.ak.store.synchronization.facade.CharacteristicFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -12,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CharacteristicConsumerKafka {
     private final CharacteristicFacade characteristicFacade;
+    private final CharacteristicKafkaErrorHandler errorHandler;
 
     @KafkaListener(
             topics = "${kafka.topics.characteristic-created}",
@@ -19,9 +23,13 @@ public class CharacteristicConsumerKafka {
             batch = "true",
             containerFactory = "batchFactory")
     public void handleCreated(List<CharacteristicCreatedEvent> characteristicCreatedEvents) {
-        characteristicFacade.createAll(characteristicCreatedEvents.stream()
-                .map(CharacteristicCreatedEvent::getPayload)
-                .toList());
+        for (var event : characteristicCreatedEvents) {
+            try {
+                characteristicFacade.createOne(event.getPayload());
+            } catch (Exception e) {
+                errorHandler.handleCreateError(event, e);
+            }
+        }
     }
 
     @KafkaListener(
@@ -30,9 +38,13 @@ public class CharacteristicConsumerKafka {
             batch = "true",
             containerFactory = "batchFactory")
     public void handleUpdated(List<CharacteristicUpdatedEvent> characteristicUpdatedEvents) {
-        characteristicFacade.updateAll(characteristicUpdatedEvents.stream()
-                .map(CharacteristicUpdatedEvent::getPayload)
-                .toList());
+        for (var event : characteristicUpdatedEvents) {
+            try {
+                characteristicFacade.updateOne(event.getPayload());
+            } catch (Exception e) {
+                errorHandler.handleUpdateError(event, e);
+            }
+        }
     }
 
     @KafkaListener(
@@ -41,8 +53,12 @@ public class CharacteristicConsumerKafka {
             batch = "true",
             containerFactory = "batchFactory")
     public void handleDeleted(List<CharacteristicDeletedEvent> characteristicDeletedEvents) {
-        characteristicFacade.deleteAll(characteristicDeletedEvents.stream()
-                .map(v -> v.getPayload().getCharacteristic().getId())
-                .toList());
+        for (var event : characteristicDeletedEvents) {
+            try {
+                characteristicFacade.deleteOne(event.getPayload().getCharacteristic().getId());
+            } catch (Exception e) {
+                errorHandler.handleDeleteError(event, e);
+            }
+        }
     }
 }

@@ -17,28 +17,12 @@ public class CharacteristicRedisRepoImpl implements CharacteristicRedisRepo {
     private final String CHARACTERISTIC_KEY = "characteristic:";
 
     @Override
-    public CharacteristicDocument saveOne(CharacteristicDocument characteristic) {
+    public void saveOne(CharacteristicDocument characteristic) {
         stringRedisTemplate.opsForValue().set(CHARACTERISTIC_KEY + characteristic.getId(), gson.toJson(characteristic));
-        return characteristic;
     }
 
     @Override
-    public List<CharacteristicDocument> saveAll(List<CharacteristicDocument> characteristics) {
-        for (CharacteristicDocument characteristic : characteristics) {
-            stringRedisTemplate.opsForValue().set(CHARACTERISTIC_KEY + characteristic.getId(), gson.toJson(characteristic));
-        }
-        return characteristics;
-    }
-
-    @Override
-    public void deleteOneById(Long id) {
+    public void deleteOne(Long id) {
         stringRedisTemplate.delete(CHARACTERISTIC_KEY + id);
-    }
-
-    @Override
-    public void deleteAllById(List<Long> ids) {
-        for (Long id : ids) {
-            stringRedisTemplate.delete(CHARACTERISTIC_KEY + id);
-        }
     }
 }

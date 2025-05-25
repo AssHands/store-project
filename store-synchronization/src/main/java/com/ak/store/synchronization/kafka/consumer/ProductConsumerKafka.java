@@ -1,8 +1,9 @@
-package com.ak.store.synchronization.kafka;
+package com.ak.store.synchronization.kafka.consumer;
 
 import com.ak.store.common.event.catalogue.ProductCreatedEvent;
 import com.ak.store.common.event.catalogue.ProductDeletedEvent;
 import com.ak.store.common.event.catalogue.ProductUpdatedEvent;
+import com.ak.store.synchronization.errorHandler.ProductKafkaErrorHandler;
 import com.ak.store.synchronization.facade.ProductFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -14,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductConsumerKafka {
     private final ProductFacade productFacade;
+    private final ProductKafkaErrorHandler errorHandler;
 
     @KafkaListener(
             topics = "${kafka.topics.product-created}",
@@ -21,9 +23,13 @@ public class ProductConsumerKafka {
             batch = "true",
             containerFactory = "batchFactory")
     public void handleCreated(List<ProductCreatedEvent> productCreatedEvents) {
-        productFacade.createAll(productCreatedEvents.stream()
-                .map(ProductCreatedEvent::getPayload)
-                .toList());
+        for (var event : productCreatedEvents) {
+            try {
+                productFacade.createOne(event.getPayload());
+            } catch (Exception e) {
+                errorHandler.handleCreateError(event, e);
+            }
+        }
     }
 
     @KafkaListener(
@@ -32,9 +38,13 @@ public class ProductConsumerKafka {
             batch = "true",
             containerFactory = "batchFactory")
     public void handleUpdated(List<ProductUpdatedEvent> productUpdatedEvents) {
-        productFacade.updateAll(productUpdatedEvents.stream()
-                .map(ProductUpdatedEvent::getPayload)
-                .toList());
+        for (var event : productUpdatedEvents) {
+            try {
+                productFacade.updateOne(event.getPayload());
+            } catch (Exception e) {
+                errorHandler.handleUpdateError(event, e);
+            }
+        }
     }
 
     @KafkaListener(
@@ -43,8 +53,12 @@ public class ProductConsumerKafka {
             batch = "true",
             containerFactory = "batchFactory")
     public void handleDeleted(List<ProductDeletedEvent> productDeletedEvents) {
-        productFacade.deleteAll(productDeletedEvents.stream()
-                .map(v -> v.getPayload().getProduct().getId())
-                .toList());
+        for (var event : productDeletedEvents) {
+            try {
+                productFacade.deleteOne(event.getPayload().getProduct().getId());
+            } catch (Exception e) {
+                errorHandler.handleDeleteError(event, e);
+            }
+        }
     }
 }

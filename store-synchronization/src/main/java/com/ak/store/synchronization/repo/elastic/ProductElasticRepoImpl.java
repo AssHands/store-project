@@ -33,34 +33,6 @@ public class ProductElasticRepoImpl implements ProductElasticRepo {
     }
 
     @Override
-    public void saveAll(List<ProductDocument> productDocuments) {
-        var br = new BulkRequest.Builder();
-
-        productDocuments.forEach(product ->
-                br.operations(op -> op
-                        .index(idx -> idx
-                                .index(PRODUCT_INDEX)
-                                .id(product.getId().toString())
-                                .document(product))));
-
-        BulkResponse result = null;
-
-        try {
-            result = esClient.bulk(br.build());
-        } catch (Exception e) {
-            throw new RuntimeException("save all error");
-        }
-
-        if (result.errors()) {
-            for (BulkResponseItem item: result.items()) {
-                if (item.error() != null) {
-                    throw new RuntimeException("save all had errors\n" + item.error().reason());
-                }
-            }
-        }
-    }
-
-    @Override
     public void updateOne(ProductDocument productDocument) {
         var request = UpdateRequest.of(u -> u
                 .index(PRODUCT_INDEX)
@@ -75,34 +47,6 @@ public class ProductElasticRepoImpl implements ProductElasticRepo {
     }
 
     @Override
-    public void updateAll(List<ProductDocument> productDocuments) {
-        var br = new BulkRequest.Builder();
-
-        productDocuments.forEach(product ->
-                br.operations(op -> op
-                        .index(idx -> idx
-                                .index(PRODUCT_INDEX)
-                                .id(product.getId().toString())
-                                .document(product))));
-
-        BulkResponse result = null;
-
-        try {
-            result = esClient.bulk(br.build());
-        } catch (Exception e) {
-            throw new RuntimeException("bulk all error");
-        }
-
-        if (result.errors()) {
-            for (BulkResponseItem item: result.items()) {
-                if (item.error() != null) {
-                    throw new RuntimeException("bulk all had errors\n" + item.error().reason());
-                }
-            }
-        }
-    }
-
-    @Override
     public void deleteOne(Long id) {
         var request = DeleteRequest.of(d -> d
                 .index(PRODUCT_INDEX)
@@ -112,33 +56,6 @@ public class ProductElasticRepoImpl implements ProductElasticRepo {
             esClient.delete(request);
         } catch (Exception e) {
             throw new RuntimeException("delete one error");
-        }
-    }
-
-    @Override
-    public void deleteAll(List<Long> ids) {
-        var br = new BulkRequest.Builder();
-
-        ids.forEach(id ->
-                br.operations(op -> op
-                        .delete(idx -> idx
-                                .index("product")
-                                .id(id.toString()))));
-
-        BulkResponse result = null;
-
-        try {
-            result = esClient.bulk(br.build());
-        } catch (Exception e) {
-            throw new RuntimeException("bulk all error");
-        }
-
-        if (result.errors()) {
-            for (BulkResponseItem item: result.items()) {
-                if (item.error() != null) {
-                    throw new RuntimeException("delete all had errors\n" + item.error().reason());
-                }
-            }
         }
     }
 }

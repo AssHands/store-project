@@ -18,6 +18,7 @@ public class CharacteristicRedisRepoImpl implements CharacteristicRedisRepo {
     private final StringRedisTemplate stringRedisTemplate;
     private final Gson gson;
 
+    //todo refactor
     private final String CHARACTERISTIC_KEY = "characteristic:";
     private final String CATEGORY_CHARACTERISTIC_KEY = "category_characteristic:";
 

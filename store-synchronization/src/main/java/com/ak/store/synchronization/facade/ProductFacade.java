@@ -1,6 +1,7 @@
 package com.ak.store.synchronization.facade;
 
 import com.ak.store.common.model.catalogue.snapshot.ProductSnapshotPayload;
+import com.ak.store.synchronization.mapper.ProductMapper;
 import com.ak.store.synchronization.service.ProductElasticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,16 +12,17 @@ import java.util.List;
 @Service
 public class ProductFacade {
     private final ProductElasticService productElasticService;
+    private final ProductMapper productMapper;
 
-    public void createAll(List<ProductSnapshotPayload> request) {
-        productElasticService.createAll(request);
+    public void createOne(ProductSnapshotPayload request) {
+        productElasticService.createOne(request);
     }
 
-    public void updateAll(List<ProductSnapshotPayload> request) {
-        productElasticService.updateAll(request);
+    public void updateOne(ProductSnapshotPayload request) {
+        productElasticService.updateOne(request);
     }
 
-    public void deleteAll(List<Long> ids) {
-        productElasticService.deleteAll(ids);
+    public void deleteOne(Long id) {
+        productElasticService.deleteOne(id);
     }
 }

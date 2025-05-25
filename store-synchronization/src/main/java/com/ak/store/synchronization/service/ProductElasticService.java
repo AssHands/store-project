@@ -1,8 +1,8 @@
 package com.ak.store.synchronization.service;
 
 import com.ak.store.common.model.catalogue.snapshot.ProductSnapshotPayload;
-import com.ak.store.synchronization.repo.elastic.ProductElasticRepo;
 import com.ak.store.synchronization.mapper.ProductMapper;
+import com.ak.store.synchronization.repo.elastic.ProductElasticRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +14,15 @@ public class ProductElasticService {
     private final ProductElasticRepo productRepo;
     private final ProductMapper productMapper;
 
-    public void createAll(List<ProductSnapshotPayload> request) {
-        productRepo.saveAll(productMapper.toProductDocument(request));
+    public void createOne(ProductSnapshotPayload request) {
+        productRepo.saveOne(productMapper.toProductDocument(request));
     }
 
-    public void updateAll(List<ProductSnapshotPayload> request) {
-        productRepo.updateAll(productMapper.toProductDocument(request));
+    public void updateOne(ProductSnapshotPayload request) {
+        productRepo.updateOne(productMapper.toProductDocument(request));
     }
 
-    public void deleteAll(List<Long> ids) {
-        productRepo.deleteAll(ids);
+    public void deleteOne(Long id) {
+        productRepo.deleteOne(id);
     }
 }
