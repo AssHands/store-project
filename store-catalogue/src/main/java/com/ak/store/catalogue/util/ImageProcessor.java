@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class ImageProcessor {
     private final ProductService productService;
 
-    public ProcessedImages processImages(ImageWriteDTO request, List<ImageDTO> images) {
+    public ProcessedImages process(ImageWriteDTO request, List<ImageDTO> images) {
         ProcessedImages processedImages = new ProcessedImages();
 
         processedImages.setImageKeysForDelete(

@@ -6,7 +6,7 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
-import com.ak.store.catalogue.util.mapper.CategoryMapper;
+import com.ak.store.catalogue.mapper.CategoryMapper;
 import com.ak.store.catalogue.validator.service.CategoryServiceValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

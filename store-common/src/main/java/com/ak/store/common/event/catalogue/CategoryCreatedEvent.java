@@ -17,7 +17,7 @@ import java.util.UUID;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CategoryCreatedEvent implements KafkaEvent {
-    private UUID taskId;
+    private UUID eventId;
 
     private CategorySnapshotPayload payload;
 }

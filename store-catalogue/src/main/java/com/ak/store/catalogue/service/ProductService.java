@@ -6,7 +6,7 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.service.product.PriceCalculator;
-import com.ak.store.catalogue.util.mapper.ProductMapper;
+import com.ak.store.catalogue.mapper.ProductMapper;
 import com.ak.store.catalogue.validator.service.ProductServiceValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

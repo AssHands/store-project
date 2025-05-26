@@ -1,7 +1,6 @@
 package com.ak.store.search.kafka;
 
 import com.ak.store.common.event.search.SearchAllEvent;
-import com.ak.store.common.event.search.SearchEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;

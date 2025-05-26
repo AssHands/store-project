@@ -1,5 +1,6 @@
 package com.ak.store.emailSender;
 
+import com.ak.store.emailSender.util.KafkaProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;

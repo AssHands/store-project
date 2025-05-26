@@ -48,6 +48,6 @@ public class OrderFacade {
                 .totalPrice(orderPayload.getOrder().getTotalPrice())
                 .build();
 
-        orderProducerKafka.send(orderCreatedEvent);
+        orderProducerKafka.send(orderCreatedEvent, orderPayload.getOrder().getId().toString());
     }
 }

@@ -12,6 +12,7 @@ public class CategoryRedisService {
     private final CategoryRedisRepo categoryRedisRepo;
     private final CategoryMapper categoryMapper;
 
+    //todo добавить транзакции в редис. если редис упадет на втором методе обновления, будут неправильные данные
     public void createOne(CategorySnapshotPayload request) {
         Long categoryId = request.getCategory().getId();
 

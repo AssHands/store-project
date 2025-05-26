@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Service
 public class DltProducerKafka {
-    private final KafkaTemplate<String, KafkaEvent> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final KafkaTopicRegistry topicRegistry;
 
     public <T extends KafkaEvent> void send(T event, String key) {

@@ -4,7 +4,7 @@ import com.ak.store.catalogue.facade.ProductFacade;
 import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
 import com.ak.store.catalogue.model.form.ProductFormPayload;
 import com.ak.store.catalogue.model.view.ProductView;
-import com.ak.store.catalogue.util.mapper.ProductMapper;
+import com.ak.store.catalogue.mapper.ProductMapper;
 import com.ak.store.catalogue.model.validationGroup.Create;
 import com.ak.store.catalogue.model.validationGroup.Update;
 import lombok.RequiredArgsConstructor;

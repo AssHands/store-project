@@ -6,7 +6,7 @@ import com.ak.store.catalogue.model.entity.Image;
 import com.ak.store.catalogue.model.pojo.ProcessedImages;
 import com.ak.store.catalogue.repository.ImageRepo;
 import com.ak.store.catalogue.util.ImageProcessor;
-import com.ak.store.catalogue.util.mapper.ImageMapper;
+import com.ak.store.catalogue.mapper.ImageMapper;
 import com.ak.store.catalogue.validator.ImageValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public class ImageService {
     public ProcessedImages saveOrUpdateAllImage(ImageWriteDTO request) {
         List<ImageDTO> images = findAll(request.getProductId());
         imageValidator.validate(request, images);
-        ProcessedImages processedImages = imageProcessor.processImages(request, images);
+        ProcessedImages processedImages = imageProcessor.process(request, images);
 
         deleteAll(request.getProductId());
         imageRepo.saveAll(imageMapper.toImage(processedImages.getAllImages(), request.getProductId()));

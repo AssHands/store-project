@@ -3,8 +3,8 @@ package com.ak.store.catalogue.controller;
 import com.ak.store.catalogue.facade.CategoryFacade;
 import com.ak.store.catalogue.model.form.CategoryForm;
 import com.ak.store.catalogue.model.view.CategoryTreeView;
-import com.ak.store.catalogue.util.CatalogueUtils;
-import com.ak.store.catalogue.util.mapper.CategoryMapper;
+import com.ak.store.catalogue.util.CategoryTreeBuilder;
+import com.ak.store.catalogue.mapper.CategoryMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ public class CategoryController {
     @GetMapping
     public List<CategoryTreeView> findAll() {
         var categories = categoryFacade.findAll();
-        return CatalogueUtils.buildCategoryTree(categories.stream()
+        return CategoryTreeBuilder.build(categories.stream()
                 .map(categoryMapper::toCategoryTreeView)
                 .toList());
     }

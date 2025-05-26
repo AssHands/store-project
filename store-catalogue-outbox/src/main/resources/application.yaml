@@ -1,0 +1,56 @@
+server:
+  port: 8086
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5430/postgres
+    username: root
+    password: root
+
+  jpa:
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        #logs
+        format_sql: true
+        generate_statistics: true
+
+        #batch
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:39092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 7
+      properties:
+        retry.backoff.ms: 500
+        retry.backoff.max.ms: 5000
+        request.timeout.ms: 15000
+        delivery.timeout.ms: 20000
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        linger.ms: 3000
+
+kafka:
+  group-id: outbox-scheduler-group
+  dlt-prefix: .dlt
+  topics:
+    category-created: category-created
+    category-updated: category-updated
+    category-deleted: category-deleted
+
+    characteristic-created: characteristic-created
+    characteristic-updated: characteristic-updated
+    characteristic-deleted: characteristic-deleted
+
+    product-created: product-created
+    product-updated: product-updated
+    product-deleted: product-deleted

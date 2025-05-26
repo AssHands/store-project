@@ -2,7 +2,7 @@ package com.ak.store.emailSender.service;
 
 import com.ak.store.emailSender.feign.CatalogueFeign;
 import com.ak.store.emailSender.model.dto.OrderCreatedWriteDTO;
-import com.ak.store.emailSender.model.propery.EmailProperties;
+import com.ak.store.emailSender.util.EmailProperties;
 import com.ak.store.emailSender.model.view.ProductView;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;

@@ -4,12 +4,13 @@ import com.ak.store.common.event.KafkaEvent;
 import com.ak.store.common.event.catalogue.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+@Configuration
 @RequiredArgsConstructor
 public class KafkaTopicRegistry {
     private final KafkaProperties kafkaProperties;

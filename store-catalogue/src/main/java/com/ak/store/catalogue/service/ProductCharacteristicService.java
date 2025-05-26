@@ -4,7 +4,7 @@ import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
 import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.catalogue.repository.ProductCharacteristicRepo;
-import com.ak.store.catalogue.util.mapper.ProductCharacteristicMapper;
+import com.ak.store.catalogue.mapper.ProductCharacteristicMapper;
 import com.ak.store.catalogue.validator.service.ProductCharacteristicServiceValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

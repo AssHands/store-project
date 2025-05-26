@@ -2,10 +2,10 @@ package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.model.dto.CategoryDTO;
 import com.ak.store.catalogue.model.dto.write.CategoryWriteDTO;
-import com.ak.store.catalogue.outbox.OutboxTaskService;
-import com.ak.store.catalogue.outbox.OutboxTaskType;
+import com.ak.store.catalogue.outbox.OutboxEventService;
+import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.CategoryService;
-import com.ak.store.catalogue.util.mapper.CategoryMapper;
+import com.ak.store.catalogue.mapper.CategoryMapper;
 import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 public class CategoryFacade {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
-    private final OutboxTaskService<CategorySnapshotPayload> outboxTaskService;
+    private final OutboxEventService<CategorySnapshotPayload> outboxEventService;
 
     public List<CategoryDTO> findAll() {
         return categoryService.findAll();
@@ -35,7 +35,7 @@ public class CategoryFacade {
                 .relatedCategories(Collections.emptyList())
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CATEGORY_CREATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CATEGORY_CREATED);
         return category.getId();
     }
 
@@ -49,7 +49,7 @@ public class CategoryFacade {
                 .relatedCategories(categoryService.findAllRelatedCategory(category.getId()))
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CATEGORY_UPDATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CATEGORY_UPDATED);
         return category.getId();
     }
 
@@ -63,7 +63,7 @@ public class CategoryFacade {
                 .relatedCategories(Collections.emptyList())
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CATEGORY_DELETED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CATEGORY_DELETED);
     }
 
     @Transactional
@@ -76,7 +76,7 @@ public class CategoryFacade {
                 .relatedCategories(categoryService.findAllRelatedCategory(category.getId()))
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CATEGORY_UPDATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CATEGORY_UPDATED);
         return category.getId();
     }
 
@@ -90,7 +90,7 @@ public class CategoryFacade {
                 .relatedCategories(categoryService.findAllRelatedCategory(category.getId()))
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CATEGORY_UPDATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CATEGORY_UPDATED);
         return category.getId();
     }
 
@@ -104,7 +104,7 @@ public class CategoryFacade {
                 .relatedCategories(categoryService.findAllRelatedCategory(category.getId()))
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CATEGORY_UPDATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CATEGORY_UPDATED);
         return category.getId();
     }
 
@@ -118,7 +118,7 @@ public class CategoryFacade {
                 .relatedCategories(categoryService.findAllRelatedCategory(category.getId()))
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CATEGORY_UPDATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CATEGORY_UPDATED);
         return category.getId();
     }
 }

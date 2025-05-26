@@ -5,10 +5,10 @@ import com.ak.store.catalogue.model.dto.NumericValueDTO;
 import com.ak.store.catalogue.model.dto.write.CharacteristicWriteDTO;
 import com.ak.store.catalogue.model.dto.write.NumericValueWriteDTO;
 import com.ak.store.catalogue.model.dto.write.TextValueWriteDTO;
-import com.ak.store.catalogue.outbox.OutboxTaskService;
-import com.ak.store.catalogue.outbox.OutboxTaskType;
+import com.ak.store.catalogue.outbox.OutboxEventService;
+import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.CharacteristicService;
-import com.ak.store.catalogue.util.mapper.CharacteristicMapper;
+import com.ak.store.catalogue.mapper.CharacteristicMapper;
 import com.ak.store.common.model.catalogue.snapshot.CharacteristicSnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.List;
 public class CharacteristicFacade {
     private final CharacteristicService characteristicService;
     private final CharacteristicMapper characteristicMapper;
-    private final OutboxTaskService<CharacteristicSnapshotPayload> outboxTaskService;
+    private final OutboxEventService<CharacteristicSnapshotPayload> outboxEventService;
 
     public List<CharacteristicDTO> findAllByCategoryId(Long categoryId) {
         return characteristicService.findAllByCategoryId(categoryId);
@@ -39,7 +39,7 @@ public class CharacteristicFacade {
                 .textValues(Collections.emptyList())
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CHARACTERISTIC_CREATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_CREATED);
         return characteristic.getId();
     }
 
@@ -61,7 +61,7 @@ public class CharacteristicFacade {
                 .textValues(textValues)
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CHARACTERISTIC_UPDATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
         return characteristic.getId();
     }
 
@@ -75,7 +75,7 @@ public class CharacteristicFacade {
                 .textValues(Collections.emptyList())
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CHARACTERISTIC_DELETED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_DELETED);
     }
 
     @Transactional
@@ -88,7 +88,7 @@ public class CharacteristicFacade {
                 .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CHARACTERISTIC_UPDATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
         return characteristic.getId();
     }
 
@@ -102,7 +102,7 @@ public class CharacteristicFacade {
                 .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CHARACTERISTIC_UPDATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
         return characteristic.getId();
     }
 
@@ -116,7 +116,7 @@ public class CharacteristicFacade {
                 .textValues(textValues)
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CHARACTERISTIC_UPDATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
         return characteristic.getId();
     }
 
@@ -130,7 +130,7 @@ public class CharacteristicFacade {
                 .textValues(textValues)
                 .build();
 
-        outboxTaskService.createOneTask(snapshot, OutboxTaskType.CHARACTERISTIC_UPDATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
         return characteristic.getId();
     }
 }

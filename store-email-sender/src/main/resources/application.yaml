@@ -2,6 +2,11 @@ server:
   port: 8085
 
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5436/postgres
+    username: root
+    password: root
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -13,6 +18,12 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:29092,localhost:39092
+
+    listener:
+      type: batch
+      ack-mode: manual
+      concurrency: 3
+      poll-timeout: 3000
 
     consumer:
       group-id: email-sender-group
@@ -43,9 +54,10 @@ spring:
 
 kafka:
   group-id: email-sender-group
+  dlt-prefix: .dlt
   topics:
     order-created: order-created
-    consumer-verify: consumer-verify
+    user-verify: user-verify
 
 email:
   verify:

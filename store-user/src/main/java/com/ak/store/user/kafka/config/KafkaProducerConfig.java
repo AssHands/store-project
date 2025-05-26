@@ -1,6 +1,5 @@
 package com.ak.store.user.kafka.config;
 
-import com.ak.store.common.event.consumer.ConsumerEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;

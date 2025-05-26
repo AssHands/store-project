@@ -44,5 +44,6 @@ spring:
 
 kafka:
   group-id: order-group
+  dlt-prefix: .dlt
   topics:
     order-created: order-created

@@ -8,7 +8,7 @@ import com.ak.store.catalogue.model.dto.write.TextValueWriteDTO;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
-import com.ak.store.catalogue.util.mapper.CharacteristicMapper;
+import com.ak.store.catalogue.mapper.CharacteristicMapper;
 import com.ak.store.catalogue.validator.service.CharacteristicServiceValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,6 @@
 package com.ak.store.common.event.order;
 
+import com.ak.store.common.event.KafkaEvent;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -9,13 +10,16 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrderCreatedEvent implements OrderEvent {
+public class OrderCreatedEvent implements KafkaEvent {
+    private UUID eventId;
+
     private Long orderId;
 
     private String userEmail;

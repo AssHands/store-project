@@ -5,14 +5,14 @@ import com.ak.store.catalogue.model.dto.ImageDTO;
 import com.ak.store.catalogue.model.dto.ProductDTO;
 import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
 import com.ak.store.catalogue.model.dto.write.ProductWritePayload;
-import com.ak.store.catalogue.outbox.OutboxTaskService;
-import com.ak.store.catalogue.outbox.OutboxTaskType;
+import com.ak.store.catalogue.outbox.OutboxEventService;
+import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.ImageService;
 import com.ak.store.catalogue.service.ProductCharacteristicService;
 import com.ak.store.catalogue.service.ProductService;
-import com.ak.store.catalogue.util.mapper.ImageMapper;
-import com.ak.store.catalogue.util.mapper.ProductCharacteristicMapper;
-import com.ak.store.catalogue.util.mapper.ProductMapper;
+import com.ak.store.catalogue.mapper.ImageMapper;
+import com.ak.store.catalogue.mapper.ProductCharacteristicMapper;
+import com.ak.store.catalogue.mapper.ProductMapper;
 import com.ak.store.common.model.catalogue.snapshot.ProductSnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class ProductFacade {
     private final ProductService productService;
     private final ImageService imageService;
     private final ProductCharacteristicService productCharacteristicService;
-    private final OutboxTaskService<ProductSnapshotPayload> productOutboxTaskService;
+    private final OutboxEventService<ProductSnapshotPayload> productOutboxEventService;
     private final S3Service s3Service;
 
     private final ProductMapper productMapper;
@@ -60,7 +60,7 @@ public class ProductFacade {
                 .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
                 .build();
 
-        productOutboxTaskService.createOneTask(snapshot, OutboxTaskType.PRODUCT_CREATED);
+        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_CREATED);
         return product.getId();
     }
 
@@ -81,7 +81,7 @@ public class ProductFacade {
                 .images(imageMapper.toImageSnapshot(images))
                 .build();
 
-        productOutboxTaskService.createOneTask(snapshot, OutboxTaskType.PRODUCT_UPDATED);
+        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_UPDATED);
         return product.getId();
     }
 
@@ -97,7 +97,7 @@ public class ProductFacade {
                 .images(imageMapper.toImageSnapshot(images))
                 .build();
 
-        productOutboxTaskService.createOneTask(snapshot, OutboxTaskType.PRODUCT_DELETED);
+        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_DELETED);
 
         List<String> imageKeys = images.stream()
                 .map(ImageDTO::getKey)
@@ -124,7 +124,7 @@ public class ProductFacade {
                 .images(imageMapper.toImageSnapshot(images))
                 .build();
 
-        productOutboxTaskService.createOneTask(snapshot, OutboxTaskType.PRODUCT_UPDATED);
+        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_UPDATED);
 
         try {
             s3Service.putAllImage(processedProductImages.getImagesForAdd());
