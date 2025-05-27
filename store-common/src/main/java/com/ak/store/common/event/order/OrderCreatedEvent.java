@@ -1,6 +1,7 @@
 package com.ak.store.common.event.order;
 
 import com.ak.store.common.event.KafkaEvent;
+import com.ak.store.common.model.order.snapshot.OrderSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -20,12 +21,5 @@ import java.util.UUID;
 public class OrderCreatedEvent implements KafkaEvent {
     private UUID eventId;
 
-    private Long orderId;
-
-    private String userEmail;
-
-    private Integer totalPrice;
-
-    @Builder.Default
-    private Map<Long, Integer> productAmount = new HashMap<>();
+    private OrderSnapshot order;
 }

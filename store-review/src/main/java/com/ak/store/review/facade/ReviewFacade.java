@@ -1,9 +1,9 @@
 package com.ak.store.review.facade;
 
-import com.ak.store.common.model.consumer.form.CommentForm;
-import com.ak.store.common.model.consumer.form.ReviewForm;
-import com.ak.store.common.model.consumer.view.CommentView;
-import com.ak.store.common.model.consumer.view.ReviewView;
+import com.ak.store.common.model.user.form.CommentForm;
+import com.ak.store.common.model.user.form.ReviewForm;
+import com.ak.store.common.model.user.view.CommentView;
+import com.ak.store.common.model.user.view.ReviewView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

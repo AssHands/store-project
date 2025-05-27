@@ -18,11 +18,7 @@ public class CategoryConsumerKafka {
     private final CategoryFacade categoryFacade;
     private final CategoryKafkaErrorHandler errorHandler;
 
-    @KafkaListener(
-            topics = "${kafka.topics.category-created}",
-            groupId = "${kafka.group-id}",
-            batch = "true",
-            containerFactory = "batchFactory")
+    @KafkaListener(topics = "${kafka.topics.category-created}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleCreated(List<CategoryCreatedEvent> categoryCreatedEvents) {
         for(var event : categoryCreatedEvents) {
             try {
@@ -33,11 +29,7 @@ public class CategoryConsumerKafka {
         }
     }
 
-    @KafkaListener(
-            topics = "${kafka.topics.category-updated}",
-            groupId = "${kafka.group-id}",
-            batch = "true",
-            containerFactory = "batchFactory")
+    @KafkaListener(topics = "${kafka.topics.category-updated}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleUpdated(List<CategoryUpdatedEvent> categoryUpdatedEvents) {
         for(var event : categoryUpdatedEvents) {
             try {
@@ -48,11 +40,7 @@ public class CategoryConsumerKafka {
         }
     }
 
-    @KafkaListener(
-            topics = "${kafka.topics.category-deleted}",
-            groupId = "${kafka.group-id}",
-            batch = "true",
-            containerFactory = "batchFactory")
+    @KafkaListener(topics = "${kafka.topics.category-deleted}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleDeleted(List<CategoryDeletedEvent> categoryDeletedEvents) {
         for(var event : categoryDeletedEvents) {
             try {

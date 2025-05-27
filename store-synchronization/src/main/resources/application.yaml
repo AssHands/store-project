@@ -5,14 +5,22 @@ spring:
   kafka:
     bootstrap-servers: localhost:29092,localhost:39092
 
+    listener:
+      type: batch
+      ack-mode: manual
+      concurrency: 3
+      poll-timeout: 3000
+
     consumer:
-      group-id: synchronization-catalogue-group
+      group-id: synchronization-group
       properties:
         spring.json.trusted.packages: "com.ak.store.*"
       auto-offset-reset: earliest
       max-poll-records: 100
 
     producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: all
       retries: 7
       properties:
@@ -24,7 +32,6 @@ spring:
         max.in.flight.requests.per.connection: 5
 
 kafka:
-  group-id: synchronization-group
   dlt-prefix: .dlt
   topics:
     category-created: category-created

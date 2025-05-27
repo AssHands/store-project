@@ -1,9 +1,13 @@
 package com.ak.store.emailSender.kafka.consumer;
 
 import com.ak.store.common.event.order.OrderCreatedEvent;
+import com.ak.store.common.model.order.snapshot.OrderSnapshot;
 import com.ak.store.emailSender.errorHandler.OrderKafkaErrorHandler;
 import com.ak.store.emailSender.facade.EmailFacade;
+import com.ak.store.emailSender.inbox.InboxEventService;
+import com.ak.store.emailSender.inbox.InboxEventType;
 import com.ak.store.emailSender.mapper.EmailMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,19 +19,15 @@ import java.util.concurrent.ExecutorService;
 @Component
 @RequiredArgsConstructor
 public class OrderConsumerKafka {
-    private final EmailFacade emailFacade;
-    private final EmailMapper emailMapper;
     private final OrderKafkaErrorHandler errorHandler;
+    private final InboxEventService<OrderSnapshot> inboxEventService;
 
-    @Qualifier("emailExecutor")
-    private ExecutorService emailExecutor;
-
-    @KafkaListener(topics = "${kafka.topics.order-created}", groupId = "${kafka.group-id}", batch = "true")
+    @Transactional
+    @KafkaListener(topics = "${kafka.topics.order-created}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handle(List<OrderCreatedEvent> orderCreatedEvents) {
         for (var event : orderCreatedEvents) {
             try {
-                emailFacade.sendOrderCreated(
-                        emailMapper.toOrderCreatedWriteDTO(event));
+                inboxEventService.createOne(event.getEventId(), event.getOrder(), InboxEventType.ORDER_CREATED);
             } catch (Exception e) {
                 errorHandler.handleCreateError(event, e);
             }

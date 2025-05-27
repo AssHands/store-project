@@ -1,7 +1,7 @@
 package com.ak.store.review.service;
 
-import com.ak.store.common.model.consumer.form.CommentForm;
-import com.ak.store.common.model.consumer.form.ReviewForm;
+import com.ak.store.common.model.user.form.CommentForm;
+import com.ak.store.common.model.user.form.ReviewForm;
 import com.ak.store.user.model.entity.Comment;
 import com.ak.store.user.model.entity.Consumer;
 import com.ak.store.user.model.entity.Review;

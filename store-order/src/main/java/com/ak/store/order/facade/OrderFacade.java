@@ -1,12 +1,13 @@
 package com.ak.store.order.facade;
 
-import com.ak.store.common.event.order.OrderCreatedEvent;
+import com.ak.store.common.model.order.snapshot.OrderSnapshot;
 import com.ak.store.order.feign.WarehouseFeign;
-import com.ak.store.order.kafka.OrderProducerKafka;
 import com.ak.store.order.model.dto.OrderDTOPayload;
 import com.ak.store.order.model.dto.UserAuthContext;
 import com.ak.store.order.model.dto.write.OrderWriteDTO;
 import com.ak.store.order.model.form.werehouse.ReserveInventoryForm;
+import com.ak.store.order.outbox.OutboxEventService;
+import com.ak.store.order.outbox.OutboxEventType;
 import com.ak.store.order.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ import java.util.UUID;
 public class OrderFacade {
     private final OrderService orderService;
     private final WarehouseFeign warehouseFeign;
-    private final OrderProducerKafka orderProducerKafka;
+    private final OutboxEventService<OrderSnapshot> outboxEventService;
 
     public List<OrderDTOPayload> findAllByUserId(UUID userId) {
         return orderService.findAllByUserId(userId);
@@ -41,13 +42,13 @@ public class OrderFacade {
 
         warehouseFeign.reserveAll(reserveForm);
 
-        var orderCreatedEvent = OrderCreatedEvent.builder()
-                .orderId(orderPayload.getOrder().getId())
+        var orderSnapshot = OrderSnapshot.builder()
+                .id(orderPayload.getOrder().getId())
                 .userEmail(authContext.getEmail())
                 .productAmount(request.getProductAmount())
                 .totalPrice(orderPayload.getOrder().getTotalPrice())
                 .build();
 
-        orderProducerKafka.send(orderCreatedEvent, orderPayload.getOrder().getId().toString());
+        outboxEventService.createOne(orderSnapshot, OutboxEventType.ORDER_CREATED);
     }
 }

@@ -4,7 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import com.nimbusds.jose.shaded.gson.Gson;
+import com.google.gson.Gson;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.apache.http.HttpHost;
@@ -34,7 +34,7 @@ import software.amazon.awssdk.services.s3.endpoints.S3EndpointProvider;
 
 
 @EnableJpaRepositories("com.ak.store.*")
-@ComponentScan(basePackages = {"com.ak.store.*" })
+@ComponentScan(basePackages = {"com.ak.store.*"})
 @EntityScan("com.ak.store.*")
 @SpringBootApplication
 public class CatalogueProjectApplication {

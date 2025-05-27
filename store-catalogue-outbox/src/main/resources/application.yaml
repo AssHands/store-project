@@ -25,6 +25,12 @@ spring:
   kafka:
     bootstrap-servers: localhost:29092,localhost:39092
 
+    listener:
+      type: batch
+      ack-mode: manual
+      concurrency: 3
+      poll-timeout: 3000
+
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -40,7 +46,6 @@ spring:
         linger.ms: 3000
 
 kafka:
-  group-id: outbox-scheduler-group
   dlt-prefix: .dlt
   topics:
     category-created: category-created

@@ -12,8 +12,6 @@ import java.util.Map;
 @Configuration
 @ConfigurationProperties(prefix = "kafka")
 public class KafkaProperties {
-    private String groupId;
-
     private String dltPrefix;
 
     private Map<String, String> topics = new HashMap<>();

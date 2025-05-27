@@ -7,6 +7,21 @@ spring:
     username: root
     password: root
 
+  jpa:
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        #logs
+        format_sql: true
+        generate_statistics: true
+
+        #batch
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -53,7 +68,6 @@ spring:
             readTimeout: 7000
 
 kafka:
-  group-id: email-sender-group
   dlt-prefix: .dlt
   topics:
     order-created: order-created

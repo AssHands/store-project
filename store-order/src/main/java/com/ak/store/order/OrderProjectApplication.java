@@ -1,5 +1,6 @@
 package com.ak.store.order;
 
+import com.google.gson.Gson;
 import feign.okhttp.OkHttpClient;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -34,5 +35,10 @@ public class OrderProjectApplication {
                 .failFast(true)
                 .buildValidatorFactory()
                 .getValidator();
+    }
+
+    @Bean
+    public Gson gson() {
+        return new Gson();
     }
 }

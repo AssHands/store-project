@@ -18,10 +18,7 @@ public class CharacteristicConsumerKafka {
     private final CharacteristicKafkaErrorHandler errorHandler;
 
     @KafkaListener(
-            topics = "${kafka.topics.characteristic-created}",
-            groupId = "${kafka.group-id}",
-            batch = "true",
-            containerFactory = "batchFactory")
+            topics = "${kafka.topics.characteristic-created}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleCreated(List<CharacteristicCreatedEvent> characteristicCreatedEvents) {
         for (var event : characteristicCreatedEvents) {
             try {
@@ -33,10 +30,7 @@ public class CharacteristicConsumerKafka {
     }
 
     @KafkaListener(
-            topics = "${kafka.topics.characteristic-updated}",
-            groupId = "${kafka.group-id}",
-            batch = "true",
-            containerFactory = "batchFactory")
+            topics = "${kafka.topics.characteristic-updated}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleUpdated(List<CharacteristicUpdatedEvent> characteristicUpdatedEvents) {
         for (var event : characteristicUpdatedEvents) {
             try {
@@ -48,10 +42,7 @@ public class CharacteristicConsumerKafka {
     }
 
     @KafkaListener(
-            topics = "${kafka.topics.characteristic-deleted}",
-            groupId = "${kafka.group-id}",
-            batch = "true",
-            containerFactory = "batchFactory")
+            topics = "${kafka.topics.characteristic-deleted}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleDeleted(List<CharacteristicDeletedEvent> characteristicDeletedEvents) {
         for (var event : characteristicDeletedEvents) {
             try {

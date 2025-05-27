@@ -17,7 +17,7 @@ public class UserConsumerKafka {
     private final EmailFacade emailFacade;
     private final UserKafkaErrorHandler errorHandler;
 
-    @KafkaListener(topics = "${kafka.topics.user-verify}", groupId = "${kafka.group-id}", batch = "true")
+    @KafkaListener(topics = "${kafka.topics.user-verify}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handle(List<UserVerifyEvent> userVerifyEvents) {
         for(var event : userVerifyEvents) {
             try {

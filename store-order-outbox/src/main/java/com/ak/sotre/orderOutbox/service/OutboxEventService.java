@@ -1,0 +1,42 @@
+package com.ak.sotre.orderOutbox.service;
+
+import com.ak.sotre.orderOutbox.model.OutboxEvent;
+import com.ak.sotre.orderOutbox.model.OutboxEventStatus;
+import com.ak.sotre.orderOutbox.model.OutboxEventType;
+import com.ak.sotre.orderOutbox.repo.OutboxEventRepo;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@RequiredArgsConstructor
+@Service
+public class OutboxEventService {
+    private final OutboxEventRepo outboxEventRepo;
+    private Integer batchSize = 100;
+    private Integer retryTimeMinutes = 5;
+
+    @Transactional
+    public List<OutboxEvent> findAllForProcessing(OutboxEventType type) {
+        LocalDateTime retryTime = LocalDateTime.now();
+
+        Pageable pageable = PageRequest.of(0, batchSize);
+        List<OutboxEvent> tasks = outboxEventRepo.findAllForProcessing(
+                type, OutboxEventStatus.IN_PROGRESS, LocalDateTime.now(), pageable);
+
+        for (OutboxEvent task : tasks) {
+            task.setRetryTime(retryTime.plusMinutes(retryTimeMinutes));
+        }
+
+        return tasks;
+    }
+
+    @Transactional
+    public void markAllAsCompleted(List<OutboxEvent> events) {
+        outboxEventRepo.updateAll(events, OutboxEventStatus.COMPLETED);
+    }
+}

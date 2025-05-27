@@ -18,10 +18,7 @@ public class ProductConsumerKafka {
     private final ProductKafkaErrorHandler errorHandler;
 
     @KafkaListener(
-            topics = "${kafka.topics.product-created}",
-            groupId = "${kafka.group-id}",
-            batch = "true",
-            containerFactory = "batchFactory")
+            topics = "${kafka.topics.product-created}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleCreated(List<ProductCreatedEvent> productCreatedEvents) {
         for (var event : productCreatedEvents) {
             try {
@@ -33,10 +30,7 @@ public class ProductConsumerKafka {
     }
 
     @KafkaListener(
-            topics = "${kafka.topics.product-updated}",
-            groupId = "${kafka.group-id}",
-            batch = "true",
-            containerFactory = "batchFactory")
+            topics = "${kafka.topics.product-updated}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleUpdated(List<ProductUpdatedEvent> productUpdatedEvents) {
         for (var event : productUpdatedEvents) {
             try {
@@ -47,11 +41,7 @@ public class ProductConsumerKafka {
         }
     }
 
-    @KafkaListener(
-            topics = "${kafka.topics.product-deleted}",
-            groupId = "${kafka.group-id}",
-            batch = "true",
-            containerFactory = "batchFactory")
+    @KafkaListener(topics = "${kafka.topics.product-deleted}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleDeleted(List<ProductDeletedEvent> productDeletedEvents) {
         for (var event : productDeletedEvents) {
             try {
