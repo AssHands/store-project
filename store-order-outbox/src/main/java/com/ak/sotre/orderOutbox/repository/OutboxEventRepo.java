@@ -1,4 +1,4 @@
-package com.ak.sotre.orderOutbox.repo;
+package com.ak.sotre.orderOutbox.repository;
 
 import com.ak.sotre.orderOutbox.model.OutboxEvent;
 import com.ak.sotre.orderOutbox.model.OutboxEventStatus;
@@ -13,9 +13,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface OutboxEventRepo extends JpaRepository<OutboxEvent, Long> {
+public interface OutboxEventRepo extends JpaRepository<OutboxEvent, UUID> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
             SELECT e FROM OutboxEvent e

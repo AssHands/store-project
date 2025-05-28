@@ -1,5 +1,10 @@
-package com.ak.store.emailSender.inbox;
+package com.ak.store.emailSender.service;
 
+import com.ak.store.emailSender.inbox.InboxEvent;
+import com.ak.store.emailSender.inbox.InboxEventMapper;
+import com.ak.store.emailSender.inbox.InboxEventStatus;
+import com.ak.store.emailSender.inbox.InboxEventType;
+import com.ak.store.emailSender.repository.InboxEventRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,7 +16,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class InboxEventService<T> {
+public class InboxEventWriterService<T> {
     private final InboxEventRepo inboxEventRepo;
     private final InboxEventMapper<T> inboxEventMapper;
 
@@ -31,7 +36,7 @@ public class InboxEventService<T> {
     public void createAll(List<T> payloads, InboxEventType type) {
         List<InboxEvent> events = new ArrayList<>();
 
-        for(var payload : payloads) {
+        for (var payload : payloads) {
             var event = inboxEventMapper.toInboxEvent(payload);
 
             event.setType(type);

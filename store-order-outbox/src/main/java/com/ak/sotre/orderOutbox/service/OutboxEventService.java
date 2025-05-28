@@ -3,7 +3,7 @@ package com.ak.sotre.orderOutbox.service;
 import com.ak.sotre.orderOutbox.model.OutboxEvent;
 import com.ak.sotre.orderOutbox.model.OutboxEventStatus;
 import com.ak.sotre.orderOutbox.model.OutboxEventType;
-import com.ak.sotre.orderOutbox.repo.OutboxEventRepo;
+import com.ak.sotre.orderOutbox.repository.OutboxEventRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -25,14 +25,14 @@ public class OutboxEventService {
         LocalDateTime retryTime = LocalDateTime.now();
 
         Pageable pageable = PageRequest.of(0, batchSize);
-        List<OutboxEvent> tasks = outboxEventRepo.findAllForProcessing(
+        List<OutboxEvent> events = outboxEventRepo.findAllForProcessing(
                 type, OutboxEventStatus.IN_PROGRESS, LocalDateTime.now(), pageable);
 
-        for (OutboxEvent task : tasks) {
-            task.setRetryTime(retryTime.plusMinutes(retryTimeMinutes));
+        for (var event : events) {
+            event.setRetryTime(retryTime.plusMinutes(retryTimeMinutes));
         }
 
-        return tasks;
+        return events;
     }
 
     @Transactional

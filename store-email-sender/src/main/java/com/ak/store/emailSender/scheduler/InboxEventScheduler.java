@@ -1,0 +1,54 @@
+package com.ak.store.emailSender.scheduler;
+
+import com.ak.store.emailSender.inbox.InboxEvent;
+import com.ak.store.emailSender.inbox.InboxEventType;
+import com.ak.store.emailSender.processor.InboxEventProcessor;
+import com.ak.store.emailSender.service.InboxEventReaderService;
+import jakarta.transaction.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+public class InboxEventScheduler {
+    private final InboxEventReaderService inboxEventReaderService;
+    private final Map<InboxEventType, InboxEventProcessor> eventProcessors;
+
+    public InboxEventScheduler(InboxEventReaderService inboxEventReaderService, List<InboxEventProcessor> eventProcessors) {
+        this.inboxEventReaderService = inboxEventReaderService;
+
+        this.eventProcessors = eventProcessors.stream()
+                .collect(Collectors.toMap(
+                        InboxEventProcessor::getType,
+                        processor -> processor
+                ));
+    }
+
+    @Transactional
+    @Scheduled(fixedRate = 5000)
+    public void executeOutboxEvents() {
+        for (var entry : eventProcessors.entrySet()) {
+            processOutboxEventsOfType(entry.getKey());
+        }
+    }
+
+    private void processOutboxEventsOfType(InboxEventType type) {
+        var processor = eventProcessors.get(type);
+        var events = inboxEventReaderService.findAllForProcessing(type);
+        List<InboxEvent> completedEvents = new ArrayList<>();
+
+        for (var event : events) {
+            try {
+                processor.process(event);
+                completedEvents.add(event);
+            } catch (Exception ignored) {
+            }
+        }
+
+        inboxEventReaderService.markAllAsCompleted(completedEvents);
+    }
+}

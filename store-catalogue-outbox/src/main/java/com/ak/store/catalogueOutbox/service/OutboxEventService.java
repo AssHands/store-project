@@ -25,14 +25,14 @@ public class OutboxEventService {
         LocalDateTime retryTime = LocalDateTime.now();
 
         Pageable pageable = PageRequest.of(0, batchSize);
-        List<OutboxEvent> tasks = outboxEventRepo.findAllForProcessing(
+        List<OutboxEvent> events = outboxEventRepo.findAllForProcessing(
                 type, OutboxEventStatus.IN_PROGRESS, LocalDateTime.now(), pageable);
 
-        for (OutboxEvent task : tasks) {
-            task.setRetryTime(retryTime.plusMinutes(retryTimeMinutes));
+        for (var event : events) {
+            event.setRetryTime(retryTime.plusMinutes(retryTimeMinutes));
         }
 
-        return tasks;
+        return events;
     }
 
     @Transactional
