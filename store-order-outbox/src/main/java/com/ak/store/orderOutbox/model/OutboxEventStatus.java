@@ -1,4 +1,4 @@
-package com.ak.sotre.orderOutbox.model;
+package com.ak.store.orderOutbox.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

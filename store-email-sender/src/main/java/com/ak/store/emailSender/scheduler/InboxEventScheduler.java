@@ -32,11 +32,11 @@ public class InboxEventScheduler {
     @Scheduled(fixedRate = 5000)
     public void executeOutboxEvents() {
         for (var entry : eventProcessors.entrySet()) {
-            processOutboxEventsOfType(entry.getKey());
+            processInboxEventsOfType(entry.getKey());
         }
     }
 
-    private void processOutboxEventsOfType(InboxEventType type) {
+    private void processInboxEventsOfType(InboxEventType type) {
         var processor = eventProcessors.get(type);
         var events = inboxEventReaderService.findAllForProcessing(type);
         List<InboxEvent> completedEvents = new ArrayList<>();
@@ -49,6 +49,8 @@ public class InboxEventScheduler {
             }
         }
 
-        inboxEventReaderService.markAllAsCompleted(completedEvents);
+        if(!completedEvents.isEmpty()) {
+            inboxEventReaderService.markAllAsCompleted(completedEvents);
+        }
     }
 }

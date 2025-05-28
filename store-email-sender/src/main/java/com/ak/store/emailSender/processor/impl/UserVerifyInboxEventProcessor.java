@@ -19,7 +19,8 @@ public class UserVerifyInboxEventProcessor implements InboxEventProcessor {
     public void process(InboxEvent event) {
         var userVerifyEvent = gson.fromJson(event.getPayload(), UserVerifyEvent.class);
 
-        emailFacade.sendVerification(userVerifyEvent.getEmail(), userVerifyEvent.getVerificationCode());
+        emailFacade.sendVerification(userVerifyEvent.getUserVerify().getEmail(),
+                userVerifyEvent.getUserVerify().getVerificationCode());
     }
 
     @Override

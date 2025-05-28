@@ -1,6 +1,6 @@
-package com.ak.sotre.orderOutbox.kafka;
+package com.ak.store.orderOutbox.kafka;
 
-import com.ak.sotre.orderOutbox.util.KafkaTopicRegistry;
+import com.ak.store.orderOutbox.util.KafkaTopicRegistry;
 import com.ak.store.common.event.KafkaEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;

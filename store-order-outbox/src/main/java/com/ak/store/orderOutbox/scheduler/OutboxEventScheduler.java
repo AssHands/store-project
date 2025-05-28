@@ -1,9 +1,9 @@
-package com.ak.sotre.orderOutbox.scheduler;
+package com.ak.store.orderOutbox.scheduler;
 
-import com.ak.sotre.orderOutbox.model.OutboxEvent;
-import com.ak.sotre.orderOutbox.model.OutboxEventType;
-import com.ak.sotre.orderOutbox.processor.OutboxEventProcessor;
-import com.ak.sotre.orderOutbox.service.OutboxEventService;
+import com.ak.store.orderOutbox.model.OutboxEvent;
+import com.ak.store.orderOutbox.model.OutboxEventType;
+import com.ak.store.orderOutbox.processor.OutboxEventProcessor;
+import com.ak.store.orderOutbox.service.OutboxEventService;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

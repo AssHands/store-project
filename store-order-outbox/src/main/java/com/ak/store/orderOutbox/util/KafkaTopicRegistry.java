@@ -1,4 +1,4 @@
-package com.ak.sotre.orderOutbox.util;
+package com.ak.store.orderOutbox.util;
 
 import com.ak.store.common.event.KafkaEvent;
 import com.ak.store.common.event.order.OrderCreatedEvent;

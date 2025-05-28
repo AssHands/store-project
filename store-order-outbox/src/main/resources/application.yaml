@@ -42,14 +42,4 @@ spring:
 kafka:
   dlt-prefix: .dlt
   topics:
-    category-created: category-created
-    category-updated: category-updated
-    category-deleted: category-deleted
-
-    characteristic-created: characteristic-created
-    characteristic-updated: characteristic-updated
-    characteristic-deleted: characteristic-deleted
-
-    product-created: product-created
-    product-updated: product-updated
-    product-deleted: product-deleted
+    order-created: order-created

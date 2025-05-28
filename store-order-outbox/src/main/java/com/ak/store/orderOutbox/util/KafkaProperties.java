@@ -1,4 +1,4 @@
-package com.ak.sotre.orderOutbox.util;
+package com.ak.store.orderOutbox.util;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

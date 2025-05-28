@@ -1,8 +1,8 @@
-package com.ak.sotre.orderOutbox.repository;
+package com.ak.store.orderOutbox.repository;
 
-import com.ak.sotre.orderOutbox.model.OutboxEvent;
-import com.ak.sotre.orderOutbox.model.OutboxEventStatus;
-import com.ak.sotre.orderOutbox.model.OutboxEventType;
+import com.ak.store.orderOutbox.model.OutboxEvent;
+import com.ak.store.orderOutbox.model.OutboxEventStatus;
+import com.ak.store.orderOutbox.model.OutboxEventType;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

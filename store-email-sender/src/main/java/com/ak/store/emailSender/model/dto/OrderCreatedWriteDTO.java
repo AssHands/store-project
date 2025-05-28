@@ -17,6 +17,7 @@ import java.util.Map;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+//todo может переименовать?
 public class OrderCreatedWriteDTO {
     private Long orderId;
 

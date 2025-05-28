@@ -1,6 +1,5 @@
 package com.ak.store.user.facade;
 
-import com.ak.store.user.kafka.UserProducerKafka;
 import com.ak.store.user.model.dto.UserDTO;
 import com.ak.store.user.model.dto.write.UserWriteDTO;
 import com.ak.store.user.service.UserKeycloakService;
@@ -17,7 +16,7 @@ import java.util.UUID;
 public class UserFacade {
     private final UserService userService;
     private final UserKeycloakService userKeycloakService;
-    private final UserProducerKafka userProducerKafka;
+    //private final UserProducerKafka userProducerKafka;
 
     public UserDTO findOne(UUID id) {
         return userService.findOne(id);

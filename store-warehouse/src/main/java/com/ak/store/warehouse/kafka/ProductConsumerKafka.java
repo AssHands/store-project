@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class ProductConsumerKafka {
     private final InventoryFacade inventoryFacade;
 
-    @KafkaListener(topics = "${kafka.topics.product-created}", groupId = "${kafka.group-id}")
+    @KafkaListener(topics = "${kafka.topics.product-created}", groupId = "${spring.kafka.consumer.group-id}")
     public void handle(ProductCreatedEvent productCreatedEvent) {
         inventoryFacade.createOne(productCreatedEvent.getPayload().getProduct().getId());
     }

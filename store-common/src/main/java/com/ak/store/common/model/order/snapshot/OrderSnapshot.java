@@ -18,9 +18,6 @@ import java.util.Map;
 public class OrderSnapshot {
     private Long id;
 
-    //todo переместить в event. email не имеет отношения к заказу
-    private String userEmail;
-
     private Integer totalPrice;
 
     @Builder.Default

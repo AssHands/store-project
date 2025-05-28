@@ -1,9 +1,9 @@
-package com.ak.sotre.orderOutbox.service;
+package com.ak.store.orderOutbox.service;
 
-import com.ak.sotre.orderOutbox.model.OutboxEvent;
-import com.ak.sotre.orderOutbox.model.OutboxEventStatus;
-import com.ak.sotre.orderOutbox.model.OutboxEventType;
-import com.ak.sotre.orderOutbox.repository.OutboxEventRepo;
+import com.ak.store.orderOutbox.model.OutboxEvent;
+import com.ak.store.orderOutbox.model.OutboxEventStatus;
+import com.ak.store.orderOutbox.model.OutboxEventType;
+import com.ak.store.orderOutbox.repository.OutboxEventRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

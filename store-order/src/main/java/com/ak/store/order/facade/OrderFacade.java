@@ -1,6 +1,8 @@
 package com.ak.store.order.facade;
 
+import com.ak.store.common.model.order.snapshot.OrderCreatedSnapshotPayload;
 import com.ak.store.common.model.order.snapshot.OrderSnapshot;
+import com.ak.store.common.model.user.snapshot.UserIdentitySnapshot;
 import com.ak.store.order.feign.WarehouseFeign;
 import com.ak.store.order.model.dto.OrderDTOPayload;
 import com.ak.store.order.model.dto.UserAuthContext;
@@ -22,7 +24,7 @@ import java.util.UUID;
 public class OrderFacade {
     private final OrderService orderService;
     private final WarehouseFeign warehouseFeign;
-    private final OutboxEventService<OrderSnapshot> outboxEventService;
+    private final OutboxEventService<OrderCreatedSnapshotPayload> outboxEventService;
 
     public List<OrderDTOPayload> findAllByUserId(UUID userId) {
         return orderService.findAllByUserId(userId);
@@ -42,11 +44,16 @@ public class OrderFacade {
 
         warehouseFeign.reserveAll(reserveForm);
 
-        var orderSnapshot = OrderSnapshot.builder()
-                .id(orderPayload.getOrder().getId())
-                .userEmail(authContext.getEmail())
-                .productAmount(request.getProductAmount())
-                .totalPrice(orderPayload.getOrder().getTotalPrice())
+        var orderSnapshot = OrderCreatedSnapshotPayload.builder()
+                .order(OrderSnapshot.builder()
+                        .id(orderPayload.getOrder().getId())
+                        .productAmount(request.getProductAmount())
+                        .totalPrice(orderPayload.getOrder().getTotalPrice())
+                        .build())
+                .userIdentity(UserIdentitySnapshot.builder()
+                        .id(authContext.getId())
+                        .email(authContext.getEmail())
+                        .build())
                 .build();
 
         outboxEventService.createOne(orderSnapshot, OutboxEventType.ORDER_CREATED);

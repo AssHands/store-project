@@ -1,7 +1,5 @@
-package com.ak.store.common.event.user;
+package com.ak.store.common.model.user.snapshot;
 
-import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.model.user.snapshot.UserVerifySnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -16,8 +14,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class UserVerifyEvent implements KafkaEvent {
-    private UUID eventId;
+public class UserVerifySnapshot {
+    private UUID id;
 
-    private UserVerifySnapshot userVerify;
+    private String email;
+
+    private String verificationCode;
 }

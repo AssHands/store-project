@@ -61,6 +61,7 @@ public class InventoryService {
     public InventoryDTO createOne(Long productId) {
         var inventory = inventoryRepo.save(Inventory.builder()
                 .productId(productId)
+                .amount(0)
                 .build());
 
         return inventoryMapper.toInventoryDTO(inventory);
@@ -103,10 +104,10 @@ public class InventoryService {
 
         for (var inventoryRequest : request) {
             Long productId = inventoryRequest.getProductId();
-            Integer amount = inventoryRequest.getAmount();
-            Integer requestAmount = inventoryMap.get(productId);
+            Integer requestAmount = inventoryRequest.getAmount();
+            Integer amount = inventoryMap.get(productId);
 
-            if (requestAmount == null || amount < requestAmount) {
+            if (requestAmount == null || requestAmount > amount) {
                 return false;
             }
         }
