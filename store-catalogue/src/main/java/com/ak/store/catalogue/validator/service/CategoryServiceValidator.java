@@ -8,6 +8,8 @@ import com.ak.store.catalogue.repository.CategoryRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @RequiredArgsConstructor
 @Component
 public class CategoryServiceValidator {
@@ -23,13 +25,14 @@ public class CategoryServiceValidator {
 
     public void validateUpdating(Long id, CategoryWriteDTO request) {
         var category = findOne(id);
-        if (request.getParentId() != null && category.getId().equals(request.getParentId())) {
+
+        if (request.getParentId() != null && Objects.equals(category.getId(), request.getParentId())) {
             throw new RuntimeException("must category_id != parent_id");
         }
 
         checkUniqName(request.getName());
 
-        if (request.getParentId() != null && !category.getParentId().equals(request.getParentId())) {
+        if (request.getParentId() != null && !Objects.equals(category.getParentId(), request.getParentId())) {
             findOne(request.getParentId());
         }
     }

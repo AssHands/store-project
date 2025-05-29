@@ -1,8 +1,12 @@
 package com.ak.store.synchronization.repo.redis;
 
-import com.ak.store.common.model.catalogue.document.CategoryDocument;
+import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
+import com.ak.store.synchronization.mapper.CategoryMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +16,7 @@ import java.util.List;
 @Repository
 public class CategoryRedisRepoImpl implements CategoryRedisRepo {
     private final StringRedisTemplate stringRedisTemplate;
+    private final CategoryMapper categoryMapper;
     private final Gson gson;
 
     private final String CATEGORY_KEY = "category:";
@@ -19,44 +24,79 @@ public class CategoryRedisRepoImpl implements CategoryRedisRepo {
     private final String RELATED_CATEGORY_KEY = "related_category:";
 
     @Override
-    public void saveOne(CategoryDocument category) {
-        stringRedisTemplate.opsForValue().set(CATEGORY_KEY + category.getId(), gson.toJson(category));
+    public void saveOne(CategorySnapshotPayload payload) {
+        stringRedisTemplate.execute(new SessionCallback<List<Object>>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public List<Object> execute(RedisOperations operations) throws DataAccessException {
+                operations.multi();
+
+                saveOne(operations, payload);
+                saveAllCategoryCharacteristic(operations, payload);
+                saveAllRelatedCategory(operations, payload);
+
+                return operations.exec();
+            }
+        });
     }
 
-    @Override
-    public void saveAllCategoryCharacteristic(Long categoryId, List<Long> characteristicIds) {
-        stringRedisTemplate.delete(CATEGORY_CHARACTERISTIC_KEY + categoryId);
+    private void saveOne(RedisOperations<Object, Object> operations, CategorySnapshotPayload payload) {
+        String categoryId = payload.getCategory().getId().toString();
+        var categoryDocument = categoryMapper.toCategoryDocument(payload.getCategory());
 
-        if(characteristicIds == null || characteristicIds.isEmpty()) {
-            stringRedisTemplate.delete(CATEGORY_CHARACTERISTIC_KEY + categoryId);
-            return;
-        }
-
-        String[] stringIds = characteristicIds.stream()
-                .map(Object::toString)
-                .toArray(String[]::new);
-
-        stringRedisTemplate.opsForSet().add(CATEGORY_CHARACTERISTIC_KEY + categoryId, stringIds);
+        operations.opsForValue().set(CATEGORY_KEY + categoryId, gson.toJson(categoryDocument));
     }
 
-    @Override
-    public void saveAllRelatedCategory(Long categoryId, List<Long> relatedCategories) {
-        stringRedisTemplate.delete(RELATED_CATEGORY_KEY + categoryId);
+    private void saveAllCategoryCharacteristic(RedisOperations<Object, Object> operations, CategorySnapshotPayload payload) {
+        String categoryId = payload.getCategory().getId().toString();
 
-        if(relatedCategories == null || relatedCategories.isEmpty()) {
-            stringRedisTemplate.delete(RELATED_CATEGORY_KEY + categoryId);
-            return;
+        operations.delete(CATEGORY_CHARACTERISTIC_KEY + categoryId);
+
+        if (payload.getCharacteristics() != null && !payload.getCharacteristics().isEmpty()) {
+            operations.delete(CATEGORY_CHARACTERISTIC_KEY + categoryId);
+            String[] stringIds = payload.getCharacteristics().stream()
+                    .map(Object::toString)
+                    .toArray(String[]::new);
+
+            operations.opsForSet().add(CATEGORY_CHARACTERISTIC_KEY + categoryId, stringIds);
         }
+    }
 
-        String[] stringIds = relatedCategories.stream()
-                .map(Object::toString)
-                .toArray(String[]::new);
+    private void saveAllRelatedCategory(RedisOperations<Object, Object> operations, CategorySnapshotPayload payload) {
+        String categoryId = payload.getCategory().getId().toString();
 
-        stringRedisTemplate.opsForSet().add(RELATED_CATEGORY_KEY + categoryId, stringIds);
+        operations.delete(RELATED_CATEGORY_KEY + categoryId);
+
+        if (payload.getRelatedCategories() != null && !payload.getRelatedCategories().isEmpty()) {
+            String[] stringIds = payload.getRelatedCategories().stream()
+                    .map(Object::toString)
+                    .toArray(String[]::new);
+
+            operations.opsForSet().add(RELATED_CATEGORY_KEY + categoryId, stringIds);
+        }
     }
 
     @Override
     public void deleteOne(Long id) {
-        stringRedisTemplate.delete(CATEGORY_KEY + id);
+        stringRedisTemplate.execute(new SessionCallback<Void>() {
+            @Override
+            public <K, V> Void execute(RedisOperations<K, V> operations) throws DataAccessException {
+                operations.multi();
+
+                //delete one category
+                operations.delete((K) (CATEGORY_KEY + id));
+
+                //delete all category characteristic
+                operations.delete((K) (CATEGORY_CHARACTERISTIC_KEY + id));
+
+                // delete all related category
+                operations.delete((K) (RELATED_CATEGORY_KEY + id));
+
+                List<Object> results = operations.exec();
+                System.out.println("Transaction results: " + results);
+
+                return null;
+            }
+        });
     }
 }
