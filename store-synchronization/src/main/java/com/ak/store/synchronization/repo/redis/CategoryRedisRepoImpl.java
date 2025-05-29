@@ -78,24 +78,22 @@ public class CategoryRedisRepoImpl implements CategoryRedisRepo {
 
     @Override
     public void deleteOne(Long id) {
-        stringRedisTemplate.execute(new SessionCallback<Void>() {
+        stringRedisTemplate.execute(new SessionCallback<List<Object>>() {
             @Override
-            public <K, V> Void execute(RedisOperations<K, V> operations) throws DataAccessException {
+            @SuppressWarnings("unchecked")
+            public List<Object> execute(RedisOperations operations) throws DataAccessException {
                 operations.multi();
 
                 //delete one category
-                operations.delete((K) (CATEGORY_KEY + id));
+                operations.delete(CATEGORY_KEY + id);
 
                 //delete all category characteristic
-                operations.delete((K) (CATEGORY_CHARACTERISTIC_KEY + id));
+                operations.delete(CATEGORY_CHARACTERISTIC_KEY + id);
 
                 // delete all related category
-                operations.delete((K) (RELATED_CATEGORY_KEY + id));
+                operations.delete(RELATED_CATEGORY_KEY + id);
 
-                List<Object> results = operations.exec();
-                System.out.println("Transaction results: " + results);
-
-                return null;
+                return operations.exec();
             }
         });
     }
