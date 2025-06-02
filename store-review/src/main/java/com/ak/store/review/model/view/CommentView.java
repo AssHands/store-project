@@ -1,4 +1,4 @@
-package com.ak.store.common.model.user.view;
+package com.ak.store.review.model.view;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -8,26 +8,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ReviewView {
-    private Long id;
+public class CommentView {
+    private UUID userId;
 
-    private ConsumerPoorView consumer;
-
-    private int amountComment;
-
-    private Long productId;
+    private String reviewId;
 
     private String text;
-
-    private String advantages;
-
-    private String disadvantages;
-
-    private Integer grade;
 }

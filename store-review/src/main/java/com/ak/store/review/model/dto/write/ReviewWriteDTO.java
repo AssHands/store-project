@@ -1,4 +1,4 @@
-package com.ak.store.common.model.user.form;
+package com.ak.store.review.model.dto.write;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ReviewForm {
+public class ReviewWriteDTO {
+    private Long productId;
+
     private String text;
 
     private String advantages;

@@ -1,45 +1,33 @@
 package com.ak.store.review.facade;
 
-import com.ak.store.common.model.user.form.CommentForm;
-import com.ak.store.common.model.user.form.ReviewForm;
-import com.ak.store.common.model.user.view.CommentView;
-import com.ak.store.common.model.user.view.ReviewView;
+import com.ak.store.review.model.dto.ReviewDTO;
+import com.ak.store.review.model.dto.write.ReviewWriteDTO;
+import com.ak.store.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class ReviewFacade {
-    public List<ReviewView> findAllReviewByProductId(Long productId) {
+    private final ReviewService reviewService;
 
+    //todo add pagination
+    public List<ReviewDTO> findAllByProductId(Long productId, int page, int size) {
+        return reviewService.findAllByProductId(productId, page, size);
     }
 
-    public List<CommentView> findAllCommentByReviewId(Long ReviewId) {
-
+    public ReviewDTO createOne(UUID userId, ReviewWriteDTO request) {
+        return reviewService.createOne(userId, request);
     }
 
-    public Long createOneReview(String consumerId, Long productId, ReviewForm reviewForm) {
-
+    public ReviewDTO updateOne(UUID userId, String reviewId, ReviewWriteDTO request) {
+        return reviewService.updateOne(userId, reviewId, request);
     }
 
-    public Long updateOneReview(Long reviewId, ReviewForm reviewForm) {
+    public void deleteOne(UUID userId, String reviewId) {
+        reviewService.deleteOne(userId, reviewId);
     }
-
-    public void deleteOneReview(Long reviewId) {
-    }
-
-    public Long createOneComment(String consumerId, Long reviewId, CommentForm commentForm) {
-    }
-
-    public Long updateOneComment(Long commentId, CommentForm commentForm) {
-    }
-
-    public void deleteOneComment(Long commentId) {
-    }
-
-    public void deleteAllByProductId(Long productId) {
-    }
-
 }

@@ -31,8 +31,8 @@ public class SecurityConfig {
 //                        accessDeniedException.printStackTrace()));
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/review/me/*").hasRole("CONSUMER")
-                .requestMatchers("/api/v1/review/{consumerId}/*").hasRole("MANAGER"));
+                .anyRequest().permitAll()
+        );
 
         return http.build();
     }
