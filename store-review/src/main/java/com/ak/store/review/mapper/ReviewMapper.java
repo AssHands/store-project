@@ -14,6 +14,10 @@ import java.util.List;
 public interface ReviewMapper {
     @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
     ReviewDTO toReviewDTO(Review r);
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "stringToObjectId")
+    Review toReview(ReviewDTO r);
+
     List<ReviewDTO> toReviewDTO(List<Review> r);
 
     ReviewView toReviewView(ReviewDTO r);
@@ -22,10 +26,15 @@ public interface ReviewMapper {
     ReviewWriteDTO toReviewWriteDTO(ReviewForm rf);
     List<ReviewWriteDTO> toReviewWriteDTO(List<ReviewForm> rf);
 
-    Review toReview(ReviewWriteDTO request);
+    Review toReview(ReviewWriteDTO rw);
 
     @Named("objectIdToString")
     static String objectIdToString(ObjectId id) {
         return id != null ? id.toString() : null;
+    }
+
+    @Named("stringToObjectId")
+    static ObjectId objectIdToString(String id) {
+        return id != null ? new ObjectId(id) : null;
     }
 }

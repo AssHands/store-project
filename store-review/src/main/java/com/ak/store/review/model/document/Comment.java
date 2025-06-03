@@ -16,33 +16,18 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "review")
-public class Review {
+@Document(collection = "comment")
+public class Comment {
     @Id
     private ObjectId id;
 
     @Field(name = "user_id")
     private UUID userId;
 
-    @Field(name = "product_id")
-    private Long productId;
+    @Field(name = "review_id")
+    private String reviewId;
 
     private String text;
-
-    private String advantages;
-
-    private String disadvantages;
-
-    @Field(name = "comment_amount")
-    private Integer commentAmount;
-
-    private Integer grade;
-
-    @Field(name = "like_amount")
-    private Integer likeAmount;
-
-    @Field(name = "dislike_amount")
-    private Integer dislikeAmount;
 
     private LocalDateTime time;
 }

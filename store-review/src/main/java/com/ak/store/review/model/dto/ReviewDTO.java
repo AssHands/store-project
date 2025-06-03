@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -24,7 +25,13 @@ public class ReviewDTO {
 
     private String disadvantages;
 
-    private Integer amountComment;
+    private Integer commentAmount;
 
     private Integer grade;
+
+    private Integer likeAmount;
+
+    private Integer dislikeAmount;
+
+    private LocalDateTime time;
 }

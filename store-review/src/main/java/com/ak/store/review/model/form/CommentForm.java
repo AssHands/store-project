@@ -1,6 +1,5 @@
-package com.ak.store.common.model.user.view;
+package com.ak.store.review.model.form;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -12,12 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ConsumerPoorView {
-    private String id;
+//todo add validation
+public class CommentForm {
+    private String reviewId;
 
-    private String name;
-
-    private String avatarKey;
+    private String text;
 }

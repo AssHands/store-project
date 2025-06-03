@@ -2,6 +2,7 @@ package com.ak.store.review.facade;
 
 import com.ak.store.review.model.dto.ReviewDTO;
 import com.ak.store.review.model.dto.write.ReviewWriteDTO;
+import com.ak.store.review.service.CommentService;
 import com.ak.store.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReviewFacade {
     private final ReviewService reviewService;
+    private final CommentService commentService;
 
-    //todo add pagination
+    //todo add sorting
     public List<ReviewDTO> findAllByProductId(Long productId, int page, int size) {
         return reviewService.findAllByProductId(productId, page, size);
     }
@@ -28,6 +30,14 @@ public class ReviewFacade {
     }
 
     public void deleteOne(UUID userId, String reviewId) {
-        reviewService.deleteOne(userId, reviewId);
+        var review = reviewService.findOne(reviewId);
+
+        try {
+            reviewService.deleteOne(userId, reviewId);
+            commentService.deleteAllByReviewId(reviewId);
+        } catch (Exception e) {
+            reviewService.compensateDeleteOne(review);
+            throw new RuntimeException("cant delete");
+        }
     }
 }

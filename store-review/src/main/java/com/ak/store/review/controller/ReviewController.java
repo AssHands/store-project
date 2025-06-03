@@ -47,49 +47,4 @@ public class ReviewController {
         UUID userId = UUID.fromString(accessToken.getSubject());
         reviewFacade.deleteOne(userId, reviewId);
     }
-
-//    @GetMapping("{reviewId}/comments")
-//    public List<CommentView> findAllCommentByReviewId(@PathVariable Long reviewId) {
-//        reviewFacade.findAllCommentByReviewId(reviewId);
-//        return null;
-//    }
-
-
-//    @PostMapping("{reviewId}/comments")
-//    public Long createOneComment(@PathVariable Long reviewId, @RequestParam String consumerId,
-//                                 @RequestBody @Valid CommentForm commentForm) {
-//        reviewFacade.createOneComment(consumerId, reviewId, commentForm);
-//        return null;
-//    }
-//
-//    @PatchMapping("comments/{commentId}")
-//    public Long updateOneComment(@PathVariable Long commentId, @RequestBody @Valid CommentForm commentForm) {
-//        reviewFacade.updateOneComment(commentId, commentForm);
-//        return null;
-//    }
-//
-//    @DeleteMapping("comments/{commentId}")
-//    public void deleteOneComment(@PathVariable Long commentId) {
-//        reviewFacade.deleteOneComment(commentId);
-//    }
-
-
-//    @PostMapping("me/{reviewId}/comments")
-//    public Long createOneCommentMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long reviewId,
-//                                   @RequestBody @Valid CommentForm commentForm) {
-//        reviewFacade.createOneComment(accessToken.getSubject(), reviewId, commentForm);
-//        return null;
-//    }
-//
-//    @PatchMapping("me/comments/{commentId}")
-//    public Long updateOneCommentMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long commentId,
-//                                   @RequestBody @Valid CommentForm commentForm) {
-//        reviewFacade.updateOneComment(commentId, commentForm);
-//        return null;
-//    }
-//
-//    @DeleteMapping("me/comments/{commentId}")
-//    public void deleteOneCommentMe(@AuthenticationPrincipal Jwt accessToken, @PathVariable Long commentId) {
-//        reviewFacade.deleteOneComment(commentId);
-//    }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ReviewRepo extends MongoRepository<Review, ObjectId> {
+public interface ReviewRepo extends ReviewRepoCustom, MongoRepository<Review, ObjectId> {
     List<Review> findAllByProductId(Long productId, Pageable pageable);
 
     Optional<Review> findOneByUserIdAndProductId(UUID userId, Long productId);

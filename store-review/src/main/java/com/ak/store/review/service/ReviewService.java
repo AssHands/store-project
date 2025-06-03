@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,9 +23,13 @@ public class ReviewService {
     private final ReviewMapper reviewMapper;
     private final ReviewServiceValidator reviewValidator;
 
-    private Review findOneById(String id) {
-        return reviewRepo.findById(new ObjectId(id))
+    private Review findOneById(String reviewId) {
+        return reviewRepo.findById(new ObjectId(reviewId))
                 .orElseThrow(() -> new RuntimeException("not found"));
+    }
+
+    public ReviewDTO findOne(String reviewId) {
+        return reviewMapper.toReviewDTO(findOneById(reviewId));
     }
 
     public List<ReviewDTO> findAllByProductId(Long productId, int page, int size) {
@@ -36,8 +41,11 @@ public class ReviewService {
         reviewValidator.validateCreating(userId, request);
         var review = reviewMapper.toReview(request);
 
+        review.setTime(LocalDateTime.now());
         review.setUserId(userId);
-        review.setAmountComment(0);
+        review.setLikeAmount(0);
+        review.setDislikeAmount(0);
+        review.setCommentAmount(0);
 
         return reviewMapper.toReviewDTO(reviewRepo.save(review));
     }
@@ -72,5 +80,26 @@ public class ReviewService {
         if(request.getGrade() != null) {
             review.setGrade(request.getGrade());
         }
+    }
+
+    public void compensateDeleteOne(ReviewDTO request) {
+        var review = reviewMapper.toReview(request);
+        reviewRepo.save(review);
+    }
+
+    public void incrementOneCommentAmount(String reviewId) {
+        reviewRepo.incrementOneCommentAmount(reviewId);
+    }
+
+    public void decrementOneCommentAmount(String reviewId) {
+        reviewRepo.decrementOneCommentAmount(reviewId);
+    }
+
+    public void incrementOneLikeAmount(String reviewId) {
+        reviewRepo.incrementOneLikeAmount(reviewId);
+    }
+
+    public void incrementOneDislikeAmount(String reviewId) {
+        reviewRepo.incrementOneISLikeAmount(reviewId);
     }
 }
