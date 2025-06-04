@@ -39,9 +39,29 @@ public class ReviewRepoCustomImpl implements ReviewRepoCustom {
     }
 
     @Override
-    public void incrementOneISLikeAmount(String reviewId) {
+    public void decrementOneLikeAmount(String reviewId) {
+        var query = new Query(
+                Criteria.where("_id").is(new ObjectId(reviewId))
+                        .and("likeAmount").gt(0)
+        );
+        var update = new Update().inc("likeAmount", -1);
+        mongoTemplate.updateFirst(query, update, Review.class);
+    }
+
+    @Override
+    public void incrementOneDislikeAmount(String reviewId) {
         var query = new Query(Criteria.where("_id").is(new ObjectId(reviewId)));
         var update = new Update().inc("dislikeAmount", 1);
+        mongoTemplate.updateFirst(query, update, Review.class);
+    }
+
+    @Override
+    public void decrementOneDislikeAmount(String reviewId) {
+        var query = new Query(
+                Criteria.where("_id").is(new ObjectId(reviewId))
+                        .and("dislikeAmount").gt(0)
+        );
+        var update = new Update().inc("dislikeAmount", -1);
         mongoTemplate.updateFirst(query, update, Review.class);
     }
 }

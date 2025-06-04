@@ -64,24 +64,6 @@ public class ReviewService {
         reviewRepo.deleteById(new ObjectId(reviewId));
     }
 
-    private void updateOneFromDTO(Review review, ReviewWriteDTO request) {
-        if(request.getText() != null) {
-            review.setText(request.getText());
-        }
-
-        if(request.getAdvantages() != null) {
-            review.setAdvantages(request.getAdvantages());
-        }
-
-        if(request.getDisadvantages() != null) {
-            review.setDisadvantages(request.getDisadvantages());
-        }
-
-        if(request.getGrade() != null) {
-            review.setGrade(request.getGrade());
-        }
-    }
-
     public void compensateDeleteOne(ReviewDTO request) {
         var review = reviewMapper.toReview(request);
         reviewRepo.save(review);
@@ -99,7 +81,33 @@ public class ReviewService {
         reviewRepo.incrementOneLikeAmount(reviewId);
     }
 
+    public void decrementOneLikeAmount(String reviewId) {
+        reviewRepo.decrementOneLikeAmount(reviewId);
+    }
+
     public void incrementOneDislikeAmount(String reviewId) {
-        reviewRepo.incrementOneISLikeAmount(reviewId);
+        reviewRepo.incrementOneDislikeAmount(reviewId);
+    }
+
+    public void decrementOneDislikeAmount(String reviewId) {
+        reviewRepo.decrementOneDislikeAmount(reviewId);
+    }
+
+    private void updateOneFromDTO(Review review, ReviewWriteDTO request) {
+        if(request.getText() != null) {
+            review.setText(request.getText());
+        }
+
+        if(request.getAdvantages() != null) {
+            review.setAdvantages(request.getAdvantages());
+        }
+
+        if(request.getDisadvantages() != null) {
+            review.setDisadvantages(request.getDisadvantages());
+        }
+
+        if(request.getGrade() != null) {
+            review.setGrade(request.getGrade());
+        }
     }
 }

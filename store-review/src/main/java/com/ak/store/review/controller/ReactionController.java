@@ -20,9 +20,21 @@ public class ReactionController {
         reactionFacade.likeOneReview(userId, reviewId);
     }
 
+    @PostMapping("unlike")
+    public void unlikeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam String reviewId) {
+        UUID userId = UUID.fromString(accessToken.getSubject());
+        reactionFacade.unlikeOneReview(userId, reviewId);
+    }
+
     @PostMapping("dislike")
     public void dislikeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam String reviewId) {
         UUID userId = UUID.fromString(accessToken.getSubject());
         reactionFacade.dislikeOneReview(userId, reviewId);
+    }
+
+    @PostMapping("undislike")
+    public void undislikeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam String reviewId) {
+        UUID userId = UUID.fromString(accessToken.getSubject());
+        reactionFacade.undislikeOneReview(userId, reviewId);
     }
 }

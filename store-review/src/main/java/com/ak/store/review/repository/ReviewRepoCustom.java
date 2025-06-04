@@ -7,5 +7,9 @@ public interface ReviewRepoCustom {
 
     void incrementOneLikeAmount(String reviewId);
 
-    void incrementOneISLikeAmount(String reviewId);
+    void decrementOneLikeAmount(String reviewId);
+
+    void incrementOneDislikeAmount(String reviewId);
+
+    void decrementOneDislikeAmount(String reviewId);
 }
