@@ -22,12 +22,12 @@ public class ReactionService {
     }
 
     public void likeOneReview(UUID userId, ObjectId reviewId) {
-        //reactionValidator.validateLikingOneReview(userId, reviewId);
+        reactionValidator.validateLikingOneReview(reviewId);
         reactionRepo.saveOrUpdate(userId, reviewId, true);
     }
 
     public void dislikeOneReview(UUID userId, ObjectId reviewId) {
-        //reactionValidator.validateDislikingOneReview(userId, reviewId);
+        reactionValidator.validateDislikingOneReview(reviewId);
         reactionRepo.saveOrUpdate(userId, reviewId, false);
     }
 

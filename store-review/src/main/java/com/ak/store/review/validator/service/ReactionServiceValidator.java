@@ -1,34 +1,28 @@
 package com.ak.store.review.validator.service;
 
-import com.ak.store.review.model.document.Reaction;
-import com.ak.store.review.repository.ReactionRepo;
+import com.ak.store.review.repository.ReviewRepo;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @Component
-//todo доделать
 public class ReactionServiceValidator {
-    private final ReactionRepo reactionRepo;
+    private final ReviewRepo reviewRepo;
 
-    public void validateLikingOneReview(UUID userId, ObjectId reviewId) {
-        var reaction = reactionRepo.findOneByUserIdAndReviewId(userId, reviewId);
+    public void validateLikingOneReview(ObjectId reviewId) {
+        if (!isReviewExist(reviewId)) {
+            throw new RuntimeException("review do not exist");
+        }
     }
 
-    public void validateDislikingOneReview(UUID userId, ObjectId reviewId) {
-
+    public void validateDislikingOneReview(ObjectId reviewId) {
+        if (!isReviewExist(reviewId)) {
+            throw new RuntimeException("review do not exist");
+        }
     }
 
-    private boolean isReactionExist(UUID userId, ObjectId reviewId) {
-        var reaction = reactionRepo.findOneByUserIdAndReviewId(userId, reviewId);
-        return true;
-    }
-
-    private Optional<Reaction> findOneByUserIdAndReviewId(UUID userId, ObjectId reviewId) {
-        return reactionRepo.findOneByUserIdAndReviewId(userId, reviewId);
+    private boolean isReviewExist(ObjectId reviewId) {
+        return reviewRepo.findById(reviewId).isPresent();
     }
 }
