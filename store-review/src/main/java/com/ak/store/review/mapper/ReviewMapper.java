@@ -12,21 +12,18 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ReviewMapper {
-    @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
-    ReviewDTO toReviewDTO(Review r);
-
-    @Mapping(target = "id", source = "id", qualifiedByName = "stringToObjectId")
     Review toReview(ReviewDTO r);
 
+    Review toReview(ReviewWriteDTO rw);
+
+    ReviewDTO toReviewDTO(Review r);
     List<ReviewDTO> toReviewDTO(List<Review> r);
 
+    @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
     ReviewView toReviewView(ReviewDTO r);
     List<ReviewView> toReviewView(List<ReviewDTO> r);
 
     ReviewWriteDTO toReviewWriteDTO(ReviewForm rf);
-    List<ReviewWriteDTO> toReviewWriteDTO(List<ReviewForm> rf);
-
-    Review toReview(ReviewWriteDTO rw);
 
     @Named("objectIdToString")
     static String objectIdToString(ObjectId id) {

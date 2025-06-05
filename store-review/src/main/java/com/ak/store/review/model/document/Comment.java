@@ -25,7 +25,7 @@ public class Comment {
     private UUID userId;
 
     @Field(name = "review_id")
-    private String reviewId;
+    private ObjectId reviewId;
 
     private String text;
 

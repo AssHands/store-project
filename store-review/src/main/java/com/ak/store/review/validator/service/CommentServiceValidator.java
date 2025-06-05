@@ -22,29 +22,29 @@ public class CommentServiceValidator {
         }
     }
 
-    public void validateUpdating(String commentId, UUID userId) {
+    public void validateUpdating(UUID userId, ObjectId commentId) {
         if(!isCommentBelongToUser(commentId, userId)) {
             throw new RuntimeException("comment do not belong to user");
         }
     }
 
-    public void validateDeleting(String commentId, UUID userId) {
+    public void validateDeleting(UUID userId, ObjectId commentId) {
         if(!isCommentBelongToUser(commentId, userId)) {
             throw new RuntimeException("comment do not belong to user");
         }
     }
 
-    private boolean isReviewExist(String reviewId) {
-        return reviewRepo.findById(new ObjectId(reviewId)).isPresent();
+    private boolean isReviewExist(ObjectId reviewId) {
+        return reviewRepo.findById(reviewId).isPresent();
     }
 
-    private boolean isCommentBelongToUser(String commentId, UUID userId) {
+    private boolean isCommentBelongToUser(ObjectId commentId, UUID userId) {
         var comment = findOneById(commentId);
         return comment.getUserId().equals(userId);
     }
 
-    private Comment findOneById(String commentId) {
-        return commentRepo.findById(new ObjectId(commentId))
+    private Comment findOneById(ObjectId commentId) {
+        return commentRepo.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("comment not found"));
     }
 }

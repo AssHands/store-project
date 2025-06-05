@@ -27,13 +27,13 @@ public class ReviewServiceValidator {
         }
     }
 
-    public void validateUpdating(UUID userId, String reviewId) {
+    public void validateUpdating(UUID userId, ObjectId reviewId) {
         if(!isReviewBelongToUser(userId, reviewId)) {
             throw new RuntimeException("review do not belong to user");
         }
     }
 
-    public void validateDeleting(UUID userId, String reviewId) {
+    public void validateDeleting(UUID userId, ObjectId reviewId) {
         if(!isReviewBelongToUser(userId, reviewId)) {
             throw new RuntimeException("review do not belong to user");
         }
@@ -43,7 +43,7 @@ public class ReviewServiceValidator {
         return catalogueFeign.isExistAllProduct(List.of(productId));
     }
 
-    private boolean isReviewBelongToUser(UUID userId, String reviewId) {
+    private boolean isReviewBelongToUser(UUID userId, ObjectId reviewId) {
         var review = findOneById(reviewId);
         return review.getUserId().equals(userId);
     }
@@ -53,8 +53,8 @@ public class ReviewServiceValidator {
         return review.isPresent();
     }
 
-    private Review findOneById(String reviewId) {
-        return reviewRepo.findById(new ObjectId(reviewId))
+    private Review findOneById(ObjectId reviewId) {
+        return reviewRepo.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("not found"));
     }
 }

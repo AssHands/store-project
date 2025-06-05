@@ -12,10 +12,11 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface CommentMapper {
-    @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
     CommentDTO toCommentDTO(Comment c);
     List<CommentDTO> toCommentDTO(List<Comment> c);
 
+    @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
+    @Mapping(target = "reviewId", source = "reviewId", qualifiedByName = "objectIdToString")
     CommentView toCommentView(CommentDTO c);
     List<CommentView> toCommentView(List<CommentDTO> c);
 
@@ -26,5 +27,10 @@ public interface CommentMapper {
     @Named("objectIdToString")
     static String objectIdToString(ObjectId id) {
         return id != null ? id.toString() : null;
+    }
+
+    @Named("stringToObjectId")
+    static ObjectId objectIdToString(String id) {
+        return id != null ? new ObjectId(id) : null;
     }
 }

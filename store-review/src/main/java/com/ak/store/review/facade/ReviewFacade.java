@@ -5,6 +5,7 @@ import com.ak.store.review.model.dto.write.ReviewWriteDTO;
 import com.ak.store.review.service.CommentService;
 import com.ak.store.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,11 +26,11 @@ public class ReviewFacade {
         return reviewService.createOne(userId, request);
     }
 
-    public ReviewDTO updateOne(UUID userId, String reviewId, ReviewWriteDTO request) {
+    public ReviewDTO updateOne(UUID userId, ObjectId reviewId, ReviewWriteDTO request) {
         return reviewService.updateOne(userId, reviewId, request);
     }
 
-    public void deleteOne(UUID userId, String reviewId) {
+    public void deleteOne(UUID userId, ObjectId reviewId) {
         var review = reviewService.findOne(reviewId);
 
         try {

@@ -1,15 +1,21 @@
 package com.ak.store.review.repository;
 
+import org.bson.types.ObjectId;
+
 public interface ReviewRepoCustom {
-    void incrementOneCommentAmount(String reviewId);
+    void incrementOneCommentAmount(ObjectId reviewId);
 
-    void decrementOneCommentAmount(String reviewId);
+    void decrementOneCommentAmount(ObjectId reviewId);
 
-    void incrementOneLikeAmount(String reviewId);
+    void incrementOneLikeAmount(ObjectId reviewId);
 
-    void decrementOneLikeAmount(String reviewId);
+    void decrementOneLikeAmount(ObjectId reviewId);
 
-    void incrementOneDislikeAmount(String reviewId);
+    void incrementOneDislikeAmount(ObjectId reviewId);
 
-    void decrementOneDislikeAmount(String reviewId);
+    void decrementOneDislikeAmount(ObjectId reviewId);
+
+    void incrementOneLikeAmountAndDecrementDislikeAmount(ObjectId reviewId);
+
+    void decrementOneLikeAmountAndIncrementDislikeAmount(ObjectId reviewId);
 }

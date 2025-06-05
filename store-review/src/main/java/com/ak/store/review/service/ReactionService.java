@@ -4,6 +4,7 @@ import com.ak.store.review.model.document.Reaction;
 import com.ak.store.review.repository.ReactionRepo;
 import com.ak.store.review.validator.service.ReactionServiceValidator;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -14,43 +15,34 @@ public class ReactionService {
     private final ReactionServiceValidator reactionValidator;
     private final ReactionRepo reactionRepo;
 
-    public Boolean findOneByUserIdAndReviewId(UUID userId, String reviewId) {
+    public Boolean findOneByUserIdAndReviewId(UUID userId, ObjectId reviewId) {
         return reactionRepo.findOneByUserIdAndReviewId(userId, reviewId)
                 .map(Reaction::getIsLike)
                 .orElse(null);
     }
 
-    public void likeOneReview(UUID userId, String reviewId) {
-        reactionValidator.validateLikingOneReview(userId, reviewId);
-
-        var reaction = Reaction.builder()
-                .userId(userId)
-                .reviewId(reviewId)
-                .isLike(true)
-                .build();
-
-        reactionRepo.save(reaction);
+    public void likeOneReview(UUID userId, ObjectId reviewId) {
+        //reactionValidator.validateLikingOneReview(userId, reviewId);
+        reactionRepo.saveOrUpdate(userId, reviewId, true);
     }
 
-    public boolean unlikeOneReview(UUID userId, String reviewId) {
-        long result = reactionRepo.deleteOneByUserIdAndReviewId(userId, reviewId);
-        return result > 0;
+    public void dislikeOneReview(UUID userId, ObjectId reviewId) {
+        //reactionValidator.validateDislikingOneReview(userId, reviewId);
+        reactionRepo.saveOrUpdate(userId, reviewId, false);
     }
 
-    public void dislikeOneReview(UUID userId, String reviewId) {
-        reactionValidator.validateDislikingOneReview(userId, reviewId);
-
-        var reaction = Reaction.builder()
-                .userId(userId)
-                .reviewId(reviewId)
-                .isLike(false)
-                .build();
-
-        reactionRepo.save(reaction);
+    public void removeOneReaction(UUID userId, ObjectId reviewId) {
+        reactionRepo.deleteOneByUserIdAndReviewId(userId, reviewId);
     }
 
-    public boolean undislikeOneReview(UUID userId, String reviewId) {
-        long result = reactionRepo.deleteOneByUserIdAndReviewId(userId, reviewId);
-        return result > 0;
+    public void save(ObjectId reviewId) {
+        var id = UUID.randomUUID();
+        System.out.println(id);
+
+        reactionRepo.save(Reaction.builder()
+                        .isLike(false)
+                        .userId(id)
+                        .reviewId(reviewId)
+                .build());
     }
 }

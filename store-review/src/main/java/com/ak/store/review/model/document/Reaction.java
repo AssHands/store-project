@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -20,9 +21,11 @@ public class Reaction {
     @Id
     private ObjectId id;
 
+    @Indexed(unique = true)
     @Field(name = "review_id")
-    private String reviewId;
+    private ObjectId reviewId;
 
+    @Indexed(unique = true)
     @Field(name = "user_id")
     private UUID userId;
 

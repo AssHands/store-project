@@ -2,6 +2,7 @@ package com.ak.store.review.controller;
 
 import com.ak.store.review.facade.ReactionFacade;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -14,27 +15,22 @@ import java.util.UUID;
 public class ReactionController {
     private final ReactionFacade reactionFacade;
 
+    //todo валидировать, что reviewId точно существует
     @PostMapping("like")
-    public void likeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam String reviewId) {
+    public void likeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam ObjectId reviewId) {
         UUID userId = UUID.fromString(accessToken.getSubject());
         reactionFacade.likeOneReview(userId, reviewId);
     }
 
-    @PostMapping("unlike")
-    public void unlikeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam String reviewId) {
-        UUID userId = UUID.fromString(accessToken.getSubject());
-        reactionFacade.unlikeOneReview(userId, reviewId);
-    }
-
     @PostMapping("dislike")
-    public void dislikeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam String reviewId) {
+    public void dislikeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam ObjectId reviewId) {
         UUID userId = UUID.fromString(accessToken.getSubject());
         reactionFacade.dislikeOneReview(userId, reviewId);
     }
 
-    @PostMapping("undislike")
-    public void undislikeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam String reviewId) {
+    @DeleteMapping("remove")
+    public void removeOneReaction(@AuthenticationPrincipal Jwt accessToken, @RequestParam ObjectId reviewId) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        reactionFacade.undislikeOneReview(userId, reviewId);
+        reactionFacade.removeOneReaction(userId, reviewId);
     }
 }

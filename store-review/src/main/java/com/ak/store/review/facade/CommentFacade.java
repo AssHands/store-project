@@ -5,6 +5,7 @@ import com.ak.store.review.model.dto.write.CommentWriteDTO;
 import com.ak.store.review.service.CommentService;
 import com.ak.store.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class CommentFacade {
     private final CommentService commentService;
     private final ReviewService reviewService;
 
-    public List<CommentDTO> findAllByReviewId(String reviewId, int page, int size) {
+    public List<CommentDTO> findAllByReviewId(ObjectId reviewId, int page, int size) {
         return commentService.findAllByReviewId(reviewId, page, size);
     }
 
@@ -26,11 +27,11 @@ public class CommentFacade {
         return comment;
     }
 
-    public CommentDTO updateOne(UUID userId, String commentId, CommentWriteDTO request) {
+    public CommentDTO updateOne(UUID userId, ObjectId commentId, CommentWriteDTO request) {
         return commentService.updateOne(userId, commentId, request);
     }
 
-    public void deleteOne(UUID userId, String commentId) {
+    public void deleteOne(UUID userId, ObjectId commentId) {
         var comment = commentService.findOne(commentId);
         commentService.deleteOne(userId, commentId);
         reviewService.decrementOneCommentAmount(comment.getReviewId());

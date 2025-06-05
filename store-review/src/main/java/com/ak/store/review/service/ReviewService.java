@@ -23,12 +23,12 @@ public class ReviewService {
     private final ReviewMapper reviewMapper;
     private final ReviewServiceValidator reviewValidator;
 
-    private Review findOneById(String reviewId) {
-        return reviewRepo.findById(new ObjectId(reviewId))
+    private Review findOneById(ObjectId reviewId) {
+        return reviewRepo.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("not found"));
     }
 
-    public ReviewDTO findOne(String reviewId) {
+    public ReviewDTO findOne(ObjectId reviewId) {
         return reviewMapper.toReviewDTO(findOneById(reviewId));
     }
 
@@ -50,7 +50,7 @@ public class ReviewService {
         return reviewMapper.toReviewDTO(reviewRepo.save(review));
     }
 
-    public ReviewDTO updateOne(UUID userId, String reviewId, ReviewWriteDTO request) {
+    public ReviewDTO updateOne(UUID userId, ObjectId reviewId, ReviewWriteDTO request) {
         reviewValidator.validateUpdating(userId, reviewId);
         var review = findOneById(reviewId);
 
@@ -59,9 +59,9 @@ public class ReviewService {
         return reviewMapper.toReviewDTO(reviewRepo.save(review));
     }
 
-    public void deleteOne(UUID userId, String reviewId) {
+    public void deleteOne(UUID userId, ObjectId reviewId) {
         reviewValidator.validateDeleting(userId, reviewId);
-        reviewRepo.deleteById(new ObjectId(reviewId));
+        reviewRepo.deleteById(reviewId);
     }
 
     public void compensateDeleteOne(ReviewDTO request) {
@@ -69,28 +69,36 @@ public class ReviewService {
         reviewRepo.save(review);
     }
 
-    public void incrementOneCommentAmount(String reviewId) {
+    public void incrementOneCommentAmount(ObjectId reviewId) {
         reviewRepo.incrementOneCommentAmount(reviewId);
     }
 
-    public void decrementOneCommentAmount(String reviewId) {
+    public void decrementOneCommentAmount(ObjectId reviewId) {
         reviewRepo.decrementOneCommentAmount(reviewId);
     }
 
-    public void incrementOneLikeAmount(String reviewId) {
+    public void incrementOneLikeAmount(ObjectId reviewId) {
         reviewRepo.incrementOneLikeAmount(reviewId);
     }
 
-    public void decrementOneLikeAmount(String reviewId) {
+    public void decrementOneLikeAmount(ObjectId reviewId) {
         reviewRepo.decrementOneLikeAmount(reviewId);
     }
 
-    public void incrementOneDislikeAmount(String reviewId) {
+    public void incrementOneDislikeAmount(ObjectId reviewId) {
         reviewRepo.incrementOneDislikeAmount(reviewId);
     }
 
-    public void decrementOneDislikeAmount(String reviewId) {
+    public void decrementOneDislikeAmount(ObjectId reviewId) {
         reviewRepo.decrementOneDislikeAmount(reviewId);
+    }
+
+    public void incrementOneLikeAmountAndDecrementDislikeAmount(ObjectId reviewId) {
+        reviewRepo.incrementOneLikeAmountAndDecrementDislikeAmount(reviewId);
+    }
+
+    public void decrementOneLikeAmountAndIncrementDislikeAmount(ObjectId reviewId) {
+        reviewRepo.decrementOneLikeAmountAndIncrementDislikeAmount(reviewId);
     }
 
     private void updateOneFromDTO(Review review, ReviewWriteDTO request) {

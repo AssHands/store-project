@@ -3,6 +3,7 @@ package com.ak.store.review.facade;
 import com.ak.store.review.service.ReactionService;
 import com.ak.store.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -13,38 +14,38 @@ public class ReactionFacade {
     private final ReactionService reactionService;
     private final ReviewService reviewService;
 
-    public void likeOneReview(UUID userId, String reviewId) {
+    public void likeOneReview(UUID userId, ObjectId reviewId) {
         Boolean isLike = reactionService.findOneByUserIdAndReviewId(userId, reviewId);
 
         if(isLike == null) {
             reactionService.likeOneReview(userId, reviewId);
             reviewService.incrementOneLikeAmount(reviewId);
         } else if (!isLike) {
-            reactionService.undislikeOneReview(userId, reviewId);
-            reviewService.decrementOneDislikeAmount(reviewId);
-
             reactionService.likeOneReview(userId, reviewId);
-            reviewService.incrementOneLikeAmount(reviewId);
+            reviewService.incrementOneLikeAmountAndDecrementDislikeAmount(reviewId);
         }
     }
 
-    public void unlikeOneReview(UUID userId, String reviewId) {
-        boolean isUnliked = reactionService.unlikeOneReview(userId, reviewId);
+    public void dislikeOneReview(UUID userId, ObjectId reviewId) {
+        Boolean isLike = reactionService.findOneByUserIdAndReviewId(userId, reviewId);
 
-        if(isUnliked) {
+        if(isLike == null) {
+            reactionService.dislikeOneReview(userId, reviewId);
+            reviewService.incrementOneDislikeAmount(reviewId);
+        } else if (isLike) {
+            reactionService.dislikeOneReview(userId, reviewId);
+            reviewService.decrementOneLikeAmountAndIncrementDislikeAmount(reviewId);
+        }
+    }
+
+    public void removeOneReaction(UUID userId, ObjectId reviewId) {
+        Boolean isLiked = reactionService.findOneByUserIdAndReviewId(userId, reviewId);
+
+        if(isLiked) {
+            reactionService.removeOneReaction(userId, reviewId);
             reviewService.decrementOneLikeAmount(reviewId);
-        }
-    }
-
-    public void dislikeOneReview(UUID userId, String reviewId) {
-        reactionService.dislikeOneReview(userId, reviewId);
-        reviewService.incrementOneDislikeAmount(reviewId);
-    }
-
-    public void undislikeOneReview(UUID userId, String reviewId) {
-        boolean isUndisliked = reactionService.undislikeOneReview(userId, reviewId);
-
-        if(isUndisliked) {
+        } else if (!isLiked) {
+            reactionService.removeOneReaction(userId, reviewId);
             reviewService.decrementOneDislikeAmount(reviewId);
         }
     }

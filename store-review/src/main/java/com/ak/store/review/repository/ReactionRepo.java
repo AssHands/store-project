@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ReactionRepo extends MongoRepository<Reaction, ObjectId> {
-    long deleteOneByUserIdAndReviewId(UUID userId, String reviewId);
+public interface ReactionRepo extends ReactionRepoCustom, MongoRepository<Reaction, ObjectId> {
+    long deleteOneByUserIdAndReviewId(UUID userId, ObjectId reviewId);
 
-    Optional<Reaction> findOneByUserIdAndReviewId(UUID userId, String reviewId);
+    Optional<Reaction> findOneByUserIdAndReviewId(UUID userId, ObjectId reviewId);
 }

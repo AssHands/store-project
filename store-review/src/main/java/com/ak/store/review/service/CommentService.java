@@ -23,17 +23,17 @@ public class CommentService {
     private final CommentRepo commentRepo;
     private final CommentServiceValidator commentValidator;
 
-    private Comment findOneById(String id) {
-        return commentRepo.findById(new ObjectId(id))
+    private Comment findOneById(ObjectId id) {
+        return commentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("not found"));
     }
 
-    public List<CommentDTO> findAllByReviewId(String reviewId, int page, int size) {
+    public List<CommentDTO> findAllByReviewId(ObjectId reviewId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return commentMapper.toCommentDTO(commentRepo.findAllByReviewId(reviewId, pageable));
     }
 
-    public CommentDTO findOne(String commentId) {
+    public CommentDTO findOne(ObjectId commentId) {
         return commentMapper.toCommentDTO(findOneById(commentId));
     }
 
@@ -47,8 +47,8 @@ public class CommentService {
         return commentMapper.toCommentDTO(commentRepo.save(comment));
     }
 
-    public CommentDTO updateOne(UUID userId, String commentId, CommentWriteDTO request) {
-        commentValidator.validateUpdating(commentId, userId);
+    public CommentDTO updateOne(UUID userId, ObjectId commentId, CommentWriteDTO request) {
+        commentValidator.validateUpdating(userId, commentId);
         var comment = findOneById(commentId);
 
         updateOneFromDTO(comment, request);
@@ -56,12 +56,12 @@ public class CommentService {
         return commentMapper.toCommentDTO(commentRepo.save(comment));
     }
 
-    public void deleteOne(UUID userId, String commentId) {
-        commentValidator.validateDeleting(commentId, userId);
-        commentRepo.deleteById(new ObjectId(commentId));
+    public void deleteOne(UUID userId, ObjectId commentId) {
+        commentValidator.validateDeleting(userId, commentId);
+        commentRepo.deleteById(commentId);
     }
 
-    public void deleteAllByReviewId(String reviewId) {
+    public void deleteAllByReviewId(ObjectId reviewId) {
         commentRepo.deleteAllByReviewId(reviewId);
     }
 
