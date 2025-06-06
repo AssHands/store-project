@@ -23,7 +23,7 @@ public class CategoryKafkaErrorHandler {
     }
 
     public void handleDeleteError(CategoryDeletedEvent event, Exception e) {
-        String categoryId = event.getPayload().getCategory().getId().toString();
+        String categoryId = event.getCategoryId().toString();
         dltProducerKafka.send(event, categoryId);
     }
 }

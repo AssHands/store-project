@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class UserConsumerKafka {
-    private final InboxEventWriterService<UserVerifySnapshot> inboxEventWriterService;
+    private final InboxEventWriterService inboxEventWriterService;
     private final UserKafkaErrorHandler errorHandler;
 
     @KafkaListener(topics = "${kafka.topics.user-verify}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")

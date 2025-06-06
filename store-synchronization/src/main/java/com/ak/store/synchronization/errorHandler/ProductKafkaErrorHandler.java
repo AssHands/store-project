@@ -23,7 +23,7 @@ public class ProductKafkaErrorHandler {
     }
 
     public void handleDeleteError(ProductDeletedEvent event, Exception e) {
-        String productId = event.getPayload().getProduct().getId().toString();
+        String productId = event.getProductId().toString();
         dltProducerKafka.send(event, productId);
     }
 }

@@ -21,6 +21,7 @@ public class ReviewController {
     private final ReviewFacade reviewFacade;
     private final ReviewMapper reviewMapper;
 
+    //todo добавить удаление всех отзывов при удалении продукта (кафка)
     //todo добавить сортировку
     @GetMapping("product/{productId}")
     public List<ReviewView> findAllByProductId(@PathVariable Long productId,

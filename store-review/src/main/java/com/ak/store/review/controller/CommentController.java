@@ -20,6 +20,7 @@ public class CommentController {
     private final CommentFacade commentFacade;
     private final CommentMapper commentMapper;
 
+    //todo добавить сортировку по time
     @GetMapping
     public List<CommentView> findAllByReviewId(@RequestParam ObjectId reviewId,
                                                @RequestParam int page, @RequestParam int size) {

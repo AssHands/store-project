@@ -19,5 +19,5 @@ import java.util.UUID;
 public class CharacteristicDeletedEvent implements KafkaEvent {
     private UUID eventId;
 
-    private CharacteristicSnapshotPayload payload;
+    private Long characteristicId;
 }

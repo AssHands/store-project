@@ -19,5 +19,5 @@ import java.util.UUID;
 public class ProductDeletedEvent implements KafkaEvent {
     private UUID eventId;
 
-    private ProductSnapshotPayload payload;
+    private Long productId;
 }

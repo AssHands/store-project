@@ -46,7 +46,7 @@ public class CharacteristicConsumerKafka {
     public void handleDeleted(List<CharacteristicDeletedEvent> characteristicDeletedEvents) {
         for (var event : characteristicDeletedEvents) {
             try {
-                characteristicFacade.deleteOne(event.getPayload().getCharacteristic().getId());
+                characteristicFacade.deleteOne(event.getCharacteristicId());
             } catch (Exception e) {
                 errorHandler.handleDeleteError(event, e);
             }

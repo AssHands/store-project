@@ -8,12 +8,12 @@ import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Service
-public class OutboxEventService<T> {
+public class OutboxEventService {
     private final OutboxEventRepo outboxEventRepo;
-    private final OutboxEventMapper<T> outboxEventMapper;
+    private final OutboxEventMapper outboxEventMapper;
 
     @Transactional
-    public void createOne(T payload, OutboxEventType type) {
+    public <T> void createOne(T payload, OutboxEventType type) {
         var event = outboxEventMapper.toOutboxEvent(payload);
 
         event.setType(type);

@@ -23,7 +23,7 @@ import java.util.List;
 public class CharacteristicFacade {
     private final CharacteristicService characteristicService;
     private final CharacteristicMapper characteristicMapper;
-    private final OutboxEventService<CharacteristicSnapshotPayload> outboxEventService;
+    private final OutboxEventService outboxEventService;
 
     public List<CharacteristicDTO> findAllByCategoryId(Long categoryId) {
         return characteristicService.findAllByCategoryId(categoryId);
@@ -69,11 +69,7 @@ public class CharacteristicFacade {
     public void deleteOne(Long id) {
         var characteristic = characteristicService.deleteOne(id);
 
-        var snapshot = CharacteristicSnapshotPayload.builder()
-                .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
-                .numericValues(Collections.emptyList())
-                .textValues(Collections.emptyList())
-                .build();
+        var snapshot = characteristic.getId().toString();
 
         outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_DELETED);
     }

@@ -1,11 +1,13 @@
 package com.ak.store.review.facade;
 
+import com.ak.store.review.model.dto.ReactionDTO;
 import com.ak.store.review.service.ReactionService;
 import com.ak.store.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -15,38 +17,33 @@ public class ReactionFacade {
     private final ReviewService reviewService;
 
     public void likeOneReview(UUID userId, ObjectId reviewId) {
-        Boolean isLike = reactionService.findOneByUserIdAndReviewId(userId, reviewId);
+        var saveStatus = reactionService.likeOneReview(userId, reviewId);
 
-        if(isLike == null) {
-            reactionService.likeOneReview(userId, reviewId);
-            reviewService.incrementOneLikeAmount(reviewId);
-        } else if (!isLike) {
-            reactionService.likeOneReview(userId, reviewId);
-            reviewService.incrementOneLikeAmountAndDecrementDislikeAmount(reviewId);
+        switch (saveStatus) {
+            case CREATED -> reviewService.incrementOneLikeAmount(reviewId);
+            case UPDATED -> reviewService.incrementOneLikeAmountAndDecrementDislikeAmount(reviewId);
         }
     }
 
     public void dislikeOneReview(UUID userId, ObjectId reviewId) {
-        Boolean isLike = reactionService.findOneByUserIdAndReviewId(userId, reviewId);
+        var saveStatus = reactionService.dislikeOneReview(userId, reviewId);
 
-        if(isLike == null) {
-            reactionService.dislikeOneReview(userId, reviewId);
-            reviewService.incrementOneDislikeAmount(reviewId);
-        } else if (isLike) {
-            reactionService.dislikeOneReview(userId, reviewId);
-            reviewService.decrementOneLikeAmountAndIncrementDislikeAmount(reviewId);
+        switch (saveStatus) {
+            case CREATED -> reviewService.incrementOneDislikeAmount(reviewId);
+            case UPDATED -> reviewService.decrementOneLikeAmountAndIncrementDislikeAmount(reviewId);
         }
     }
 
-    public void removeOneReaction(UUID userId, ObjectId reviewId) {
-        Boolean isLiked = reactionService.findOneByUserIdAndReviewId(userId, reviewId);
+    public void removeOne(UUID userId, ObjectId reviewId) {
+        var removeStatus = reactionService.removeOne(userId, reviewId);
 
-        if(isLiked) {
-            reactionService.removeOneReaction(userId, reviewId);
-            reviewService.decrementOneLikeAmount(reviewId);
-        } else if (!isLiked) {
-            reactionService.removeOneReaction(userId, reviewId);
-            reviewService.decrementOneDislikeAmount(reviewId);
+        switch (removeStatus) {
+            case LIKE_REMOVED -> reviewService.decrementOneLikeAmount(reviewId);
+            case DISLIKE_REMOVED -> reviewService.decrementOneDislikeAmount(reviewId);
         }
+    }
+
+    public List<ReactionDTO> findAllByReviewIds(UUID userId, List<ObjectId> reviewIds) {
+        return reactionService.findAllByReviewIds(userId, reviewIds);
     }
 }

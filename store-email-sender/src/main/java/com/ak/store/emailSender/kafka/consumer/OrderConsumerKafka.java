@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class OrderConsumerKafka {
-    private final InboxEventWriterService<OrderCreatedSnapshotPayload> inboxEventWriterService;
+    private final InboxEventWriterService inboxEventWriterService;
     private final OrderKafkaErrorHandler errorHandler;
 
     @Transactional

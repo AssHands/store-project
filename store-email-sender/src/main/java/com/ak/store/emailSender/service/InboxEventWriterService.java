@@ -16,12 +16,12 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class InboxEventWriterService<T> {
+public class InboxEventWriterService {
     private final InboxEventRepo inboxEventRepo;
-    private final InboxEventMapper<T> inboxEventMapper;
+    private final InboxEventMapper inboxEventMapper;
 
     @Transactional
-    public void createOne(UUID eventId, T payload, InboxEventType type) {
+    public <T> void createOne(UUID eventId, T payload, InboxEventType type) {
         var event = inboxEventMapper.toInboxEvent(payload);
 
         event.setType(type);
@@ -33,7 +33,7 @@ public class InboxEventWriterService<T> {
     }
 
     @Transactional
-    public void createAll(List<T> payloads, InboxEventType type) {
+    public <T> void createAll(List<T> payloads, InboxEventType type) {
         List<InboxEvent> events = new ArrayList<>();
 
         for (var payload : payloads) {

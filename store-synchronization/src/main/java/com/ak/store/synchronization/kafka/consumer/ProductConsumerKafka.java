@@ -45,7 +45,7 @@ public class ProductConsumerKafka {
     public void handleDeleted(List<ProductDeletedEvent> productDeletedEvents) {
         for (var event : productDeletedEvents) {
             try {
-                productFacade.deleteOne(event.getPayload().getProduct().getId());
+                productFacade.deleteOne(event.getProductId());
             } catch (Exception e) {
                 errorHandler.handleDeleteError(event, e);
             }

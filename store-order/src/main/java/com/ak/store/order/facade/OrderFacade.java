@@ -24,7 +24,7 @@ import java.util.UUID;
 public class OrderFacade {
     private final OrderService orderService;
     private final WarehouseFeign warehouseFeign;
-    private final OutboxEventService<OrderCreatedSnapshotPayload> outboxEventService;
+    private final OutboxEventService outboxEventService;
 
     public List<OrderDTOPayload> findAllByUserId(UUID userId) {
         return orderService.findAllByUserId(userId);
@@ -44,9 +44,10 @@ public class OrderFacade {
 
         warehouseFeign.reserveAll(reserveForm);
 
-        var orderSnapshot = OrderCreatedSnapshotPayload.builder()
+        var snapshot = OrderCreatedSnapshotPayload.builder()
                 .order(OrderSnapshot.builder()
                         .id(orderPayload.getOrder().getId())
+                        .userId(authContext.getId())
                         .productAmount(request.getProductAmount())
                         .totalPrice(orderPayload.getOrder().getTotalPrice())
                         .build())
@@ -56,6 +57,6 @@ public class OrderFacade {
                         .build())
                 .build();
 
-        outboxEventService.createOne(orderSnapshot, OutboxEventType.ORDER_CREATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.ORDER_CREATED);
     }
 }

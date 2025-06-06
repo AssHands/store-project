@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -17,6 +18,8 @@ import java.util.Map;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderSnapshot {
     private Long id;
+
+    private UUID userId;
 
     private Integer totalPrice;
 

@@ -21,7 +21,7 @@ public class CharacteristicKafkaErrorHandler {
     }
 
     public void handleDeleteError(CharacteristicDeletedEvent event, Exception e) {
-        String characteristicId = event.getPayload().getCharacteristic().getId().toString();
+        String characteristicId = event.getCharacteristicId().toString();
         dltProducerKafka.send(event, characteristicId);
     }
 }

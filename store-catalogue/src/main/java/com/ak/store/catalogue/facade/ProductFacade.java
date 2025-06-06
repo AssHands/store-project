@@ -26,7 +26,7 @@ public class ProductFacade {
     private final ProductService productService;
     private final ImageService imageService;
     private final ProductCharacteristicService productCharacteristicService;
-    private final OutboxEventService<ProductSnapshotPayload> productOutboxEventService;
+    private final OutboxEventService productOutboxEventService;
     private final S3Service s3Service;
 
     private final ProductMapper productMapper;
@@ -88,14 +88,9 @@ public class ProductFacade {
     @Transactional
     public void deleteOne(Long id) {
         var images = imageService.deleteAll(id);
-        var productCharacteristics = productCharacteristicService.deleteAll(id);
         var product = productService.deleteOne(id);
 
-        var snapshot = ProductSnapshotPayload.builder()
-                .product(productMapper.toProductSnapshot(product))
-                .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
-                .images(imageMapper.toImageSnapshot(images))
-                .build();
+        var snapshot = product.getId().toString();
 
         productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_DELETED);
 

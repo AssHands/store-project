@@ -1,5 +1,6 @@
 package com.ak.store.review.mapper;
 
+import com.ak.store.common.model.review.snapshot.ReviewSnapshot;
 import com.ak.store.review.model.document.Review;
 import com.ak.store.review.model.dto.ReviewDTO;
 import com.ak.store.review.model.dto.write.ReviewWriteDTO;
@@ -24,6 +25,9 @@ public interface ReviewMapper {
     List<ReviewView> toReviewView(List<ReviewDTO> r);
 
     ReviewWriteDTO toReviewWriteDTO(ReviewForm rf);
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
+    ReviewSnapshot toReviewSnapshot(ReviewDTO r);
 
     @Named("objectIdToString")
     static String objectIdToString(ObjectId id) {

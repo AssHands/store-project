@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class OutboxEventMapper<T> {
+public class OutboxEventMapper {
     private final Gson gson;
 
-    public OutboxEvent toOutboxEvent(T payload) {
+    public <T> OutboxEvent toOutboxEvent(T payload) {
         return OutboxEvent.builder()
                 .payload(gson.toJson(payload))
                 .build();

@@ -19,7 +19,7 @@ import java.util.List;
 public class CategoryFacade {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
-    private final OutboxEventService<CategorySnapshotPayload> outboxEventService;
+    private final OutboxEventService outboxEventService;
 
     public List<CategoryDTO> findAll() {
         return categoryService.findAll();
@@ -57,11 +57,7 @@ public class CategoryFacade {
     public void deleteOne(Long id) {
         var category = categoryService.deleteOne(id);
 
-        var snapshot = CategorySnapshotPayload.builder()
-                .category(categoryMapper.toCategorySnapshot(category))
-                .characteristics(Collections.emptyList())
-                .relatedCategories(Collections.emptyList())
-                .build();
+        var snapshot = category.getId().toString();
 
         outboxEventService.createOne(snapshot, OutboxEventType.CATEGORY_DELETED);
     }

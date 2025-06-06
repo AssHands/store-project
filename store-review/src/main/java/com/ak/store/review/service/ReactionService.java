@@ -1,12 +1,17 @@
 package com.ak.store.review.service;
 
+import com.ak.store.review.mapper.ReactionMapper;
 import com.ak.store.review.model.document.Reaction;
+import com.ak.store.review.model.dto.ReactionDTO;
+import com.ak.store.review.model.dto.ReactionRemoveStatus;
+import com.ak.store.review.model.dto.ReactionSaveStatus;
 import com.ak.store.review.repository.ReactionRepo;
 import com.ak.store.review.validator.service.ReactionServiceValidator;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -14,6 +19,7 @@ import java.util.UUID;
 public class ReactionService {
     private final ReactionServiceValidator reactionValidator;
     private final ReactionRepo reactionRepo;
+    private final ReactionMapper reactionMapper;
 
     public Boolean findOneByUserIdAndReviewId(UUID userId, ObjectId reviewId) {
         return reactionRepo.findOneByUserIdAndReviewId(userId, reviewId)
@@ -21,28 +27,21 @@ public class ReactionService {
                 .orElse(null);
     }
 
-    public void likeOneReview(UUID userId, ObjectId reviewId) {
+    public ReactionSaveStatus likeOneReview(UUID userId, ObjectId reviewId) {
         reactionValidator.validateLikingOneReview(reviewId);
-        reactionRepo.saveOrUpdate(userId, reviewId, true);
+        return reactionRepo.likeOneReview(userId, reviewId);
     }
 
-    public void dislikeOneReview(UUID userId, ObjectId reviewId) {
+    public ReactionSaveStatus dislikeOneReview(UUID userId, ObjectId reviewId) {
         reactionValidator.validateDislikingOneReview(reviewId);
-        reactionRepo.saveOrUpdate(userId, reviewId, false);
+        return reactionRepo.dislikeOneReview(userId, reviewId);
     }
 
-    public void removeOneReaction(UUID userId, ObjectId reviewId) {
-        reactionRepo.deleteOneByUserIdAndReviewId(userId, reviewId);
+    public ReactionRemoveStatus removeOne(UUID userId, ObjectId reviewId) {
+        return reactionRepo.findOneAndRemove(userId, reviewId);
     }
 
-    public void save(ObjectId reviewId) {
-        var id = UUID.randomUUID();
-        System.out.println(id);
-
-        reactionRepo.save(Reaction.builder()
-                        .isLike(false)
-                        .userId(id)
-                        .reviewId(reviewId)
-                .build());
+    public List<ReactionDTO> findAllByReviewIds(UUID userId, List<ObjectId> reviewIds) {
+        return reactionMapper.toReactionDTO(reactionRepo.findAllByUserIdAndReviewIdIn(userId, reviewIds));
     }
 }
