@@ -1,7 +1,7 @@
 package com.ak.store.search.repo;
 
 
-import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
+import com.ak.store.common.document.catalogue.CharacteristicDocument;
 
 import java.util.List;
 

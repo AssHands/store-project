@@ -1,11 +1,9 @@
 package com.ak.store.synchronization.facade;
 
-import com.ak.store.common.model.catalogue.snapshot.CharacteristicSnapshotPayload;
+import com.ak.store.common.snapshot.catalogue.CharacteristicSnapshotPayload;
 import com.ak.store.synchronization.service.CharacteristicRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service

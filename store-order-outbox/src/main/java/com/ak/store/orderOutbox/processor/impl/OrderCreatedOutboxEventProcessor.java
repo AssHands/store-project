@@ -5,7 +5,7 @@ import com.ak.store.orderOutbox.model.OutboxEvent;
 import com.ak.store.orderOutbox.model.OutboxEventType;
 import com.ak.store.orderOutbox.processor.OutboxEventProcessor;
 import com.ak.store.common.event.order.OrderCreatedEvent;
-import com.ak.store.common.model.order.snapshot.OrderCreatedSnapshotPayload;
+import com.ak.store.common.snapshot.order.OrderCreatedSnapshotPayload;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

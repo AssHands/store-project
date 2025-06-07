@@ -1,9 +1,7 @@
 package com.ak.store.synchronization.repo.redis;
 
 
-import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
-
-import java.util.List;
+import com.ak.store.common.document.catalogue.CharacteristicDocument;
 
 public interface CharacteristicRedisRepo {
     void saveOne(CharacteristicDocument characteristic);

@@ -1,6 +1,6 @@
 package com.ak.store.search.repo;
 
-import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
+import com.ak.store.common.document.catalogue.CharacteristicDocument;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;

@@ -9,7 +9,7 @@ import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.CharacteristicService;
 import com.ak.store.catalogue.mapper.CharacteristicMapper;
-import com.ak.store.common.model.catalogue.snapshot.CharacteristicSnapshotPayload;
+import com.ak.store.common.snapshot.catalogue.CharacteristicSnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

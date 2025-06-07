@@ -27,7 +27,9 @@ public class ProductView {
 
     private Long categoryId;
 
-    private Float grade;
+    private Float rating;
+
+    private Integer amountReviews;
 
     private Boolean isAvailable;
 

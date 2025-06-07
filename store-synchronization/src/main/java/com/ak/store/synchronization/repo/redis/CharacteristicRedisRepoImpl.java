@@ -1,12 +1,10 @@
 package com.ak.store.synchronization.repo.redis;
 
-import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
+import com.ak.store.common.document.catalogue.CharacteristicDocument;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Repository

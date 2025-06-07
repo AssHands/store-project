@@ -2,13 +2,10 @@ package com.ak.store.synchronization.repo.elastic;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.*;
-import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
-import com.ak.store.common.model.catalogue.document.ProductDocument;
+import com.ak.store.common.document.catalogue.ProductDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Repository

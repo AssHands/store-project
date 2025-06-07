@@ -1,6 +1,6 @@
 package com.ak.store.cart.util.mapper;
 
-import com.ak.store.common.model.cart.document.CartDocument;
+import com.ak.store.common.document.cart.CartDocument;
 import com.ak.store.common.model.cart.view.CartView;
 import org.mapstruct.*;
 

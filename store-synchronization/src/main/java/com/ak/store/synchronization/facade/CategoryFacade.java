@@ -1,12 +1,9 @@
 package com.ak.store.synchronization.facade;
 
-import com.ak.store.common.event.catalogue.CategoryCreatedEvent;
-import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
+import com.ak.store.common.snapshot.catalogue.CategorySnapshotPayload;
 import com.ak.store.synchronization.service.CategoryRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service

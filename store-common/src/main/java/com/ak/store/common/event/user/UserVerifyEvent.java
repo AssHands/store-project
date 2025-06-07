@@ -1,7 +1,7 @@
 package com.ak.store.common.event.user;
 
 import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.model.user.snapshot.UserVerifySnapshot;
+import com.ak.store.common.snapshot.user.UserVerifySnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;

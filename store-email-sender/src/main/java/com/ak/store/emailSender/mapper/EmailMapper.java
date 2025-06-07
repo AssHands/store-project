@@ -1,6 +1,6 @@
 package com.ak.store.emailSender.mapper;
 
-import com.ak.store.common.model.order.snapshot.OrderCreatedSnapshotPayload;
+import com.ak.store.common.snapshot.order.OrderCreatedSnapshotPayload;
 import com.ak.store.emailSender.model.dto.OrderCreatedWriteDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

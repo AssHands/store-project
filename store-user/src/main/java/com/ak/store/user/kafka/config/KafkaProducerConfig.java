@@ -43,7 +43,7 @@ public class KafkaProducerConfig {
     private String maxInFlightRequests;
 
     @Bean
-    public ProducerFactory<String, ConsumerEvent> producerFactory() {
+    public ProducerFactory<String, > producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
 
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddresses);

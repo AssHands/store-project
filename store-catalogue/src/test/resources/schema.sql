@@ -22,7 +22,7 @@ create table inventory (
     discount_percentage int,
     category_id int,
     amount_reviews int,
-    grade float,
+    ratingSummary float,
     foreign key(category_id) REFERENCES category (id)
 );
 

@@ -14,9 +14,9 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode(of = { "key" })
 @ToString(exclude = { "product" })
-//todo rename table
 @Table(name = "image")
 public class Image {
+    //todo почему product_image_id_seq если табл называется image
     @Id
     @GeneratedValue(generator = "pi_gen", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "pi_gen",sequenceName = "product_image_id_seq", allocationSize = 1)

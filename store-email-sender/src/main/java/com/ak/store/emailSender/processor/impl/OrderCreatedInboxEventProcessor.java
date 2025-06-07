@@ -1,7 +1,7 @@
 package com.ak.store.emailSender.processor.impl;
 
 import com.ak.store.common.event.order.OrderCreatedEvent;
-import com.ak.store.common.model.order.snapshot.OrderCreatedSnapshotPayload;
+import com.ak.store.common.snapshot.order.OrderCreatedSnapshotPayload;
 import com.ak.store.emailSender.facade.EmailFacade;
 import com.ak.store.emailSender.inbox.InboxEvent;
 import com.ak.store.emailSender.inbox.InboxEventType;

@@ -25,6 +25,7 @@ public class KafkaTopicRegistry {
                 ProductCreatedEvent.class, "product-created",
                 ProductUpdatedEvent.class, "product-updated",
                 ProductDeletedEvent.class, "product-deleted",
+                ProductRatingUpdatedEvent.class, "product-rating-updated",
 
                 CharacteristicCreatedEvent.class, "characteristic-created",
                 CharacteristicUpdatedEvent.class, "characteristic-updated",

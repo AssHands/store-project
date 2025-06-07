@@ -1,8 +1,8 @@
 package com.ak.store.synchronization.mapper;
 
 
-import com.ak.store.common.model.catalogue.document.ProductDocument;
-import com.ak.store.common.model.catalogue.snapshot.ProductSnapshotPayload;
+import com.ak.store.common.document.catalogue.ProductDocument;
+import com.ak.store.common.snapshot.catalogue.ProductSnapshotPayload;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

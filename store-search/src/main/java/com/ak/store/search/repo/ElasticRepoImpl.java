@@ -3,7 +3,7 @@ package com.ak.store.search.repo;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import com.ak.store.common.model.catalogue.document.ProductDocument;
+import com.ak.store.common.document.catalogue.ProductDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

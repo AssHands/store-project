@@ -6,7 +6,7 @@ import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.CategoryService;
 import com.ak.store.catalogue.mapper.CategoryMapper;
-import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
+import com.ak.store.common.snapshot.catalogue.CategorySnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

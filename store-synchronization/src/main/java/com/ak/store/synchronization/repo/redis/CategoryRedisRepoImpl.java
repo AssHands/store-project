@@ -1,6 +1,6 @@
 package com.ak.store.synchronization.repo.redis;
 
-import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
+import com.ak.store.common.snapshot.catalogue.CategorySnapshotPayload;
 import com.ak.store.synchronization.mapper.CategoryMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;

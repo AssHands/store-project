@@ -13,7 +13,7 @@ import com.ak.store.catalogue.service.ProductService;
 import com.ak.store.catalogue.mapper.ImageMapper;
 import com.ak.store.catalogue.mapper.ProductCharacteristicMapper;
 import com.ak.store.catalogue.mapper.ProductMapper;
-import com.ak.store.common.model.catalogue.snapshot.ProductSnapshotPayload;
+import com.ak.store.common.snapshot.catalogue.ProductSnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -86,6 +86,7 @@ public class ProductFacade {
     }
 
     @Transactional
+    //todo удалять RatingSummary
     public void deleteOne(Long id) {
         var images = imageService.deleteAll(id);
         var product = productService.deleteOne(id);

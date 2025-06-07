@@ -1,6 +1,6 @@
 package com.ak.store.review.facade;
 
-import com.ak.store.common.model.review.snapshot.ReviewUpdatedSnapshotPayload;
+import com.ak.store.common.snapshot.review.ReviewUpdatedSnapshotPayload;
 import com.ak.store.review.mapper.ReviewMapper;
 import com.ak.store.review.model.dto.ReviewDTO;
 import com.ak.store.review.model.dto.write.ReviewWriteDTO;
@@ -55,7 +55,7 @@ public class ReviewFacade {
     public void deleteOne(UUID userId, ObjectId reviewId) {
         //todo добавить метод findAndDelete, чтобы уменьшить кол-во запросов
         var review = reviewService.findOne(reviewId);
-        outboxEventService.createOne(review.getId().toString(), OutboxEventType.REVIEW_DELETED);
+        outboxEventService.createOne(reviewMapper.toReviewDeletedSnapshot(review), OutboxEventType.REVIEW_DELETED);
 
         try {
             reviewService.deleteOne(userId, reviewId);

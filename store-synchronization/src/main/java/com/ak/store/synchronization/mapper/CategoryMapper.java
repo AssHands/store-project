@@ -1,8 +1,7 @@
 package com.ak.store.synchronization.mapper;
 
-import com.ak.store.common.model.catalogue.document.CategoryDocument;
-import com.ak.store.common.model.catalogue.snapshot.CategorySnapshot;
-import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
+import com.ak.store.common.document.catalogue.CategoryDocument;
+import com.ak.store.common.snapshot.catalogue.CategorySnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;

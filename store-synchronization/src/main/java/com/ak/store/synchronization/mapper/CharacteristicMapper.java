@@ -1,9 +1,7 @@
 package com.ak.store.synchronization.mapper;
 
-import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
-import com.ak.store.common.model.catalogue.document.NumericValueDocument;
-import com.ak.store.common.model.catalogue.snapshot.CharacteristicSnapshotPayload;
-import com.ak.store.common.model.catalogue.snapshot.NumericValueSnapshot;
+import com.ak.store.common.document.catalogue.CharacteristicDocument;
+import com.ak.store.common.snapshot.catalogue.CharacteristicSnapshotPayload;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

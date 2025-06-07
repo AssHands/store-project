@@ -43,23 +43,25 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Builder.Default
     @Min(0)
-    @Column(name = "amount_reviews")
-    private int amountReviews;
+    private Integer amountReviews = 0;
 
     //todo: check it work
-    @DecimalMin(value = "0.1")
+    @DecimalMin(value = "1.0")
     @DecimalMax(value = "5.0")
-    private Float grade;
+    private Float rating;
 
     private Boolean isAvailable;
 
     private Boolean isDeleted;
 
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private RatingSummary ratingSummary;
+
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductCharacteristic> characteristics = new ArrayList<>();
-
 
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)

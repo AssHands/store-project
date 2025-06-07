@@ -5,7 +5,7 @@ import com.ak.store.catalogue.model.dto.write.CategoryWriteDTO;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.form.CategoryForm;
 import com.ak.store.catalogue.model.view.CategoryTreeView;
-import com.ak.store.common.model.catalogue.snapshot.CategorySnapshot;
+import com.ak.store.common.snapshot.catalogue.CategorySnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;

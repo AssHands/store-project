@@ -1,6 +1,7 @@
 package com.ak.store.reviewOutbox.processor.impl;
 
 import com.ak.store.common.event.review.ReviewDeletedEvent;
+import com.ak.store.common.snapshot.review.ReviewDeletedSnapshot;
 import com.ak.store.reviewOutbox.kafka.EventProducerKafka;
 import com.ak.store.reviewOutbox.model.OutboxEvent;
 import com.ak.store.reviewOutbox.model.OutboxEventType;
@@ -18,9 +19,9 @@ public class ReviewDeletedOutboxEventProcessor implements OutboxEventProcessor {
     @Override
     public void process(OutboxEvent event) {
         var reviewDeletedEvent = new ReviewDeletedEvent(event.getId(),
-                gson.fromJson(event.getPayload(), String.class));
+                gson.fromJson(event.getPayload(), ReviewDeletedSnapshot.class));
 
-        String reviewId = reviewDeletedEvent.getReviewId();
+        String reviewId = reviewDeletedEvent.getReview().getId();
         eventProducerKafka.send(reviewDeletedEvent, reviewId);
     }
 

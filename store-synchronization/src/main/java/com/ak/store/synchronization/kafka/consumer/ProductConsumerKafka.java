@@ -2,6 +2,7 @@ package com.ak.store.synchronization.kafka.consumer;
 
 import com.ak.store.common.event.catalogue.ProductCreatedEvent;
 import com.ak.store.common.event.catalogue.ProductDeletedEvent;
+import com.ak.store.common.event.catalogue.ProductRatingUpdatedEvent;
 import com.ak.store.common.event.catalogue.ProductUpdatedEvent;
 import com.ak.store.synchronization.errorHandler.ProductKafkaErrorHandler;
 import com.ak.store.synchronization.facade.ProductFacade;
@@ -29,8 +30,7 @@ public class ProductConsumerKafka {
         }
     }
 
-    @KafkaListener(
-            topics = "${kafka.topics.product-updated}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
+    @KafkaListener(topics = "${kafka.topics.product-updated}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleUpdated(List<ProductUpdatedEvent> productUpdatedEvents) {
         for (var event : productUpdatedEvents) {
             try {
@@ -48,6 +48,17 @@ public class ProductConsumerKafka {
                 productFacade.deleteOne(event.getProductId());
             } catch (Exception e) {
                 errorHandler.handleDeleteError(event, e);
+            }
+        }
+    }
+
+    @KafkaListener(topics = "${kafka.topics.product-rating-updated}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
+    public void handleRatingUpdated(List<ProductRatingUpdatedEvent> productRatingUpdatedEvents) {
+        for (var event : productRatingUpdatedEvents) {
+            try {
+                productFacade.deleteOne(event.getProductId());
+            } catch (Exception e) {
+                errorHandler.handleRatingUpdateError(event, e);
             }
         }
     }

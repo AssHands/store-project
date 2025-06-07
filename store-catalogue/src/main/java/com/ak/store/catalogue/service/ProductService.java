@@ -4,6 +4,7 @@ import com.ak.store.catalogue.model.dto.ProductDTO;
 import com.ak.store.catalogue.model.dto.write.ProductWriteDTO;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Product;
+import com.ak.store.catalogue.model.entity.RatingSummary;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.service.product.PriceCalculator;
 import com.ak.store.catalogue.mapper.ProductMapper;
@@ -53,6 +54,9 @@ public class ProductService {
 
         PriceCalculator.setPrice(product, request);
         product.setIsDeleted(false);
+        product.setRatingSummary(RatingSummary.builder()
+                .product(product)
+                .build());
 
         //flush for immediate validation
         productRepo.saveAndFlush(product);

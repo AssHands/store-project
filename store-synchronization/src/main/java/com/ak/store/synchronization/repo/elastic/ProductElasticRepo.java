@@ -1,9 +1,7 @@
 package com.ak.store.synchronization.repo.elastic;
 
 
-import com.ak.store.common.model.catalogue.document.ProductDocument;
-
-import java.util.List;
+import com.ak.store.common.document.catalogue.ProductDocument;
 
 public interface ProductElasticRepo {
     void saveOne(ProductDocument productDocument);

@@ -1,7 +1,7 @@
 package com.ak.store.common.event.review;
 
 import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.model.review.snapshot.ReviewSnapshot;
+import com.ak.store.common.snapshot.review.ReviewSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;

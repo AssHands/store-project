@@ -1,6 +1,6 @@
 package com.ak.store.cart.repo;
 
-import com.ak.store.common.model.cart.document.CartDocument;
+import com.ak.store.common.document.cart.CartDocument;
 
 import java.util.Optional;
 

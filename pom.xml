@@ -31,5 +31,6 @@
         <module>store-review</module>
         <module>store-order-outbox</module>
         <module>store-review-outbox</module>
+        <module>catalogue-rating-updater</module>
     </modules>
 </project>

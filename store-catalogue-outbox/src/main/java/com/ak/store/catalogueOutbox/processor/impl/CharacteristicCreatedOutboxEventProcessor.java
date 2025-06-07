@@ -1,7 +1,7 @@
 package com.ak.store.catalogueOutbox.processor.impl;
 
 import com.ak.store.common.event.catalogue.CharacteristicCreatedEvent;
-import com.ak.store.common.model.catalogue.snapshot.CharacteristicSnapshotPayload;
+import com.ak.store.common.snapshot.catalogue.CharacteristicSnapshotPayload;
 import com.ak.store.catalogueOutbox.kafka.EventProducerKafka;
 import com.ak.store.catalogueOutbox.model.OutboxEvent;
 import com.ak.store.catalogueOutbox.model.OutboxEventType;

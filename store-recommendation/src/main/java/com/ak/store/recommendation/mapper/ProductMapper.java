@@ -1,6 +1,6 @@
 package com.ak.store.recommendation.mapper;
 
-import com.ak.store.common.model.catalogue.document.ProductDocument;
+import com.ak.store.common.document.catalogue.ProductDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;

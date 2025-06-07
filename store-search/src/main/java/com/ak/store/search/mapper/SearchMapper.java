@@ -1,6 +1,6 @@
 package com.ak.store.search.mapper;
 
-import com.ak.store.common.model.catalogue.document.ProductDocument;
+import com.ak.store.common.document.catalogue.ProductDocument;
 import com.ak.store.search.model.dto.ProductDTO;
 import com.ak.store.search.model.dto.request.FilterSearchRequestDTO;
 import com.ak.store.search.model.dto.request.ProductSearchRequestDTO;

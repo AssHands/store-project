@@ -5,7 +5,7 @@ import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import com.ak.store.common.model.catalogue.document.ProductDocument;
+import com.ak.store.common.document.catalogue.ProductDocument;
 import com.ak.store.search.mapper.SearchMapper;
 import com.ak.store.search.model.dto.*;
 import com.ak.store.search.model.dto.request.*;
@@ -14,7 +14,6 @@ import com.ak.store.search.model.dto.response.ProductSearchResponseDTO;
 import com.ak.store.search.repo.CharacteristicRedisRepo;
 import com.ak.store.search.repo.ElasticRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

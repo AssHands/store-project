@@ -5,11 +5,10 @@ import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationRange;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.util.NamedValue;
-import com.ak.store.common.model.catalogue.document.CharacteristicDocument;
+import com.ak.store.common.document.catalogue.CharacteristicDocument;
 import com.ak.store.search.model.common.ProductFields;
 import com.ak.store.search.model.dto.request.FilterSearchRequestDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

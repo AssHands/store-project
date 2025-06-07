@@ -3,7 +3,7 @@ package com.ak.store.catalogue.mapper;
 import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
 import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
-import com.ak.store.common.model.catalogue.snapshot.ProductCharacteristicSnapshot;
+import com.ak.store.common.snapshot.catalogue.ProductCharacteristicSnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

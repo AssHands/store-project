@@ -1,7 +1,7 @@
 package com.ak.store.recommendation.facade;
 
 import com.ak.store.common.event.search.SearchAllEvent;
-import com.ak.store.common.model.recommendation.RecommendationResponse;
+import com.ak.store.common.snapshot.recommendation.RecommendationResponse;
 import com.ak.store.recommendation.service.RecommendationElasticService;
 import com.ak.store.recommendation.service.RecommendationRedisService;
 import lombok.RequiredArgsConstructor;

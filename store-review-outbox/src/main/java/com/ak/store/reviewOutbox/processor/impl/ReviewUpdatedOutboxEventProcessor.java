@@ -1,9 +1,7 @@
 package com.ak.store.reviewOutbox.processor.impl;
 
-import com.ak.store.common.event.review.ReviewCreatedEvent;
 import com.ak.store.common.event.review.ReviewUpdatedEvent;
-import com.ak.store.common.model.review.snapshot.ReviewSnapshot;
-import com.ak.store.common.model.review.snapshot.ReviewUpdatedSnapshotPayload;
+import com.ak.store.common.snapshot.review.ReviewUpdatedSnapshotPayload;
 import com.ak.store.reviewOutbox.kafka.EventProducerKafka;
 import com.ak.store.reviewOutbox.model.OutboxEvent;
 import com.ak.store.reviewOutbox.model.OutboxEventType;

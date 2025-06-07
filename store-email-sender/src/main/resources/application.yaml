@@ -33,6 +33,7 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:29092,localhost:39092
+
     listener:
       type: batch
       ack-mode: manual

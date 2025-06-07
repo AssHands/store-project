@@ -1,7 +1,7 @@
 package com.ak.store.cart.repo;
 
-import com.ak.store.common.model.cart.document.CartDocument;
-import com.ak.store.common.model.cart.document.ProductCartDocument;
+import com.ak.store.common.document.cart.CartDocument;
+import com.ak.store.common.document.cart.ProductCartDocument;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;

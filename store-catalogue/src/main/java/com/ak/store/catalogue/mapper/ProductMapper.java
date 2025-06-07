@@ -5,7 +5,7 @@ import com.ak.store.catalogue.model.dto.write.ProductWriteDTO;
 import com.ak.store.catalogue.model.dto.write.ProductWritePayload;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.form.ProductFormPayload;
-import com.ak.store.common.model.catalogue.snapshot.ProductSnapshot;
+import com.ak.store.common.snapshot.catalogue.ProductSnapshot;
 import com.ak.store.catalogue.model.view.ProductView;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

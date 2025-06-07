@@ -1,7 +1,7 @@
 package com.ak.store.common.event.catalogue;
 
 import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.model.catalogue.snapshot.CategorySnapshotPayload;
+import com.ak.store.common.snapshot.catalogue.CategorySnapshotPayload;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;

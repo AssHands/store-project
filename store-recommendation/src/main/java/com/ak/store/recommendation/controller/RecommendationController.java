@@ -1,6 +1,6 @@
 package com.ak.store.recommendation.controller;
 
-import com.ak.store.common.model.recommendation.RecommendationResponse;
+import com.ak.store.common.snapshot.recommendation.RecommendationResponse;
 import com.ak.store.recommendation.facade.RecommendationFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

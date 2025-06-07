@@ -1,7 +1,7 @@
 package com.ak.store.cart.service;
 
 import com.ak.store.cart.repo.CartRedisRepo;
-import com.ak.store.common.model.cart.document.CartDocument;
+import com.ak.store.common.document.cart.CartDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

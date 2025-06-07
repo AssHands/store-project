@@ -1,8 +1,7 @@
 package com.ak.store.common.event.order;
 
 import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.model.order.snapshot.OrderCreatedSnapshotPayload;
-import com.ak.store.common.model.order.snapshot.OrderSnapshot;
+import com.ak.store.common.snapshot.order.OrderCreatedSnapshotPayload;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -10,8 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Data

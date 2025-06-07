@@ -1,8 +1,8 @@
 package com.ak.store.order.facade;
 
-import com.ak.store.common.model.order.snapshot.OrderCreatedSnapshotPayload;
-import com.ak.store.common.model.order.snapshot.OrderSnapshot;
-import com.ak.store.common.model.user.snapshot.UserIdentitySnapshot;
+import com.ak.store.common.snapshot.order.OrderCreatedSnapshotPayload;
+import com.ak.store.common.snapshot.order.OrderSnapshot;
+import com.ak.store.common.snapshot.user.UserIdentitySnapshot;
 import com.ak.store.order.feign.WarehouseFeign;
 import com.ak.store.order.model.dto.OrderDTOPayload;
 import com.ak.store.order.model.dto.UserAuthContext;
