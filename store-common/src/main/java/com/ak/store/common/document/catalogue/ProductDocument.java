@@ -31,11 +31,11 @@ public class ProductDocument {
 
     private Long categoryId;
 
-    private Integer amountSales;
+    private Integer saleAmount;
+
+    private Integer reviewAmount;
 
     private Float rating;
-
-    private Integer amountReviews;
 
     private Boolean isAvailable;
 

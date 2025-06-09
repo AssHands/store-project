@@ -2,6 +2,7 @@ package com.ak.store.synchronization.mapper;
 
 
 import com.ak.store.common.document.catalogue.ProductDocument;
+import com.ak.store.common.snapshot.catalogue.ProductRatingUpdatedSnapshot;
 import com.ak.store.common.snapshot.catalogue.ProductSnapshotPayload;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,5 +18,5 @@ public interface ProductMapper {
     @Mapping(source = "images", target = "images")
     ProductDocument toProductDocument(ProductSnapshotPayload psp);
 
-    List<ProductDocument> toProductDocument(List<ProductSnapshotPayload> psp);
+    ProductDocument toProductDocument(ProductRatingUpdatedSnapshot prus);
 }

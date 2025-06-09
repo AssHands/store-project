@@ -43,13 +43,9 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Builder.Default
     @Min(0)
-    private Integer amountReviews = 0;
+    private Integer reviewAmount;
 
-    //todo: check it work
-    @DecimalMin(value = "1.0")
-    @DecimalMax(value = "5.0")
     private Float rating;
 
     private Boolean isAvailable;

@@ -7,6 +7,7 @@ import com.ak.store.synchronization.errorHandler.CharacteristicKafkaErrorHandler
 import com.ak.store.synchronization.facade.CharacteristicFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class CharacteristicConsumerKafka {
 
     @KafkaListener(
             topics = "${kafka.topics.characteristic-created}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handleCreated(List<CharacteristicCreatedEvent> characteristicCreatedEvents) {
+    public void handleCreated(List<CharacteristicCreatedEvent> characteristicCreatedEvents, Acknowledgment ack) {
         for (var event : characteristicCreatedEvents) {
             try {
                 characteristicFacade.createOne(event.getPayload());
@@ -27,11 +28,13 @@ public class CharacteristicConsumerKafka {
                 errorHandler.handleCreateError(event, e);
             }
         }
+
+        ack.acknowledge();
     }
 
     @KafkaListener(
             topics = "${kafka.topics.characteristic-updated}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handleUpdated(List<CharacteristicUpdatedEvent> characteristicUpdatedEvents) {
+    public void handleUpdated(List<CharacteristicUpdatedEvent> characteristicUpdatedEvents, Acknowledgment ack) {
         for (var event : characteristicUpdatedEvents) {
             try {
                 characteristicFacade.updateOne(event.getPayload());
@@ -39,11 +42,13 @@ public class CharacteristicConsumerKafka {
                 errorHandler.handleUpdateError(event, e);
             }
         }
+
+        ack.acknowledge();
     }
 
     @KafkaListener(
             topics = "${kafka.topics.characteristic-deleted}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handleDeleted(List<CharacteristicDeletedEvent> characteristicDeletedEvents) {
+    public void handleDeleted(List<CharacteristicDeletedEvent> characteristicDeletedEvents, Acknowledgment ack) {
         for (var event : characteristicDeletedEvents) {
             try {
                 characteristicFacade.deleteOne(event.getCharacteristicId());
@@ -51,5 +56,7 @@ public class CharacteristicConsumerKafka {
                 errorHandler.handleDeleteError(event, e);
             }
         }
+
+        ack.acknowledge();
     }
 }

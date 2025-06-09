@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Repository
@@ -22,9 +23,9 @@ public class SearchHistoryRedisRepoImpl implements SearchHistoryRedisRepo {
     }
 
     @Override
-    public List<Long> findAllCategoryByConsumerId(String consumerId) {
+    public List<Long> findAllCategoryByUserId(UUID userId) {
         Set<String> searchHistory = stringRedisTemplate.opsForZSet()
-                .distinctRandomMembers(SEARCH_HISTORY_KEY + consumerId, 5);
+                .distinctRandomMembers(SEARCH_HISTORY_KEY + userId, 5);
 
         if (searchHistory == null) {
             return Collections.emptyList();
@@ -36,8 +37,8 @@ public class SearchHistoryRedisRepoImpl implements SearchHistoryRedisRepo {
     }
 
     @Override
-    public void putAll(String consumerId, List<Long> categoryIds) {
-        String key = SEARCH_HISTORY_KEY + consumerId;
+    public void putAll(UUID userId, List<Long> categoryIds) {
+        String key = SEARCH_HISTORY_KEY + userId;
         double timestamp = System.currentTimeMillis() / 1000.0;
 
         Set<ZSetOperations.TypedTuple<String>> tuples = categoryIds.stream()

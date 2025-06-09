@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/search")
@@ -32,7 +34,8 @@ public class SearchController {
     //todo заменить на view
     public FilterSearchResponseView searchAllAvailableFilters(@AuthenticationPrincipal Jwt accessToken,
                                                               @RequestBody @Valid FilterSearchRequestForm request) {
-        var response = searchFacade.searchAllFilter(accessToken, searchMapper.FilterSearchRequestDTO(request));
+        var userId = UUID.fromString(accessToken.getSubject());
+        var response = searchFacade.searchAllFilter(userId, searchMapper.FilterSearchRequestDTO(request));
         return searchMapper.toFilterSearchResponseView(response);
     }
 }

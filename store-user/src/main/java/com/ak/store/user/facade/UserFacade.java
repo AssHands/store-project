@@ -1,5 +1,8 @@
 package com.ak.store.user.facade;
 
+import com.ak.store.common.event.user.UserVerifyEvent;
+import com.ak.store.common.snapshot.user.UserVerifySnapshot;
+import com.ak.store.user.kafka.EventProducerKafka;
 import com.ak.store.user.model.dto.UserDTO;
 import com.ak.store.user.model.dto.write.UserWriteDTO;
 import com.ak.store.user.service.UserKeycloakService;
@@ -16,7 +19,7 @@ import java.util.UUID;
 public class UserFacade {
     private final UserService userService;
     private final UserKeycloakService userKeycloakService;
-    //private final UserProducerKafka userProducerKafka;
+    private final EventProducerKafka eventProducerKafka;
 
     public UserDTO findOne(UUID id) {
         return userService.findOne(id);
@@ -31,8 +34,16 @@ public class UserFacade {
             var user = userService.createOne(userId, request);
             String code = userService.makeVerificationCode(userId, user.getEmail());
 
-            //todo
-            //userProducerKafka.send(new ConsumerVerifyEvent(code, user.getEmail()));
+            var event = UserVerifyEvent.builder()
+                    .eventId(UUID.randomUUID())
+                    .userVerify(UserVerifySnapshot.builder()
+                            .email(user.getEmail())
+                            .verificationCode(code)
+                            .build())
+                    .build();
+
+            eventProducerKafka.send(event, user.getId().toString());
+
             return user;
 
         } catch (Exception e) {
@@ -71,9 +82,17 @@ public class UserFacade {
     @Transactional
     public UserDTO updateOneEmail(UUID id, String email) {
         String code = userService.makeVerificationCode(id, email);
-        //todo
-        //userProducerKafka.send(new ConsumerVerifyEvent(code, email));
+
+        var event = UserVerifyEvent.builder()
+                .eventId(UUID.randomUUID())
+                .userVerify(UserVerifySnapshot.builder()
+                        .email(email)
+                        .verificationCode(code)
+                        .build())
+                .build();
+
+        eventProducerKafka.send(event, id.toString());
+
         return userService.findOne(id);
     }
 }
-

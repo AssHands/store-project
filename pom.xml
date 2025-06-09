@@ -27,10 +27,9 @@
         <module>store-catalogue-outbox</module>
         <module>store-search</module>
         <module>store-recommendation</module>
-        <module>store-cart</module>
         <module>store-review</module>
         <module>store-order-outbox</module>
         <module>store-review-outbox</module>
-        <module>catalogue-rating-updater</module>
+        <module>store-catalogue-rating-updater</module>
     </modules>
 </project>

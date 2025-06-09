@@ -28,11 +28,11 @@ public class ProductView {
 
     private Long categoryId;
 
-    private Integer amountSales;
+    private Integer saleAmount;
 
-    private Integer amountReviews;
+    private Integer reviewAmount;
 
-    private Float grade;
+    private Float rating;
 
     private Boolean isAvailable;
 

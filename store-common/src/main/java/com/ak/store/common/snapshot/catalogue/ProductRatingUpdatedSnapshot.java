@@ -17,5 +17,5 @@ public class ProductRatingUpdatedSnapshot {
 
     private Float rating;
 
-    private Integer amountReviews;
+    private Integer reviewAmount;
 }

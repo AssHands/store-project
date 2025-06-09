@@ -1,5 +1,6 @@
 package com.ak.store.synchronization.service;
 
+import com.ak.store.common.snapshot.catalogue.ProductRatingUpdatedSnapshot;
 import com.ak.store.common.snapshot.catalogue.ProductSnapshotPayload;
 import com.ak.store.synchronization.mapper.ProductMapper;
 import com.ak.store.synchronization.repo.elastic.ProductElasticRepo;
@@ -22,5 +23,9 @@ public class ProductElasticService {
 
     public void deleteOne(Long id) {
         productRepo.deleteOne(id);
+    }
+
+    public void updateOneRating(ProductRatingUpdatedSnapshot request) {
+        productRepo.updateOne(productMapper.toProductDocument(request));
     }
 }

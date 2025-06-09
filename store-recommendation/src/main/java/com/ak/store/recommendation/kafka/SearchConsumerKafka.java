@@ -13,11 +13,7 @@ import java.util.List;
 public class SearchConsumerKafka {
     private final RecommendationFacade recommendationFacade;
 
-    @KafkaListener(
-            topics = "search-all-events",
-            groupId = "recommendation-group",
-            batch = "true",
-            containerFactory = "batchFactory")
+    @KafkaListener(topics = "${kafka.topics.search-all-events}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleCreated(List<SearchAllEvent> searchAllEvents) {
         recommendationFacade.putInSearchHistory(searchAllEvents);
     }

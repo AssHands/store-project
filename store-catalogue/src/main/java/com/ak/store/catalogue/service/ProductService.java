@@ -54,6 +54,8 @@ public class ProductService {
 
         PriceCalculator.setPrice(product, request);
         product.setIsDeleted(false);
+        product.setReviewAmount(0);
+        product.setRating(0f);
         product.setRatingSummary(RatingSummary.builder()
                 .product(product)
                 .build());

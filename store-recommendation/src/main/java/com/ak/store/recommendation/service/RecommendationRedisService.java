@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -13,17 +14,17 @@ public class RecommendationRedisService {
     private final SearchHistoryRedisRepo searchHistoryRedisRepo;
     private final CatalogueRedisRepo catalogueRedisRepo;
 
-    public List<Long> getAllCategoryId(String consumerId) {
-        return searchHistoryRedisRepo.findAllCategoryByConsumerId(consumerId);
+    public List<Long> getAllCategoryId(UUID userId) {
+        return searchHistoryRedisRepo.findAllCategoryByUserId(userId);
     }
 
-    public List<Long> getAllRelatedCategoryId(String consumerId) {
+    public List<Long> getAllRelatedCategoryId(UUID userId) {
         return catalogueRedisRepo.findAllRelatedCategoryByCategoryIds(
-                searchHistoryRedisRepo.findAllCategoryByConsumerId(consumerId)
+                searchHistoryRedisRepo.findAllCategoryByUserId(userId)
         );
     }
 
-    public void putAll(String consumerId, List<Long> categoryIds) {
-        searchHistoryRedisRepo.putAll(consumerId, categoryIds);
+    public void putAll(UUID userId, List<Long> categoryIds) {
+        searchHistoryRedisRepo.putAll(userId, categoryIds);
     }
 }

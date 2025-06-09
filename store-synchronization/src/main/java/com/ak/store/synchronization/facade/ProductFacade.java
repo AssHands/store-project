@@ -19,11 +19,11 @@ public class ProductFacade {
         productElasticService.updateOne(request);
     }
 
-    public void deleteOne(Long id) {
-        productElasticService.deleteOne(id);
+    public void updateOneRating(ProductRatingUpdatedSnapshot request) {
+        productElasticService.updateOneRating(request);
     }
 
-    public void updateOneRating(ProductRatingUpdatedSnapshot request) {
-
+    public void deleteOne(Long id) {
+        productElasticService.deleteOne(id);
     }
 }

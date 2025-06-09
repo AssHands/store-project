@@ -36,9 +36,15 @@ spring:
         retry.backoff.max.ms: 5000
         request.timeout.ms: 15000
         delivery.timeout.ms: 20000
+        enable.idempotence: true
         max.in.flight.requests.per.connection: 5
-        linger.ms: 5000
+        linger.ms: 3000
 
 elasticsearch:
   indexes:
     product: "product"
+
+kafka:
+  dlt-prefix: .dlt
+  topics:
+    search-all-events: search-all-events

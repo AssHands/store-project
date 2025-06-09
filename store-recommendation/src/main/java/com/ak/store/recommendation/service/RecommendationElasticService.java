@@ -7,8 +7,9 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.ak.store.common.document.catalogue.ProductDocument;
-import com.ak.store.common.snapshot.recommendation.RecommendationResponse;
 import com.ak.store.recommendation.mapper.ProductMapper;
+import com.ak.store.recommendation.model.view.ProductView;
+import com.ak.store.recommendation.model.view.RecommendationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -129,11 +130,11 @@ public class RecommendationElasticService {
         }
     }
 
-    private List<ProductPoorView> getContent(SearchResponse<ProductDocument> searchResponse) {
+    private List<ProductView> getContent(SearchResponse<ProductDocument> searchResponse) {
         return searchResponse.hits().hits().stream()
                 .filter(doc -> doc.source() != null)
                 .map(Hit::source)
-                .map(productMapper::toProductPoorView)
+                .map(productMapper::toProductView)
                 .toList();
     }
 }

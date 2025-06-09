@@ -27,9 +27,5 @@ public class ProductSnapshot {
 
     private Long categoryId;
 
-    private Float rating;
-
-    private Integer amountReviews;
-
     private Boolean isAvailable;
 }

@@ -29,7 +29,7 @@ public class ProductView {
 
     private Float rating;
 
-    private Integer amountReviews;
+    private Integer reviewAmount;
 
     private Boolean isAvailable;
 

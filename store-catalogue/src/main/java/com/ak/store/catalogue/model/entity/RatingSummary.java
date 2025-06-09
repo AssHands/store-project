@@ -32,7 +32,5 @@ public class RatingSummary {
     private Integer sum = 0;
 
     @Builder.Default
-    @DecimalMin(value = "1.0")
-    @DecimalMax(value = "5.0")
-    private Float average = null;
+    private Float average = 0f;
 }

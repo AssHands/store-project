@@ -1,17 +1,13 @@
 package com.ak.store.recommendation.facade;
 
 import com.ak.store.common.event.search.SearchAllEvent;
-import com.ak.store.common.snapshot.recommendation.RecommendationResponse;
 import com.ak.store.recommendation.service.RecommendationElasticService;
 import com.ak.store.recommendation.service.RecommendationRedisService;
+import com.ak.store.recommendation.model.view.RecommendationResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -20,12 +16,12 @@ public class RecommendationFacade {
     private final RecommendationElasticService recommendationElasticService;
 
     public void putInSearchHistory(List<SearchAllEvent> searchAllEvents) {
-        Map<String, List<Long>> map = new HashMap<>(searchAllEvents.size());
+        Map<UUID, List<Long>> map = new HashMap<>(searchAllEvents.size());
 
         for (var searchEvent : searchAllEvents) {
-            String consumerId = searchEvent.getConsumerSearch().getConsumerId();
-            Long categoryId = searchEvent.getConsumerSearch().getCategoryId();
-            map.computeIfAbsent(consumerId, k -> new ArrayList<>()).add(categoryId);
+            UUID userId = searchEvent.getUserId();
+            Long categoryId = searchEvent.getCategoryId();
+            map.computeIfAbsent(userId, k -> new ArrayList<>()).add(categoryId);
         }
 
         for (var entry : map.entrySet()) {
@@ -33,17 +29,16 @@ public class RecommendationFacade {
         }
     }
 
-    public RecommendationResponse getRecommendation(Jwt accessToken) {
-        if (accessToken == null || accessToken.getClaims() == null) {
+    public RecommendationResponse getRecommendation(UUID userId) {
+        if (userId == null) {
             return recommendationElasticService.getRecommendation();
         }
 
-        return recommendationElasticService.getRecommendation(
-                recommendationRedisService.getAllRelatedCategoryId(accessToken.getSubject())
-        );
+        var relatedCategories = recommendationRedisService.getAllRelatedCategoryId(userId);
+        return recommendationElasticService.getRecommendation(relatedCategories);
     }
 
-    public List<Long> findSearchHistory(Jwt accessToken) {
-        return recommendationRedisService.getAllCategoryId(accessToken.getSubject());
+    public List<Long> findSearchHistory(UUID userId) {
+        return recommendationRedisService.getAllCategoryId(userId);
     }
 }

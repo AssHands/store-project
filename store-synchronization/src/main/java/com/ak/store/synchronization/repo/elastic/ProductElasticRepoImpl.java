@@ -1,7 +1,9 @@
 package com.ak.store.synchronization.repo.elastic;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.DeleteRequest;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
+import co.elastic.clients.elasticsearch.core.UpdateRequest;
 import com.ak.store.common.document.catalogue.ProductDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
