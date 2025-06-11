@@ -1,6 +1,6 @@
 package com.ak.store.synchronization.mapper;
 
-import com.ak.store.common.document.catalogue.CharacteristicDocument;
+import com.ak.store.synchronization.model.document.Characteristic;
 import com.ak.store.common.snapshot.catalogue.CharacteristicSnapshotPayload;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,7 +14,7 @@ public interface CharacteristicMapper {
     @Mapping(target = "id", source = "characteristic.id")
     @Mapping(target = "name", source = "characteristic.name")
     @Mapping(target = "isText", source = "characteristic.isText")
-    CharacteristicDocument toCharacteristicDocument(CharacteristicSnapshotPayload csp);
+    Characteristic toCharacteristicDocument(CharacteristicSnapshotPayload csp);
 
-    List<CharacteristicDocument> toCharacteristicDocument(List<CharacteristicSnapshotPayload> csp);
+    List<Characteristic> toCharacteristicDocument(List<CharacteristicSnapshotPayload> csp);
 }

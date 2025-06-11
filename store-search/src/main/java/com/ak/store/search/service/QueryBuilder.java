@@ -7,7 +7,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.json.JsonData;
-import com.ak.store.search.model.common.ProductFields;
+import com.ak.store.search.util.ProductFields;
 import com.ak.store.search.model.dto.request.ProductSearchRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -3,7 +3,7 @@ package com.ak.store.synchronization.service;
 import com.ak.store.common.snapshot.catalogue.ProductRatingUpdatedSnapshot;
 import com.ak.store.common.snapshot.catalogue.ProductSnapshotPayload;
 import com.ak.store.synchronization.mapper.ProductMapper;
-import com.ak.store.synchronization.repo.elastic.ProductElasticRepo;
+import com.ak.store.synchronization.repository.elastic.ProductElasticRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -3,7 +3,7 @@ package com.ak.store.search.service;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.json.JsonData;
-import com.ak.store.search.model.common.ProductFields;
+import com.ak.store.search.util.ProductFields;
 import com.ak.store.search.model.dto.request.FilterSearchRequestDTO;
 import com.ak.store.search.model.dto.NumericFilterDTO;
 import com.ak.store.search.model.dto.request.ProductSearchRequestDTO;

@@ -1,6 +1,6 @@
 package com.ak.store.search.mapper;
 
-import com.ak.store.common.document.catalogue.ProductDocument;
+import com.ak.store.search.model.document.Product;
 import com.ak.store.search.model.dto.ProductDTO;
 import com.ak.store.search.model.dto.request.FilterSearchRequestDTO;
 import com.ak.store.search.model.dto.request.ProductSearchRequestDTO;
@@ -16,7 +16,7 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface SearchMapper {
-    ProductDTO toProductDTO(ProductDocument productDocument);
+    ProductDTO toProductDTO(Product productDocument);
 
     ProductSearchRequestDTO toProductSearchRequestDTO(ProductSearchRequestForm psr);
 

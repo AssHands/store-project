@@ -5,10 +5,11 @@ import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import com.ak.store.common.document.catalogue.ProductDocument;
 import com.ak.store.search.mapper.SearchMapper;
+import com.ak.store.search.model.document.Product;
 import com.ak.store.search.model.dto.*;
-import com.ak.store.search.model.dto.request.*;
+import com.ak.store.search.model.dto.request.FilterSearchRequestDTO;
+import com.ak.store.search.model.dto.request.ProductSearchRequestDTO;
 import com.ak.store.search.model.dto.response.FilterSearchResponseDTO;
 import com.ak.store.search.model.dto.response.ProductSearchResponseDTO;
 import com.ak.store.search.repo.CharacteristicRedisRepo;
@@ -31,7 +32,7 @@ public class SearchElasticService {
 
 
     public FilterSearchResponseDTO searchAllFilter(FilterSearchRequestDTO request) {
-        if(request.getCategoryId() == null) {
+        if (request.getCategoryId() == null) {
             //todo ловить ошибку в случае неудачи определения категории и возвращать пустые фильтры
             request.setCategoryId(
                     elasticRepo.defineCategory(queryBuilder.buildDefineCategoryRequest(request.getText()))
@@ -44,7 +45,7 @@ public class SearchElasticService {
                 queryBuilder.buildFilterRequest(
                         queryBuilder.buildBoolQuery(filters, request.getText()),
                         aggregationBuilder.buildAggregations(request,
-                                characteristicRedisRepo.findAllCharacteristicByCategoryId(request.getCategoryId())
+                                characteristicRedisRepo.findAllByCategoryId(request.getCategoryId())
                         )
                 )
         );
@@ -56,7 +57,7 @@ public class SearchElasticService {
     }
 
     public ProductSearchResponseDTO searchAllProduct(ProductSearchRequestDTO request) {
-        if(request.getCategoryId() == null) {
+        if (request.getCategoryId() == null) {
             //todo ловить ошибку в случае неудачи определения категории и возвращать пустые фильтры
             request.setCategoryId(
                     elasticRepo.defineCategory(queryBuilder.buildDefineCategoryRequest(request.getText()))
@@ -78,7 +79,7 @@ public class SearchElasticService {
     }
 
     //todo: move to utils class?
-    private FiltersDTO getFiltersDTO(SearchResponse<ProductDocument> response) {
+    private FiltersDTO getFiltersDTO(SearchResponse<Product> response) {
         var filtersDTO = new FiltersDTO();
 
         for (var allAggs : response.aggregations().entrySet()) {
@@ -130,7 +131,7 @@ public class SearchElasticService {
         return filtersDTO;
     }
 
-    private List<ProductDTO> getContent(SearchResponse<ProductDocument> response) {
+    private List<ProductDTO> getContent(SearchResponse<Product> response) {
         return response.hits().hits()
                 .stream()
                 .filter(doc -> doc.source() != null)
@@ -139,7 +140,7 @@ public class SearchElasticService {
                 .toList();
     }
 
-    private List<Object> getSearchAfter(SearchResponse<ProductDocument> response) {
+    private List<Object> getSearchAfter(SearchResponse<Product> response) {
         var hits = response.hits().hits();
 
         if (hits.isEmpty()) {

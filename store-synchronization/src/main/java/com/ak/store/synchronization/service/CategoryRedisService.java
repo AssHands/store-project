@@ -1,7 +1,7 @@
 package com.ak.store.synchronization.service;
 
 import com.ak.store.common.snapshot.catalogue.CategorySnapshotPayload;
-import com.ak.store.synchronization.repo.redis.CategoryRedisRepo;
+import com.ak.store.synchronization.repository.redis.CategoryRedisRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -6,8 +6,8 @@ import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import com.ak.store.common.document.catalogue.ProductDocument;
 import com.ak.store.recommendation.mapper.ProductMapper;
+import com.ak.store.recommendation.model.document.Product;
 import com.ak.store.recommendation.model.view.ProductView;
 import com.ak.store.recommendation.model.view.RecommendationResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,8 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+
+//todo сервис возвращает view вместо DTO
 public class RecommendationElasticService {
     private final ElasticsearchClient esClient;
     private final ProductMapper productMapper;
@@ -122,15 +124,15 @@ public class RecommendationElasticService {
         });
     }
 
-    private SearchResponse<ProductDocument> sendRequest(SearchRequest searchRequest) {
+    private SearchResponse<Product> sendRequest(SearchRequest searchRequest) {
         try {
-            return esClient.search(searchRequest, ProductDocument.class);
+            return esClient.search(searchRequest, Product.class);
         } catch (IOException e) {
             throw new RuntimeException("send request error");
         }
     }
 
-    private List<ProductView> getContent(SearchResponse<ProductDocument> searchResponse) {
+    private List<ProductView> getContent(SearchResponse<Product> searchResponse) {
         return searchResponse.hits().hits().stream()
                 .filter(doc -> doc.source() != null)
                 .map(Hit::source)

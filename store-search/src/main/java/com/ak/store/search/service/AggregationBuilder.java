@@ -5,8 +5,8 @@ import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationRange;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.util.NamedValue;
-import com.ak.store.common.document.catalogue.CharacteristicDocument;
-import com.ak.store.search.model.common.ProductFields;
+import com.ak.store.search.util.ProductFields;
+import com.ak.store.search.model.document.Characteristic;
 import com.ak.store.search.model.dto.request.FilterSearchRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class AggregationBuilder {
     private final FilterBuilder filterBuilder;
 
     public Map<String, Aggregation> buildAggregations(FilterSearchRequestDTO request,
-                                                      List<CharacteristicDocument> availableCharacteristics) {
+                                                      List<Characteristic> availableCharacteristics) {
         Map<String, Aggregation> aggs = new HashMap<>();
 
         //todo если так вернуть, то будет ли оно работать?
@@ -61,7 +61,7 @@ public class AggregationBuilder {
         return aggs;
     }
 
-    private Aggregation buildNestedAggregation(CharacteristicDocument filter) {
+    private Aggregation buildNestedAggregation(Characteristic filter) {
         return Aggregation.of(a -> a
                 .nested(n -> n.path(ProductFields.CHARACTERISTICS))
                 .aggregations("2", fa -> {
@@ -93,7 +93,7 @@ public class AggregationBuilder {
                 }));
     }
 
-    private List<AggregationRange> buildAggregationRanges(CharacteristicDocument filter) {
+    private List<AggregationRange> buildAggregationRanges(Characteristic filter) {
         List<AggregationRange> ranges = new ArrayList<>();
 
         for (var rangeValue : filter.getNumericValues()) {

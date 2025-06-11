@@ -1,7 +1,7 @@
 package com.ak.store.synchronization.service;
 
 import com.ak.store.common.snapshot.catalogue.CharacteristicSnapshotPayload;
-import com.ak.store.synchronization.repo.redis.CharacteristicRedisRepo;
+import com.ak.store.synchronization.repository.redis.CharacteristicRedisRepo;
 import com.ak.store.synchronization.mapper.CharacteristicMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

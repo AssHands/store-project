@@ -1,7 +1,7 @@
 package com.ak.store.warehouse.kafka.config;
 
-import com.ak.store.common.exception.kafka.NonRetryableException;
-import com.ak.store.common.exception.kafka.RetryableException;
+import com.ak.store.common.exception.NonRetryableException;
+import com.ak.store.common.exception.RetryableException;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;

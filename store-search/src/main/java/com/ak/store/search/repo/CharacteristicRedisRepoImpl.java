@@ -1,6 +1,7 @@
 package com.ak.store.search.repo;
 
-import com.ak.store.common.document.catalogue.CharacteristicDocument;
+import com.ak.store.search.util.CharacteristicRedisKeys;
+import com.ak.store.search.model.document.Characteristic;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,13 +19,10 @@ public class CharacteristicRedisRepoImpl implements CharacteristicRedisRepo {
     private final StringRedisTemplate stringRedisTemplate;
     private final Gson gson;
 
-    //todo refactor
-    private final String CHARACTERISTIC_KEY = "characteristic:";
-    private final String CATEGORY_CHARACTERISTIC_KEY = "category_characteristic:";
-
     @Override
-    public List<CharacteristicDocument> findAllCharacteristicByCategoryId(Long categoryId) {
-        Set<String> characteristicIds = stringRedisTemplate.opsForSet().members(CATEGORY_CHARACTERISTIC_KEY + categoryId);
+    public List<Characteristic> findAllByCategoryId(Long categoryId) {
+        Set<String> characteristicIds = stringRedisTemplate.opsForSet()
+                .members(CharacteristicRedisKeys.CATEGORY_CHARACTERISTIC + categoryId);
 
         if (characteristicIds == null) {
             return Collections.emptyList();
@@ -32,7 +30,7 @@ public class CharacteristicRedisRepoImpl implements CharacteristicRedisRepo {
 
         List<String> keys = new ArrayList<>();
         for (var characteristicId : characteristicIds) {
-            keys.add(CHARACTERISTIC_KEY + characteristicId);
+            keys.add(CharacteristicRedisKeys.CHARACTERISTIC + characteristicId);
         }
 
         List<String> characteristics = stringRedisTemplate.opsForValue().multiGet(keys);
@@ -41,9 +39,9 @@ public class CharacteristicRedisRepoImpl implements CharacteristicRedisRepo {
             return Collections.emptyList();
         }
 
-        List<CharacteristicDocument> values = new ArrayList<>();
-        for(var characteristic : characteristics) {
-            values.add(gson.fromJson(characteristic, CharacteristicDocument.class));
+        List<Characteristic> values = new ArrayList<>();
+        for (var characteristic : characteristics) {
+            values.add(gson.fromJson(characteristic, Characteristic.class));
         }
 
         return values;

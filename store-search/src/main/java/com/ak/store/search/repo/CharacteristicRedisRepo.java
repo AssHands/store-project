@@ -1,10 +1,10 @@
 package com.ak.store.search.repo;
 
 
-import com.ak.store.common.document.catalogue.CharacteristicDocument;
+import com.ak.store.search.model.document.Characteristic;
 
 import java.util.List;
 
 public interface CharacteristicRedisRepo {
-    List<CharacteristicDocument> findAllCharacteristicByCategoryId(Long categoryId);
+    List<Characteristic> findAllByCategoryId(Long categoryId);
 }
