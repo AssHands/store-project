@@ -1,24 +1,28 @@
 package com.ak.store.synchronization.facade;
 
 import com.ak.store.common.snapshot.catalogue.CategorySnapshotPayload;
-import com.ak.store.synchronization.service.CategoryRedisService;
+import com.ak.store.synchronization.service.CategoryService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class CategoryFacade {
-    private final CategoryRedisService categoryRedisService;
+    private final CategoryService categoryService;
 
+    @Transactional
     public void createOne(CategorySnapshotPayload request) {
-        categoryRedisService.createOne(request);
+        categoryService.createOne(request);
     }
 
+    @Transactional
     public void updateOne(CategorySnapshotPayload request) {
-        categoryRedisService.updateOne(request);
+        categoryService.updateOne(request);
     }
 
+    @Transactional
     public void deleteOne(Long id) {
-        categoryRedisService.deleteOne(id);
+        categoryService.deleteOne(id);
     }
 }

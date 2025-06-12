@@ -2,6 +2,26 @@ server:
   port: 8084
 
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5435/postgres
+    username: root
+    password: root
+
+  jpa:
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        #logs
+        format_sql: true
+        generate_statistics: true
+
+        #batch
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
   kafka:
     bootstrap-servers: localhost:29092,localhost:39092
 

@@ -14,11 +14,11 @@ public class ProductElasticService {
     private final ProductMapper productMapper;
 
     public void createOne(ProductSnapshotPayload request) {
-        productRepo.saveOne(productMapper.toProductDocument(request));
+        productRepo.saveOne(productMapper.toProduct(request));
     }
 
     public void updateOne(ProductSnapshotPayload request) {
-        productRepo.updateOne(productMapper.toProductDocument(request));
+        productRepo.updateOne(productMapper.toProduct(request));
     }
 
     public void deleteOne(Long id) {
@@ -26,6 +26,6 @@ public class ProductElasticService {
     }
 
     public void updateOneRating(ProductRatingUpdatedSnapshot request) {
-        productRepo.updateOne(productMapper.toProductDocument(request));
+        productRepo.updateOne(productMapper.toProduct(request));
     }
 }

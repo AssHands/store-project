@@ -14,7 +14,7 @@ public interface ProductMapper {
     @Mapping(source = "product", target = ".")
     @Mapping(source = "productCharacteristics", target = "characteristics")
     @Mapping(source = "images", target = "images")
-    Product toProductDocument(ProductSnapshotPayload psp);
+    Product toProduct(ProductSnapshotPayload psp);
 
-    Product toProductDocument(ProductRatingUpdatedSnapshot prus);
+    Product toProduct(ProductRatingUpdatedSnapshot prus);
 }

@@ -5,8 +5,8 @@ create table category (
     name varchar
 );
 
-DROP TABLE IF EXISTS characteristic;
-create table characteristic (
+DROP TABLE IF EXISTS characteristicDocument;
+create table characteristicDocument (
     id serial primary key,
     name varchar,
     is_text boolean
@@ -43,7 +43,7 @@ create table product_characteristic (
     numeric_value int,
     text_value varchar(60),
     foreign key(product_id) REFERENCES inventory (id),
-    foreign key(characteristic_id) REFERENCES characteristic (id)
+    foreign key(characteristic_id) REFERENCES characteristicDocument (id)
 );
 
 DROP TABLE IF EXISTS category_characteristic;
@@ -52,7 +52,7 @@ create table category_characteristic (
     category_id int,
     characteristic_id int,
     foreign key(category_id) REFERENCES category (id),
-    foreign key(characteristic_id) REFERENCES characteristic (id)
+    foreign key(characteristic_id) REFERENCES characteristicDocument (id)
 );
 
 DROP TABLE IF EXISTS range_value;
@@ -61,7 +61,7 @@ create table range_value (
     characteristic_id int,
     from_value int,
     to_value int,
-    foreign key(characteristic_id) REFERENCES characteristic (id)
+    foreign key(characteristic_id) REFERENCES characteristicDocument (id)
 );
 
 DROP TABLE IF EXISTS text_value;
@@ -69,7 +69,7 @@ CREATE TABLE text_value (
     id SERIAL PRIMARY KEY,
     characteristic_id INT,
     text_value VARCHAR(60),
-    FOREIGN KEY (characteristic_id) REFERENCES characteristic (id)
+    FOREIGN KEY (characteristic_id) REFERENCES characteristicDocument (id)
 );
 
 
