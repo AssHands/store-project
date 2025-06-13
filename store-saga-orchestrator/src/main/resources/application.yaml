@@ -1,0 +1,77 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5430/postgres
+    username: root
+    password: root
+
+  jpa:
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        #logs
+        format_sql: true
+        generate_statistics: true
+
+        #batch
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:39092
+
+    listener:
+      type: batch
+      ack-mode: manual
+      concurrency: 3
+      poll-timeout: 3000
+
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: saga-orchestrator-group
+      properties:
+        spring.json.trusted.packages: "com.ak.store.*"
+      auto-offset-reset: earliest
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 7
+      properties:
+        retry.backoff.ms: 500
+        retry.backoff.max.ms: 5000
+        request.timeout.ms: 15000
+        delivery.timeout.ms: 20000
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+
+kafka:
+  dlt-prefix: .dlt
+  topics:
+    order-created: order-created
+
+#failure
+saga:
+  saga-definitions:
+    order-creation:
+      name: order-creation
+      topic: order-creation
+      steps:
+        - name: reserve-funds
+          topic: payment-reserve-funds
+          compensation-topic: payment-release-funds
+          timeout: 300
+
+        - name: reserve-products
+          topic: warehouse-reserve-products
+          compensation-topic: warehouse-release-products
+          timeout: 300
+
+        - name: order-confirm
+          topic: order-confirm
+          compensation-topic: order-cancel
+          timeout: 300

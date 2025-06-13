@@ -32,5 +32,7 @@
         <module>store-review-outbox</module>
         <module>store-catalogue-rating-updater</module>
         <module>store-cart</module>
+        <module>store-payment</module>
+        <module>store-saga-orchestrator</module>
     </modules>
 </project>
