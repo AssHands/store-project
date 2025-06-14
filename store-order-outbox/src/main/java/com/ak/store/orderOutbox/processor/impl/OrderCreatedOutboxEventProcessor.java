@@ -5,7 +5,7 @@ import com.ak.store.orderOutbox.model.OutboxEvent;
 import com.ak.store.orderOutbox.model.OutboxEventType;
 import com.ak.store.orderOutbox.processor.OutboxEventProcessor;
 import com.ak.store.common.event.order.OrderCreatedEvent;
-import com.ak.store.common.snapshot.order.OrderCreatedSnapshotPayload;
+import com.ak.store.common.snapshot.order.OrderCreationSnapshotPayload;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class OrderCreatedOutboxEventProcessor implements OutboxEventProcessor {
     @Override
     public void process(OutboxEvent event) {
         var orderCreatedEvent = new OrderCreatedEvent(event.getId(),
-                gson.fromJson(event.getPayload(), OrderCreatedSnapshotPayload.class));
+                gson.fromJson(event.getPayload(), OrderCreationSnapshotPayload.class));
 
         String orderId = orderCreatedEvent.getPayload().getOrder().getId().toString();
         eventProducerKafka.send(orderCreatedEvent, orderId);

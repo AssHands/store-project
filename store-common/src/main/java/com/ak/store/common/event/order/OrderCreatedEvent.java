@@ -1,7 +1,7 @@
 package com.ak.store.common.event.order;
 
 import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.snapshot.order.OrderCreatedSnapshotPayload;
+import com.ak.store.common.snapshot.order.OrderCreationSnapshotPayload;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -19,5 +19,5 @@ import java.util.UUID;
 public class OrderCreatedEvent implements KafkaEvent {
     private UUID eventId;
 
-    private OrderCreatedSnapshotPayload payload;
+    private OrderCreationSnapshotPayload payload;
 }

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5430/postgres
+    url: jdbc:postgresql://localhost:5440/postgres
     username: root
     password: root
 
@@ -56,22 +56,27 @@ kafka:
 
 #failure
 saga:
-  saga-definitions:
+  definitions:
     order-creation:
       name: order-creation
-      topic: order-creation
+      request-topic: order-creation-request
+      response-topic: order-creation-response
+      timeout: 1200
       steps:
-        - name: reserve-funds
-          topic: payment-reserve-funds
-          compensation-topic: payment-release-funds
-          timeout: 300
+        reserve-funds:
+          name: reserve-funds
+          timeout: 600
+          topics:
+            request: payment-reserve-funds-request
+            response: payment-reserve-funds-response
+            compensation-request: payment-release-funds-request
+            compensation-response: payment-release-funds-response
 
-        - name: reserve-products
-          topic: warehouse-reserve-products
-          compensation-topic: warehouse-release-products
-          timeout: 300
-
-        - name: order-confirm
-          topic: order-confirm
-          compensation-topic: order-cancel
-          timeout: 300
+        reserve-products:
+          name: reserve-products
+          timeout: 600
+          topics:
+            request: warehouse-reserve-products-request
+            response: warehouse-reserve-products-response
+            compensation-request: warehouse-release-products-request
+            compensation-response: warehouse-release-products-response

@@ -1,7 +1,8 @@
 package com.ak.store.sagaOrchestrator.kafka.producer;
 
 import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.sagaOrchestrator.util.kafka.KafkaTopicRegistry;
+import com.ak.store.common.saga.SagaEvent;
+import com.ak.store.sagaOrchestrator.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

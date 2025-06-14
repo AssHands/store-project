@@ -1,4 +1,4 @@
-package com.ak.store.common.snapshot.order;
+package com.ak.store.common.saga.orderCreation.pojo.order;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrderSnapshot {
+public class OrderCreationRequest {
     private Long id;
 
     private UUID userId;

@@ -1,6 +1,6 @@
 package com.ak.store.order.facade;
 
-import com.ak.store.common.snapshot.order.OrderCreatedSnapshotPayload;
+import com.ak.store.common.snapshot.order.OrderCreationSnapshotPayload;
 import com.ak.store.common.snapshot.order.OrderSnapshot;
 import com.ak.store.common.snapshot.user.UserIdentitySnapshot;
 import com.ak.store.order.feign.WarehouseFeign;
@@ -44,7 +44,7 @@ public class OrderFacade {
 
         warehouseFeign.reserveAll(reserveForm);
 
-        var snapshot = OrderCreatedSnapshotPayload.builder()
+        var snapshot = OrderCreationSnapshotPayload.builder()
                 .order(OrderSnapshot.builder()
                         .id(orderPayload.getOrder().getId())
                         .userId(authContext.getId())

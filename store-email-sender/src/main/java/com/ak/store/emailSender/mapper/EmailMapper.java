@@ -1,6 +1,6 @@
 package com.ak.store.emailSender.mapper;
 
-import com.ak.store.common.snapshot.order.OrderCreatedSnapshotPayload;
+import com.ak.store.common.snapshot.order.OrderCreationSnapshotPayload;
 import com.ak.store.emailSender.model.dto.OrderCreatedWriteDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,5 +13,5 @@ public interface EmailMapper {
     @Mapping(target = "orderId", source = "p.order.id")
     @Mapping(target = "productAmount", source = "p.order.productAmount")
     @Mapping(target = "userEmail", source = "p.userIdentity.email")
-    OrderCreatedWriteDTO toOrderCreatedWriteDTO(OrderCreatedSnapshotPayload p);
+    OrderCreatedWriteDTO toOrderCreatedWriteDTO(OrderCreationSnapshotPayload p);
 }

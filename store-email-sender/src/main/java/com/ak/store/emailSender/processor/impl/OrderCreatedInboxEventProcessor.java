@@ -1,7 +1,7 @@
 package com.ak.store.emailSender.processor.impl;
 
 import com.ak.store.common.event.order.OrderCreatedEvent;
-import com.ak.store.common.snapshot.order.OrderCreatedSnapshotPayload;
+import com.ak.store.common.snapshot.order.OrderCreationSnapshotPayload;
 import com.ak.store.emailSender.facade.EmailFacade;
 import com.ak.store.emailSender.inbox.InboxEvent;
 import com.ak.store.emailSender.inbox.InboxEventType;
@@ -21,7 +21,7 @@ public class OrderCreatedInboxEventProcessor implements InboxEventProcessor {
     @Override
     public void process(InboxEvent event) {
         var orderCreatedEvent = new OrderCreatedEvent(event.getId(),
-                gson.fromJson(event.getPayload(), OrderCreatedSnapshotPayload.class));
+                gson.fromJson(event.getPayload(), OrderCreationSnapshotPayload.class));
 
         emailFacade.sendOrderCreated(emailMapper.toOrderCreatedWriteDTO(orderCreatedEvent.getPayload()));
     }

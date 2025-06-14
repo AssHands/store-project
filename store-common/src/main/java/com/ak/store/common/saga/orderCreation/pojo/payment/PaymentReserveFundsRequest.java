@@ -1,4 +1,4 @@
-package com.ak.store.common.snapshot.order;
+package com.ak.store.common.saga.orderCreation.pojo.payment;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -16,13 +14,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrderSnapshot {
-    private Long id;
-
+public class PaymentReserveFundsRequest {
     private UUID userId;
 
-    @Builder.Default
-    private Map<Long, Integer> productAmount = new HashMap<>();
+    private Long orderId;
 
-    private Integer totalPrice;
+    private Integer sum;
 }
