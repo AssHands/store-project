@@ -17,12 +17,12 @@ import java.util.UUID;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderCreationRequest {
-    private Long id;
+    private Long orderId;
 
     private UUID userId;
 
+    private Integer totalPrice;
+
     @Builder.Default
     private Map<Long, Integer> productAmount = new HashMap<>();
-
-    private Integer totalPrice;
 }

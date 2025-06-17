@@ -11,6 +11,4 @@ import java.util.UUID;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public abstract class SagaEvent implements KafkaEvent {
     private UUID sagaId;
-
-    private UUID stepId;
 }
