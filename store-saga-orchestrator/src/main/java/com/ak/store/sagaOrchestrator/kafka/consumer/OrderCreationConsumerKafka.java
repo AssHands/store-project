@@ -17,57 +17,41 @@ import java.util.List;
 public class OrderCreationConsumerKafka {
     private final SagaFacade sagaFacade;
 
-    @Value("${saga.definitions.order-creation.steps.reserve-funds.name}")
-    private String RESERVE_FUNDS_STEP_NAME;
-
-    @Value("${saga.definitions.order-creation.steps.reserve-products.name}")
-    private String RESERVE_PRODUCTS_STEP_NAME;
+    @Value("${saga.definitions.order-creation.name}")
+    private String SAGA_ORDER_CREATION_NAME;
 
     @KafkaListener(topics = "${saga.definitions.order-creation.request-topic}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handleOrderCreationRequest(List<OrderCreationRequestEvent> events, Acknowledgment ack) {
+    public void handleRequest(List<OrderCreationRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
-            sagaFacade.createOne(event.getSagaId(), event);
+            sagaFacade.createOne(event.getSagaId(), SAGA_ORDER_CREATION_NAME, event.getRequest());
         }
 
         ack.acknowledge();
     }
 
-    @KafkaListener(topics = "${saga.definitions.order-creation.steps.reserve-funds.topics.response}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handlePaymentReserveFundsResponse(List<OrderCreationResponseEvent> events, Acknowledgment ack) {
+    @KafkaListener(topics = {
+            "${saga.definitions.order-creation.steps.reserve-funds.topics.response}",
+            "${saga.definitions.order-creation.steps.reserve-products.topics.response}"},
+            groupId = "${spring.kafka.consumer.group-id}", batch = "true")
+    public void handleResponse(List<OrderCreationResponseEvent> events, Acknowledgment ack) {
         for (var event : events) {
             if (event.getStatus() == SagaStatus.SUCCESS) {
-                sagaFacade.continueOne(event.getSagaId(), RESERVE_FUNDS_STEP_NAME);
+                sagaFacade.continueOne(event.getSagaId(), event.getStepName());
             } else {
-                sagaFacade.compensateOne(event.getSagaId(), RESERVE_FUNDS_STEP_NAME);
+                sagaFacade.compensateOne(event.getSagaId(), event.getStepName());
             }
         }
 
         ack.acknowledge();
     }
 
-    @KafkaListener(topics = "${saga.definitions.order-creation.steps.reserve-products.topics.response}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handleWarehouseReserveProductsResponse(List<OrderCreationResponseEvent> events, Acknowledgment ack) {
+    @KafkaListener(topics = {
+            "${saga.definitions.order-creation.steps.reserve-funds.topics.compensation-response}",
+            "${saga.definitions.order-creation.steps.reserve-products.topics.compensation-response}"},
+            groupId = "${spring.kafka.consumer.group-id}", batch = "true")
+    public void handleCompensation(List<OrderCreationResponseEvent> events, Acknowledgment ack) {
         for (var event : events) {
-            if (event.getStatus() == SagaStatus.SUCCESS) {
-                sagaFacade.continueOne(event.getSagaId(), RESERVE_PRODUCTS_STEP_NAME);
-            } else {
-                sagaFacade.compensateOne(event.getSagaId(), RESERVE_PRODUCTS_STEP_NAME);
-            }
-        }
-
-        ack.acknowledge();
-    }
-
-    //----- COMPENSATION -----
-
-    @KafkaListener(topics = "${saga.definitions.order-creation.steps.reserve-funds.topics.compensation-response}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handlePaymentReleaseFundsResponse(List<OrderCreationResponseEvent> events, Acknowledgment ack) {
-        for (var event : events) {
-            if (event.getStatus() == SagaStatus.SUCCESS) {
-                sagaFacade.compensateOne(event.getSagaId(), RESERVE_FUNDS_STEP_NAME);
-            } else {
-                //todo что делать, если компенсирующий запрос провалился
-            }
+            sagaFacade.compensateOne(event.getSagaId(), event.getStepName());
         }
 
         ack.acknowledge();

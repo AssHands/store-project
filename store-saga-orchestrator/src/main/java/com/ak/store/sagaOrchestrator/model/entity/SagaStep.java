@@ -1,7 +1,6 @@
 package com.ak.store.sagaOrchestrator.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,11 +14,22 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "saga_step")
 public class SagaStep {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String stepName;
+    private String name;
+
+    private Boolean isCompensation;
+
+    @Enumerated(EnumType.STRING)
+    private SagaStepStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "saga_id")
+    private Saga saga;
 
     private LocalDateTime time;
 }

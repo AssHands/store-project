@@ -49,12 +49,6 @@ spring:
         enable.idempotence: true
         max.in.flight.requests.per.connection: 5
 
-kafka:
-  dlt-prefix: .dlt
-  topics:
-    order-created: order-created
-
-#failure
 saga:
   definitions:
     order-creation:

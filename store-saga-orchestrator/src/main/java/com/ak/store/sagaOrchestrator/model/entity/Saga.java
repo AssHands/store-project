@@ -1,12 +1,11 @@
 package com.ak.store.sagaOrchestrator.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,12 +21,17 @@ public class Saga {
     @Id
     private UUID id;
 
-    private String sagaName;
-
+    @Column(columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     private String payload;
 
-    @OneToMany
+    private String name;
+
+    @OneToMany(mappedBy = "saga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SagaStep> steps = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    private SagaStatus status;
 
     private LocalDateTime time;
 }

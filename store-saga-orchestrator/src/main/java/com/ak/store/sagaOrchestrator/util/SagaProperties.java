@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 @Configuration
 @ConfigurationProperties(prefix = "saga")
 public class SagaProperties {
-    private Map<String, SagaDefinition> definitions;
+    private Map<String, SagaDefinitionProperty> definitions;
     private List<String> allTopics = new ArrayList<>();
 
     @PostConstruct
@@ -40,7 +40,7 @@ public class SagaProperties {
                 .toList();
     }
 
-    public SagaStep getNextStep(String definition, String currentStep) {
+    public SagaStepProperty getNextStep(String definition, String currentStep) {
         var steps = definitions.get(definition).getSteps();
 
         return steps.entrySet().stream()
@@ -51,13 +51,23 @@ public class SagaProperties {
                 .orElse(null);
     }
 
-    public SagaStep getFirstStep(String definition) {
+    public SagaStepProperty getPreviousStep(String definition, String currentStep) {
+        var steps = definitions.get(definition).getSteps();
+
+        return steps.entrySet().stream()
+                .takeWhile(entry -> !entry.getKey().equals(currentStep))
+                .reduce((first, second) -> second)
+                .map(Map.Entry::getValue)
+                .orElse(null);
+    }
+
+    public SagaStepProperty getFirstStep(String definition) {
         var steps = definitions.get(definition).getSteps();
         return steps.isEmpty() ? null : steps.values().iterator().next();
     }
 
     @Data
-    public static class SagaDefinition {
+    public static class SagaDefinitionProperty {
         private String name;
 
         private String requestTopic;
@@ -66,11 +76,11 @@ public class SagaProperties {
 
         private Integer timeout;
 
-        private LinkedHashMap<String, SagaStep> steps;
+        private LinkedHashMap<String, SagaStepProperty> steps;
     }
 
     @Data
-    public static class SagaStep {
+    public static class SagaStepProperty {
         private String name;
 
         private Integer timeout;
