@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 @Configuration
 @ConfigurationProperties(prefix = "saga")
 public class SagaProperties {
-    private Map<String, SagaDefinitionProperty> definitions;
+    private Map<String, SagaDefinition> definitions;
     private List<String> allTopics = new ArrayList<>();
 
     @PostConstruct
@@ -40,34 +40,49 @@ public class SagaProperties {
                 .toList();
     }
 
-    public SagaStepProperty getNextStep(String definition, String currentStep) {
+    public SagaStepDefinition getNextStep(String definition, String currentStep) {
         var steps = definitions.get(definition).getSteps();
 
         return steps.entrySet().stream()
-                .dropWhile(entry -> !entry.getKey().equals(currentStep))
+                .dropWhile(entry -> !entry.getValue().name.equals(currentStep))
                 .skip(1)
                 .findFirst()
                 .map(Map.Entry::getValue)
                 .orElse(null);
     }
 
-    public SagaStepProperty getPreviousStep(String definition, String currentStep) {
+    public SagaStepDefinition getPreviousStep(String definition, String currentStep) {
         var steps = definitions.get(definition).getSteps();
 
         return steps.entrySet().stream()
-                .takeWhile(entry -> !entry.getKey().equals(currentStep))
+                .takeWhile(entry -> !entry.getValue().name.equals(currentStep))
                 .reduce((first, second) -> second)
                 .map(Map.Entry::getValue)
                 .orElse(null);
     }
 
-    public SagaStepProperty getFirstStep(String definition) {
+    public SagaStepDefinition getFirstStep(String definition) {
         var steps = definitions.get(definition).getSteps();
         return steps.isEmpty() ? null : steps.values().iterator().next();
     }
 
+    public SagaDefinition getDefinition(String name) {
+        return definitions.get(name);
+    }
+
+    public SagaStepDefinition getCurrentStep(String definition, String currentStep) {
+        var steps = definitions.get(definition).getSteps();
+
+        return steps.entrySet().stream()
+                .dropWhile(entry -> !entry.getKey().equals(currentStep))
+                .findFirst()
+                .map(Map.Entry::getValue)
+                .orElse(null);
+    }
+
+
     @Data
-    public static class SagaDefinitionProperty {
+    public static class SagaDefinition {
         private String name;
 
         private String requestTopic;
@@ -76,20 +91,20 @@ public class SagaProperties {
 
         private Integer timeout;
 
-        private LinkedHashMap<String, SagaStepProperty> steps;
+        private LinkedHashMap<String, SagaStepDefinition> steps;
     }
 
     @Data
-    public static class SagaStepProperty {
+    public static class SagaStepDefinition {
         private String name;
 
         private Integer timeout;
 
-        private SagaStepTopics topics;
+        private SagaStepTopicsDefinition topics;
     }
 
     @Data
-    public static class SagaStepTopics {
+    public static class SagaStepTopicsDefinition {
         private String request;
 
         private String response;

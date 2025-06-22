@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum SagaStatus {
     RECEIVED("RECEIVED"),
     IN_PROGRESS("IN_PROGRESS"),
+    FAILED("FAILED"),
     COMPLETED("COMPLETED");
 
     private String status;

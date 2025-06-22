@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum SagaStatus {
+public enum SagaResponseStatus {
     SUCCESS("SUCCESS"),
     FAILURE("FAILURE");
 

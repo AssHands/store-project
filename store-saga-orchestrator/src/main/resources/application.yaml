@@ -33,6 +33,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       group-id: saga-orchestrator-group
       properties:
+        spring.json.value.default.type: "com.ak.store.common.saga.SagaRequestEvent"
         spring.json.trusted.packages: "com.ak.store.*"
       auto-offset-reset: earliest
 
@@ -55,11 +56,11 @@ saga:
       name: order-creation
       request-topic: order-creation-request
       response-topic: order-creation-response
-      timeout: 1200
+      timeout: 300
       steps:
         reserve-funds:
           name: reserve-funds
-          timeout: 600
+          timeout: 300
           topics:
             request: payment-reserve-funds-request
             response: payment-reserve-funds-response
@@ -68,7 +69,7 @@ saga:
 
         reserve-products:
           name: reserve-products
-          timeout: 600
+          timeout: 300
           topics:
             request: warehouse-reserve-products-request
             response: warehouse-reserve-products-response

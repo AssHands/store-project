@@ -1,19 +1,19 @@
 package com.ak.store.sagaOrchestrator.scheduler;
 
-import com.ak.store.common.saga.orderCreation.event.order.OrderCreationRequestEvent;
-import com.ak.store.common.saga.orderCreation.pojo.order.OrderCreationRequest;
-import com.ak.store.sagaOrchestrator.kafka.producer.EventProducerKafka;
 import com.ak.store.sagaOrchestrator.model.entity.Saga;
+import com.ak.store.sagaOrchestrator.model.entity.SagaStatus;
 import com.ak.store.sagaOrchestrator.model.entity.SagaStep;
+import com.ak.store.sagaOrchestrator.service.SagaProcessor;
 import com.ak.store.sagaOrchestrator.service.SagaService;
 import com.ak.store.sagaOrchestrator.service.SagaStepService;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;
-import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -21,109 +21,87 @@ import java.util.List;
 public class SagaScheduler {
     private final SagaStepService sagaStepService;
     private final SagaService sagaService;
+    private final SagaProcessor sagaProcessor;
     private final SagaProperties sagaProperties;
-    private final EventProducerKafka eventProducerKafka;
-    private final Gson gson;
-
-    @Transactional
-    @Scheduled(fixedRate = 5000)
-    public void executeSagaStep() {
-        var sagaSteps = sagaStepService.findAllForProcessing();
-        processAllStep(sagaSteps);
-    }
 
     @Transactional
     @Scheduled(fixedRate = 5000)
     public void executeSaga() {
         var sagas = sagaService.findAllForProcessing();
-        processAllSaga(sagas);
-    }
+        List<Saga> completed = new ArrayList<>();
+        List<Saga> failed = new ArrayList<>();
 
-    private void processAllStep(List<SagaStep> sagaSteps) {
-        for(var sagaStep : sagaSteps) {
-            if(sagaStep.getIsCompensation()) {
-                processCompensation(sagaStep);
-            } else {
-                processSuccess(sagaStep);
+        for (var saga : sagas) {
+            if (!isSagaValid(saga)) {
+                failed.add(saga);
+                continue;
+            }
+
+            if (sagaProcessor.startSaga(saga)) {
+                completed.add(saga);
             }
         }
 
-        //todo
-        sagaStepService.markAllAsCompleted(sagaSteps);
+        sagaService.markAllAs(completed, SagaStatus.IN_PROGRESS);
+        sagaService.markAllAs(failed, SagaStatus.FAILED);
     }
 
-    private void processAllSaga(List<Saga> sagas) {
-        for(var saga : sagas) {
-            processSaga(saga);
+    @Transactional
+    @Scheduled(fixedRate = 5000)
+    public void executeFailedSaga() {
+        var sagas = sagaService.findAllFailedForProcessing();
+        List<Saga> completed = new ArrayList<>();
+
+        for (var saga : sagas) {
+            if (sagaProcessor.endSaga(saga)) {
+                completed.add(saga);
+            }
         }
 
-        //todo
-        sagaService.markAllAsInProgress(sagas);
+        sagaService.markAllAs(completed, SagaStatus.COMPLETED);
     }
 
-    private void processSaga(Saga saga) {
-        var stepProperty = sagaProperties.getFirstStep(saga.getName());
+    @Transactional
+    @Scheduled(fixedRate = 5000)
+    public void executeSagaStep() {
+        var sagaSteps = sagaStepService.findAllForProcessing();
+        List<SagaStep> completed = new ArrayList<>();
+        List<SagaStep> failed = new ArrayList<>();
 
-        if(stepProperty == null) {
-            //todo
-            System.out.println("nul");
-            return;
+        for (var sagaStep : sagaSteps) {
+            if (!isSagaStepValid(sagaStep)) {
+                failed.add(sagaStep);
+                continue;
+            }
+
+            if (sagaProcessor.handleSagaStep(sagaStep)) {
+                completed.add(sagaStep);
+            }
         }
 
-        String stepName = stepProperty.getName();
-        String topic = stepProperty.getTopics().getRequest();
-
-        var requestEvent = OrderCreationRequestEvent.builder()
-                .request(gson.fromJson(saga.getPayload(), OrderCreationRequest.class))
-                .build();
-
-        requestEvent.setSagaId(saga.getId());
-        requestEvent.setStepName(stepName);
-
-        eventProducerKafka.send(requestEvent, topic, requestEvent.getSagaId().toString());
+        sagaStepService.compensateAll(failed);
+        sagaStepService.markAllAsCompleted(completed);
     }
 
-    private void processSuccess(SagaStep sagaStep) {
-        var stepProperty = sagaProperties.getNextStep(sagaStep.getSaga().getName(), sagaStep.getName());
+    private boolean isSagaValid(Saga saga) {
+        var sagaDef = sagaProperties.getDefinition(saga.getName());
 
-        if(stepProperty == null) {
-            //todo
-            System.out.println("nul");
-            return;
+        if (sagaDef == null) {
+            return false;
         }
 
-        String stepName = stepProperty.getName();
-        String topic = stepProperty.getTopics().getRequest();
-
-        var requestEvent = OrderCreationRequestEvent.builder()
-                .request(gson.fromJson(sagaStep.getSaga().getPayload(), OrderCreationRequest.class))
-                .build();
-
-        requestEvent.setSagaId(sagaStep.getSaga().getId());
-        requestEvent.setStepName(stepName);
-
-        eventProducerKafka.send(requestEvent, topic, requestEvent.getSagaId().toString());
+        var afterTime = LocalDateTime.now().minusMinutes(sagaDef.getTimeout());
+        return !saga.getTime().isBefore(afterTime);
     }
 
-    private void processCompensation(SagaStep sagaStep) {
-        var stepProperty = sagaProperties.getPreviousStep(sagaStep.getSaga().getName(), sagaStep.getName());
+    private boolean isSagaStepValid(SagaStep sagaStep) {
+        var stepDef = sagaProperties.getCurrentStep(sagaStep.getSaga().getName(), sagaStep.getName());
 
-        if(stepProperty == null) {
-            //todo
-            System.out.println("nul");
-            return;
+        if (stepDef == null) {
+            return false;
         }
 
-        String stepName = stepProperty.getName();
-        String topic = stepProperty.getTopics().getCompensationRequest();
-
-        var requestEvent = OrderCreationRequestEvent.builder()
-                .request(gson.fromJson(sagaStep.getSaga().getPayload(), OrderCreationRequest.class))
-                .build();
-
-        requestEvent.setSagaId(sagaStep.getSaga().getId());
-        requestEvent.setStepName(stepName);
-
-        eventProducerKafka.send(requestEvent, topic, requestEvent.getSagaId().toString());
+        var afterTime = LocalDateTime.now().minusMinutes(stepDef.getTimeout());
+        return !sagaStep.getTime().isBefore(afterTime);
     }
 }
