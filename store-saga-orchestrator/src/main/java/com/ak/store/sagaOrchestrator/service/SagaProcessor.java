@@ -9,10 +9,10 @@ import com.ak.store.sagaOrchestrator.model.entity.Saga;
 import com.ak.store.sagaOrchestrator.model.entity.SagaStep;
 import com.ak.store.sagaOrchestrator.util.JsonMapper;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 @RequiredArgsConstructor
 @Service
@@ -21,26 +21,29 @@ public class SagaProcessor {
     private final EventProducerKafka eventProducerKafka;
     private final JsonMapper jsonMapper;
 
-    public boolean startSaga(Saga saga) {
+    public boolean handleSaga(Saga saga) {
         var stepDef = sagaProperties.getFirstStep(saga.getName());
 
         String stepName = stepDef.getName();
         String topic = stepDef.getTopics().getRequest();
+        JsonNode request;
 
         try {
-            var requestEvent = SagaRequestEvent.builder()
-                    .request(jsonMapper.toJsonNode(saga.getPayload()))
-                    .sagaId(saga.getId())
-                    .stepName(stepName)
-                    .build();
-
-            return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
-        } catch (IOException e) {
+            request = jsonMapper.toJsonNode(saga.getPayload());
+        } catch (JsonProcessingException e) {
             return false;
         }
+
+        var requestEvent = SagaRequestEvent.builder()
+                .request(request)
+                .sagaId(saga.getId())
+                .stepName(stepName)
+                .build();
+
+        return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
     }
 
-    public boolean endSaga(Saga saga) {
+    public boolean handleFailedSaga(Saga saga) {
         var stepDef = sagaProperties.getDefinition(saga.getName());
 
         String stepName = stepDef.getName();
@@ -109,36 +112,42 @@ public class SagaProcessor {
         var stepDef = sagaProperties.getPreviousStep(sagaStep.getSaga().getName(), sagaStep.getName());
         String stepName = stepDef.getName();
         String topic = stepDef.getTopics().getCompensationRequest();
+        JsonNode request;
 
         try {
-            var requestEvent = SagaRequestEvent.builder()
-                    .request(jsonMapper.toJsonNode(sagaStep.getSaga().getPayload()))
-                    .sagaId(sagaStep.getSaga().getId())
-                    .stepName(stepName)
-                    .build();
-
-            return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
-        } catch (IOException e) {
+            request = jsonMapper.toJsonNode(sagaStep.getSaga().getPayload());
+        } catch (JsonProcessingException e) {
             return false;
         }
+
+        var requestEvent = SagaRequestEvent.builder()
+                .request(request)
+                .sagaId(sagaStep.getSaga().getId())
+                .stepName(stepName)
+                .build();
+
+        return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
     }
 
     private boolean sendNextStep(SagaStep sagaStep) {
         var stepDef = sagaProperties.getNextStep(sagaStep.getSaga().getName(), sagaStep.getName());
         String stepName = stepDef.getName();
         String topic = stepDef.getTopics().getRequest();
+        JsonNode request;
 
         try {
-            var requestEvent = SagaRequestEvent.builder()
-                    .request(jsonMapper.toJsonNode(sagaStep.getSaga().getPayload()))
-                    .sagaId(sagaStep.getSaga().getId())
-                    .stepName(stepName)
-                    .build();
-
-            return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
-        } catch (IOException e) {
+            request = jsonMapper.toJsonNode(sagaStep.getSaga().getPayload());
+        } catch (JsonProcessingException e) {
             return false;
         }
+
+        var requestEvent = SagaRequestEvent.builder()
+                .request(request)
+                .sagaId(sagaStep.getSaga().getId())
+                .stepName(stepName)
+                .build();
+
+        return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
     }
 
     private <T extends KafkaEvent> boolean sendEvent(T payload, String topic, String key) {

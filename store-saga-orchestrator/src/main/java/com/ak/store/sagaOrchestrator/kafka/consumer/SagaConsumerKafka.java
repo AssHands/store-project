@@ -6,36 +6,46 @@ import com.ak.store.common.saga.SagaResponseStatus;
 import com.ak.store.sagaOrchestrator.model.entity.SagaStatus;
 import com.ak.store.sagaOrchestrator.service.SagaService;
 import com.ak.store.sagaOrchestrator.service.SagaStepService;
+import com.ak.store.sagaOrchestrator.util.SagaProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class OrderCreationConsumerKafka {
+public class SagaConsumerKafka {
     private final SagaService sagaService;
     private final SagaStepService sagaStepService;
+    private final SagaProperties sagaProperties;
 
-    @Value("${saga.definitions.order-creation.name}")
-    private String SAGA_ORDER_CREATION_NAME;
+    @KafkaListener(
+            topics = "#{@sagaProperties.getAllRequestSagaTopics()}",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handle(List<SagaRequestEvent> events,
+                       @Header(KafkaHeaders.RECEIVED_TOPIC) List<String> topics, Acknowledgment ack) {
+        for (int i = 0; i < events.size(); i++) {
+            var event = events.get(i);
+            var topic = topics.get(i);
 
-    @KafkaListener(topics = "${saga.definitions.order-creation.request-topic}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handleRequest(List<SagaRequestEvent> events, Acknowledgment ack) {
-        for (var event : events) {
-            sagaService.createOne(event.getSagaId(), SAGA_ORDER_CREATION_NAME, event.getRequest().toString());
+            String sagaName = sagaProperties.getDefinitionByRequestTopic(topic).getName();
+            sagaService.createOne(event.getSagaId(), sagaName, event.getRequest().toString());
         }
 
         ack.acknowledge();
     }
 
-    @KafkaListener(topics = {
-            "${saga.definitions.order-creation.steps.reserve-funds.topics.response}",
-            "${saga.definitions.order-creation.steps.reserve-products.topics.response}"},
-            groupId = "${spring.kafka.consumer.group-id}", batch = "true")
+    @KafkaListener(
+            topics = "#{@sagaProperties.getAllResponseStepTopics()}",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
     public void handleResponse(List<SagaResponseEvent> events, Acknowledgment ack) {
         for (var event : events) {
             if (event.getStatus() == SagaResponseStatus.SUCCESS) {
@@ -48,10 +58,11 @@ public class OrderCreationConsumerKafka {
         ack.acknowledge();
     }
 
-    @KafkaListener(topics = {
-            "${saga.definitions.order-creation.steps.reserve-funds.topics.compensation-response}",
-            "${saga.definitions.order-creation.steps.reserve-products.topics.compensation-response}"},
-            groupId = "${spring.kafka.consumer.group-id}", batch = "true")
+    @KafkaListener(
+            topics = "#{@sagaProperties.getAllResponseCompensationStepTopics()}",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
     public void handleCompensation(List<SagaResponseEvent> events, Acknowledgment ack) {
         for (var event : events) {
             sagaStepService.compensateOne(event.getSagaId(), event.getStepName());
@@ -60,8 +71,12 @@ public class OrderCreationConsumerKafka {
         ack.acknowledge();
     }
 
-    @KafkaListener(topics = "${saga.definitions.order-creation.response-topic}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handle(List<SagaResponseEvent> events, Acknowledgment ack) {
+    @KafkaListener(
+            topics = "#{@sagaProperties.getAllResponseSagaTopics()}",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleCompletedSaga(List<SagaResponseEvent> events, Acknowledgment ack) {
         var ids = events.stream()
                 .map(SagaResponseEvent::getSagaId)
                 .toList();

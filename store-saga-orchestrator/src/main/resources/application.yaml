@@ -33,7 +33,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       group-id: saga-orchestrator-group
       properties:
-        spring.json.value.default.type: "com.ak.store.common.saga.SagaRequestEvent"
+#        spring.json.value.default.type: "com.ak.store.common.saga.SagaRequestEvent"
         spring.json.trusted.packages: "com.ak.store.*"
       auto-offset-reset: earliest
 

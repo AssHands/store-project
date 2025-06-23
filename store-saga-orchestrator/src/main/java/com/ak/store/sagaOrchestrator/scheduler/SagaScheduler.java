@@ -37,7 +37,7 @@ public class SagaScheduler {
                 continue;
             }
 
-            if (sagaProcessor.startSaga(saga)) {
+            if (sagaProcessor.handleSaga(saga)) {
                 completed.add(saga);
             }
         }
@@ -53,7 +53,7 @@ public class SagaScheduler {
         List<Saga> completed = new ArrayList<>();
 
         for (var saga : sagas) {
-            if (sagaProcessor.endSaga(saga)) {
+            if (sagaProcessor.handleFailedSaga(saga)) {
                 completed.add(saga);
             }
         }

@@ -5,7 +5,10 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @Data
@@ -13,30 +16,37 @@ import java.util.stream.Stream;
 @ConfigurationProperties(prefix = "saga")
 public class SagaProperties {
     private Map<String, SagaDefinition> definitions;
-    private List<String> allTopics = new ArrayList<>();
+
+
+    private List<String> allRequestSagaTopics = new ArrayList<>();
+    private List<String> allResponseStepTopics = new ArrayList<>();
+    private List<String> allResponseCompensationStepTopics = new ArrayList<>();
+    private List<String> allResponseSagaTopics = new ArrayList<>();
 
     @PostConstruct
     public void init() {
-        allTopics = definitions.values().stream()
-                .flatMap(def -> {
-                    Stream<String> listenTopicStream = Stream.of(
-                            def.getRequestTopic(),
-                            def.getResponseTopic()
-                    ).filter(Objects::nonNull);
+        allRequestSagaTopics = definitions.values().stream()
+                .map(SagaDefinition::getRequestTopic)
+                .toList();
 
-                    Stream<String> stepTopicsStream = def.getSteps().values().stream()
-                            .flatMap(step -> Stream.ofNullable(step.getTopics()))
-                            .flatMap(topics -> Stream.of(
-                                    topics.getRequest(),
-                                    topics.getResponse(),
-                                    topics.getCompensationRequest(),
-                                    topics.getCompensationResponse()
-                            ))
-                            .filter(Objects::nonNull);
+        allResponseStepTopics = definitions.values().stream()
+                .map(SagaDefinition::getSteps)
+                .flatMap(stepMap -> stepMap.values().stream())
+                .map(SagaStepDefinition::getTopics)
+                .flatMap(step -> Stream.of(
+                        step.getResponse()))
+                .toList();
 
-                    return Stream.concat(listenTopicStream, stepTopicsStream);
-                })
-                .distinct()
+        allResponseCompensationStepTopics = definitions.values().stream()
+                .map(SagaDefinition::getSteps)
+                .flatMap(stepMap -> stepMap.values().stream())
+                .map(SagaStepDefinition::getTopics)
+                .flatMap(step -> Stream.of(
+                        step.getCompensationResponse()))
+                .toList();
+
+        allResponseSagaTopics = definitions.values().stream()
+                .map(SagaDefinition::getResponseTopic)
                 .toList();
     }
 
@@ -68,6 +78,13 @@ public class SagaProperties {
 
     public SagaDefinition getDefinition(String name) {
         return definitions.get(name);
+    }
+
+    public SagaDefinition getDefinitionByRequestTopic(String topic) {
+        return definitions.values().stream()
+                .filter(v -> v.getRequestTopic().equals(topic))
+                .findFirst()
+                .orElse(null);
     }
 
     public SagaStepDefinition getCurrentStep(String definition, String currentStep) {
