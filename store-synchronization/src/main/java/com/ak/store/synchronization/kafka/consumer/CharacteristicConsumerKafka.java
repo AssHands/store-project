@@ -1,8 +1,8 @@
 package com.ak.store.synchronization.kafka.consumer;
 
-import com.ak.store.common.event.catalogue.CharacteristicCreatedEvent;
-import com.ak.store.common.event.catalogue.CharacteristicDeletedEvent;
-import com.ak.store.common.event.catalogue.CharacteristicUpdatedEvent;
+import com.ak.store.common.kafka.catalogue.CharacteristicCreatedEvent;
+import com.ak.store.common.kafka.catalogue.CharacteristicDeletedEvent;
+import com.ak.store.common.kafka.catalogue.CharacteristicUpdatedEvent;
 import com.ak.store.synchronization.errorHandler.CharacteristicKafkaErrorHandler;
 import com.ak.store.synchronization.facade.CharacteristicFacade;
 import lombok.RequiredArgsConstructor;

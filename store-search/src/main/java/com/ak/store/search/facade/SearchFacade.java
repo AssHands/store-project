@@ -1,6 +1,6 @@
 package com.ak.store.search.facade;
 
-import com.ak.store.common.event.search.SearchAllEvent;
+import com.ak.store.common.kafka.search.SearchAllEvent;
 import com.ak.store.search.kafka.EventProducerKafka;
 import com.ak.store.search.model.dto.request.FilterSearchRequestDTO;
 import com.ak.store.search.model.dto.request.ProductSearchRequestDTO;

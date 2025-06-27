@@ -1,6 +1,5 @@
-package com.ak.store.common.event.search;
+package com.ak.store.common.snapshot.order;
 
-import com.ak.store.common.event.KafkaEvent;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -8,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -15,8 +15,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SearchAllEvent implements KafkaEvent {
+public class OrderCreatedSnapshot {
+    private Long orderId;
+
     private UUID userId;
 
-    private Long categoryId;
+    private Integer totalPrice;
+
+    private Map<Long, Integer> productAmount;
 }

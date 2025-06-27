@@ -15,13 +15,9 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderProductDTO {
-    private Long id;
+    private Long productId;
 
     private Long orderId;
 
-    private Long productId;
-
-    private Integer amount;
-
-    private Integer pricePerOne;
+    private Integer price;
 }

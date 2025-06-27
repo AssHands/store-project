@@ -1,6 +1,8 @@
 package com.ak.store.order;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import feign.okhttp.OkHttpClient;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -14,7 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @EnableJpaRepositories("com.ak.store.*")
-@ComponentScan(basePackages = {"com.ak.store.*" })
+@ComponentScan(basePackages = {"com.ak.store.*"})
 @EntityScan("com.ak.store.*")
 @EnableFeignClients
 @SpringBootApplication
@@ -39,6 +41,8 @@ public class OrderProjectApplication {
 
     @Bean
     public Gson gson() {
-        return new Gson();
+        return new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create();
     }
 }

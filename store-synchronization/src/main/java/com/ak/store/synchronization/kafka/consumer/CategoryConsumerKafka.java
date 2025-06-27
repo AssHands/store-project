@@ -1,11 +1,10 @@
 package com.ak.store.synchronization.kafka.consumer;
 
-import com.ak.store.common.event.catalogue.CategoryCreatedEvent;
-import com.ak.store.common.event.catalogue.CategoryDeletedEvent;
-import com.ak.store.common.event.catalogue.CategoryUpdatedEvent;
+import com.ak.store.common.kafka.catalogue.CategoryCreatedEvent;
+import com.ak.store.common.kafka.catalogue.CategoryDeletedEvent;
+import com.ak.store.common.kafka.catalogue.CategoryUpdatedEvent;
 import com.ak.store.synchronization.errorHandler.CategoryKafkaErrorHandler;
 import com.ak.store.synchronization.facade.CategoryFacade;
-import com.ak.store.synchronization.util.KafkaProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;

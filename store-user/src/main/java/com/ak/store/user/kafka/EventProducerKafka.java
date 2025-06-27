@@ -1,6 +1,6 @@
 package com.ak.store.user.kafka;
 
-import com.ak.store.common.event.KafkaEvent;
+import com.ak.store.common.kafka.KafkaEvent;
 import com.ak.store.user.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;

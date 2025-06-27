@@ -1,8 +1,8 @@
 package com.ak.store.synchronization.errorHandler;
 
-import com.ak.store.common.event.catalogue.CategoryCreatedEvent;
-import com.ak.store.common.event.catalogue.CategoryDeletedEvent;
-import com.ak.store.common.event.catalogue.CategoryUpdatedEvent;
+import com.ak.store.common.kafka.catalogue.CategoryCreatedEvent;
+import com.ak.store.common.kafka.catalogue.CategoryDeletedEvent;
+import com.ak.store.common.kafka.catalogue.CategoryUpdatedEvent;
 import com.ak.store.synchronization.kafka.producer.DltProducerKafka;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

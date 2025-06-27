@@ -1,6 +1,6 @@
 package com.ak.store.emailSender.kafka.producer;
 
-import com.ak.store.common.event.KafkaEvent;
+import com.ak.store.common.kafka.KafkaEvent;
 import com.ak.store.emailSender.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;

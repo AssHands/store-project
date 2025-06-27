@@ -2,10 +2,9 @@ package com.ak.store.catalogueRatingUpdater.kafka.consumer;
 
 import com.ak.store.catalogueRatingUpdater.errorHandler.ReviewKafkaErrorHandler;
 import com.ak.store.catalogueRatingUpdater.facade.RatingUpdaterFacade;
-import com.ak.store.common.event.review.ReviewCreatedEvent;
-import com.ak.store.common.event.review.ReviewDeletedEvent;
-import com.ak.store.common.event.review.ReviewUpdatedEvent;
-import jakarta.transaction.Transactional;
+import com.ak.store.common.kafka.review.ReviewCreatedEvent;
+import com.ak.store.common.kafka.review.ReviewDeletedEvent;
+import com.ak.store.common.kafka.review.ReviewUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;

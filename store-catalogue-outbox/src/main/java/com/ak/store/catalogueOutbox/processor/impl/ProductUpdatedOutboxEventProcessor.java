@@ -1,6 +1,6 @@
 package com.ak.store.catalogueOutbox.processor.impl;
 
-import com.ak.store.common.event.catalogue.ProductUpdatedEvent;
+import com.ak.store.common.kafka.catalogue.ProductUpdatedEvent;
 import com.ak.store.common.snapshot.catalogue.ProductSnapshotPayload;
 import com.ak.store.catalogueOutbox.kafka.EventProducerKafka;
 import com.ak.store.catalogueOutbox.model.OutboxEvent;

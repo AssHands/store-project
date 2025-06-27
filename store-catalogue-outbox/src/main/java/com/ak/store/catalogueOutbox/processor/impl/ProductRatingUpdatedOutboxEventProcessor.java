@@ -4,7 +4,7 @@ import com.ak.store.catalogueOutbox.kafka.EventProducerKafka;
 import com.ak.store.catalogueOutbox.model.OutboxEvent;
 import com.ak.store.catalogueOutbox.model.OutboxEventType;
 import com.ak.store.catalogueOutbox.processor.OutboxEventProcessor;
-import com.ak.store.common.event.catalogue.ProductRatingUpdatedEvent;
+import com.ak.store.common.kafka.catalogue.ProductRatingUpdatedEvent;
 import com.ak.store.common.snapshot.catalogue.ProductRatingUpdatedSnapshot;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;

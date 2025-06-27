@@ -1,6 +1,6 @@
 package com.ak.store.catalogueOutbox.processor.impl;
 
-import com.ak.store.common.event.catalogue.CharacteristicDeletedEvent;
+import com.ak.store.common.kafka.catalogue.CharacteristicDeletedEvent;
 import com.ak.store.catalogueOutbox.kafka.EventProducerKafka;
 import com.ak.store.catalogueOutbox.model.OutboxEvent;
 import com.ak.store.catalogueOutbox.model.OutboxEventType;

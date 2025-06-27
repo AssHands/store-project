@@ -1,6 +1,7 @@
-package com.ak.store.common.saga;
+package com.ak.store.common.kafka.catalogue;
 
 import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.common.snapshot.catalogue.CharacteristicSnapshotPayload;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -15,10 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SagaResponseEvent implements KafkaEvent {
-    private UUID sagaId;
+public class CharacteristicUpdatedEvent implements KafkaEvent {
+    private UUID eventId;
 
-    private String stepName;
-
-    private SagaResponseStatus status;
+    private CharacteristicSnapshotPayload payload;
 }

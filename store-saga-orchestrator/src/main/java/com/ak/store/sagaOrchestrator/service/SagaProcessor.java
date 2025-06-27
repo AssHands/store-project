@@ -1,13 +1,13 @@
 package com.ak.store.sagaOrchestrator.service;
 
-import com.ak.store.common.event.KafkaEvent;
+import com.ak.store.common.kafka.KafkaEvent;
 import com.ak.store.common.saga.SagaRequestEvent;
 import com.ak.store.common.saga.SagaResponseEvent;
 import com.ak.store.common.saga.SagaResponseStatus;
 import com.ak.store.sagaOrchestrator.kafka.producer.EventProducerKafka;
 import com.ak.store.sagaOrchestrator.model.entity.Saga;
 import com.ak.store.sagaOrchestrator.model.entity.SagaStep;
-import com.ak.store.sagaOrchestrator.util.JsonMapper;
+import com.ak.store.sagaOrchestrator.mapper.JsonMapper;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

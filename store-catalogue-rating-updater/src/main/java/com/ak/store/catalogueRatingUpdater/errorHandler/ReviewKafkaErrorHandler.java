@@ -1,9 +1,9 @@
 package com.ak.store.catalogueRatingUpdater.errorHandler;
 
 import com.ak.store.catalogueRatingUpdater.kafka.producer.DltProducerKafka;
-import com.ak.store.common.event.review.ReviewCreatedEvent;
-import com.ak.store.common.event.review.ReviewDeletedEvent;
-import com.ak.store.common.event.review.ReviewUpdatedEvent;
+import com.ak.store.common.kafka.review.ReviewCreatedEvent;
+import com.ak.store.common.kafka.review.ReviewDeletedEvent;
+import com.ak.store.common.kafka.review.ReviewUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

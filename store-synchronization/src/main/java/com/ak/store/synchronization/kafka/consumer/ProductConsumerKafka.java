@@ -1,9 +1,9 @@
 package com.ak.store.synchronization.kafka.consumer;
 
-import com.ak.store.common.event.catalogue.ProductCreatedEvent;
-import com.ak.store.common.event.catalogue.ProductDeletedEvent;
-import com.ak.store.common.event.catalogue.ProductRatingUpdatedEvent;
-import com.ak.store.common.event.catalogue.ProductUpdatedEvent;
+import com.ak.store.common.kafka.catalogue.ProductCreatedEvent;
+import com.ak.store.common.kafka.catalogue.ProductDeletedEvent;
+import com.ak.store.common.kafka.catalogue.ProductRatingUpdatedEvent;
+import com.ak.store.common.kafka.catalogue.ProductUpdatedEvent;
 import com.ak.store.synchronization.errorHandler.ProductKafkaErrorHandler;
 import com.ak.store.synchronization.facade.ProductFacade;
 import lombok.RequiredArgsConstructor;

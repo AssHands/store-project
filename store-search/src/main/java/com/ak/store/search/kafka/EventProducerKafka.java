@@ -1,6 +1,6 @@
 package com.ak.store.search.kafka;
 
-import com.ak.store.common.event.KafkaEvent;
+import com.ak.store.common.kafka.KafkaEvent;
 
 import com.ak.store.search.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;

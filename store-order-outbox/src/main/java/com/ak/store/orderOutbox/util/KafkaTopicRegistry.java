@@ -1,7 +1,7 @@
 package com.ak.store.orderOutbox.util;
 
-import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.event.order.OrderCreatedEvent;
+import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.common.kafka.order.OrderCreatedEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ public class KafkaTopicRegistry {
     @PostConstruct
     public void init() {
         Map<Class<? extends KafkaEvent>, String> eventKeyMap = Map.of(
-                OrderCreatedEvent.class, "order-created"
+                OrderCreatedEvent.class, "order-creation-request"
         );
 
         for (var entry : eventKeyMap.entrySet()) {

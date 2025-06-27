@@ -1,6 +1,6 @@
 package com.ak.store.user.facade;
 
-import com.ak.store.common.event.user.UserVerifyEvent;
+import com.ak.store.common.kafka.user.UserVerifyEvent;
 import com.ak.store.common.snapshot.user.UserVerifySnapshot;
 import com.ak.store.user.kafka.EventProducerKafka;
 import com.ak.store.user.model.dto.UserDTO;

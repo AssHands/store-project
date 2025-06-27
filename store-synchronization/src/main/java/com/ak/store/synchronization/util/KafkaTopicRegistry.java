@@ -1,11 +1,10 @@
 package com.ak.store.synchronization.util;
 
-import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.event.catalogue.*;
+import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.common.kafka.catalogue.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -39,6 +39,6 @@ public class OrderController {
                 accessToken.getClaimAsString("email")
         );
 
-        orderFacade.createOne(authContext, orderMapper.toOrderWriteDTO(request));
+        orderFacade.createOne(authContext, request.getProductAmount());
     }
 }

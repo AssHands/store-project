@@ -1,6 +1,6 @@
 package com.ak.store.emailSender.processor.impl;
 
-import com.ak.store.common.event.user.UserVerifyEvent;
+import com.ak.store.common.kafka.user.UserVerifyEvent;
 import com.ak.store.emailSender.facade.EmailFacade;
 import com.ak.store.emailSender.inbox.InboxEvent;
 import com.ak.store.emailSender.inbox.InboxEventType;

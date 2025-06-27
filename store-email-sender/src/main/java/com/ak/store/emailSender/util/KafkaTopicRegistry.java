@@ -1,12 +1,11 @@
 package com.ak.store.emailSender.util;
 
-import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.event.user.UserVerifyEvent;
-import com.ak.store.common.event.order.OrderCreatedEvent;
+import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.common.kafka.user.UserVerifyEvent;
+import com.ak.store.common.kafka.order.OrderCreatedEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;

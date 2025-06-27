@@ -1,7 +1,7 @@
-package com.ak.store.common.event.catalogue;
+package com.ak.store.common.kafka.review;
 
-import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.snapshot.catalogue.CategorySnapshotPayload;
+import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.common.snapshot.review.ReviewUpdatedSnapshotPayload;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -16,8 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CategoryUpdatedEvent implements KafkaEvent {
+public class ReviewUpdatedEvent implements KafkaEvent {
     private UUID eventId;
 
-    private CategorySnapshotPayload payload;
+    private ReviewUpdatedSnapshotPayload payload;
 }

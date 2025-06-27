@@ -28,4 +28,7 @@ public class Order {
     @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderProduct> products = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 }

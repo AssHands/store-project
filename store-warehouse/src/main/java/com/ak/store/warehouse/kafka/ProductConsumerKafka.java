@@ -1,6 +1,6 @@
 package com.ak.store.warehouse.kafka;
 
-import com.ak.store.common.event.catalogue.ProductCreatedEvent;
+import com.ak.store.common.kafka.catalogue.ProductCreatedEvent;
 import com.ak.store.warehouse.facade.InventoryFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;

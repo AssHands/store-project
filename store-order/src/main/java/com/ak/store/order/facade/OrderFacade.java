@@ -1,13 +1,8 @@
 package com.ak.store.order.facade;
 
-import com.ak.store.common.snapshot.order.OrderCreationSnapshotPayload;
-import com.ak.store.common.snapshot.order.OrderSnapshot;
-import com.ak.store.common.snapshot.user.UserIdentitySnapshot;
-import com.ak.store.order.feign.WarehouseFeign;
+import com.ak.store.common.snapshot.order.OrderCreatedSnapshot;
 import com.ak.store.order.model.dto.OrderDTOPayload;
 import com.ak.store.order.model.dto.UserAuthContext;
-import com.ak.store.order.model.dto.write.OrderWriteDTO;
-import com.ak.store.order.model.form.werehouse.ReserveInventoryForm;
 import com.ak.store.order.outbox.OutboxEventService;
 import com.ak.store.order.outbox.OutboxEventType;
 import com.ak.store.order.service.OrderService;
@@ -15,15 +10,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class OrderFacade {
     private final OrderService orderService;
-    private final WarehouseFeign warehouseFeign;
     private final OutboxEventService outboxEventService;
 
     public List<OrderDTOPayload> findAllByUserId(UUID userId) {
@@ -31,30 +26,19 @@ public class OrderFacade {
     }
 
     @Transactional
-    public void createOne(UserAuthContext authContext, OrderWriteDTO request) {
-        var orderPayload = orderService.createOne(authContext.getId(), request);
+    public void createOne(UserAuthContext authContext, Map<Long, Integer> productMap) {
+        var orderPayload = orderService.createOne(authContext.getId(), productMap);
 
-        List<ReserveInventoryForm> reserveForm = new ArrayList<>();
-        for (var entry : request.getProductAmount().entrySet()) {
-            reserveForm.add(ReserveInventoryForm.builder()
-                    .productId(entry.getKey())
-                    .amount(entry.getValue())
-                    .build());
+        Map<Long, Integer> productAmount = new HashMap<>();
+        for (var product : orderPayload.getProducts()) {
+            productAmount.merge(product.getProductId(), 1, Integer::sum);
         }
 
-        warehouseFeign.reserveAll(reserveForm);
-
-        var snapshot = OrderCreationSnapshotPayload.builder()
-                .order(OrderSnapshot.builder()
-                        .id(orderPayload.getOrder().getId())
-                        .userId(authContext.getId())
-                        .productAmount(request.getProductAmount())
-                        .totalPrice(orderPayload.getOrder().getTotalPrice())
-                        .build())
-                .userIdentity(UserIdentitySnapshot.builder()
-                        .id(authContext.getId())
-                        .email(authContext.getEmail())
-                        .build())
+        var snapshot = OrderCreatedSnapshot.builder()
+                .orderId(orderPayload.getOrder().getId())
+                .userId(authContext.getId())
+                .totalPrice(orderPayload.getOrder().getTotalPrice())
+                .productAmount(productAmount)
                 .build();
 
         outboxEventService.createOne(snapshot, OutboxEventType.ORDER_CREATED);

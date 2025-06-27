@@ -1,6 +1,6 @@
 package com.ak.store.reviewOutbox.processor.impl;
 
-import com.ak.store.common.event.review.ReviewDeletedEvent;
+import com.ak.store.common.kafka.review.ReviewDeletedEvent;
 import com.ak.store.common.snapshot.review.ReviewDeletedSnapshot;
 import com.ak.store.reviewOutbox.kafka.EventProducerKafka;
 import com.ak.store.reviewOutbox.model.OutboxEvent;

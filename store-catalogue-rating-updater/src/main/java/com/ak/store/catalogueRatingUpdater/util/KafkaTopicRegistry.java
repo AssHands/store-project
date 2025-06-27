@@ -1,9 +1,9 @@
 package com.ak.store.catalogueRatingUpdater.util;
 
-import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.event.review.ReviewCreatedEvent;
-import com.ak.store.common.event.review.ReviewDeletedEvent;
-import com.ak.store.common.event.review.ReviewUpdatedEvent;
+import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.common.kafka.review.ReviewCreatedEvent;
+import com.ak.store.common.kafka.review.ReviewDeletedEvent;
+import com.ak.store.common.kafka.review.ReviewUpdatedEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

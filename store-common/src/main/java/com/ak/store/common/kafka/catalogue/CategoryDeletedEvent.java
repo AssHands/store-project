@@ -1,7 +1,6 @@
-package com.ak.store.common.event.order;
+package com.ak.store.common.kafka.catalogue;
 
-import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.snapshot.order.OrderCreationSnapshotPayload;
+import com.ak.store.common.kafka.KafkaEvent;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -16,8 +15,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrderCreatedEvent implements KafkaEvent {
+public class CategoryDeletedEvent implements KafkaEvent {
     private UUID eventId;
 
-    private OrderCreationSnapshotPayload payload;
+    private Long categoryId;
 }

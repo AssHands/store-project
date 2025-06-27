@@ -1,7 +1,7 @@
 package com.ak.store.catalogueOutbox.util;
 
-import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.event.catalogue.*;
+import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.common.kafka.catalogue.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

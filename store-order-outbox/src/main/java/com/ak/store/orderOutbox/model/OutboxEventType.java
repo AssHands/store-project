@@ -8,5 +8,5 @@ import lombok.Getter;
 public enum OutboxEventType {
     ORDER_CREATED("ORDER_CREATED");
 
-    private String type;
+    private String value;
 }

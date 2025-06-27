@@ -20,7 +20,5 @@ public class OrderProduct {
 
     private Long productId;
 
-    private Integer amount;
-
-    private Integer pricePerOne;
+    private Integer price;
 }

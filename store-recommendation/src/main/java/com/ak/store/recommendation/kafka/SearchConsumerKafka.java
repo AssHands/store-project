@@ -1,6 +1,6 @@
 package com.ak.store.recommendation.kafka;
 
-import com.ak.store.common.event.search.SearchAllEvent;
+import com.ak.store.common.kafka.search.SearchAllEvent;
 import com.ak.store.recommendation.facade.RecommendationFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;

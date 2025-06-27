@@ -42,4 +42,4 @@ spring:
 kafka:
   dlt-prefix: .dlt
   topics:
-    order-created: order-created
+    order-creation-request: order-creation-request

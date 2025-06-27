@@ -1,8 +1,7 @@
 package com.ak.store.search.util;
 
-import com.ak.store.common.event.KafkaEvent;
-import com.ak.store.common.event.search.SearchAllEvent;
-import com.ak.store.common.event.user.UserVerifyEvent;
+import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.common.kafka.search.SearchAllEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

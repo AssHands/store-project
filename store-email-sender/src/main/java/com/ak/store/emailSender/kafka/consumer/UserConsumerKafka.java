@@ -1,6 +1,6 @@
 package com.ak.store.emailSender.kafka.consumer;
 
-import com.ak.store.common.event.user.UserVerifyEvent;
+import com.ak.store.common.kafka.user.UserVerifyEvent;
 import com.ak.store.emailSender.errorHandler.UserKafkaErrorHandler;
 import com.ak.store.emailSender.inbox.InboxEventType;
 import com.ak.store.emailSender.service.InboxEventWriterService;

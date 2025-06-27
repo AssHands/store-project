@@ -1,6 +1,6 @@
 package com.ak.store.emailSender.processor.impl;
 
-import com.ak.store.common.event.order.OrderCreatedEvent;
+import com.ak.store.common.kafka.order.OrderCreatedEvent;
 import com.ak.store.common.snapshot.order.OrderCreationSnapshotPayload;
 import com.ak.store.emailSender.facade.EmailFacade;
 import com.ak.store.emailSender.inbox.InboxEvent;
