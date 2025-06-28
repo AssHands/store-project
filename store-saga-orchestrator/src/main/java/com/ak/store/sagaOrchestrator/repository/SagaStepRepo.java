@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface SagaStepRepo extends JpaRepository<SagaStep, UUID> {
@@ -22,4 +23,7 @@ public interface SagaStepRepo extends JpaRepository<SagaStep, UUID> {
     @Modifying
     @Query("UPDATE SagaStep ss SET ss.status = :status WHERE ss IN :sagaSteps")
     void updateAll(List<SagaStep> sagaSteps, SagaStepStatus status);
+
+    @Query("SELECT ss FROM SagaStep ss WHERE ss.saga.id = :sagaId")
+    Optional<SagaStep> findOneBySagaId(UUID sagaId);
 }

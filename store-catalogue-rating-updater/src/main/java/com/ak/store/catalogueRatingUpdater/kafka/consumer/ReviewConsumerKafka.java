@@ -19,6 +19,7 @@ public class ReviewConsumerKafka {
     private final RatingUpdaterFacade ratingUpdaterFacade;
 
     //todo не видно ошибкой, если я ловлю их. добавить логи
+    //todo добавить паттерн inbox
     @KafkaListener(topics = "${kafka.topics.review-created}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleCreated(List<ReviewCreatedEvent> reviewCreatedEvents, Acknowledgment ack) {
         for (ReviewCreatedEvent event : reviewCreatedEvents) {

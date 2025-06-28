@@ -1,22 +1,18 @@
-package com.ak.store.emailSender;
+package com.ak.store.paymentSagaWorker;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@ComponentScan(basePackages = {"com.ak.store.*"})
-@EnableScheduling
-@EnableFeignClients
 @SpringBootApplication
-public class EmailSenderProjectApplication {
+@EnableScheduling
+public class PaymentSagaWorkerProjectApplication {
     public static void main(String[] args) {
-        SpringApplication.run(EmailSenderProjectApplication.class, args);
+        SpringApplication.run(PaymentSagaWorkerProjectApplication.class, args);
     }
 
     @Bean

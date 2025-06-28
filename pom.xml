@@ -34,5 +34,6 @@
         <module>store-cart</module>
         <module>store-payment</module>
         <module>store-saga-orchestrator</module>
+        <module>store-payment-saga-worker</module>
     </modules>
 </project>

@@ -1,9 +1,9 @@
-package com.ak.store.emailSender.scheduler;
+package com.ak.store.paymentSagaWorker.sheduler;
 
-import com.ak.store.emailSender.inbox.InboxEvent;
-import com.ak.store.emailSender.inbox.InboxEventType;
-import com.ak.store.emailSender.processor.InboxEventProcessor;
-import com.ak.store.emailSender.service.InboxEventReaderService;
+import com.ak.store.paymentSagaWorker.inbox.InboxEvent;
+import com.ak.store.paymentSagaWorker.inbox.InboxEventReaderService;
+import com.ak.store.paymentSagaWorker.inbox.InboxEventType;
+import com.ak.store.paymentSagaWorker.processor.InboxEventProcessor;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -46,10 +46,11 @@ public class InboxEventScheduler {
                 processor.process(event);
                 completedEvents.add(event);
             } catch (Exception ignored) {
+                //todo ловить, записывать в outbox топик, отправлять в кафку failed status
             }
         }
 
-        if(!completedEvents.isEmpty()) {
+        if (!completedEvents.isEmpty()) {
             inboxEventReaderService.markAllAsCompleted(completedEvents);
         }
     }
