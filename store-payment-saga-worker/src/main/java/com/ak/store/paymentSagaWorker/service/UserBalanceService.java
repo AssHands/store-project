@@ -18,15 +18,21 @@ public class UserBalanceService {
                 .orElseThrow(() -> new RuntimeException("not found"));
     }
 
-    @Transactional
     public void reserveFunds(UUID id, Integer sum) {
         var userBalance = findOneById(id);
-        Integer newBalance = userBalance.getBalance() - sum;
+        int newBalance = userBalance.getBalance() - sum;
 
         if (newBalance >= 0) {
             userBalance.setBalance(newBalance);
+            userBalanceRepo.save(userBalance);
         } else {
             throw new RuntimeException("not enough balance");
         }
+    }
+
+    public void releaseFunds(UUID id, Integer sum) {
+        var userBalance = findOneById(id);
+        userBalance.setBalance(userBalance.getBalance() + sum);
+        userBalanceRepo.save(userBalance);
     }
 }
