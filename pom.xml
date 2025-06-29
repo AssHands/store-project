@@ -36,5 +36,7 @@
         <module>store-saga-orchestrator</module>
         <module>store-payment-saga-worker</module>
         <module>store-payment-outbox</module>
+        <module>store-warehouse-saga-worker</module>
+        <module>store-warehouse-outbox</module>
     </modules>
 </project>
