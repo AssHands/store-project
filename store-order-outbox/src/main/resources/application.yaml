@@ -42,4 +42,6 @@ spring:
 kafka:
   dlt-prefix: .dlt
   topics:
-    order-creation-request: order-creation-request
+    order-creation: order-creation-request
+    confirm-order: confirm-order-response
+    cancel-order: cancel-order-response

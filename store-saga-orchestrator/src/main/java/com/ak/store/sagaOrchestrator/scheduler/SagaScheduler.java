@@ -3,7 +3,7 @@ package com.ak.store.sagaOrchestrator.scheduler;
 import com.ak.store.sagaOrchestrator.model.entity.Saga;
 import com.ak.store.sagaOrchestrator.model.entity.SagaStatus;
 import com.ak.store.sagaOrchestrator.model.entity.SagaStep;
-import com.ak.store.sagaOrchestrator.service.SagaProcessor;
+import com.ak.store.sagaOrchestrator.processor.SagaProcessor;
 import com.ak.store.sagaOrchestrator.service.SagaService;
 import com.ak.store.sagaOrchestrator.service.SagaStepService;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;
@@ -58,6 +58,7 @@ public class SagaScheduler {
             }
         }
 
+        //todo нельзя ставить completed сразу. надо ловить ответ в кафке уже тогда ставить что выполнено. иначе retry
         sagaService.markAllAs(completed, SagaStatus.COMPLETED);
     }
 
@@ -80,9 +81,11 @@ public class SagaScheduler {
         }
 
         sagaStepService.compensateAll(failed);
+        //todo нельзя ставить completed сразу. надо ловить ответ в кафке уже тогда ставить что выполнено. иначе retry
         sagaStepService.markAllAsCompleted(completed);
     }
 
+    //todo перенести валидацию в отдельный класс
     private boolean isSagaValid(Saga saga) {
         var sagaDef = sagaProperties.getDefinition(saga.getName());
 

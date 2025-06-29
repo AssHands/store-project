@@ -41,6 +41,6 @@ public class OrderFacade {
                 .productAmount(productAmount)
                 .build();
 
-        outboxEventService.createOne(snapshot, OutboxEventType.ORDER_CREATED);
+        outboxEventService.createOne(snapshot, OutboxEventType.ORDER_CREATION);
     }
 }

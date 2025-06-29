@@ -1,4 +1,4 @@
-package com.ak.store.sagaOrchestrator.service;
+package com.ak.store.sagaOrchestrator.processor;
 
 import com.ak.store.common.kafka.KafkaEvent;
 import com.ak.store.common.saga.SagaRequestEvent;
@@ -40,22 +40,29 @@ public class SagaProcessor {
                 .stepName(stepName)
                 .build();
 
-        return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
+        return sendEvent(requestEvent, topic, saga.getId().toString());
     }
 
     public boolean handleFailedSaga(Saga saga) {
-        var stepDef = sagaProperties.getDefinition(saga.getName());
+        var sagaDef = sagaProperties.getDefinition(saga.getName());
 
-        String stepName = stepDef.getName();
-        String topic = stepDef.getResponseTopic();
+        String stepName = sagaDef.getName();
+        String topic = sagaDef.getCompensationRequestTopic();
+        JsonNode request;
 
-        var response = SagaResponseEvent.builder()
+        try {
+            request = jsonMapper.toJsonNode(saga.getPayload());
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+
+        var requestEvent = SagaRequestEvent.builder()
+                .request(request)
                 .sagaId(saga.getId())
                 .stepName(stepName)
-                .status(SagaResponseStatus.FAILURE)
                 .build();
 
-        return sendEvent(response, topic, response.getSagaId().toString());
+        return sendEvent(requestEvent, topic, saga.getId().toString());
     }
 
     public boolean handleSagaStep(SagaStep sagaStep) {
@@ -64,52 +71,43 @@ public class SagaProcessor {
                 : handleStep(sagaStep);
     }
 
-    private boolean handleCompensationStep(SagaStep sagaStep) {
-        var stepDef = sagaProperties.getPreviousStep(sagaStep.getSaga().getName(), sagaStep.getName());
-
-        return stepDef == null
-                ? sendLastCompensationStep(sagaStep)
-                : sendNextCompensationStep(sagaStep);
-    }
-
     private boolean handleStep(SagaStep sagaStep) {
         var stepDef = sagaProperties.getNextStep(sagaStep.getSaga().getName(), sagaStep.getName());
 
         return stepDef == null
-                ? sendLastStep(sagaStep)
-                : sendNextStep(sagaStep);
+                ? sendStep(sagaStep, sagaProperties.getLastStep(sagaStep.getSaga().getName()))
+                : sendStep(sagaStep, sagaProperties.getNextStep(sagaStep.getSaga().getName(), sagaStep.getName()));
     }
 
-    private boolean sendLastStep(SagaStep sagaStep) {
-        var sagaDef = sagaProperties.getDefinition(sagaStep.getSaga().getName());
-        String stepName = sagaDef.getName();
-        String topic = sagaDef.getResponseTopic();
-
-        var responseEvent = SagaResponseEvent.builder()
-                .status(SagaResponseStatus.SUCCESS)
-                .sagaId(sagaStep.getSaga().getId())
-                .stepName(stepName)
-                .build();
-
-        return sendEvent(responseEvent, topic, responseEvent.getSagaId().toString());
-    }
-
-    private boolean sendLastCompensationStep(SagaStep sagaStep) {
-        var sagaDef = sagaProperties.getDefinition(sagaStep.getSaga().getName());
-        String stepName = sagaDef.getName();
-        String topic = sagaDef.getResponseTopic();
-
-        var responseEvent = SagaResponseEvent.builder()
-                .status(SagaResponseStatus.FAILURE)
-                .sagaId(sagaStep.getSaga().getId())
-                .stepName(stepName)
-                .build();
-
-        return sendEvent(responseEvent, topic, responseEvent.getSagaId().toString());
-    }
-
-    private boolean sendNextCompensationStep(SagaStep sagaStep) {
+    private boolean handleCompensationStep(SagaStep sagaStep) {
         var stepDef = sagaProperties.getPreviousStep(sagaStep.getSaga().getName(), sagaStep.getName());
+
+        return stepDef == null
+                ? sendLastCompensationStep(sagaStep, sagaProperties.getDefinition(sagaStep.getSaga().getName()))
+                : sendCompensationStep(sagaStep, sagaProperties.getPreviousStep(sagaStep.getSaga().getName(), sagaStep.getName()));
+    }
+
+    private boolean sendStep(SagaStep sagaStep, SagaProperties.SagaStepDefinition stepDef) {
+        String stepName = stepDef.getName();
+        String topic = stepDef.getTopics().getRequest();
+        JsonNode request;
+
+        try {
+            request = jsonMapper.toJsonNode(sagaStep.getSaga().getPayload());
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+
+        var requestEvent = SagaRequestEvent.builder()
+                .request(request)
+                .sagaId(sagaStep.getSaga().getId())
+                .stepName(stepName)
+                .build();
+
+        return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
+    }
+
+    private boolean sendCompensationStep(SagaStep sagaStep, SagaProperties.SagaStepDefinition stepDef) {
         String stepName = stepDef.getName();
         String topic = stepDef.getTopics().getCompensationRequest();
         JsonNode request;
@@ -129,10 +127,9 @@ public class SagaProcessor {
         return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
     }
 
-    private boolean sendNextStep(SagaStep sagaStep) {
-        var stepDef = sagaProperties.getNextStep(sagaStep.getSaga().getName(), sagaStep.getName());
-        String stepName = stepDef.getName();
-        String topic = stepDef.getTopics().getRequest();
+    private boolean sendLastCompensationStep(SagaStep sagaStep, SagaProperties.SagaDefinition sagaDef) {
+        String stepName = sagaDef.getName();
+        String topic = sagaDef.getCompensationRequestTopic();
         JsonNode request;
 
         try {

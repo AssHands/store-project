@@ -14,7 +14,9 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Component
@@ -64,24 +66,18 @@ public class SagaConsumerKafka {
             batch = "true"
     )
     public void handleCompensation(List<SagaResponseEvent> events, Acknowledgment ack) {
+        //todo а что если компенсация вернет FAILURE статус?
+        List<UUID> failedSagaIds = new ArrayList<>();
+
         for (var event : events) {
-            sagaStepService.compensateOne(event.getSagaId(), event.getStepName());
+            if(sagaProperties.getDefinition(event.getStepName()) == null) {
+                sagaStepService.compensateOne(event.getSagaId(), event.getStepName());
+            } else {
+                failedSagaIds.add(event.getSagaId());
+            }
         }
 
-        ack.acknowledge();
-    }
-
-    @KafkaListener(
-            topics = "#{@sagaProperties.getAllResponseSagaTopics()}",
-            groupId = "${spring.kafka.consumer.group-id}",
-            batch = "true"
-    )
-    public void handleCompletedSaga(List<SagaResponseEvent> events, Acknowledgment ack) {
-        var ids = events.stream()
-                .map(SagaResponseEvent::getSagaId)
-                .toList();
-
-        sagaService.markAllAsByIds(ids, SagaStatus.COMPLETED);
+        sagaService.markAllAsByIds(failedSagaIds, SagaStatus.COMPLETED);
         ack.acknowledge();
     }
 }

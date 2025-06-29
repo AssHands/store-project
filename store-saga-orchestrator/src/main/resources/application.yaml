@@ -58,7 +58,7 @@ saga:
     order-creation:
       name: order-creation
       request-topic: order-creation-request
-      response-topic: order-creation-response
+      compensation-request-topic: cancel-order-request
       timeout: 300
       steps:
         reserve-funds:
@@ -78,3 +78,12 @@ saga:
             response: warehouse-reserve-products-response
             compensation-request: warehouse-release-products-request
             compensation-response: warehouse-release-products-response
+
+        confirm-order:
+          name: confirm-order
+          timeout: 300
+          topics:
+            request: confirm-order-request
+            response: confirm-order-response
+            compensation-request: cancel-order-request
+            compensation-response: cancel-order-response

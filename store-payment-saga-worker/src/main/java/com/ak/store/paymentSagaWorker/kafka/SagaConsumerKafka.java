@@ -37,7 +37,7 @@ public class SagaConsumerKafka {
     public void handleReleaseFunds(List<SagaRequestEvent> events, Acknowledgment ack) {
         for(var event : events) {
             inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
-                    event.getRequest().asText(), InboxEventType.RELEASE_FUNDS);
+                    event.getRequest().toString(), InboxEventType.RELEASE_FUNDS);
         }
 
         ack.acknowledge();

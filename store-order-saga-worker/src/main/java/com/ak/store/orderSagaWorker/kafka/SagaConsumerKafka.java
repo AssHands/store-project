@@ -1,8 +1,8 @@
-package com.ak.store.warehouseSagaWorker.kafka;
+package com.ak.store.orderSagaWorker.kafka;
 
 import com.ak.store.common.saga.SagaRequestEvent;
-import com.ak.store.warehouseSagaWorker.model.entity.InboxEventType;
-import com.ak.store.warehouseSagaWorker.service.InboxEventWriterService;
+import com.ak.store.orderSagaWorker.model.entity.InboxEventType;
+import com.ak.store.orderSagaWorker.service.InboxEventWriterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -16,28 +16,28 @@ public class SagaConsumerKafka {
     private final InboxEventWriterService inboxEventWriterService;
 
     @KafkaListener(
-            topics = "warehouse-reserve-products-request",
+            topics = "confirm-order-request",
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"
     )
-    public void handleReserveProducts(List<SagaRequestEvent> events, Acknowledgment ack) {
+    public void handleConfirmOrder(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
             inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
-                    event.getRequest().toString(), InboxEventType.RESERVE_PRODUCTS);
+                    event.getRequest().toString(), InboxEventType.CONFIRM_ORDER);
         }
 
         ack.acknowledge();
     }
 
     @KafkaListener(
-            topics = "warehouse-release-products-request",
+            topics = "cancel-order-request",
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"
     )
-    public void handleReleaseProducts(List<SagaRequestEvent> events, Acknowledgment ack) {
+    public void handleCanselOrder(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
             inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
-                    event.getRequest().asText(), InboxEventType.RELEASE_PRODUCTS);
+                    event.getRequest().toString(), InboxEventType.CANCEL_ORDER);
         }
 
         ack.acknowledge();

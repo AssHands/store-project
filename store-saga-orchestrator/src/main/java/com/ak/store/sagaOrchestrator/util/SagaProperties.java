@@ -21,7 +21,6 @@ public class SagaProperties {
     private List<String> allRequestSagaTopics = new ArrayList<>();
     private List<String> allResponseStepTopics = new ArrayList<>();
     private List<String> allResponseCompensationStepTopics = new ArrayList<>();
-    private List<String> allResponseSagaTopics = new ArrayList<>();
 
     @PostConstruct
     public void init() {
@@ -43,10 +42,6 @@ public class SagaProperties {
                 .map(SagaStepDefinition::getTopics)
                 .flatMap(step -> Stream.of(
                         step.getCompensationResponse()))
-                .toList();
-
-        allResponseSagaTopics = definitions.values().stream()
-                .map(SagaDefinition::getResponseTopic)
                 .toList();
     }
 
@@ -74,6 +69,17 @@ public class SagaProperties {
     public SagaStepDefinition getFirstStep(String definition) {
         var steps = definitions.get(definition).getSteps();
         return steps.isEmpty() ? null : steps.values().iterator().next();
+    }
+
+    public SagaStepDefinition getLastStep(String definition) {
+        var stepsIterator = definitions.get(definition).getSteps().entrySet().iterator();
+        SagaStepDefinition lastStep = null;
+
+        while (stepsIterator.hasNext()) {
+            lastStep = stepsIterator.next().getValue();
+        }
+
+        return lastStep;
     }
 
     public SagaDefinition getDefinition(String name) {
@@ -104,7 +110,7 @@ public class SagaProperties {
 
         private String requestTopic;
 
-        private String responseTopic;
+        private String compensationRequestTopic;
 
         private Integer timeout;
 

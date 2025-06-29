@@ -1,7 +1,8 @@
 package com.ak.store.orderOutbox.kafka;
 
-import com.ak.store.orderOutbox.util.KafkaTopicRegistry;
 import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.orderOutbox.model.OutboxEventType;
+import com.ak.store.orderOutbox.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,8 @@ public class EventProducerKafka {
     private final KafkaTemplate<String, KafkaEvent> kafkaTemplate;
     private final KafkaTopicRegistry topicRegistry;
 
-    public <T extends KafkaEvent> void send(T event, String key) {
-        String topic = topicRegistry.getTopicByEvent(event.getClass());
+    public <T extends KafkaEvent> void send(T event, OutboxEventType eventType, String key) {
+        String topic = topicRegistry.getTopicByEvent(eventType);
 
         if (topic == null) {
             throw new IllegalArgumentException("No topic configured for event class: " + event.getClass().getName());
