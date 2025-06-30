@@ -43,6 +43,7 @@ public class SagaProperties {
                 .flatMap(step -> Stream.of(
                         step.getCompensationResponse()))
                 .toList();
+        System.out.println();
     }
 
     public SagaStepDefinition getNextStep(String definition, String currentStep) {

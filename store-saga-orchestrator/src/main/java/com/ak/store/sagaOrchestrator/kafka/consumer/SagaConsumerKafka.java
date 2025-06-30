@@ -7,6 +7,7 @@ import com.ak.store.sagaOrchestrator.model.entity.SagaStatus;
 import com.ak.store.sagaOrchestrator.service.SagaService;
 import com.ak.store.sagaOrchestrator.service.SagaStepService;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;
+import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -35,9 +36,13 @@ public class SagaConsumerKafka {
         for (int i = 0; i < events.size(); i++) {
             var event = events.get(i);
             var topic = topics.get(i);
-
             String sagaName = sagaProperties.getDefinitionByRequestTopic(topic).getName();
-            sagaService.createOne(event.getSagaId(), sagaName, event.getRequest().toString());
+
+            try {
+                sagaService.createOne(event.getSagaId(), sagaName, event.getRequest().toString());
+            } catch (Exception e) {
+                //todo не получилось создать запись в бд о новой саге. что делать? кидать в dlt топик и создавать новую failed сагу?
+            }
         }
 
         ack.acknowledge();
@@ -50,10 +55,14 @@ public class SagaConsumerKafka {
     )
     public void handleResponse(List<SagaResponseEvent> events, Acknowledgment ack) {
         for (var event : events) {
-            if (event.getStatus() == SagaResponseStatus.SUCCESS) {
-                sagaStepService.continueOne(event.getSagaId(), event.getStepName());
-            } else {
-                sagaStepService.compensateOne(event.getSagaId(), event.getStepName());
+            try {
+                if (event.getStatus() == SagaResponseStatus.SUCCESS) {
+                    sagaStepService.continueOne(event.getSagaId(), event.getStepName());
+                } else {
+                    sagaStepService.compensateOne(event.getSagaId(), event.getStepName());
+                }
+            } catch (Exception e) {
+                //todo не получилось создать запись в бд о шаге. что делать? кидать в dlt топик и закрывать сагу?
             }
         }
 
@@ -70,7 +79,7 @@ public class SagaConsumerKafka {
         List<UUID> failedSagaIds = new ArrayList<>();
 
         for (var event : events) {
-            if(sagaProperties.getDefinition(event.getStepName()) == null) {
+            if (sagaProperties.getDefinition(event.getStepName()) == null) {
                 sagaStepService.compensateOne(event.getSagaId(), event.getStepName());
             } else {
                 failedSagaIds.add(event.getSagaId());

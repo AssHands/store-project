@@ -14,7 +14,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "saga_step")
+@Table(name = "saga_step",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_saga_step_name_compensation_saga",
+                        columnNames = {"name", "is_compensation", "saga_id"}
+                )
+        })
 public class SagaStep {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

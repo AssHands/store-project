@@ -26,4 +26,6 @@ public interface SagaStepRepo extends JpaRepository<SagaStep, UUID> {
 
     @Query("SELECT ss FROM SagaStep ss WHERE ss.saga.id = :sagaId")
     Optional<SagaStep> findOneBySagaId(UUID sagaId);
+
+    boolean existsByNameAndSagaIdAndIsCompensation(String name, UUID sagaId, boolean isCompensation);
 }

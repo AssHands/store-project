@@ -11,5 +11,5 @@ public enum SagaStatus {
     FAILED("FAILED"),
     COMPLETED("COMPLETED");
 
-    private String status;
+    private String value;
 }

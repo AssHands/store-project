@@ -22,15 +22,7 @@ public class SagaService {
 
     @Transactional
     public <T> void createOne(UUID sagaId, String sagaName, String payload) {
-        var saga = Saga.builder()
-                .id(sagaId)
-                .name(sagaName)
-                .payload(payload)
-                .time(LocalDateTime.now())
-                .status(SagaStatus.RECEIVED)
-                .build();
-
-        sagaRepo.save(saga);
+        sagaRepo.insertIgnoreDuplicate(sagaId, sagaName, payload, SagaStatus.RECEIVED.getValue(), LocalDateTime.now());
     }
 
     public List<Saga> findAllForProcessing() {
