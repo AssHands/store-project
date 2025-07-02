@@ -62,6 +62,7 @@ saga:
       name: order-creation
       request-topic: order-creation-request
       compensation-request-topic: cancel-order-request
+      #todo добавить compensation-response-topic. не закрывать сагу, пока не получу подтверждение об успешности компенсации
       timeout: 300
       steps:
         reserve-funds:

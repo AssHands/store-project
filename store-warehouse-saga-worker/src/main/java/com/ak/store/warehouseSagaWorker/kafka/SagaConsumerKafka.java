@@ -22,8 +22,13 @@ public class SagaConsumerKafka {
     )
     public void handleReserveProducts(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
-            inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
+            try {
+                inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
                     event.getRequest().toString(), InboxEventType.RESERVE_PRODUCTS);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getSagaId(),
+                        event.getStepName(), InboxEventType.RESERVE_PRODUCTS);
+            }
         }
 
         ack.acknowledge();
@@ -36,8 +41,13 @@ public class SagaConsumerKafka {
     )
     public void handleReleaseProducts(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
-            inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
-                    event.getRequest().asText(), InboxEventType.RELEASE_PRODUCTS);
+            try {
+                inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
+                        event.getRequest().toString(), InboxEventType.RELEASE_PRODUCTS);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getSagaId(),
+                        event.getStepName(), InboxEventType.RELEASE_PRODUCTS);
+            }
         }
 
         ack.acknowledge();

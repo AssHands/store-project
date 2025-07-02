@@ -1,9 +1,9 @@
 package com.ak.store.orderSagaWorker.service;
 
-import com.ak.store.orderSagaWorker.mapper.OutboxEventMapper;
 import com.ak.store.orderSagaWorker.model.entity.OutboxEventStatus;
 import com.ak.store.orderSagaWorker.model.entity.OutboxEventType;
 import com.ak.store.orderSagaWorker.repository.OutboxEventRepo;
+import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,19 +15,11 @@ import java.util.UUID;
 @Service
 public class OutboxEventService {
     private final OutboxEventRepo outboxEventRepo;
-    private final OutboxEventMapper outboxEventMapper;
+    private final Gson gson;
 
     @Transactional
     public <T> void createOne(UUID id, T payload, OutboxEventType type) {
-        var event = outboxEventMapper.toOutboxEvent(payload);
-
-        //todo если такое id уже есть в БД - что произойдет?
-        // он удалит текущую запись и создаст новую запись с таким же id
-        event.setId(id);
-        event.setType(type);
-        event.setStatus(OutboxEventStatus.IN_PROGRESS);
-        event.setRetryTime(LocalDateTime.now());
-
-        outboxEventRepo.save(event);
+        outboxEventRepo.saveOneIgnoreDuplicate(id, gson.toJson(payload), type.getValue(),
+                OutboxEventStatus.IN_PROGRESS.getStatus(), LocalDateTime.now());
     }
 }

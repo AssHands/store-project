@@ -22,8 +22,13 @@ public class SagaConsumerKafka {
     )
     public void handleConfirmOrder(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
-            inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
-                    event.getRequest().toString(), InboxEventType.CONFIRM_ORDER);
+            try {
+                inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
+                        event.getRequest().toString(), InboxEventType.CONFIRM_ORDER);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getSagaId(),
+                        event.getStepName(), InboxEventType.CONFIRM_ORDER);
+            }
         }
 
         ack.acknowledge();
@@ -36,8 +41,13 @@ public class SagaConsumerKafka {
     )
     public void handleCanselOrder(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
-            inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
-                    event.getRequest().toString(), InboxEventType.CANCEL_ORDER);
+            try {
+                inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
+                        event.getRequest().toString(), InboxEventType.CANCEL_ORDER);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getSagaId(),
+                        event.getStepName(), InboxEventType.CANCEL_ORDER);
+            }
         }
 
         ack.acknowledge();

@@ -6,8 +6,8 @@ import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface SagaStepRepo extends JpaRepository<SagaStep, UUID> {
@@ -21,11 +21,18 @@ public interface SagaStepRepo extends JpaRepository<SagaStep, UUID> {
     List<SagaStep> findAllForProcessing(SagaStepStatus status, Pageable pageable);
 
     @Modifying
+    @Query(nativeQuery = true, value = """
+            INSERT INTO saga_step (name, is_compensation, status, saga_id, time)
+            VALUES (:name, :isCompensation, :status, :sagaId, :time)
+            ON CONFLICT (name, is_compensation, saga_id) DO NOTHING
+            """)
+    int saveOneIgnoreDuplicate(String name,
+                               boolean isCompensation,
+                               String status,
+                               UUID sagaId,
+                               LocalDateTime time);
+
+    @Modifying
     @Query("UPDATE SagaStep ss SET ss.status = :status WHERE ss IN :sagaSteps")
     void updateAll(List<SagaStep> sagaSteps, SagaStepStatus status);
-
-    @Query("SELECT ss FROM SagaStep ss WHERE ss.saga.id = :sagaId")
-    Optional<SagaStep> findOneBySagaId(UUID sagaId);
-
-    boolean existsByNameAndSagaIdAndIsCompensation(String name, UUID sagaId, boolean isCompensation);
 }

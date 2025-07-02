@@ -45,8 +45,7 @@ public class OutboxEventScheduler {
             try {
                 processor.process(event);
                 completedEvents.add(event);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
 
         if (!completedEvents.isEmpty()) {

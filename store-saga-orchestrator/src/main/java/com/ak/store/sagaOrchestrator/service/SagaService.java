@@ -22,7 +22,7 @@ public class SagaService {
 
     @Transactional
     public <T> void createOne(UUID sagaId, String sagaName, String payload) {
-        sagaRepo.insertIgnoreDuplicate(sagaId, sagaName, payload, SagaStatus.RECEIVED.getValue(), LocalDateTime.now());
+        sagaRepo.saveOneIgnoreDuplicate(sagaId, sagaName, payload, SagaStatus.RECEIVED.getValue(), LocalDateTime.now());
     }
 
     public List<Saga> findAllForProcessing() {

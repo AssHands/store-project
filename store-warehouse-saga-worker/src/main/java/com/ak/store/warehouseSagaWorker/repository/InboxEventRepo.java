@@ -29,6 +29,31 @@ public interface InboxEventRepo extends JpaRepository<InboxEvent, UUID> {
                                           LocalDateTime retryTime, Pageable pageable);
 
     @Modifying
+    @Query(nativeQuery = true, value = """
+            INSERT INTO inbox (id, step_name, payload, type, status, retry_time)
+            VALUES (:id, :stepName, CAST(:payload AS jsonb), :type, :status, :retryTime)
+            ON CONFLICT (id) DO NOTHING
+            """)
+    int saveOneIgnoreDuplicate(UUID id,
+                               String stepName,
+                               String payload,
+                               String type,
+                               String status,
+                               LocalDateTime retryTime);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            INSERT INTO inbox (id, step_name, type, status, retry_time)
+            VALUES (:id, :stepName, :type, :status, :retryTime)
+            ON CONFLICT (id) DO NOTHING
+            """)
+    int saveOneIgnoreDuplicate(UUID id,
+                               String stepName,
+                               String type,
+                               String status,
+                               LocalDateTime retryTime);
+
+    @Modifying
     @Query("UPDATE InboxEvent e SET e.status = :status, e.retryTime = :time WHERE e IN :events")
     void updateAll(List<InboxEvent> events, InboxEventStatus status, LocalDateTime time);
 }

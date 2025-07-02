@@ -41,6 +41,7 @@ public class SagaConsumerKafka {
             try {
                 sagaService.createOne(event.getSagaId(), sagaName, event.getRequest().toString());
             } catch (Exception e) {
+                System.out.println("a");
                 //todo не получилось создать запись в бд о новой саге. что делать? кидать в dlt топик и создавать новую failed сагу?
             }
         }
@@ -62,6 +63,7 @@ public class SagaConsumerKafka {
                     sagaStepService.compensateOne(event.getSagaId(), event.getStepName());
                 }
             } catch (Exception e) {
+                System.out.println("a");
                 //todo не получилось создать запись в бд о шаге. что делать? кидать в dlt топик и закрывать сагу?
             }
         }
@@ -75,11 +77,11 @@ public class SagaConsumerKafka {
             batch = "true"
     )
     public void handleCompensation(List<SagaResponseEvent> events, Acknowledgment ack) {
-        //todo а что если компенсация вернет FAILURE статус?
         List<UUID> failedSagaIds = new ArrayList<>();
 
         for (var event : events) {
             if (sagaProperties.getDefinition(event.getStepName()) == null) {
+                //todo а что если компенсация вернет FAILURE статус?
                 sagaStepService.compensateOne(event.getSagaId(), event.getStepName());
             } else {
                 failedSagaIds.add(event.getSagaId());

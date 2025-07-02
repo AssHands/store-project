@@ -28,14 +28,14 @@ public interface SagaRepo extends JpaRepository<Saga, UUID> {
     @Modifying
     @Query(nativeQuery = true, value = """
             INSERT INTO saga (id, name, payload, status, time)
-            VALUES (:id, :name, :payload::jsonb, :status, :time)
+            VALUES (:id, :name, CAST(:payload AS jsonb), :status, :time)
             ON CONFLICT (id) DO NOTHING
             """)
-    int insertIgnoreDuplicate(UUID id,
-                              String name,
-                              String payload,
-                              String status,
-                              LocalDateTime time);
+    int saveOneIgnoreDuplicate(UUID id,
+                               String name,
+                               String payload,
+                               String status,
+                               LocalDateTime time);
 
     @Modifying
     @Query("UPDATE Saga s SET s.status = :status WHERE s IN :sagas")

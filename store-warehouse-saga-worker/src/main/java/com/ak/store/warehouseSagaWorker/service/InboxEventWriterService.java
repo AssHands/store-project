@@ -1,6 +1,5 @@
 package com.ak.store.warehouseSagaWorker.service;
 
-import com.ak.store.warehouseSagaWorker.model.entity.InboxEvent;
 import com.ak.store.warehouseSagaWorker.model.entity.InboxEventStatus;
 import com.ak.store.warehouseSagaWorker.model.entity.InboxEventType;
 import com.ak.store.warehouseSagaWorker.repository.InboxEventRepo;
@@ -18,15 +17,13 @@ public class InboxEventWriterService {
 
     @Transactional
     public <T> void createOne(UUID eventId, String stepName, String payload, InboxEventType type) {
-        var event = InboxEvent.builder()
-                .id(eventId)
-                .stepName(stepName)
-                .payload(payload)
-                .type(type)
-                .status(InboxEventStatus.IN_PROGRESS)
-                .retryTime(LocalDateTime.now())
-                .build();
+        inboxEventRepo.saveOneIgnoreDuplicate(eventId, stepName, payload, type.getValue(),
+                InboxEventStatus.IN_PROGRESS.getValue(), LocalDateTime.now());
+    }
 
-        inboxEventRepo.save(event);
+    @Transactional
+    public <T> void createOneFailure(UUID eventId, String stepName, InboxEventType type) {
+        inboxEventRepo.saveOneIgnoreDuplicate(eventId, stepName, type.getValue(),
+                InboxEventStatus.FAILURE.getValue(), LocalDateTime.now());
     }
 }
