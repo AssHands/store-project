@@ -1,4 +1,4 @@
-package com.ak.store.user.util;
+package com.ak.store.userOutbox.util;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

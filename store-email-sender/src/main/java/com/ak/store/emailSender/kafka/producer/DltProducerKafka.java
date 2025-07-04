@@ -1,6 +1,7 @@
 package com.ak.store.emailSender.kafka.producer;
 
 import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.emailSender.inbox.InboxEventType;
 import com.ak.store.emailSender.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,8 +15,8 @@ public class DltProducerKafka {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final KafkaTopicRegistry topicRegistry;
 
-    public <T extends KafkaEvent> void send(T event, String key) {
-        String topic = topicRegistry.getDltTopicByEvent(event.getClass());
+    public <T extends KafkaEvent> void send(T event, InboxEventType eventType, String key) {
+        String topic = topicRegistry.getDltTopicByEvent(eventType);
 
         if (topic == null) {
             throw new IllegalArgumentException("No topic configured for event class: " + event.getClass().getName());
@@ -28,9 +29,8 @@ public class DltProducerKafka {
         }
     }
 
-    public <T extends KafkaEvent> void send(T event) {
-        String topic = topicRegistry.getDltTopicByEvent(event.getClass());
-
+    public <T extends KafkaEvent> void send(T event, InboxEventType eventType) {
+        String topic = topicRegistry.getDltTopicByEvent(eventType);
 
         if (topic == null) {
             throw new IllegalArgumentException("No topic configured for event class: " + event.getClass().getName());

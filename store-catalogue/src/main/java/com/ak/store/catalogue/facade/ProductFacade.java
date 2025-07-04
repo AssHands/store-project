@@ -86,24 +86,13 @@ public class ProductFacade {
     }
 
     @Transactional
-    //todo удалять RatingSummary
+    //todo добавить snapshot вместо строки?
     public void deleteOne(Long id) {
-        var images = imageService.deleteAll(id);
         var product = productService.deleteOne(id);
 
-        var snapshot = product.getId().toString();
+        String snapshot = product.getId().toString();
 
         productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_DELETED);
-
-        List<String> imageKeys = images.stream()
-                .map(ImageDTO::getKey)
-                .toList();
-        try {
-            s3Service.deleteAllImage(imageKeys);
-        } catch (Exception e) {
-            s3Service.compensateDeleteAllImage(imageKeys);
-            throw e;
-        }
     }
 
     @Transactional

@@ -1,6 +1,6 @@
 package com.ak.store.emailSender.processor.impl;
 
-import com.ak.store.common.kafka.user.UserVerifyEvent;
+import com.ak.store.common.kafka.user.VerifyUserEvent;
 import com.ak.store.emailSender.facade.EmailFacade;
 import com.ak.store.emailSender.inbox.InboxEvent;
 import com.ak.store.emailSender.inbox.InboxEventType;
@@ -11,20 +11,20 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class UserVerifyInboxEventProcessor implements InboxEventProcessor {
+public class UserCreatedInboxEventProcessor implements InboxEventProcessor {
     private final Gson gson;
     private final EmailFacade emailFacade;
 
     @Override
     public void process(InboxEvent event) {
-        var userVerifyEvent = gson.fromJson(event.getPayload(), UserVerifyEvent.class);
+        var verifyUserEvent = gson.fromJson(event.getPayload(), VerifyUserEvent.class);
 
-        emailFacade.sendVerification(userVerifyEvent.getUserVerify().getEmail(),
-                userVerifyEvent.getUserVerify().getVerificationCode());
+        emailFacade.sendVerification(verifyUserEvent.getVerifyUser().getEmail(),
+                verifyUserEvent.getVerifyUser().getVerificationCode());
     }
 
     @Override
     public InboxEventType getType() {
-        return InboxEventType.USER_VERIFY;
+        return InboxEventType.USER_CREATED;
     }
 }

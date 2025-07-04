@@ -1,11 +1,9 @@
 package com.ak.store.emailSender.processor.impl;
 
-import com.ak.store.common.kafka.order.OrderCreatedEvent;
-import com.ak.store.common.snapshot.order.OrderCreationSnapshotPayload;
+import com.ak.store.common.kafka.user.VerifyUserEvent;
 import com.ak.store.emailSender.facade.EmailFacade;
 import com.ak.store.emailSender.inbox.InboxEvent;
 import com.ak.store.emailSender.inbox.InboxEventType;
-import com.ak.store.emailSender.mapper.EmailMapper;
 import com.ak.store.emailSender.processor.InboxEventProcessor;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
@@ -13,21 +11,20 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class OrderCreatedInboxEventProcessor implements InboxEventProcessor {
+public class VerifyUserInboxEventProcessor implements InboxEventProcessor {
     private final Gson gson;
     private final EmailFacade emailFacade;
-    private final EmailMapper emailMapper;
 
     @Override
     public void process(InboxEvent event) {
-        var orderCreatedEvent = new OrderCreatedEvent(event.getId(),
-                gson.fromJson(event.getPayload(), OrderCreationSnapshotPayload.class));
+        var verifyUserEvent = gson.fromJson(event.getPayload(), VerifyUserEvent.class);
 
-        emailFacade.sendOrderCreated(emailMapper.toOrderCreatedWriteDTO(orderCreatedEvent.getPayload()));
+        emailFacade.sendVerification(verifyUserEvent.getVerifyUser().getEmail(),
+                verifyUserEvent.getVerifyUser().getVerificationCode());
     }
 
     @Override
     public InboxEventType getType() {
-        return InboxEventType.ORDER_CREATED;
+        return InboxEventType.VERIFY_USER;
     }
 }

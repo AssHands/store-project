@@ -16,10 +16,9 @@ import lombok.*;
 @ToString(exclude = { "product" })
 @Table(name = "image")
 public class Image {
-    //todo почему product_image_id_seq если табл называется image
     @Id
-    @GeneratedValue(generator = "pi_gen", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "pi_gen",sequenceName = "product_image_id_seq", allocationSize = 1)
+    @GeneratedValue(generator = "i_gen", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "i_gen",sequenceName = "image_id_seq", allocationSize = 1)
     private Long id;
 
     @NotNull
@@ -28,7 +27,6 @@ public class Image {
     private Product product;
 
     @NotBlank
-    //todo rename column to "key"
     private String key;
 
     @NotNull

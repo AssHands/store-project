@@ -22,28 +22,6 @@ spring:
         order_inserts: true
         order_updates: true
 
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 5MB
-
-  kafka:
-    bootstrap-servers: localhost:29092,localhost:39092
-
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      acks: all
-      retries: 7
-      properties:
-        retry.backoff.ms: 500
-        retry.backoff.max.ms: 5000
-        request.timeout.ms: 15000
-        delivery.timeout.ms: 20000
-        enable.idempotence: true
-        max.in.flight.requests.per.connection: 5
-        linger.ms: 3000
-
   security:
     oauth2:
       resourceserver:
@@ -80,8 +58,3 @@ keycloak:
   use-resource-role-mapping: true
   credentials:
     secret: 7Iqf1S2bESodz36SFISi3n51xgYGoV9S
-
-kafka:
-  dlt-prefix: .dlt
-  topics:
-    user-verify: user-verify

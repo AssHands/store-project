@@ -39,5 +39,6 @@
         <module>store-warehouse-saga-worker</module>
         <module>store-warehouse-outbox</module>
         <module>store-order-saga-worker</module>
+        <module>store-user-outbox</module>
     </modules>
 </project>

@@ -72,22 +72,15 @@ spring:
 kafka:
   dlt-prefix: .dlt
   topics:
-    order-created: order-created
-    user-verify: user-verify
+    verify-user: verify-user
+    user-created: user-created
 
 email:
   verify:
-    url: http://localhost:8081/api/v1/consumer/consumers/verify?code=%s
-    subject: Please verify your registration
+    url: http://localhost:8081/api/v1/user/users/verify?code=%s
+    subject: Please verify your account
     content: >
-      Please click the link below to verify your registration:<br>
+      Please click the link below to verify your account:<br>
       <h3><a href="%s" target="_self">VERIFY</a></h3>
-      Thank you,<br>
-      Store.
-  order:
-    subject: Your order
-    content: >
-      Your order %d:<br>
-      <h2>%s</h2><br>
       Thank you,<br>
       Store.

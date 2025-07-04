@@ -1,8 +1,9 @@
 package com.ak.store.emailSender.util;
 
 import com.ak.store.common.kafka.KafkaEvent;
-import com.ak.store.common.kafka.user.UserVerifyEvent;
+import com.ak.store.common.kafka.user.VerifyUserEvent;
 import com.ak.store.common.kafka.order.OrderCreatedEvent;
+import com.ak.store.emailSender.inbox.InboxEventType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -14,13 +15,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KafkaTopicRegistry {
     private final KafkaProperties kafkaProperties;
-    private final Map<Class<? extends KafkaEvent>, String> eventTopicMap = new HashMap<>();
+    private final Map<InboxEventType, String> eventTopicMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        Map<Class<? extends KafkaEvent>, String> eventKeyMap = Map.of(
-                OrderCreatedEvent.class, "order-created",
-                UserVerifyEvent.class, "user-verify"
+        Map<InboxEventType, String> eventKeyMap = Map.of(
+                InboxEventType.VERIFY_USER, "verify-user",
+                InboxEventType.USER_CREATED, "user-created"
         );
 
         for (var entry : eventKeyMap.entrySet()) {
@@ -32,18 +33,18 @@ public class KafkaTopicRegistry {
         }
     }
 
-    public String getTopicByEvent(Class<? extends KafkaEvent> eventClass) {
-        String topic = eventTopicMap.get(eventClass);
+    public String getTopicByEvent(InboxEventType eventType) {
+        String topic = eventTopicMap.get(eventType);
         if (topic == null) {
-            throw new IllegalArgumentException("No topic configured for event: " + eventClass.getName());
+            throw new IllegalArgumentException("No topic configured for event: " + eventType.getValue());
         }
         return topic;
     }
 
-    public String getDltTopicByEvent(Class<? extends KafkaEvent> eventClass) {
+    public String getDltTopicByEvent(InboxEventType eventClass) {
         String topic = eventTopicMap.get(eventClass);
         if (topic == null) {
-            throw new IllegalArgumentException("No topic configured for event: " + eventClass.getName());
+            throw new IllegalArgumentException("No topic configured for event: " + eventClass.getValue());
         }
 
         return topic + kafkaProperties.getDltPrefix();

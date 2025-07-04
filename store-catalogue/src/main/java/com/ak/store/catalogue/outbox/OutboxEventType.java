@@ -16,5 +16,5 @@ public enum  OutboxEventType {
     CHARACTERISTIC_UPDATED("CHARACTERISTIC_UPDATED"),
     CHARACTERISTIC_DELETED("CHARACTERISTIC_DELETED");
 
-    private String type;
+    private String value;
 }

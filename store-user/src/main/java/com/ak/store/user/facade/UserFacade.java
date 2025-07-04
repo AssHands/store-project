@@ -1,17 +1,16 @@
 package com.ak.store.user.facade;
 
-import com.ak.store.common.kafka.user.UserVerifyEvent;
-import com.ak.store.common.snapshot.user.UserVerifySnapshot;
-import com.ak.store.user.kafka.EventProducerKafka;
+import com.ak.store.common.snapshot.user.VerifyUserSnapshot;
 import com.ak.store.user.model.dto.UserDTO;
 import com.ak.store.user.model.dto.write.UserWriteDTO;
+import com.ak.store.user.outbox.OutboxEventService;
+import com.ak.store.user.outbox.OutboxEventType;
 import com.ak.store.user.service.UserKeycloakService;
 import com.ak.store.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -19,7 +18,7 @@ import java.util.UUID;
 public class UserFacade {
     private final UserService userService;
     private final UserKeycloakService userKeycloakService;
-    private final EventProducerKafka eventProducerKafka;
+    private final OutboxEventService outboxEventService;
 
     public UserDTO findOne(UUID id) {
         return userService.findOne(id);
@@ -34,23 +33,22 @@ public class UserFacade {
             var user = userService.createOne(userId, request);
             String code = userService.makeVerificationCode(userId, user.getEmail());
 
-            var event = UserVerifyEvent.builder()
-                    .eventId(UUID.randomUUID())
-                    .userVerify(UserVerifySnapshot.builder()
-                            .email(user.getEmail())
-                            .verificationCode(code)
-                            .build())
+            var event = VerifyUserSnapshot.builder()
+                    .id(userId)
+                    .email(user.getEmail())
+                    .verificationCode(code)
                     .build();
 
-            eventProducerKafka.send(event, user.getId().toString());
+            outboxEventService.createOne(event, OutboxEventType.USER_CREATED);
 
             return user;
 
         } catch (Exception e) {
-            if (!Objects.isNull(userId))
+            if (userId != null) {
                 userKeycloakService.deleteOne(userId);
+            }
 
-            throw new RuntimeException("error while creating consumer");
+            throw new RuntimeException("error while creating user");
         }
     }
 
@@ -61,7 +59,6 @@ public class UserFacade {
     }
 
     @Transactional
-    //todo: не удлаять его отзывы.
     public void deleteOne(UUID id) {
         userKeycloakService.deleteOne(id);
         userService.deleteOne(id);
@@ -83,15 +80,13 @@ public class UserFacade {
     public UserDTO updateOneEmail(UUID id, String email) {
         String code = userService.makeVerificationCode(id, email);
 
-        var event = UserVerifyEvent.builder()
-                .eventId(UUID.randomUUID())
-                .userVerify(UserVerifySnapshot.builder()
-                        .email(email)
-                        .verificationCode(code)
-                        .build())
+        var event = VerifyUserSnapshot.builder()
+                .id(id)
+                .email(email)
+                .verificationCode(code)
                 .build();
 
-        eventProducerKafka.send(event, id.toString());
+        outboxEventService.createOne(event, OutboxEventType.VERIFY_USER);
 
         return userService.findOne(id);
     }

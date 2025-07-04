@@ -9,5 +9,5 @@ public enum InboxEventStatus {
     IN_PROGRESS("IN_PROGRESS"),
     COMPLETED("COMPLETED");
 
-    private String status;
+    private String value;
 }

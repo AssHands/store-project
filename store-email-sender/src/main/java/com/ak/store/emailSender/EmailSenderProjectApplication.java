@@ -12,7 +12,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @ComponentScan(basePackages = {"com.ak.store.*"})
 @EnableScheduling
-@EnableFeignClients
 @SpringBootApplication
 public class EmailSenderProjectApplication {
     public static void main(String[] args) {

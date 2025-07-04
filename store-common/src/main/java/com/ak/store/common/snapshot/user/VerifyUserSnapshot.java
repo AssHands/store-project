@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class UserVerifySnapshot {
+public class VerifyUserSnapshot {
     private UUID id;
 
     private String email;

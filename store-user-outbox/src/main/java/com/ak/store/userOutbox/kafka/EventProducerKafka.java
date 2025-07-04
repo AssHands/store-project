@@ -1,7 +1,8 @@
-package com.ak.store.user.kafka;
+package com.ak.store.userOutbox.kafka;
 
 import com.ak.store.common.kafka.KafkaEvent;
-import com.ak.store.user.util.KafkaTopicRegistry;
+import com.ak.store.userOutbox.model.OutboxEventType;
+import com.ak.store.userOutbox.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,8 @@ public class EventProducerKafka {
     private final KafkaTemplate<String, KafkaEvent> kafkaTemplate;
     private final KafkaTopicRegistry topicRegistry;
 
-    public <T extends KafkaEvent> void send(T event, String key) {
-        String topic = topicRegistry.getTopicByEvent(event.getClass());
+    public <T extends KafkaEvent> void send(T event, OutboxEventType eventType, String key) {
+        String topic = topicRegistry.getTopicByEvent(eventType);
 
         if (topic == null) {
             throw new IllegalArgumentException("No topic configured for event class: " + event.getClass().getName());
@@ -28,15 +29,9 @@ public class EventProducerKafka {
         }
     }
 
-    public <T extends KafkaEvent> void send(T event) {
-        String topic = topicRegistry.getTopicByEvent(event.getClass());
-
-        if (topic == null) {
-            throw new IllegalArgumentException("No topic configured for event class: " + event.getClass().getName());
-        }
-
+    public <T extends KafkaEvent> void send(T event, String topic, String key) {
         try {
-            kafkaTemplate.send(topic, event).get(5, TimeUnit.SECONDS);
+            kafkaTemplate.send(topic, key, event).get(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException("Kafka error sending to topic: " + topic, e);
         }
