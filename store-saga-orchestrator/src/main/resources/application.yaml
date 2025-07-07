@@ -91,3 +91,38 @@ saga:
             response: confirm-order-response
             compensation-request: cancel-order-request
             compensation-response: cancel-order-response
+
+    #------------------------------------------------------------
+
+    user-registration:
+      name: user-registration
+      request-topic: user-registration-request
+      compensation-request-topic: cancel-user-registration-request
+      timeout: 300
+      steps:
+        user-creation:
+          name: user-creation
+          timeout: 300
+          topics:
+            request: user-creation-request
+            response: user-creation-response
+            compensation-request: cancel-user-creation-request
+            compensation-response: cancel-user-creation-response
+
+        user-payment-creation:
+          name: user-payment-creation
+          timeout: 300
+          topics:
+            request: user-payment-creation-request
+            response: user-payment-creation-response
+            compensation-request: cancel-user-payment-creation-request
+            compensation-response: cancel-user-payment-creation-response
+
+        confirm-user-creation:
+          name: confirm-user-creation
+          timeout: 300
+          topics:
+            request: confirm-user-request
+            response: confirm-user-response
+            compensation-request: cancel-user-registration-request
+            compensation-response: cancel-user-registration-response

@@ -9,8 +9,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-//@ToString(exclude = { "reviews", "comments" })
-//@EqualsAndHashCode(exclude = { "reviews", "comments" })
 @Table(name = "users")
 @Entity
 public class User {
@@ -21,19 +19,8 @@ public class User {
 
     private String email;
 
-    private String password;
-
-    private Boolean isEnabled;
-
-    private String avatarKey;
-
-//    @Builder.Default
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Review> reviews = new ArrayList<>();
-//
-//    @Builder.Default
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Comment> comments = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private VerificationCode verificationCode;

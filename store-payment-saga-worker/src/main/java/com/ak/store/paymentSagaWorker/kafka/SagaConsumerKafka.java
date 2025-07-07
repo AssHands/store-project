@@ -23,10 +23,10 @@ public class SagaConsumerKafka {
     public void handleReserveFunds(List<SagaRequestEvent> events, Acknowledgment ack) {
         for(var event : events) {
             try {
-                inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
+                inboxEventWriterService.createOne(event.getStepId(), event.getSagaId(), event.getStepName(),
                         event.getRequest().toString(), InboxEventType.RESERVE_FUNDS);
             } catch (Exception e) {
-                inboxEventWriterService.createOneFailure(event.getSagaId(),
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getSagaId(),
                         event.getStepName(), InboxEventType.RESERVE_FUNDS);
             }
         }
@@ -42,11 +42,49 @@ public class SagaConsumerKafka {
     public void handleReleaseFunds(List<SagaRequestEvent> events, Acknowledgment ack) {
         for(var event : events) {
             try {
-                inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
+                inboxEventWriterService.createOne(event.getStepId(), event.getSagaId(), event.getStepName(),
                         event.getRequest().toString(), InboxEventType.RELEASE_FUNDS);
             } catch (Exception e) {
-                inboxEventWriterService.createOneFailure(event.getSagaId(),
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getSagaId(),
                         event.getStepName(), InboxEventType.RELEASE_FUNDS);
+            }
+        }
+
+        ack.acknowledge();
+    }
+
+    @KafkaListener(
+            topics = "user-payment-creation-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleUserPaymentCreation(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for(var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getSagaId(), event.getStepName(),
+                        event.getRequest().toString(), InboxEventType.USER_PAYMENT_CREATION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getSagaId(),
+                        event.getStepName(), InboxEventType.USER_PAYMENT_CREATION);
+            }
+        }
+
+        ack.acknowledge();
+    }
+
+    @KafkaListener(
+            topics = "cancel-user-payment-creation-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleCancelUserPaymentCreation(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for(var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getSagaId(), event.getStepName(),
+                        event.getRequest().toString(), InboxEventType.CANCEL_USER_PAYMENT_CREATION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getSagaId(),
+                        event.getStepName(), InboxEventType.CANCEL_USER_PAYMENT_CREATION);
             }
         }
 

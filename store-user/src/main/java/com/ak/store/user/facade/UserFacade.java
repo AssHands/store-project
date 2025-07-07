@@ -25,34 +25,6 @@ public class UserFacade {
     }
 
     @Transactional
-    public UserDTO createOne(UserWriteDTO request) {
-        UUID userId = null;
-
-        try {
-            userId = userKeycloakService.createOne(request);
-            var user = userService.createOne(userId, request);
-            String code = userService.makeVerificationCode(userId, user.getEmail());
-
-            var event = VerifyUserSnapshot.builder()
-                    .id(userId)
-                    .email(user.getEmail())
-                    .verificationCode(code)
-                    .build();
-
-            outboxEventService.createOne(event, OutboxEventType.USER_CREATED);
-
-            return user;
-
-        } catch (Exception e) {
-            if (userId != null) {
-                userKeycloakService.deleteOne(userId);
-            }
-
-            throw new RuntimeException("error while creating user");
-        }
-    }
-
-    @Transactional
     public UserDTO updateOne(UUID id, UserWriteDTO request) {
         userKeycloakService.updateOne(id, request);
         return userService.updateOne(id, request);

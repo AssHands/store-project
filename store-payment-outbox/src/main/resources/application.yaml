@@ -44,3 +44,5 @@ kafka:
   topics:
     reserve-funds: payment-reserve-funds-response
     release-funds: payment-release-funds-response
+    user-payment-creation: user-payment-creation-response
+    cancel-user-payment-creation: cancel-user-payment-creation-response

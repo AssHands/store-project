@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class UserWriteDTO {
     private String name;
 
-    //todo must null for update
+    //todo это поле должно быть null при обновлении. при создании наоборот, не должно быть null
     private String email;
 
     private String password;

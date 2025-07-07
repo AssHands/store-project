@@ -17,8 +17,8 @@ public class ReleaseFundsInboxEventProcessor implements InboxEventProcessor {
 
     @Override
     public void process(InboxEvent event) {
-        var reserveFundsEvent = gson.fromJson(event.getPayload(), ReserveFundsSagaRequestEvent.class);
-        userBalanceService.releaseFunds(reserveFundsEvent.getUserId(), reserveFundsEvent.getTotalPrice());
+        var reserveFundsRequest = gson.fromJson(event.getPayload(), ReserveFundsSagaRequestEvent.class);
+        userBalanceService.releaseFunds(reserveFundsRequest.getUserId(), reserveFundsRequest.getTotalPrice());
     }
 
     @Override

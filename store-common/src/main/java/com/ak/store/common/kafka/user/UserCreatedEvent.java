@@ -1,6 +1,7 @@
 package com.ak.store.common.kafka.user;
 
 import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.common.snapshot.user.UserCreatedSnapshot;
 import com.ak.store.common.snapshot.user.VerifyUserSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -19,5 +20,5 @@ import java.util.UUID;
 public class UserCreatedEvent implements KafkaEvent {
     private UUID eventId;
 
-    private VerifyUserSnapshot verifyUser;
+    private UserCreatedSnapshot user;
 }

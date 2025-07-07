@@ -1,8 +1,8 @@
 package com.ak.store.paymentSagaWorker.processor.inbox.impl;
 
+import com.ak.store.paymentSagaWorker.model.dto.ReserveFundsSagaRequestEvent;
 import com.ak.store.paymentSagaWorker.model.entity.InboxEvent;
 import com.ak.store.paymentSagaWorker.model.entity.InboxEventType;
-import com.ak.store.paymentSagaWorker.model.dto.ReserveFundsSagaRequestEvent;
 import com.ak.store.paymentSagaWorker.processor.inbox.InboxEventProcessor;
 import com.ak.store.paymentSagaWorker.service.UserBalanceService;
 import com.google.gson.Gson;
@@ -17,8 +17,8 @@ public class ReserveFundsInboxEventProcessor implements InboxEventProcessor {
 
     @Override
     public void process(InboxEvent event) {
-         var reserveFundsEvent = gson.fromJson(event.getPayload(), ReserveFundsSagaRequestEvent.class);
-         userBalanceService.reserveFunds(reserveFundsEvent.getUserId(), reserveFundsEvent.getTotalPrice());
+        var reserveFundsRequest = gson.fromJson(event.getPayload(), ReserveFundsSagaRequestEvent.class);
+        userBalanceService.reserveFunds(reserveFundsRequest.getUserId(), reserveFundsRequest.getTotalPrice());
     }
 
     @Override

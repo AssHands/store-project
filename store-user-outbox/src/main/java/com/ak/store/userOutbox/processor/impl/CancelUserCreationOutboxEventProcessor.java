@@ -1,6 +1,6 @@
 package com.ak.store.userOutbox.processor.impl;
 
-import com.ak.store.common.kafka.user.VerifyUserEvent;
+import com.ak.store.common.saga.SagaResponseEvent;
 import com.ak.store.userOutbox.kafka.EventProducerKafka;
 import com.ak.store.userOutbox.model.OutboxEvent;
 import com.ak.store.userOutbox.model.OutboxEventType;
@@ -11,18 +11,18 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class VerifyUserOutboxEventProcessor implements OutboxEventProcessor {
+public class CancelUserCreationOutboxEventProcessor implements OutboxEventProcessor {
     private final EventProducerKafka eventProducerKafka;
     private final Gson gson;
 
     @Override
     public void process(OutboxEvent event) {
-        var verifyUserEvent = gson.fromJson(event.getPayload(), VerifyUserEvent.class);
-        eventProducerKafka.send(verifyUserEvent, getType(), verifyUserEvent.getVerifyUser().getId().toString());
+        var response = gson.fromJson(event.getPayload(), SagaResponseEvent.class);
+        eventProducerKafka.send(response, getType(), event.getId().toString());
     }
 
     @Override
     public OutboxEventType getType() {
-        return OutboxEventType.VERIFY_USER;
+        return OutboxEventType.CANCEL_USER_CREATION;
     }
 }

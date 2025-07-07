@@ -19,6 +19,8 @@ import java.util.UUID;
 public class SagaRequestEvent implements KafkaEvent {
     private UUID sagaId;
 
+    private UUID stepId;
+
     private String stepName;
 
     private JsonNode request;

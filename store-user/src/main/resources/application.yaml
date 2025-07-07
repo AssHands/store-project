@@ -31,7 +31,7 @@ spring:
         registration:
           keycloak:
             provider: keycloak
-            client-id: store-consumer-service-client
+            client-id: store-user-service-client
             client-secret: 7Iqf1S2bESodz36SFISi3n51xgYGoV9S
             authorization-grant-type: client_credentials
         provider:

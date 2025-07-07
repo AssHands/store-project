@@ -21,7 +21,5 @@ public class UserDTO {
 
     private String email;
 
-    private Boolean isEnabled;
-
-    private String avatarKey;
+    private String status;
 }

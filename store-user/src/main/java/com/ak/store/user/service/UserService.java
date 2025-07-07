@@ -38,16 +38,6 @@ public class UserService {
         return userMapper.toUserDTO(findOneById(id));
     }
 
-    @Transactional
-    public UserDTO createOne(UUID id, UserWriteDTO request) {
-        var user = userMapper.toUser(request);
-
-        user.setId(id);
-        user.setIsEnabled(false);
-
-        return userMapper.toUserDTO(userRepo.save(user));
-    }
-
     public UserDTO updateOne(UUID id, UserWriteDTO request) {
         var user = findOneById(id);
         updateOneFromDTO(user, request);
@@ -87,7 +77,8 @@ public class UserService {
             throw new RuntimeException("this verify code is expired");
         }
 
-        user.setIsEnabled(true);
+        //todo менять статус, а не true
+        //user.setIsEnabled(true);
         String email = user.getVerificationCode().getEmail();
         user.setEmail(email);
         user.setVerificationCode(null);
@@ -102,9 +93,6 @@ public class UserService {
     private void updateOneFromDTO(User user, UserWriteDTO request) {
         if (request.getName() != null) {
             user.setName(request.getName());
-        }
-        if (request.getPassword() != null) {
-            user.setPassword(request.getPassword());
         }
     }
 }

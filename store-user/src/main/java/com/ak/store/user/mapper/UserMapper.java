@@ -11,8 +11,6 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface UserMapper {
-    User toUser(UserWriteDTO u);
-
     UserDTO toUserDTO(User u);
 
     UserWriteDTO toUserWriteDTO(UserForm u);

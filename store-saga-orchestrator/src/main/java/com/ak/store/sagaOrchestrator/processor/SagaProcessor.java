@@ -14,6 +14,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 public class SagaProcessor {
@@ -36,6 +38,9 @@ public class SagaProcessor {
 
         var requestEvent = SagaRequestEvent.builder()
                 .request(request)
+                //todo УБРАТЬ RANDOM UUID. МЕШАЕТ ИДЕМПОТЕНЦИИ. KAFKA CONSUMER В SAGA-WORKER ПРИНИМАЕТ ПЕРВЫЙ ШАГ И ТАМ ЗАПИСЫВАЕТ ЭТО КАК ОСНОВНОЙ ID В INBOX ТАБЛИЦЕ.
+                // В ПРИНЦИЕ, НИЧЕГО НЕ ДОЛЖНО СЛУЧИТЬСЯ, ТАМ ЕСЛИ SAGA_ID + TYPE УЖЕ СУЩЕСТВУЮТ, ТО ЗАПИСЬ ПРОИГНОРИРУЕТСЯ. НО ВСЕ РАВНО.
+                .stepId(UUID.randomUUID())
                 .sagaId(saga.getId())
                 .stepName(stepName)
                 .build();
@@ -100,6 +105,7 @@ public class SagaProcessor {
 
         var requestEvent = SagaRequestEvent.builder()
                 .request(request)
+                .stepId(sagaStep.getId())
                 .sagaId(sagaStep.getSaga().getId())
                 .stepName(stepName)
                 .build();
@@ -120,6 +126,7 @@ public class SagaProcessor {
 
         var requestEvent = SagaRequestEvent.builder()
                 .request(request)
+                .stepId(sagaStep.getId())
                 .sagaId(sagaStep.getSaga().getId())
                 .stepName(stepName)
                 .build();
@@ -140,6 +147,7 @@ public class SagaProcessor {
 
         var requestEvent = SagaRequestEvent.builder()
                 .request(request)
+                .stepId(sagaStep.getId())
                 .sagaId(sagaStep.getSaga().getId())
                 .stepName(stepName)
                 .build();

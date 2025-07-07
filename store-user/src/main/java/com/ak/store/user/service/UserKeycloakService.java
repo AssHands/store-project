@@ -27,28 +27,6 @@ public class UserKeycloakService {
     @Value("${keycloak.realm}")
     private String realm;
 
-    public UUID createOne(UserWriteDTO request) {
-        CredentialRepresentation credential = createPasswordCredentials(request.getPassword());
-
-        UserRepresentation user = new UserRepresentation();
-        user.setEmail(request.getEmail());
-        user.setCredentials(Collections.singletonList(credential));
-        user.setFirstName(request.getName());
-        user.setEnabled(true);
-
-        UsersResource userResource = getUsersResource();
-        var response = userResource.create(user);
-
-        if (response.getStatus() == HttpStatus.CONFLICT.value()) {
-            throw new RuntimeException("email already exists");
-        }
-
-        UUID userId = UUID.fromString(CreatedResponseUtil.getCreatedId(response));
-        addRealmRoleToUser(userId, List.of("ROLE_CONSUMER"));
-
-        return userId;
-    }
-
     public void deleteOne(UUID id) {
         UserResource usersResource = getUsersResource().get(id.toString());
         usersResource.remove();
@@ -68,17 +46,6 @@ public class UserKeycloakService {
         }
 
         return id;
-    }
-
-    private void addRealmRoleToUser(UUID id, List<String> roles) {
-        List<RoleRepresentation> kcRoles = new ArrayList<>();
-        for (String role : roles) {
-            RoleRepresentation roleRep = keycloak.realm(realm).roles().get(role).toRepresentation();
-            kcRoles.add(roleRep);
-        }
-
-        UserResource userResource = getUsersResource().get(id.toString());
-        userResource.roles().realmLevel().add(kcRoles);
     }
 
     private UsersResource getUsersResource() {

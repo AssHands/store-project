@@ -42,5 +42,6 @@ spring:
 kafka:
   dlt-prefix: .dlt
   topics:
-    verify-user: verify-user
-    user-created: user-created
+    user-creation: user-creation-response
+    confirm-user: confirm-user-response
+    cancel-user-creation: cancel-user-creation-response

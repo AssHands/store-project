@@ -30,11 +30,12 @@ public interface InboxEventRepo extends JpaRepository<InboxEvent, UUID> {
 
     @Modifying
     @Query(nativeQuery = true, value = """
-            INSERT INTO inbox (id, step_name, payload, type, status, retry_time)
-            VALUES (:id, :stepName, CAST(:payload AS jsonb), :type, :status, :retryTime)
-            ON CONFLICT (id) DO NOTHING
+            INSERT INTO inbox (id, saga_id, step_name, payload, type, status, retry_time)
+            VALUES (:id, :sagaId, :stepName, CAST(:payload AS jsonb), :type, :status, :retryTime)
+            ON CONFLICT (saga_id, type) DO NOTHING
             """)
     int saveOneIgnoreDuplicate(UUID id,
+                               UUID sagaId,
                                String stepName,
                                String payload,
                                String type,
@@ -43,11 +44,12 @@ public interface InboxEventRepo extends JpaRepository<InboxEvent, UUID> {
 
     @Modifying
     @Query(nativeQuery = true, value = """
-            INSERT INTO inbox (id, step_name, type, status, retry_time)
-            VALUES (:id, :stepName, :type, :status, :retryTime)
-            ON CONFLICT (id) DO NOTHING
+            INSERT INTO inbox (id, saga_id, step_name, type, status, retry_time)
+            VALUES (:id, :sagaId, :stepName, :type, :status, :retryTime)
+            ON CONFLICT (saga_id, type) DO NOTHING
             """)
     int saveOneIgnoreDuplicate(UUID id,
+                               UUID sagaId,
                                String stepName,
                                String type,
                                String status,

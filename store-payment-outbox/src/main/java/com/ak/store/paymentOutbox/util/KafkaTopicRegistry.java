@@ -18,7 +18,9 @@ public class KafkaTopicRegistry {
     public void init() {
         Map<OutboxEventType, String> eventKeyMap = Map.of(
                 OutboxEventType.RESERVE_FUNDS, "reserve-funds",
-                OutboxEventType.RELEASE_FUNDS, "release-funds"
+                OutboxEventType.RELEASE_FUNDS, "release-funds",
+                OutboxEventType.USER_PAYMENT_CREATION, "user-payment-creation",
+                OutboxEventType.CANCEL_USER_PAYMENT_CREATION, "cancel-user-payment-creation"
         );
 
         for (var entry : eventKeyMap.entrySet()) {

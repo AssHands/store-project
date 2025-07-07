@@ -27,9 +27,9 @@ public class ReleaseFundsOutboxEventProcessor implements OutboxEventProcessor {
         }
 
         var response = SagaResponseEvent.builder()
-                .status(status)
-                .sagaId(event.getId())
+                .sagaId(event.getSagaId())
                 .stepName(event.getStepName())
+                .status(status)
                 .build();
 
         outboxEventService.createOne(event.getId(), response, OutboxEventType.RELEASE_FUNDS);

@@ -2,7 +2,6 @@ package com.ak.store.paymentSagaWorker.service;
 
 import com.ak.store.paymentSagaWorker.model.entity.UserBalance;
 import com.ak.store.paymentSagaWorker.repository.UserBalanceRepo;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +15,23 @@ public class UserBalanceService {
     private UserBalance findOneById(UUID id) {
         return userBalanceRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("not found"));
+    }
+
+    public void createOne(UUID id) {
+        if (userBalanceRepo.existsById(id)) {
+            return;
+        }
+
+        var balance = UserBalance.builder()
+                .id(id)
+                .balance(0)
+                .build();
+
+        userBalanceRepo.save(balance);
+    }
+
+    public void deleteOne(UUID id) {
+        userBalanceRepo.deleteById(id);
     }
 
     public void reserveFunds(UUID id, Integer sum) {

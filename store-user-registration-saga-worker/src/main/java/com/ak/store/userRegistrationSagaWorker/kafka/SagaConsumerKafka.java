@@ -1,0 +1,36 @@
+package com.ak.store.userRegistrationSagaWorker.kafka;
+
+import com.ak.store.common.saga.SagaRequestEvent;
+import com.ak.store.userRegistrationSagaWorker.model.entity.InboxEventType;
+import com.ak.store.userRegistrationSagaWorker.service.InboxEventWriterService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@RequiredArgsConstructor
+@Component
+public class SagaConsumerKafka {
+    private final InboxEventWriterService inboxEventWriterService;
+
+    @KafkaListener(
+            topics = "cancel-user-registration-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleCancelUserRegistration(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getSagaId(), event.getStepName(),
+                    event.getRequest().toString(), InboxEventType.CANCEL_USER_REGISTRATION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getSagaId(),
+                        event.getStepName(), InboxEventType.CANCEL_USER_REGISTRATION);
+            }
+        }
+
+        ack.acknowledge();
+    }
+}

@@ -27,7 +27,7 @@ public class ReserveFundsOutboxEventProcessor implements OutboxEventProcessor {
         }
 
         var response = SagaResponseEvent.builder()
-                .sagaId(event.getId())
+                .sagaId(event.getSagaId())
                 .stepName(event.getStepName())
                 .status(status)
                 .build();

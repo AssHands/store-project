@@ -27,12 +27,6 @@ public class UserController {
         return userMapper.toUserView(userFacade.findOne(id));
     }
 
-    @PostMapping
-    public UUID createOne(@RequestBody @Validated(Create.class) UserForm request) {
-        var user = userFacade.createOne(userMapper.toUserWriteDTO(request));
-        return user.getId();
-    }
-
     @PatchMapping("{id}")
     public UUID updateOne(@PathVariable UUID id, @RequestBody @Validated(Update.class) UserForm request) {
         var user = userFacade.updateOne(id, userMapper.toUserWriteDTO(request));

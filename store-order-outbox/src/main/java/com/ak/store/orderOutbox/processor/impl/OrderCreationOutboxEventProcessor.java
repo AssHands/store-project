@@ -27,6 +27,7 @@ public class OrderCreationOutboxEventProcessor implements OutboxEventProcessor {
         var orderCreatedEvent = new OrderCreatedEvent(event.getId(),
                 gson.fromJson(event.getPayload(), OrderCreatedSnapshot.class));
 
+        //todo поменять UUID.randomUUID() на что то другое. например нв event.getId(), ибо приложение может послать несколько одинаковых сообщений
         var request = SagaRequestEvent.builder()
                 .sagaId(UUID.randomUUID())
                 .request(jsonMapper.toJsonNode(orderCreatedEvent.getOrder()))
