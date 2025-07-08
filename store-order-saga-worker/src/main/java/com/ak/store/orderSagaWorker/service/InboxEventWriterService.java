@@ -16,14 +16,14 @@ public class InboxEventWriterService {
     private final InboxEventRepo inboxEventRepo;
 
     @Transactional
-    public <T> void createOne(UUID eventId, String stepName, String payload, InboxEventType type) {
-        inboxEventRepo.saveOneIgnoreDuplicate(eventId, stepName, payload, type.getValue(),
+    public <T> void createOne(UUID eventId, String stepName, UUID sagaId, String sagaName, String payload, InboxEventType type) {
+        inboxEventRepo.saveOneIgnoreDuplicate(eventId, stepName, sagaId, sagaName, payload, type.getValue(),
                 InboxEventStatus.IN_PROGRESS.getValue(), LocalDateTime.now());
     }
 
     @Transactional
-    public <T> void createOneFailure(UUID eventId, String stepName, InboxEventType type) {
-        inboxEventRepo.saveOneIgnoreDuplicate(eventId, stepName, type.getValue(),
+    public <T> void createOneFailure(UUID eventId, String stepName, UUID sagId, String sagaName, InboxEventType type) {
+        inboxEventRepo.saveOneIgnoreDuplicate(eventId, stepName, sagId, sagaName, type.getValue(),
                 InboxEventStatus.FAILURE.getValue(), LocalDateTime.now());
     }
 }

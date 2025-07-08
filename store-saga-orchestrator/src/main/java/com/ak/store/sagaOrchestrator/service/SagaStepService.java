@@ -20,36 +20,17 @@ public class SagaStepService {
 
     private Integer batchSize = 100;
 
+    public void markOneAs(UUID stepId, SagaStepStatus status) {
+        sagaStepRepo.updateStatusById(stepId, status);
+    }
+
+    public void createOne(UUID sagaId, String stepName, Boolean isCompensation) {
+        sagaStepRepo.saveOneIgnoreDuplicate(sagaId, stepName, isCompensation,
+                SagaStepStatus.IN_PROGRESS.getValue(), LocalDateTime.now());
+    }
+
     public List<SagaStep> findAllForProcessing() {
         Pageable pageable = PageRequest.of(0, batchSize);
         return sagaStepRepo.findAllForProcessing(SagaStepStatus.IN_PROGRESS, pageable);
-    }
-
-    @Transactional
-    public void continueOne(UUID sagaId, String stepName) {
-        sagaStepRepo.saveOneIgnoreDuplicate(stepName, false,
-                SagaStepStatus.IN_PROGRESS.getValue(), sagaId, LocalDateTime.now());
-    }
-
-    @Transactional
-    public void compensateOne(UUID sagaId, String stepName) {
-        sagaStepRepo.saveOneIgnoreDuplicate(stepName, true,
-                SagaStepStatus.IN_PROGRESS.getValue(), sagaId, LocalDateTime.now());
-    }
-
-    @Transactional
-    public void compensateAll(List<SagaStep> sagaSteps) {
-        for (var sagaStep : sagaSteps) {
-            sagaStep.setIsCompensation(true);
-            sagaStep.setTime(LocalDateTime.now());
-            sagaStep.setStatus(SagaStepStatus.IN_PROGRESS);
-        }
-
-        sagaStepRepo.saveAll(sagaSteps);
-    }
-
-    @Transactional
-    public void markAllAsCompleted(List<SagaStep> sagaSteps) {
-        sagaStepRepo.updateAll(sagaSteps, SagaStepStatus.COMPLETED);
     }
 }

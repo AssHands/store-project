@@ -19,6 +19,10 @@ import java.util.UUID;
 public class SagaResponseEvent implements KafkaEvent {
     private UUID sagaId;
 
+    private String sagaName;
+
+    private UUID stepId;
+
     private String stepName;
 
     private SagaResponseStatus status;

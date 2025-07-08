@@ -3,11 +3,9 @@ package com.ak.store.sagaOrchestrator.kafka.consumer;
 import com.ak.store.common.saga.SagaRequestEvent;
 import com.ak.store.common.saga.SagaResponseEvent;
 import com.ak.store.common.saga.SagaResponseStatus;
-import com.ak.store.sagaOrchestrator.model.entity.SagaStatus;
-import com.ak.store.sagaOrchestrator.service.SagaService;
-import com.ak.store.sagaOrchestrator.service.SagaStepService;
+import com.ak.store.sagaOrchestrator.facade.SagaFacade;
+import com.ak.store.sagaOrchestrator.facade.SagaStepFacade;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;
-import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -15,31 +13,29 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Component
 public class SagaConsumerKafka {
-    private final SagaService sagaService;
-    private final SagaStepService sagaStepService;
     private final SagaProperties sagaProperties;
+    private final SagaFacade sagaFacade;
+    private final SagaStepFacade sagaStepFacade;
 
     @KafkaListener(
             topics = "#{@sagaProperties.getAllRequestSagaTopics()}",
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"
     )
-    public void handle(List<SagaRequestEvent> events,
-                       @Header(KafkaHeaders.RECEIVED_TOPIC) List<String> topics, Acknowledgment ack) {
+    public void handleStartSaga(List<SagaRequestEvent> events,
+                                @Header(KafkaHeaders.RECEIVED_TOPIC) List<String> topics, Acknowledgment ack) {
         for (int i = 0; i < events.size(); i++) {
             var event = events.get(i);
             var topic = topics.get(i);
             String sagaName = sagaProperties.getDefinitionByRequestTopic(topic).getName();
 
             try {
-                sagaService.createOne(event.getSagaId(), sagaName, event.getRequest().toString());
+                sagaFacade.createOne(event.getSagaId(), sagaName, event.getRequest().toString());
             } catch (Exception e) {
                 System.out.println("a");
                 //todo не получилось создать запись в бд о новой саге. что делать? кидать в dlt топик и создавать новую failed сагу?
@@ -54,13 +50,13 @@ public class SagaConsumerKafka {
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"
     )
-    public void handleResponse(List<SagaResponseEvent> events, Acknowledgment ack) {
+    public void handleSteps(List<SagaResponseEvent> events, Acknowledgment ack) {
         for (var event : events) {
             try {
                 if (event.getStatus() == SagaResponseStatus.SUCCESS) {
-                    sagaStepService.continueOne(event.getSagaId(), event.getStepName());
+                    sagaStepFacade.continueOne(event.getSagaId(), event.getSagaName(), event.getStepId(), event.getStepName());
                 } else {
-                    sagaStepService.compensateOne(event.getSagaId(), event.getStepName());
+                    sagaStepFacade.startCompensation(event.getSagaId(), event.getSagaName(), event.getStepId(), event.getStepName());
                 }
             } catch (Exception e) {
                 System.out.println("a");
@@ -76,19 +72,12 @@ public class SagaConsumerKafka {
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"
     )
-    public void handleCompensation(List<SagaResponseEvent> events, Acknowledgment ack) {
-        List<UUID> failedSagaIds = new ArrayList<>();
-
+    public void handleCompensationSteps(List<SagaResponseEvent> events, Acknowledgment ack) {
         for (var event : events) {
-            if (sagaProperties.getDefinition(event.getStepName()) == null) {
-                //todo а что если компенсация вернет FAILURE статус?
-                sagaStepService.compensateOne(event.getSagaId(), event.getStepName());
-            } else {
-                failedSagaIds.add(event.getSagaId());
-            }
+            //todo а что если компенсация вернет FAILURE статус?
+            sagaStepFacade.compensateOne(event.getSagaId(), event.getSagaName(), event.getStepId(), event.getStepName());
         }
 
-        sagaService.markAllAsByIds(failedSagaIds, SagaStatus.COMPLETED);
         ack.acknowledge();
     }
 }

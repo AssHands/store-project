@@ -47,7 +47,7 @@ public class InboxEventScheduler {
             try {
                 processor.process(event);
                 successEvents.add(event);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
                 //todo сделать логику retry. сейчас в случае неудачи - событие сразу помечается как неудачное
                 failedEvents.add(event);
             }

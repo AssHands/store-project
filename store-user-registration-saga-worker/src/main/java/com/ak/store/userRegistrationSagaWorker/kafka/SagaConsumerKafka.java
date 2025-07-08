@@ -23,11 +23,11 @@ public class SagaConsumerKafka {
     public void handleCancelUserRegistration(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
             try {
-                inboxEventWriterService.createOne(event.getStepId(), event.getSagaId(), event.getStepName(),
-                    event.getRequest().toString(), InboxEventType.CANCEL_USER_REGISTRATION);
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CANCEL_USER_REGISTRATION);
             } catch (Exception e) {
-                inboxEventWriterService.createOneFailure(event.getStepId(), event.getSagaId(),
-                        event.getStepName(), InboxEventType.CANCEL_USER_REGISTRATION);
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_USER_REGISTRATION);
             }
         }
 

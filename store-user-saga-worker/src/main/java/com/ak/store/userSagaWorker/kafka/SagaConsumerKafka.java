@@ -23,11 +23,11 @@ public class SagaConsumerKafka {
     public void handleUserCreation(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
             try {
-                inboxEventWriterService.createOne(event.getStepId(), event.getSagaId(), event.getStepName(),
-                        event.getRequest().toString(), InboxEventType.USER_CREATION);
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.USER_CREATION);
             } catch (Exception e) {
-                inboxEventWriterService.createOneFailure(event.getStepId(), event.getSagaId(),
-                        event.getStepName(), InboxEventType.USER_CREATION);
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.USER_CREATION);
             }
         }
 
@@ -42,11 +42,11 @@ public class SagaConsumerKafka {
     public void handleReleaseProducts(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
             try {
-                inboxEventWriterService.createOne(event.getStepId(), event.getSagaId(), event.getStepName(),
-                        event.getRequest().toString(), InboxEventType.CANCEL_USER_CREATION);
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CANCEL_USER_CREATION);
             } catch (Exception e) {
-                inboxEventWriterService.createOneFailure(event.getStepId(), event.getSagaId(),
-                        event.getStepName(), InboxEventType.CANCEL_USER_CREATION);
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_USER_CREATION);
             }
         }
 
@@ -61,11 +61,11 @@ public class SagaConsumerKafka {
     public void handleConfirmUserCreation(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
             try {
-                inboxEventWriterService.createOne(event.getStepId(), event.getSagaId(), event.getStepName(),
-                        event.getRequest().toString(), InboxEventType.CONFIRM_USER_CREATION);
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CONFIRM_USER_CREATION);
             } catch (Exception e) {
-                inboxEventWriterService.createOneFailure(event.getStepId(), event.getSagaId(),
-                        event.getStepName(), InboxEventType.CONFIRM_USER_CREATION);
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_USER_CREATION);
             }
         }
 

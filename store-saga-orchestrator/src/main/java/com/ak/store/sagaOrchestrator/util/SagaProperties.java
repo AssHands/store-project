@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 public class SagaProperties {
     private Map<String, SagaDefinition> definitions;
 
-
     private List<String> allRequestSagaTopics = new ArrayList<>();
     private List<String> allResponseStepTopics = new ArrayList<>();
     private List<String> allResponseCompensationStepTopics = new ArrayList<>();
@@ -112,6 +111,8 @@ public class SagaProperties {
         private String requestTopic;
 
         private String compensationRequestTopic;
+
+        private String compensationResponseTopic;
 
         private Integer timeout;
 

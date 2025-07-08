@@ -26,47 +26,9 @@ public class SagaScheduler {
 
     @Transactional
     @Scheduled(fixedRate = 5000)
-    public void executeSaga() {
-        var sagas = sagaService.findAllForProcessing();
-        List<Saga> completed = new ArrayList<>();
-        List<Saga> failed = new ArrayList<>();
-
-        for (var saga : sagas) {
-            if (!isSagaValid(saga)) {
-                failed.add(saga);
-                continue;
-            }
-
-            if (sagaProcessor.handleSaga(saga)) {
-                completed.add(saga);
-            }
-        }
-
-        sagaService.markAllAs(completed, SagaStatus.IN_PROGRESS);
-        sagaService.markAllAs(failed, SagaStatus.FAILED);
-    }
-
-    @Transactional
-    @Scheduled(fixedRate = 5000)
-    public void executeFailedSaga() {
-        var sagas = sagaService.findAllFailedForProcessing();
-        List<Saga> completed = new ArrayList<>();
-
-        for (var saga : sagas) {
-            if (sagaProcessor.handleFailedSaga(saga)) {
-                completed.add(saga);
-            }
-        }
-
-        //todo нельзя ставить completed сразу. надо ловить ответ в кафке уже тогда ставить что выполнено. иначе retry
-        sagaService.markAllAs(completed, SagaStatus.COMPLETED);
-    }
-
-    @Transactional
-    @Scheduled(fixedRate = 5000)
     public void executeSagaStep() {
+        //todo добавить retry_time, иначе он будет постоянно доставать сообщения, которые уже были отправлены и отправлять их снова и снова без ожидания.
         var sagaSteps = sagaStepService.findAllForProcessing();
-        List<SagaStep> completed = new ArrayList<>();
         List<SagaStep> failed = new ArrayList<>();
 
         for (var sagaStep : sagaSteps) {
@@ -75,36 +37,24 @@ public class SagaScheduler {
                 continue;
             }
 
-            if (sagaProcessor.handleSagaStep(sagaStep)) {
-                completed.add(sagaStep);
-            }
+            sagaProcessor.handleSagaStep(sagaStep);
         }
 
-        sagaStepService.compensateAll(failed);
-        //todo нельзя ставить completed сразу. надо ловить ответ в кафке уже тогда ставить что выполнено. иначе retry
-        sagaStepService.markAllAsCompleted(completed);
+        //todo помечать просроченные шаги как failed
     }
 
     //todo перенести валидацию в отдельный класс
-    private boolean isSagaValid(Saga saga) {
-        var sagaDef = sagaProperties.getDefinition(saga.getName());
-
-        if (sagaDef == null) {
-            return false;
-        }
-
-        var afterTime = LocalDateTime.now().minusMinutes(sagaDef.getTimeout());
-        return !saga.getTime().isBefore(afterTime);
-    }
-
     private boolean isSagaStepValid(SagaStep sagaStep) {
         var stepDef = sagaProperties.getCurrentStep(sagaStep.getSaga().getName(), sagaStep.getName());
+        LocalDateTime afterTime;
 
         if (stepDef == null) {
-            return false;
+            var sagaDef = sagaProperties.getDefinition(sagaStep.getName());
+            afterTime = LocalDateTime.now().minusMinutes(sagaDef.getTimeout());
+        } else {
+            afterTime = LocalDateTime.now().minusMinutes(stepDef.getTimeout());
         }
 
-        var afterTime = LocalDateTime.now().minusMinutes(stepDef.getTimeout());
         return !sagaStep.getTime().isBefore(afterTime);
     }
 }

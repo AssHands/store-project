@@ -27,9 +27,11 @@ public class ReleaseProductsOutboxEventProcessor implements OutboxEventProcessor
         }
 
         var response = SagaResponseEvent.builder()
-                .status(status)
-                .sagaId(event.getId())
+                .stepId(event.getId())
                 .stepName(event.getStepName())
+                .sagaId(event.getSagaId())
+                .sagaName(event.getSagaName())
+                .status(status)
                 .build();
 
         outboxEventService.createOne(event.getId(), response, OutboxEventType.RELEASE_PRODUCTS);

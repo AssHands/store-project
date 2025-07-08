@@ -20,12 +20,20 @@ public class InboxEvent {
     @Id
     private UUID id;
 
+    @Column(updatable = false)
+    private UUID sagaId;
+
+    @Column(updatable = false)
+    private String sagaName;
+
+    @Column(updatable = false)
     private String stepName;
 
-    @Column(columnDefinition = "jsonb")
+    @Column(updatable = false, columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
     private String payload;
 
+    @Column(updatable = false)
     @Enumerated(EnumType.STRING)
     private InboxEventType type;
 

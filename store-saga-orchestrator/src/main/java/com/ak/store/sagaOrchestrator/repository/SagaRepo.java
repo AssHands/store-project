@@ -44,4 +44,8 @@ public interface SagaRepo extends JpaRepository<Saga, UUID> {
     @Modifying
     @Query("UPDATE Saga s SET s.status = :status WHERE s.id IN :sagaIds")
     void updateAllStatusByIds(List<UUID> sagaIds, SagaStatus status);
+
+    @Modifying
+    @Query("UPDATE Saga s SET s.status = :status WHERE s.id = :sagaId")
+    void updateOneStatusById(UUID sagaId, SagaStatus status);
 }

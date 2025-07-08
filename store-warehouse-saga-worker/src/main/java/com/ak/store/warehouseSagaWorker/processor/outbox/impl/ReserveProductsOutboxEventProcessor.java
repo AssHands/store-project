@@ -27,8 +27,10 @@ public class ReserveProductsOutboxEventProcessor implements OutboxEventProcessor
         }
 
         var response = SagaResponseEvent.builder()
-                .sagaId(event.getId())
+                .stepId(event.getId())
                 .stepName(event.getStepName())
+                .sagaId(event.getSagaId())
+                .sagaName(event.getSagaName())
                 .status(status)
                 .build();
 

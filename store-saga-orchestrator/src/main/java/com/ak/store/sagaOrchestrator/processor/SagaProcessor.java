@@ -8,6 +8,8 @@ import com.ak.store.sagaOrchestrator.kafka.producer.EventProducerKafka;
 import com.ak.store.sagaOrchestrator.model.entity.Saga;
 import com.ak.store.sagaOrchestrator.model.entity.SagaStep;
 import com.ak.store.sagaOrchestrator.mapper.JsonMapper;
+import com.ak.store.sagaOrchestrator.service.SagaService;
+import com.ak.store.sagaOrchestrator.service.SagaStepService;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,118 +25,17 @@ public class SagaProcessor {
     private final EventProducerKafka eventProducerKafka;
     private final JsonMapper jsonMapper;
 
-    public boolean handleSaga(Saga saga) {
-        var stepDef = sagaProperties.getFirstStep(saga.getName());
-
-        String stepName = stepDef.getName();
-        String topic = stepDef.getTopics().getRequest();
-        JsonNode request;
-
-        try {
-            request = jsonMapper.toJsonNode(saga.getPayload());
-        } catch (JsonProcessingException e) {
-            return false;
-        }
-
-        var requestEvent = SagaRequestEvent.builder()
-                .request(request)
-                //todo УБРАТЬ RANDOM UUID. МЕШАЕТ ИДЕМПОТЕНЦИИ. KAFKA CONSUMER В SAGA-WORKER ПРИНИМАЕТ ПЕРВЫЙ ШАГ И ТАМ ЗАПИСЫВАЕТ ЭТО КАК ОСНОВНОЙ ID В INBOX ТАБЛИЦЕ.
-                // В ПРИНЦИЕ, НИЧЕГО НЕ ДОЛЖНО СЛУЧИТЬСЯ, ТАМ ЕСЛИ SAGA_ID + TYPE УЖЕ СУЩЕСТВУЮТ, ТО ЗАПИСЬ ПРОИГНОРИРУЕТСЯ. НО ВСЕ РАВНО.
-                .stepId(UUID.randomUUID())
-                .sagaId(saga.getId())
-                .stepName(stepName)
-                .build();
-
-        return sendEvent(requestEvent, topic, saga.getId().toString());
-    }
-
-    public boolean handleFailedSaga(Saga saga) {
-        var sagaDef = sagaProperties.getDefinition(saga.getName());
-
-        String stepName = sagaDef.getName();
-        String topic = sagaDef.getCompensationRequestTopic();
-        JsonNode request;
-
-        try {
-            request = jsonMapper.toJsonNode(saga.getPayload());
-        } catch (JsonProcessingException e) {
-            return false;
-        }
-
-        var requestEvent = SagaRequestEvent.builder()
-                .request(request)
-                .sagaId(saga.getId())
-                .stepName(stepName)
-                .build();
-
-        return sendEvent(requestEvent, topic, saga.getId().toString());
-    }
-
     public boolean handleSagaStep(SagaStep sagaStep) {
-        return sagaStep.getIsCompensation()
-                ? handleCompensationStep(sagaStep)
-                : handleStep(sagaStep);
-    }
-
-    private boolean handleStep(SagaStep sagaStep) {
-        var stepDef = sagaProperties.getNextStep(sagaStep.getSaga().getName(), sagaStep.getName());
-
-        return stepDef == null
-                ? sendStep(sagaStep, sagaProperties.getLastStep(sagaStep.getSaga().getName()))
-                : sendStep(sagaStep, sagaProperties.getNextStep(sagaStep.getSaga().getName(), sagaStep.getName()));
-    }
-
-    private boolean handleCompensationStep(SagaStep sagaStep) {
-        var stepDef = sagaProperties.getPreviousStep(sagaStep.getSaga().getName(), sagaStep.getName());
-
-        return stepDef == null
-                ? sendLastCompensationStep(sagaStep, sagaProperties.getDefinition(sagaStep.getSaga().getName()))
-                : sendCompensationStep(sagaStep, sagaProperties.getPreviousStep(sagaStep.getSaga().getName(), sagaStep.getName()));
-    }
-
-    private boolean sendStep(SagaStep sagaStep, SagaProperties.SagaStepDefinition stepDef) {
-        String stepName = stepDef.getName();
-        String topic = stepDef.getTopics().getRequest();
-        JsonNode request;
-
-        try {
-            request = jsonMapper.toJsonNode(sagaStep.getSaga().getPayload());
-        } catch (JsonProcessingException e) {
-            return false;
+        if(sagaProperties.getCurrentStep(sagaStep.getSaga().getName(), sagaStep.getName()) == null) {
+            return sendLastStep(sagaStep);
         }
 
-        var requestEvent = SagaRequestEvent.builder()
-                .request(request)
-                .stepId(sagaStep.getId())
-                .sagaId(sagaStep.getSaga().getId())
-                .stepName(stepName)
-                .build();
-
-        return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
+        return sendStep(sagaStep);
     }
 
-    private boolean sendCompensationStep(SagaStep sagaStep, SagaProperties.SagaStepDefinition stepDef) {
-        String stepName = stepDef.getName();
-        String topic = stepDef.getTopics().getCompensationRequest();
-        JsonNode request;
+    private boolean sendLastStep(SagaStep sagaStep) {
+        var sagaDef = sagaProperties.getDefinition(sagaStep.getName());
 
-        try {
-            request = jsonMapper.toJsonNode(sagaStep.getSaga().getPayload());
-        } catch (JsonProcessingException e) {
-            return false;
-        }
-
-        var requestEvent = SagaRequestEvent.builder()
-                .request(request)
-                .stepId(sagaStep.getId())
-                .sagaId(sagaStep.getSaga().getId())
-                .stepName(stepName)
-                .build();
-
-        return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
-    }
-
-    private boolean sendLastCompensationStep(SagaStep sagaStep, SagaProperties.SagaDefinition sagaDef) {
         String stepName = sagaDef.getName();
         String topic = sagaDef.getCompensationRequestTopic();
         JsonNode request;
@@ -147,8 +48,38 @@ public class SagaProcessor {
 
         var requestEvent = SagaRequestEvent.builder()
                 .request(request)
-                .stepId(sagaStep.getId())
                 .sagaId(sagaStep.getSaga().getId())
+                .sagaName(sagaStep.getSaga().getName())
+                .stepId(sagaStep.getId())
+                .stepName(stepName)
+                .build();
+
+        return sendEvent(requestEvent, topic, requestEvent.getSagaId().toString());
+    }
+
+    private boolean sendStep(SagaStep sagaStep) {
+        var stepDef = sagaProperties.getCurrentStep(sagaStep.getSaga().getName(), sagaStep.getName());
+
+        String stepName = stepDef.getName();
+        String topic = stepDef.getTopics().getRequest();
+
+        if(sagaStep.getIsCompensation()) {
+            topic = stepDef.getTopics().getCompensationRequest();
+        }
+
+        JsonNode request;
+
+        try {
+            request = jsonMapper.toJsonNode(sagaStep.getSaga().getPayload());
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+
+        var requestEvent = SagaRequestEvent.builder()
+                .request(request)
+                .sagaId(sagaStep.getSaga().getId())
+                .sagaName(sagaStep.getSaga().getName())
+                .stepId(sagaStep.getId())
                 .stepName(stepName)
                 .build();
 

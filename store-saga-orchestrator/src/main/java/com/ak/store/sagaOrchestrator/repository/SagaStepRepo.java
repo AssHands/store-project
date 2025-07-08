@@ -26,11 +26,16 @@ public interface SagaStepRepo extends JpaRepository<SagaStep, UUID> {
             VALUES (:name, :isCompensation, :status, :sagaId, :time)
             ON CONFLICT (name, is_compensation, saga_id) DO NOTHING
             """)
-    int saveOneIgnoreDuplicate(String name,
+    int saveOneIgnoreDuplicate(UUID sagaId,
+                               String name,
                                boolean isCompensation,
                                String status,
-                               UUID sagaId,
                                LocalDateTime time);
+
+    @Modifying
+    @Query("UPDATE SagaStep ss SET ss.status = :status WHERE ss.id = :id")
+    void updateStatusById(UUID id, SagaStepStatus status);
+
 
     @Modifying
     @Query("UPDATE SagaStep ss SET ss.status = :status WHERE ss IN :sagaSteps")

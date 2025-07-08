@@ -27,9 +27,11 @@ public class ConfirmUserCreationOutboxEventProcessor implements OutboxEventProce
         }
 
         var response = SagaResponseEvent.builder()
-                .status(SagaResponseStatus.FAILURE)
-                .sagaId(event.getSagaId())
+                .stepId(event.getId())
                 .stepName(event.getStepName())
+                .sagaId(event.getSagaId())
+                .sagaName(event.getSagaName())
+                .status(SagaResponseStatus.FAILURE)
                 .build();
 
         outboxEventService.createOne(event.getId(), response, OutboxEventType.CONFIRM_USER_CREATION);

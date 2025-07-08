@@ -20,10 +20,11 @@ public class OutboxEvent {
     @Id
     private UUID id;
 
-    @Column(columnDefinition = "jsonb")
+    @Column(updatable = false, columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
     private String payload;
 
+    @Column(updatable = false)
     @Enumerated(EnumType.STRING)
     private OutboxEventType type;
 

@@ -23,11 +23,11 @@ public class SagaConsumerKafka {
     public void handleConfirmOrder(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
             try {
-                inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
-                        event.getRequest().toString(), InboxEventType.CONFIRM_ORDER);
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CONFIRM_ORDER);
             } catch (Exception e) {
-                inboxEventWriterService.createOneFailure(event.getSagaId(),
-                        event.getStepName(), InboxEventType.CONFIRM_ORDER);
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_ORDER);
             }
         }
 
@@ -42,11 +42,11 @@ public class SagaConsumerKafka {
     public void handleCanselOrder(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
             try {
-                inboxEventWriterService.createOne(event.getSagaId(), event.getStepName(),
-                        event.getRequest().toString(), InboxEventType.CANCEL_ORDER);
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CANCEL_ORDER);
             } catch (Exception e) {
-                inboxEventWriterService.createOneFailure(event.getSagaId(),
-                        event.getStepName(), InboxEventType.CANCEL_ORDER);
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_ORDER);
             }
         }
 

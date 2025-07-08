@@ -20,28 +20,15 @@ public class SagaService {
 
     private Integer batchSize = 100;
 
-    @Transactional
     public <T> void createOne(UUID sagaId, String sagaName, String payload) {
-        sagaRepo.saveOneIgnoreDuplicate(sagaId, sagaName, payload, SagaStatus.RECEIVED.getValue(), LocalDateTime.now());
+        sagaRepo.saveOneIgnoreDuplicate(sagaId, sagaName, payload, SagaStatus.IN_PROGRESS.getValue(), LocalDateTime.now());
     }
 
-    public List<Saga> findAllForProcessing() {
-        Pageable pageable = PageRequest.of(0, batchSize);
-        return sagaRepo.findAllForProcessing(SagaStatus.RECEIVED, pageable);
-    }
-
-    public List<Saga> findAllFailedForProcessing() {
-        Pageable pageable = PageRequest.of(0, batchSize);
-        return sagaRepo.findAllForProcessing(SagaStatus.FAILED, pageable);
-    }
-
-    @Transactional
     public void markAllAs(List<Saga> sagas, SagaStatus status) {
         sagaRepo.updateAllStatus(sagas, status);
     }
 
-    @Transactional
-    public void markAllAsByIds(List<UUID> sagaIds, SagaStatus status) {
-        sagaRepo.updateAllStatusByIds(sagaIds, status);
+    public void markOneAs(UUID sagaId, SagaStatus status) {
+        sagaRepo.updateOneStatusById(sagaId, status);
     }
 }

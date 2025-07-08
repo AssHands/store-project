@@ -27,9 +27,11 @@ public class UserCreationOutboxEventProcessor implements OutboxEventProcessor {
         }
 
         var response = SagaResponseEvent.builder()
-                .status(status)
-                .sagaId(event.getSagaId())
+                .stepId(event.getId())
                 .stepName(event.getStepName())
+                .sagaId(event.getSagaId())
+                .sagaName(event.getSagaName())
+                .status(status)
                 .build();
 
         outboxEventService.createOne(event.getId(), response, OutboxEventType.USER_CREATION);
