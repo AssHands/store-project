@@ -38,4 +38,6 @@ public class SagaStep {
     private Saga saga;
 
     private LocalDateTime time;
+
+    private LocalDateTime retryTime;
 }

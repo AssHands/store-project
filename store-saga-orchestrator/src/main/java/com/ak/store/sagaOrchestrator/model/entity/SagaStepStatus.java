@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum SagaStepStatus {
     IN_PROGRESS("IN_PROGRESS"),
+    EXPIRED("EXPIRED"),
     FAILED("FAILED"),
     COMPLETED("COMPLETED");
 

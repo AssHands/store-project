@@ -1,10 +1,8 @@
 package com.ak.store.sagaOrchestrator.scheduler;
 
-import com.ak.store.sagaOrchestrator.model.entity.Saga;
-import com.ak.store.sagaOrchestrator.model.entity.SagaStatus;
 import com.ak.store.sagaOrchestrator.model.entity.SagaStep;
+import com.ak.store.sagaOrchestrator.model.entity.SagaStepStatus;
 import com.ak.store.sagaOrchestrator.processor.SagaProcessor;
-import com.ak.store.sagaOrchestrator.service.SagaService;
 import com.ak.store.sagaOrchestrator.service.SagaStepService;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;
 import jakarta.transaction.Transactional;
@@ -15,46 +13,69 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class SagaScheduler {
     private final SagaStepService sagaStepService;
-    private final SagaService sagaService;
     private final SagaProcessor sagaProcessor;
     private final SagaProperties sagaProperties;
 
     @Transactional
     @Scheduled(fixedRate = 5000)
     public void executeSagaStep() {
-        //todo добавить retry_time, иначе он будет постоянно доставать сообщения, которые уже были отправлены и отправлять их снова и снова без ожидания.
-        var sagaSteps = sagaStepService.findAllForProcessing();
-        List<SagaStep> failed = new ArrayList<>();
+        var sagaSteps = sagaStepService.findAllForProcessing(SagaStepStatus.IN_PROGRESS);
+        List<SagaStep> expired = new ArrayList<>();
 
-        for (var sagaStep : sagaSteps) {
-            if (!isSagaStepValid(sagaStep)) {
-                failed.add(sagaStep);
+        for (var step : sagaSteps) {
+            if (isSagaStepExpired(step)) {
+                expired.add(step);
                 continue;
             }
 
-            sagaProcessor.handleSagaStep(sagaStep);
+            sagaProcessor.handleSagaStep(step);
         }
 
-        //todo помечать просроченные шаги как failed
+        sagaStepService.markAllAs(expired, SagaStepStatus.EXPIRED);
     }
 
-    //todo перенести валидацию в отдельный класс
-    private boolean isSagaStepValid(SagaStep sagaStep) {
-        var stepDef = sagaProperties.getCurrentStep(sagaStep.getSaga().getName(), sagaStep.getName());
-        LocalDateTime afterTime;
+    @Transactional
+    @Scheduled(fixedRate = 5000)
+    public void executeExpiredSagaStep() {
+        var sagaSteps = sagaStepService.findAllForProcessing(SagaStepStatus.EXPIRED);
+        List<SagaStep> completed = new ArrayList<>();
 
-        if (stepDef == null) {
-            var sagaDef = sagaProperties.getDefinition(sagaStep.getName());
-            afterTime = LocalDateTime.now().minusMinutes(sagaDef.getTimeout());
-        } else {
-            afterTime = LocalDateTime.now().minusMinutes(stepDef.getTimeout());
+        for (var step : sagaSteps) {
+            String sagaName = step.getSaga().getName();
+            String stepName = step.getName();
+            UUID sagaId = step.getSaga().getId();
+
+            var stepDef = sagaProperties.getPreviousStep(sagaName, stepName);
+
+            try {
+                if (stepDef != null) {
+                    sagaStepService.createOne(sagaId, stepDef.getName(), true);
+                } else {
+                    sagaStepService.createOne(sagaId, sagaName, true);
+                }
+
+                completed.add(step);
+            } catch (Exception ignored) {}
         }
 
-        return !sagaStep.getTime().isBefore(afterTime);
+        sagaStepService.markAllAs(completed, SagaStepStatus.FAILED);
+    }
+
+
+    //todo перенести валидацию в отдельный класс
+    private boolean isSagaStepExpired(SagaStep sagaStep) {
+        if (sagaStep.getIsCompensation() || sagaStep.getSaga().getName().equals(sagaStep.getName())) {
+            return false;
+        }
+
+        var stepDef = sagaProperties.getCurrentStep(sagaStep.getSaga().getName(), sagaStep.getName());
+        LocalDateTime afterTime = LocalDateTime.now().minusMinutes(stepDef.getTimeout());
+        return sagaStep.getTime().isBefore(afterTime);
     }
 }

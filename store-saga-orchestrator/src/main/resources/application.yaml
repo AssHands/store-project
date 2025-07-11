@@ -63,11 +63,10 @@ saga:
       request-topic: order-creation-request
       compensation-request-topic: cancel-order-request
       compensation-response-topic: cancel-order-response
-      timeout: 300
       steps:
         reserve-funds:
           name: reserve-funds
-          timeout: 300
+          timeout: 500
           topics:
             request: payment-reserve-funds-request
             response: payment-reserve-funds-response
@@ -76,7 +75,7 @@ saga:
 
         reserve-products:
           name: reserve-products
-          timeout: 300
+          timeout: 500
           topics:
             request: warehouse-reserve-products-request
             response: warehouse-reserve-products-response
@@ -85,7 +84,7 @@ saga:
 
         confirm-order:
           name: confirm-order
-          timeout: 300
+          timeout: 500
           topics:
             request: confirm-order-request
             response: confirm-order-response
@@ -99,11 +98,10 @@ saga:
       request-topic: user-registration-request
       compensation-request-topic: cancel-user-registration-request
       compensation-response-topic: cancel-user-registration-response
-      timeout: 300
       steps:
         user-creation:
           name: user-creation
-          timeout: 300
+          timeout: 500
           topics:
             request: user-creation-request
             response: user-creation-response
@@ -112,7 +110,7 @@ saga:
 
         user-payment-creation:
           name: user-payment-creation
-          timeout: 300
+          timeout: 500
           topics:
             request: user-payment-creation-request
             response: user-payment-creation-response
@@ -121,7 +119,7 @@ saga:
 
         confirm-user-creation:
           name: confirm-user-creation
-          timeout: 300
+          timeout: 500
           topics:
             request: confirm-user-request
             response: confirm-user-response

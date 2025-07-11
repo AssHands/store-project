@@ -16,28 +16,30 @@ public interface SagaStepRepo extends JpaRepository<SagaStep, UUID> {
     @Query("""
             SELECT ss FROM SagaStep ss
             WHERE ss.status = :status
+            AND ss.retryTime <= :retryTime
             ORDER BY ss.time ASC
             """)
-    List<SagaStep> findAllForProcessing(SagaStepStatus status, Pageable pageable);
+    List<SagaStep> findAllForProcessing(SagaStepStatus status, LocalDateTime retryTime, Pageable pageable);
 
     @Modifying
     @Query(nativeQuery = true, value = """
-            INSERT INTO saga_step (name, is_compensation, status, saga_id, time)
-            VALUES (:name, :isCompensation, :status, :sagaId, :time)
+            INSERT INTO saga_step (name, is_compensation, status, saga_id, time, retry_time)
+            VALUES (:name, :isCompensation, :status, :sagaId, :time, :retryTime)
             ON CONFLICT (name, is_compensation, saga_id) DO NOTHING
             """)
     int saveOneIgnoreDuplicate(UUID sagaId,
                                String name,
                                boolean isCompensation,
                                String status,
-                               LocalDateTime time);
+                               LocalDateTime time,
+                               LocalDateTime retryTime);
 
     @Modifying
-    @Query("UPDATE SagaStep ss SET ss.status = :status WHERE ss.id = :id")
-    void updateStatusById(UUID id, SagaStepStatus status);
+    @Query("UPDATE SagaStep ss SET ss.status = :status, ss.retryTime = :retryTime WHERE ss.id = :id")
+    void updateOneStatusById(UUID id, SagaStepStatus status, LocalDateTime retryTime);
 
 
     @Modifying
-    @Query("UPDATE SagaStep ss SET ss.status = :status WHERE ss IN :sagaSteps")
-    void updateAll(List<SagaStep> sagaSteps, SagaStepStatus status);
+    @Query("UPDATE SagaStep ss SET ss.status = :status, ss.retryTime = :retryTime WHERE ss IN :sagaSteps")
+    void updateAllStatus(List<SagaStep> sagaSteps, SagaStepStatus status, LocalDateTime retryTime);
 }

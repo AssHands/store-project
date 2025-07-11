@@ -114,8 +114,6 @@ public class SagaProperties {
 
         private String compensationResponseTopic;
 
-        private Integer timeout;
-
         private LinkedHashMap<String, SagaStepDefinition> steps;
     }
 
