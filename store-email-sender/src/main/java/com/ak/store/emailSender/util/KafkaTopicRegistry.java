@@ -1,8 +1,5 @@
 package com.ak.store.emailSender.util;
 
-import com.ak.store.common.kafka.KafkaEvent;
-import com.ak.store.common.kafka.user.VerifyUserEvent;
-import com.ak.store.common.kafka.order.OrderCreatedEvent;
 import com.ak.store.emailSender.inbox.InboxEventType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

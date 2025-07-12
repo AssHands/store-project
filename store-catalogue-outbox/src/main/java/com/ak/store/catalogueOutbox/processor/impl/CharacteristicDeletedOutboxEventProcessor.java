@@ -21,7 +21,7 @@ public class CharacteristicDeletedOutboxEventProcessor implements OutboxEventPro
                 gson.fromJson(event.getPayload(), Long.class));
 
         String characteristicId = characteristicDeletedEvent.getCharacteristicId().toString();
-        eventProducerKafka.send(characteristicDeletedEvent, characteristicId);
+        eventProducerKafka.send(characteristicDeletedEvent, getType(), characteristicId);
     }
 
     @Override

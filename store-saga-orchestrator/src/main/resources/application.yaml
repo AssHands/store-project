@@ -125,3 +125,81 @@ saga:
             response: confirm-user-response
             compensation-request: cancel-user-registration-request
             compensation-response: cancel-user-registration-response
+
+    #------------------------------------------------------------
+
+    review-creation:
+      name: review-creation
+      request-topic: review-creation-request
+      compensation-request-topic: cancel-review-creation-request
+      compensation-response-topic: cancel-review-creation-response
+      steps:
+        update-product-rating:
+          name: update-product-rating
+          timeout: 500
+          topics:
+            request: add-product-grade-request
+            response: add-product-grade-response
+            compensation-request: remove-product-grade-request
+            compensation-response: remove-product-grade-response
+
+        confirm-review-creation:
+          name: confirm-review-creation
+          timeout: 500
+          topics:
+            request: confirm-review-creation-request
+            response: confirm-review-creation-response
+            compensation-request: cancel-review-creation-request
+            compensation-response: cancel-review-creation-response
+
+    #------------------------------------------------------------
+
+    review-update:
+      name: review-update
+      request-topic: review-update-request
+      compensation-request-topic: cancel-review-update-request
+      compensation-response-topic: cancel-review-update-response
+      steps:
+        update-product-rating:
+          name: update-product-rating
+          timeout: 500
+          topics:
+            request: update-product-grade-request
+            response: update-product-grade-response
+            compensation-request: cancel-update-product-grade-request
+            compensation-response: cancel-update-product-grade-response
+
+        confirm-review-update:
+          name: confirm-review-update
+          timeout: 500
+          topics:
+            request: confirm-review-update-request
+            response: confirm-review-update-response
+            compensation-request: cancel-review-update-request
+            compensation-response: cancel-review-update-response
+
+    #------------------------------------------------------------
+
+    review-deletion:
+      name: review-deletion
+      request-topic: review-deletion-request
+      compensation-request-topic: cancel-review-deletion-request
+      compensation-response-topic: cancel-review-deletion-response
+      steps:
+        update-product-rating:
+          name: update-product-rating
+          timeout: 500
+          topics:
+            request: delete-product-grade-request
+            response: delete-product-grade-response
+            compensation-request: cancel-delete-product-grade-request
+            compensation-response: cancel-delete-product-grade-response
+
+        confirm-review-deletion:
+          name: confirm-review-deletion
+          timeout: 500
+          topics:
+            request: confirm-review-deletion-request
+            response: confirm-review-deletion-response
+            compensation-request: cancel-review-deletion-request
+            compensation-response: cancel-review-deletion-response

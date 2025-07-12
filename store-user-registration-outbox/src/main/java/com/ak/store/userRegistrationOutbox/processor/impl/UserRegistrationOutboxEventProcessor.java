@@ -1,6 +1,6 @@
 package com.ak.store.userRegistrationOutbox.processor.impl;
 
-import com.ak.store.common.kafka.user.UserCreatedEvent;
+import com.ak.store.common.kafka.user.UserCreationEvent;
 import com.ak.store.common.saga.SagaRequestEvent;
 import com.ak.store.common.snapshot.user.UserCreatedSnapshot;
 import com.ak.store.userRegistrationOutbox.kafka.EventProducerKafka;
@@ -22,15 +22,15 @@ public class UserRegistrationOutboxEventProcessor implements OutboxEventProcesso
 
     @Override
     public void process(OutboxEvent event) throws JsonProcessingException {
-        var userRegistrationEvent = new UserCreatedEvent(event.getId(),
+        var userRegistrationEvent = new UserCreationEvent(event.getId(),
                 gson.fromJson(event.getPayload(), UserCreatedSnapshot.class));
 
         var request = SagaRequestEvent.builder()
                 .sagaId(event.getId())
-                .request(jsonMapper.toJsonNode(userRegistrationEvent.getUser()))
+                .request(jsonMapper.toJsonNode(userRegistrationEvent.getRequest()))
                 .build();
 
-        String userId = userRegistrationEvent.getUser().getUserId().toString();
+        String userId = userRegistrationEvent.getRequest().getUserId().toString();
         eventProducerKafka.send(request, getType(), userId);
     }
 

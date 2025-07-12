@@ -21,7 +21,7 @@ public class CategoryDeletedOutboxEventProcessor implements OutboxEventProcessor
                 gson.fromJson(event.getPayload(), Long.class));
 
         String categoryId = categoryDeletedEvent.getCategoryId().toString();
-        eventProducerKafka.send(categoryDeletedEvent, categoryId);
+        eventProducerKafka.send(categoryDeletedEvent, getType(), categoryId);
     }
 
     @Override

@@ -35,4 +35,7 @@ public class ReviewDTO {
     private Integer dislikeAmount;
 
     private LocalDateTime time;
+
+    //todo сделать так, чтобы mapper мапил enum в String
+    private String status;
 }

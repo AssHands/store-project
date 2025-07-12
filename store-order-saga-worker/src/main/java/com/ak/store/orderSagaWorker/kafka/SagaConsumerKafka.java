@@ -39,7 +39,7 @@ public class SagaConsumerKafka {
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"
     )
-    public void handleCanselOrder(List<SagaRequestEvent> events, Acknowledgment ack) {
+    public void handleCancelOrder(List<SagaRequestEvent> events, Acknowledgment ack) {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),

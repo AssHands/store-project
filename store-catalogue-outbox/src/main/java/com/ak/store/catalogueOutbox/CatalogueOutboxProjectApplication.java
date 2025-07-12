@@ -1,6 +1,7 @@
 package com.ak.store.catalogueOutbox;
 
 import com.ak.store.catalogueOutbox.util.LocalDateTimeAdapter;
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.boot.SpringApplication;
@@ -12,10 +13,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.time.LocalDateTime;
-
-@EnableJpaRepositories("com.ak.store.*")
-@ComponentScan(basePackages = {"com.ak.store.*" })
-@EntityScan("com.ak.store.*")
 @EnableScheduling
 @SpringBootApplication
 public class CatalogueOutboxProjectApplication {
@@ -26,6 +23,7 @@ public class CatalogueOutboxProjectApplication {
     @Bean
     public Gson gson() {
         return new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                 .create();
     }

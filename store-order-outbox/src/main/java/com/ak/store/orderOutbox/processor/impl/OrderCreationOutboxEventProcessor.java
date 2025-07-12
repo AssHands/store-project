@@ -1,6 +1,6 @@
 package com.ak.store.orderOutbox.processor.impl;
 
-import com.ak.store.common.kafka.order.OrderCreatedEvent;
+import com.ak.store.common.kafka.order.OrderCreationEvent;
 import com.ak.store.common.saga.SagaRequestEvent;
 import com.ak.store.common.snapshot.order.OrderCreatedSnapshot;
 import com.ak.store.orderOutbox.kafka.EventProducerKafka;
@@ -13,8 +13,6 @@ import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @Service
 public class OrderCreationOutboxEventProcessor implements OutboxEventProcessor {
@@ -24,16 +22,15 @@ public class OrderCreationOutboxEventProcessor implements OutboxEventProcessor {
 
     @Override
     public void process(OutboxEvent event) throws JsonProcessingException {
-        var orderCreatedEvent = new OrderCreatedEvent(event.getId(),
+        var orderCreatedEvent = new OrderCreationEvent(event.getId(),
                 gson.fromJson(event.getPayload(), OrderCreatedSnapshot.class));
 
-        //todo поменять UUID.randomUUID() на что то другое. например нв event.getId(), ибо приложение может послать несколько одинаковых сообщений
         var request = SagaRequestEvent.builder()
-                .sagaId(UUID.randomUUID())
-                .request(jsonMapper.toJsonNode(orderCreatedEvent.getOrder()))
+                .sagaId(event.getId())
+                .request(jsonMapper.toJsonNode(orderCreatedEvent.getRequest()))
                 .build();
 
-        String orderId = orderCreatedEvent.getOrder().getOrderId().toString();
+        String orderId = orderCreatedEvent.getRequest().getOrderId().toString();
         eventProducerKafka.send(request, getType(), orderId);
     }
 

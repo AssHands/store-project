@@ -30,7 +30,7 @@
         <module>store-review</module>
         <module>store-order-outbox</module>
         <module>store-review-outbox</module>
-        <module>store-catalogue-rating-updater</module>
+        <module>store-catalogue-saga-worker</module>
         <module>store-cart</module>
         <module>store-payment</module>
         <module>store-saga-orchestrator</module>
@@ -44,5 +44,6 @@
         <module>store-user-registration-outbox</module>
         <module>store-user-saga-worker</module>
         <module>store-user-registration-saga-worker</module>
+        <module>store-review-saga-worker</module>
     </modules>
 </project>

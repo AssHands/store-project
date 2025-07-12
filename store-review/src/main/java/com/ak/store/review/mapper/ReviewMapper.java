@@ -1,6 +1,5 @@
 package com.ak.store.review.mapper;
 
-import com.ak.store.common.snapshot.review.ReviewDeletedSnapshot;
 import com.ak.store.common.snapshot.review.ReviewSnapshot;
 import com.ak.store.review.model.document.Review;
 import com.ak.store.review.model.dto.ReviewDTO;
@@ -22,16 +21,13 @@ public interface ReviewMapper {
     List<ReviewDTO> toReviewDTO(List<Review> r);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
+    ReviewSnapshot toReviewSnapshot(ReviewDTO r);
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
     ReviewView toReviewView(ReviewDTO r);
     List<ReviewView> toReviewView(List<ReviewDTO> r);
 
     ReviewWriteDTO toReviewWriteDTO(ReviewForm rf);
-
-    @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
-    ReviewSnapshot toReviewSnapshot(ReviewDTO r);
-
-    @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
-    ReviewDeletedSnapshot toReviewDeletedSnapshot(ReviewDTO r);
 
     @Named("objectIdToString")
     static String objectIdToString(ObjectId id) {
@@ -39,7 +35,7 @@ public interface ReviewMapper {
     }
 
     @Named("stringToObjectId")
-    static ObjectId objectIdToString(String id) {
+    static ObjectId stringToObjectId(String id) {
         return id != null ? new ObjectId(id) : null;
     }
 }

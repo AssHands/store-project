@@ -44,5 +44,7 @@ public class Review {
     @Field(name = "dislike_amount")
     private Integer dislikeAmount;
 
+    private ReviewStatus status;
+
     private LocalDateTime time;
 }

@@ -2,6 +2,7 @@ package com.ak.store.review.service;
 
 import com.ak.store.review.mapper.ReviewMapper;
 import com.ak.store.review.model.document.Review;
+import com.ak.store.review.model.document.ReviewStatus;
 import com.ak.store.review.model.dto.ReviewDTO;
 import com.ak.store.review.model.dto.write.ReviewWriteDTO;
 import com.ak.store.review.repository.ReviewRepo;
@@ -41,6 +42,7 @@ public class ReviewService {
         reviewValidator.validateCreating(userId, request);
         var review = reviewMapper.toReview(request);
 
+        review.setStatus(ReviewStatus.IN_PROGRESS);
         review.setTime(LocalDateTime.now());
         review.setUserId(userId);
         review.setLikeAmount(0);
@@ -52,9 +54,10 @@ public class ReviewService {
 
     public ReviewDTO updateOne(UUID userId, ObjectId reviewId, ReviewWriteDTO request) {
         reviewValidator.validateUpdating(userId, reviewId);
-        var review = findOneById(reviewId);
 
+        var review = findOneById(reviewId);
         updateOneFromDTO(review, request);
+        review.setStatus(ReviewStatus.IN_PROGRESS);
 
         return reviewMapper.toReviewDTO(reviewRepo.save(review));
     }

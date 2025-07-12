@@ -54,3 +54,13 @@ kafka:
     product-updated: product-updated
     product-deleted: product-deleted
     product-rating-updated: product-rating-updated
+
+
+    add-product-grade: add-product-grade-response
+    remove-product-grade: remove-product-grade-response
+
+    update-product-grade: update-product-grade-response
+    cancel-update-product-grade: cancel-update-product-grade-response
+
+    delete-product-grade: delete-product-grade-response
+    cancel-delete-product-grade: cancel-delete-product-grade-response

@@ -1,0 +1,131 @@
+package com.ak.store.reviewSagaWorker.kafka;
+
+import com.ak.store.common.saga.SagaRequestEvent;
+import com.ak.store.reviewSagaWorker.model.entity.InboxEventType;
+import com.ak.store.reviewSagaWorker.service.InboxEventWriterService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@RequiredArgsConstructor
+@Component
+public class SagaConsumerKafka {
+    private final InboxEventWriterService inboxEventWriterService;
+
+    @KafkaListener(
+            topics = "confirm-review-creation-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleConfirmReviewCreation(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CONFIRM_REVIEW_CREATION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_REVIEW_CREATION);
+            }
+        }
+
+        ack.acknowledge();
+    }
+
+    @KafkaListener(
+            topics = "cancel-review-creation-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleCancelReviewCreation(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CANCEL_REVIEW_CREATION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_REVIEW_CREATION);
+            }
+        }
+
+        ack.acknowledge();
+    }
+
+    @KafkaListener(
+            topics = "confirm-review-update-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleConfirmReviewUpdate(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CONFIRM_REVIEW_UPDATE);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_REVIEW_UPDATE);
+            }
+        }
+
+        ack.acknowledge();
+    }
+
+    @KafkaListener(
+            topics = "cancel-review-update-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleCancelReviewUpdate(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CANCEL_REVIEW_UPDATE);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_REVIEW_UPDATE);
+            }
+        }
+
+        ack.acknowledge();
+    }
+
+    @KafkaListener(
+            topics = "confirm-review-deletion-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleConfirmReviewDeletion(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CONFIRM_REVIEW_DELETION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_REVIEW_DELETION);
+            }
+        }
+
+        ack.acknowledge();
+    }
+
+    @KafkaListener(
+            topics = "cancel-review-deletion-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleCancelReviewDeletion(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CANCEL_REVIEW_DELETION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_REVIEW_DELETION);
+            }
+        }
+
+        ack.acknowledge();
+    }
+}

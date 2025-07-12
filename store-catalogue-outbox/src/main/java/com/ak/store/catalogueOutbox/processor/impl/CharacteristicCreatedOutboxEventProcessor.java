@@ -22,7 +22,7 @@ public class CharacteristicCreatedOutboxEventProcessor implements OutboxEventPro
                 gson.fromJson(event.getPayload(), CharacteristicSnapshotPayload.class));
 
         String characteristicId = characteristicCreatedEvent.getPayload().getCharacteristic().getId().toString();
-        eventProducerKafka.send(characteristicCreatedEvent, characteristicId);
+        eventProducerKafka.send(characteristicCreatedEvent, getType(), characteristicId);
     }
 
     @Override

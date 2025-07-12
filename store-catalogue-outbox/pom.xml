@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.ak.store.outboxScheduler</groupId>
+    <groupId>com.ak.store.catalogueOutbox</groupId>
     <artifactId>store-catalogue-outbox</artifactId>
 
     <properties>

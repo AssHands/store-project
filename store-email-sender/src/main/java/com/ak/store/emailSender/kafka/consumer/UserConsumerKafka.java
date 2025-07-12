@@ -1,6 +1,6 @@
 package com.ak.store.emailSender.kafka.consumer;
 
-import com.ak.store.common.kafka.user.UserCreatedEvent;
+import com.ak.store.common.kafka.user.UserCreationEvent;
 import com.ak.store.common.kafka.user.VerifyUserEvent;
 import com.ak.store.emailSender.errorHandler.UserKafkaErrorHandler;
 import com.ak.store.emailSender.inbox.InboxEventType;
@@ -32,8 +32,8 @@ public class UserConsumerKafka {
     }
 
     @KafkaListener(topics = "${kafka.topics.user-created}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handleUserCreated(List<UserCreatedEvent> userCreatedEvents, Acknowledgment ack) {
-        for(var event : userCreatedEvents) {
+    public void handleUserCreated(List<UserCreationEvent> userCreationEvents, Acknowledgment ack) {
+        for(var event : userCreationEvents) {
             try {
                 inboxEventWriterService.createOne(event.getEventId(), event.getVerifyUser(), InboxEventType.USER_CREATED);
             } catch (Exception e) {

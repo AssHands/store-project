@@ -16,6 +16,7 @@ public class OutboxEventService {
     public <T> void createOne(T payload, OutboxEventType type) {
         var event = outboxEventMapper.toOutboxEvent(payload);
 
+
         event.setType(type);
         event.setStatus(OutboxEventStatus.IN_PROGRESS);
         event.setRetryTime(LocalDateTime.now());

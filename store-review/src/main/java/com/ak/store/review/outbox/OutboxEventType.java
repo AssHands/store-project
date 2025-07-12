@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum OutboxEventType {
-    REVIEW_CREATED("REVIEW_CREATED"),
-    REVIEW_UPDATED("REVIEW_UPDATED"),
-    REVIEW_DELETED("REVIEW_DELETED");
+    REVIEW_CREATION("REVIEW_CREATED"),
+    REVIEW_UPDATE("REVIEW_UPDATE"),
+    REVIEW_DELETION("REVIEW_DELETION");
 
-    private String type;
+    private final String value;
 }

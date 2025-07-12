@@ -3,7 +3,7 @@ package com.ak.store.catalogueOutbox.service;
 import com.ak.store.catalogueOutbox.model.OutboxEvent;
 import com.ak.store.catalogueOutbox.model.OutboxEventStatus;
 import com.ak.store.catalogueOutbox.model.OutboxEventType;
-import com.ak.store.catalogueOutbox.repo.OutboxEventRepo;
+import com.ak.store.catalogueOutbox.repository.OutboxEventRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

@@ -39,4 +39,6 @@ public class ReviewView {
     private Integer dislikeAmount;
 
     private LocalDateTime time;
+
+    private String status;
 }

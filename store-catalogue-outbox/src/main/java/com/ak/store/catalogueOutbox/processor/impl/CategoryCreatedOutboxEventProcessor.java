@@ -22,7 +22,7 @@ public class CategoryCreatedOutboxEventProcessor implements OutboxEventProcessor
                 gson.fromJson(event.getPayload(), CategorySnapshotPayload.class));
 
         String categoryId = categoryCreatedEvent.getPayload().getCategory().getId().toString();
-        eventProducerKafka.send(categoryCreatedEvent, categoryId);
+        eventProducerKafka.send(categoryCreatedEvent, getType(), categoryId);
     }
 
     @Override

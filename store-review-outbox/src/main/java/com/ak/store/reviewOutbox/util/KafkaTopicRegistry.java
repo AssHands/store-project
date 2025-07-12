@@ -1,9 +1,6 @@
 package com.ak.store.reviewOutbox.util;
 
-import com.ak.store.common.kafka.KafkaEvent;
-import com.ak.store.common.kafka.review.ReviewCreatedEvent;
-import com.ak.store.common.kafka.review.ReviewDeletedEvent;
-import com.ak.store.common.kafka.review.ReviewUpdatedEvent;
+import com.ak.store.reviewOutbox.model.OutboxEventType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -15,14 +12,22 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KafkaTopicRegistry {
     private final KafkaProperties kafkaProperties;
-    private final Map<Class<? extends KafkaEvent>, String> eventTopicMap = new HashMap<>();
+    private final Map<OutboxEventType, String> eventTopicMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        Map<Class<? extends KafkaEvent>, String> eventKeyMap = Map.of(
-                ReviewCreatedEvent.class, "review-created",
-                ReviewUpdatedEvent.class, "review-updated",
-                ReviewDeletedEvent.class, "review-deleted"
+        Map<OutboxEventType, String> eventKeyMap = Map.ofEntries(
+                Map.entry(OutboxEventType.REVIEW_CREATION, "review-creation"),
+                Map.entry(OutboxEventType.CONFIRM_REVIEW_CREATION, "confirm-review-creation"),
+                Map.entry(OutboxEventType.CANCEL_REVIEW_CREATION, "cancel-review-creation"),
+
+                Map.entry(OutboxEventType.REVIEW_UPDATE, "review-update"),
+                Map.entry(OutboxEventType.CONFIRM_REVIEW_UPDATE, "confirm-review-update"),
+                Map.entry(OutboxEventType.CANCEL_REVIEW_UPDATE, "cancel-review-update"),
+
+                Map.entry(OutboxEventType.REVIEW_DELETION, "review-deletion"),
+                Map.entry(OutboxEventType.CONFIRM_REVIEW_DELETION, "confirm-review-deletion"),
+                Map.entry(OutboxEventType.CANCEL_REVIEW_DELETION, "cancel-review-deletion")
         );
 
         for (var entry : eventKeyMap.entrySet()) {
@@ -34,10 +39,10 @@ public class KafkaTopicRegistry {
         }
     }
 
-    public String getTopicByEvent(Class<? extends KafkaEvent> eventClass) {
-        String topic = eventTopicMap.get(eventClass);
+    public String getTopicByEvent(OutboxEventType type) {
+        String topic = eventTopicMap.get(type);
         if (topic == null) {
-            throw new IllegalArgumentException("No topic configured for event: " + eventClass.getName());
+            throw new IllegalArgumentException("No topic configured for event: " + type.getValue());
         }
         return topic;
     }
