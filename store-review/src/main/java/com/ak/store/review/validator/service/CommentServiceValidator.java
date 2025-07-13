@@ -1,6 +1,7 @@
 package com.ak.store.review.validator.service;
 
 import com.ak.store.review.model.document.Comment;
+import com.ak.store.review.model.document.ReviewStatus;
 import com.ak.store.review.model.dto.write.CommentWriteDTO;
 import com.ak.store.review.repository.CommentRepo;
 import com.ak.store.review.repository.ReviewRepo;
@@ -35,7 +36,8 @@ public class CommentServiceValidator {
     }
 
     private boolean isReviewExist(ObjectId reviewId) {
-        return reviewRepo.findById(reviewId).isPresent();
+        var review = reviewRepo.findById(reviewId);
+        return review.filter(value -> value.getStatus() == ReviewStatus.COMPLETED).isPresent();
     }
 
     private boolean isCommentBelongToUser(ObjectId commentId, UUID userId) {

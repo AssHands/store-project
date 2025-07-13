@@ -33,12 +33,6 @@ public class ReviewServiceValidator {
         }
     }
 
-    public void validateDeleting(UUID userId, ObjectId reviewId) {
-        if(!isReviewBelongToUser(userId, reviewId)) {
-            throw new RuntimeException("review do not belong to user");
-        }
-    }
-
     private boolean isProductExist(Long productId) {
         return catalogueFeign.isExistAllProduct(List.of(productId));
     }

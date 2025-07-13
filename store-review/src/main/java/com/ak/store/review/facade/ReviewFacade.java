@@ -4,6 +4,7 @@ import com.ak.store.common.snapshot.review.ReviewCreationSnapshot;
 import com.ak.store.common.snapshot.review.ReviewDeletionSnapshot;
 import com.ak.store.common.snapshot.review.ReviewUpdateSnapshotPayload;
 import com.ak.store.review.mapper.ReviewMapper;
+import com.ak.store.review.model.document.ReviewStatus;
 import com.ak.store.review.model.dto.ReviewDTO;
 import com.ak.store.review.model.dto.write.ReviewWriteDTO;
 import com.ak.store.review.outbox.OutboxEventService;
@@ -22,7 +23,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReviewFacade {
     private final ReviewService reviewService;
-    private final CommentService commentService;
     private final OutboxEventService outboxEventService;
     private final ReviewMapper reviewMapper;
 
@@ -48,7 +48,7 @@ public class ReviewFacade {
 
     @Transactional
     public ReviewDTO updateOne(UUID userId, ObjectId reviewId, ReviewWriteDTO request) {
-        //todo заменить на findAndUpdate
+        //todo добавить метод findAndUpdate, чтобы уменьшить кол-во запросов
         var oldReview = reviewService.findOne(reviewId);
         var newReview = reviewService.updateOne(userId, reviewId, request);
 
@@ -63,8 +63,9 @@ public class ReviewFacade {
 
     @Transactional
     public void deleteOne(UUID userId, ObjectId reviewId) {
-        //todo добавить метод findAndDelete, чтобы уменьшить кол-во запросов
+        //todo добавить метод findAndUpdate, чтобы уменьшить кол-во запросов
         var review = reviewService.findOne(reviewId);
+        reviewService.updateOneStatus(userId, reviewId, ReviewStatus.IN_PROGRESS);
 
         var snapshot = ReviewDeletionSnapshot.builder()
                 .reviewId(review.getId().toString())
@@ -73,14 +74,5 @@ public class ReviewFacade {
                 .build();
 
         outboxEventService.createOne(snapshot, OutboxEventType.REVIEW_DELETION);
-
-        try {
-            reviewService.deleteOne(userId, reviewId);
-            commentService.deleteAllByReviewId(reviewId);
-        } catch (Exception e) {
-            //todo добавить компенсирующий метод для восстановления комментариев
-            reviewService.compensateDeleteOne(review);
-            throw new RuntimeException("cant delete");
-        }
     }
 }

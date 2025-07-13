@@ -61,10 +61,6 @@ public class CommentService {
         commentRepo.deleteById(commentId);
     }
 
-    public void deleteAllByReviewId(ObjectId reviewId) {
-        commentRepo.deleteAllByReviewId(reviewId);
-    }
-
     private void updateOneFromDTO(Comment comment, CommentWriteDTO request) {
         if (request.getText() != null) {
             comment.setText(request.getText());

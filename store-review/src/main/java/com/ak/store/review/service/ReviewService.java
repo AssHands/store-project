@@ -62,13 +62,12 @@ public class ReviewService {
         return reviewMapper.toReviewDTO(reviewRepo.save(review));
     }
 
-    public void deleteOne(UUID userId, ObjectId reviewId) {
-        reviewValidator.validateDeleting(userId, reviewId);
-        reviewRepo.deleteById(reviewId);
-    }
+    public void updateOneStatus(UUID userId, ObjectId reviewId, ReviewStatus status) {
+        reviewValidator.validateUpdating(userId, reviewId);
 
-    public void compensateDeleteOne(ReviewDTO request) {
-        var review = reviewMapper.toReview(request);
+        var review = findOneById(reviewId);
+        review.setStatus(status);
+
         reviewRepo.save(review);
     }
 
