@@ -23,10 +23,11 @@ public class InboxEventReaderService {
     @Transactional
     public List<InboxEvent> findAllForProcessing(InboxEventType type) {
         LocalDateTime retryTime = LocalDateTime.now();
-
         Pageable pageable = PageRequest.of(0, batchSize);
+
         List<InboxEvent> events = inboxEventRepo.findAllForProcessing(
-                type, InboxEventStatus.IN_PROGRESS, LocalDateTime.now(), pageable);
+                type, InboxEventStatus.IN_PROGRESS, LocalDateTime.now(), pageable
+        );
 
         for (var event : events) {
             event.setRetryTime(retryTime.plusMinutes(retryTimeMinutes));

@@ -17,4 +17,7 @@ public class UserForm {
     private String name;
 
     private String email;
+
+    //todo null for update, not null for create
+    private String password;
 }

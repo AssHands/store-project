@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum  OutboxEventType {
-    VERIFY_USER("VERIFY_USER"),
-    USER_CREATED("USER_CREATED");
+    USER_REGISTRATION("USER_REGISTRATION"),
+    USER_VERIFICATION("USER_VERIFICATION");
 
-    private String value;
+    private final String value;
 }

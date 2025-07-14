@@ -1,11 +1,13 @@
 package com.ak.store.user.facade;
 
-import com.ak.store.common.snapshot.user.VerifyUserSnapshot;
+import com.ak.store.common.snapshot.user.UserCreationSnapshot;
+import com.ak.store.common.snapshot.user.UserVerificationSnapshot;
 import com.ak.store.user.model.dto.UserDTO;
 import com.ak.store.user.model.dto.write.UserWriteDTO;
 import com.ak.store.user.outbox.OutboxEventService;
 import com.ak.store.user.outbox.OutboxEventType;
 import com.ak.store.user.service.UserKeycloakService;
+import com.ak.store.user.service.UserRegistrationService;
 import com.ak.store.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class UserFacade {
     private final UserService userService;
     private final UserKeycloakService userKeycloakService;
     private final OutboxEventService outboxEventService;
+    private final UserRegistrationService userRegistrationService;
 
     public UserDTO findOne(UUID id) {
         return userService.findOne(id);
@@ -49,17 +52,28 @@ public class UserFacade {
     }
 
     @Transactional
-    public UserDTO updateOneEmail(UUID id, String email) {
+    public void updateOneEmail(UUID id, String email) {
         String code = userService.makeVerificationCode(id, email);
 
-        var event = VerifyUserSnapshot.builder()
-                .id(id)
+        var event = UserVerificationSnapshot.builder()
+                .userId(id)
                 .email(email)
                 .verificationCode(code)
                 .build();
 
-        outboxEventService.createOne(event, OutboxEventType.VERIFY_USER);
+        outboxEventService.createOne(event, OutboxEventType.USER_VERIFICATION);
+    }
 
-        return userService.findOne(id);
+    public void registerOne(UserWriteDTO request) {
+        UUID id = userRegistrationService.registerOne(request);
+
+        var snapshot = UserCreationSnapshot.builder()
+                .verificationCode(UUID.randomUUID().toString())
+                .userId(id)
+                .email(request.getEmail())
+                .name(request.getName())
+                .build();
+
+        outboxEventService.createOne(snapshot, OutboxEventType.USER_REGISTRATION);
     }
 }

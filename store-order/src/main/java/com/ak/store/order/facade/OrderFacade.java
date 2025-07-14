@@ -1,6 +1,6 @@
 package com.ak.store.order.facade;
 
-import com.ak.store.common.snapshot.order.OrderCreatedSnapshot;
+import com.ak.store.common.snapshot.order.OrderCreationSnapshot;
 import com.ak.store.order.model.dto.OrderDTOPayload;
 import com.ak.store.order.model.dto.UserAuthContext;
 import com.ak.store.order.outbox.OutboxEventService;
@@ -34,7 +34,7 @@ public class OrderFacade {
             productAmount.merge(product.getProductId(), 1, Integer::sum);
         }
 
-        var snapshot = OrderCreatedSnapshot.builder()
+        var snapshot = OrderCreationSnapshot.builder()
                 .orderId(orderPayload.getOrder().getId())
                 .userId(authContext.getId())
                 .totalPrice(orderPayload.getOrder().getTotalPrice())

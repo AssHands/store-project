@@ -3,6 +3,7 @@ package com.ak.store.user.service;
 import com.ak.store.user.model.dto.UserDTO;
 import com.ak.store.user.model.dto.write.UserWriteDTO;
 import com.ak.store.user.model.entity.User;
+import com.ak.store.user.model.entity.UserStatus;
 import com.ak.store.user.model.entity.VerificationCode;
 import com.ak.store.user.repository.UserRepo;
 import com.ak.store.user.mapper.UserMapper;
@@ -55,6 +56,7 @@ public class UserService {
         String code = UUID.randomUUID().toString();
         var expireTime = LocalDateTime.now().plusDays(1L);
 
+        user.setStatus(UserStatus.PENDING_VERIFICATION);
         user.setVerificationCode(VerificationCode.builder()
                 .code(code)
                 //todo заменить на User.Builder()? чтобы цикличности не было
@@ -77,10 +79,9 @@ public class UserService {
             throw new RuntimeException("this verify code is expired");
         }
 
-        //todo менять статус, а не true
-        //user.setIsEnabled(true);
         String email = user.getVerificationCode().getEmail();
         user.setEmail(email);
+        user.setStatus(UserStatus.ACTIVE);
         user.setVerificationCode(null);
 
         return userMapper.toUserDTO(userRepo.save(user));

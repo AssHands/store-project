@@ -9,18 +9,11 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "email")
 public class EmailProperties {
 
-    private Verify verify;
-    private Order order;
+    private Verification verification;
 
     @Data
-    public static class Verify {
+    public static class Verification {
         private String url;
-        private String subject;
-        private String content;
-    }
-
-    @Data
-    public static class Order {
         private String subject;
         private String content;
     }

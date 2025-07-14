@@ -2,7 +2,6 @@ package com.ak.store.user.controller;
 
 import com.ak.store.user.model.form.UserForm;
 import com.ak.store.user.facade.UserFacade;
-import com.ak.store.user.model.validationGroup.Create;
 import com.ak.store.user.model.validationGroup.Update;
 import com.ak.store.user.model.view.UserView;
 import com.ak.store.user.mapper.UserMapper;
@@ -27,17 +26,6 @@ public class UserController {
         return userMapper.toUserView(userFacade.findOne(id));
     }
 
-    @PatchMapping("{id}")
-    public UUID updateOne(@PathVariable UUID id, @RequestBody @Validated(Update.class) UserForm request) {
-        var user = userFacade.updateOne(id, userMapper.toUserWriteDTO(request));
-        return user.getId();
-    }
-
-    @DeleteMapping("{id}")
-    public void deleteOne(@PathVariable UUID id) {
-        userFacade.deleteOne(id);
-    }
-
     @PostMapping("verify")
     public UUID verifyOne(@RequestParam String code) {
         return userFacade.verifyOne(code).getId();
@@ -46,6 +34,11 @@ public class UserController {
     @GetMapping("exist/{id}")
     public Boolean isExistOne(@PathVariable UUID id) {
         return userFacade.isExistOne(id);
+    }
+
+    @PostMapping("register")
+    public void registerOne(@RequestBody UserForm request) {
+        userFacade.registerOne(userMapper.toUserWriteDTO(request));
     }
 
     //--- AUTH ---
@@ -69,8 +62,7 @@ public class UserController {
     }
 
     @PatchMapping("me/email")
-    public UUID updateMyEmail(@AuthenticationPrincipal Jwt accessToken, @RequestBody @Email String email) {
-        var user = userFacade.updateOneEmail(UUID.fromString(accessToken.getSubject()), email);
-        return user.getId();
+    public void updateMyEmail(@AuthenticationPrincipal Jwt accessToken, @RequestBody @Email String email) {
+        userFacade.updateOneEmail(UUID.fromString(accessToken.getSubject()), email);
     }
 }

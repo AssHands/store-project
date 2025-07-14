@@ -45,3 +45,12 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8070/realms/store-realm/protocol/openid-connect/certs
+
+keycloak:
+  auth-server-url: http://localhost:8070/
+  resource: store-user-service-client
+  realm: store-realm
+  ssl-required: external
+  use-resource-role-mapping: true
+  credentials:
+    secret: 7Iqf1S2bESodz36SFISi3n51xgYGoV9S

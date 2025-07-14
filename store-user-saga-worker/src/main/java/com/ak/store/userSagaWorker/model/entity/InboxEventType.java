@@ -6,9 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum InboxEventType {
+    CANCEL_USER_REGISTRATION("CANCEL_USER_REGISTRATION"),
     USER_CREATION("USER_CREATION"),
     CANCEL_USER_CREATION("CANCEL_USER_CREATION"),
     CONFIRM_USER_CREATION("CONFIRM_USER_CREATION");
 
-    private String value;
+    private final String value;
 }

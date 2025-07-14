@@ -7,10 +7,9 @@ import lombok.Getter;
 @Getter
 public enum UserStatus {
     PENDING_REGISTRATION("PENDING_REGISTRATION"),
-    PENDING_EMAIL_UPDATING("PENDING_EMAIL_UPDATING"),
+    PENDING_VERIFICATION("PENDING_VERIFICATION"),
     ACTIVE("ACTIVE"),
     BANNED("BANNED");
 
-
-    private String value;
+    private final String value;
 }

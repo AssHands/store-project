@@ -16,12 +16,12 @@ import java.util.stream.Collectors;
 @Service
 public class InboxEventScheduler {
     private final InboxEventReaderService inboxEventReaderService;
-    private final Map<InboxEventType, InboxEventProcessor> eventProcessors;
+    private final Map<InboxEventType, InboxEventProcessor> inboxEventProcessors;
 
-    public InboxEventScheduler(InboxEventReaderService inboxEventReaderService, List<InboxEventProcessor> eventProcessors) {
+    public InboxEventScheduler(InboxEventReaderService inboxEventReaderService, List<InboxEventProcessor> inboxEventProcessors) {
         this.inboxEventReaderService = inboxEventReaderService;
 
-        this.eventProcessors = eventProcessors.stream()
+        this.inboxEventProcessors = inboxEventProcessors.stream()
                 .collect(Collectors.toMap(
                         InboxEventProcessor::getType,
                         processor -> processor
@@ -31,13 +31,13 @@ public class InboxEventScheduler {
     @Transactional
     @Scheduled(fixedRate = 5000)
     public void executeInboxEvents() {
-        for (var entry : eventProcessors.entrySet()) {
+        for (var entry : inboxEventProcessors.entrySet()) {
             processInboxEventsOfType(entry.getKey());
         }
     }
 
     private void processInboxEventsOfType(InboxEventType type) {
-        var processor = eventProcessors.get(type);
+        var processor = inboxEventProcessors.get(type);
         var events = inboxEventReaderService.findAllForProcessing(type);
         List<InboxEvent> completedEvents = new ArrayList<>();
 

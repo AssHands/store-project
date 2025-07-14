@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class ConfirmUserCreationOutboxEventProcessor implements OutboxEventProcessor {
+public class CancelUserRegistrationOutboxEventProcessor implements OutboxEventProcessor {
     private final OutboxEventService outboxEventService;
 
     @Override
@@ -34,11 +34,12 @@ public class ConfirmUserCreationOutboxEventProcessor implements OutboxEventProce
                 .status(status)
                 .build();
 
-        outboxEventService.createOne(event.getId(), response, OutboxEventType.CONFIRM_USER_CREATION);
+        outboxEventService.createOne(event.getId(), response, OutboxEventType.CANCEL_USER_REGISTRATION);
     }
 
     @Override
     public InboxEventType getType() {
-        return InboxEventType.CONFIRM_USER_CREATION;
+        return InboxEventType.CANCEL_USER_REGISTRATION;
     }
 }
+

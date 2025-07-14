@@ -17,9 +17,12 @@ public class KafkaTopicRegistry {
     @PostConstruct
     public void init() {
         Map<OutboxEventType, String> eventKeyMap = Map.of(
+                OutboxEventType.USER_REGISTRATION, "user-registration",
+                OutboxEventType.CANCEL_USER_REGISTRATION, "cancel-user-registration",
                 OutboxEventType.USER_CREATION, "user-creation",
                 OutboxEventType.CONFIRM_USER_CREATION, "confirm-user",
-                OutboxEventType.CANCEL_USER_CREATION, "cancel-user-creation"
+                OutboxEventType.CANCEL_USER_CREATION, "cancel-user-creation",
+                OutboxEventType.USER_VERIFICATION, "user-verification"
         );
 
         for (var entry : eventKeyMap.entrySet()) {

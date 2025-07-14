@@ -24,4 +24,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private VerificationCode verificationCode;
 }

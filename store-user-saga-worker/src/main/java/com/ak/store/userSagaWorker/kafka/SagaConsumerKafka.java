@@ -16,6 +16,25 @@ public class SagaConsumerKafka {
     private final InboxEventWriterService inboxEventWriterService;
 
     @KafkaListener(
+            topics = "cancel-user-registration-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleCancelUserRegistration(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CANCEL_USER_REGISTRATION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_USER_REGISTRATION);
+            }
+        }
+
+        ack.acknowledge();
+    }
+
+    @KafkaListener(
             topics = "user-creation-request",
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"

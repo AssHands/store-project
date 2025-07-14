@@ -6,8 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum InboxEventType {
-    USER_CREATED("USER_CREATED"),
-    VERIFY_USER("VERIFY_USER");
+    USER_VERIFICATION("USER_VERIFICATION");
 
-    private String value;
+    private final String value;
 }

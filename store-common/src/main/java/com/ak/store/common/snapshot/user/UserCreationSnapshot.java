@@ -1,4 +1,4 @@
-package com.ak.store.userSagaWorker.model.dto;
+package com.ak.store.common.snapshot.user;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -15,12 +14,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class UserCreationSagaRequestEvent {
+public class UserCreationSnapshot {
     private String verificationCode;
 
     private UUID userId;
 
-    private String email;
-
     private String name;
+
+    private String email;
 }

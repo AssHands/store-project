@@ -2,7 +2,7 @@ package com.ak.store.orderOutbox.processor.impl;
 
 import com.ak.store.common.kafka.order.OrderCreationEvent;
 import com.ak.store.common.saga.SagaRequestEvent;
-import com.ak.store.common.snapshot.order.OrderCreatedSnapshot;
+import com.ak.store.common.snapshot.order.OrderCreationSnapshot;
 import com.ak.store.orderOutbox.kafka.EventProducerKafka;
 import com.ak.store.orderOutbox.mapper.JsonMapper;
 import com.ak.store.orderOutbox.model.OutboxEvent;
@@ -23,7 +23,7 @@ public class OrderCreationOutboxEventProcessor implements OutboxEventProcessor {
     @Override
     public void process(OutboxEvent event) throws JsonProcessingException {
         var orderCreatedEvent = new OrderCreationEvent(event.getId(),
-                gson.fromJson(event.getPayload(), OrderCreatedSnapshot.class));
+                gson.fromJson(event.getPayload(), OrderCreationSnapshot.class));
 
         var request = SagaRequestEvent.builder()
                 .sagaId(event.getId())

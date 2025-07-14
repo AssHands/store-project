@@ -1,5 +1,7 @@
-package com.ak.store.userSagaWorker.model.dto;
+package com.ak.store.common.kafka.user;
 
+import com.ak.store.common.kafka.KafkaEvent;
+import com.ak.store.common.snapshot.user.UserVerificationSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -7,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -15,12 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class UserCreationSagaRequestEvent {
-    private String verificationCode;
+public class UserVerificationEvent implements KafkaEvent {
+    private UUID eventId;
 
-    private UUID userId;
-
-    private String email;
-
-    private String name;
+    private UserVerificationSnapshot request;
 }

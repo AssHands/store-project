@@ -72,11 +72,10 @@ spring:
 kafka:
   dlt-prefix: .dlt
   topics:
-    verify-user: verify-user
-    user-created: user-created
+    user-verification: user-verification
 
 email:
-  verify:
+  verification:
     url: http://localhost:8081/api/v1/user/users/verify?code=%s
     subject: Please verify your account
     content: >

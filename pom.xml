@@ -40,10 +40,7 @@
         <module>store-warehouse-outbox</module>
         <module>store-order-saga-worker</module>
         <module>store-user-outbox</module>
-        <module>store-user-registration</module>
-        <module>store-user-registration-outbox</module>
         <module>store-user-saga-worker</module>
-        <module>store-user-registration-saga-worker</module>
         <module>store-review-saga-worker</module>
     </modules>
 </project>

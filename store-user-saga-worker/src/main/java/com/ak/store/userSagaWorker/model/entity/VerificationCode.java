@@ -1,4 +1,4 @@
-package com.ak.store.user.model.entity;
+package com.ak.store.userSagaWorker.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

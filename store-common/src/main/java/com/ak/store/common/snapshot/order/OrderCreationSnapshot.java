@@ -1,4 +1,4 @@
-package com.ak.store.userSagaWorker.model.dto;
+package com.ak.store.common.snapshot.order;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -15,12 +15,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class UserCreationSagaRequestEvent {
-    private String verificationCode;
+public class OrderCreationSnapshot {
+    private Long orderId;
 
     private UUID userId;
 
-    private String email;
+    private Integer totalPrice;
 
-    private String name;
+    private Map<Long, Integer> productAmount;
 }

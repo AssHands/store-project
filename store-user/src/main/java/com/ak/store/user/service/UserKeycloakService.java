@@ -62,17 +62,6 @@ public class UserKeycloakService {
         return passwordCredentials;
     }
 
-    private void updateOneFromDTO(UserRepresentation user, UserWriteDTO request) {
-        if (request.getName() != null) {
-            user.setFirstName(request.getName());
-        }
-
-        if (request.getPassword() != null) {
-            CredentialRepresentation credentialRepresentation = createPasswordCredentials(request.getPassword());
-            user.setCredentials(Collections.singletonList(credentialRepresentation));
-        }
-    }
-
     public void verifyOne(UUID id, String email) {
         UserRepresentation user = new UserRepresentation();
 
@@ -84,6 +73,17 @@ public class UserKeycloakService {
             userResource.update(user);
         } catch (ClientErrorException e) {
             throw new RuntimeException("error while verifying email kc");
+        }
+    }
+
+    private void updateOneFromDTO(UserRepresentation user, UserWriteDTO request) {
+        if (request.getName() != null) {
+            user.setFirstName(request.getName());
+        }
+
+        if (request.getPassword() != null) {
+            CredentialRepresentation credentialRepresentation = createPasswordCredentials(request.getPassword());
+            user.setCredentials(Collections.singletonList(credentialRepresentation));
         }
     }
 }

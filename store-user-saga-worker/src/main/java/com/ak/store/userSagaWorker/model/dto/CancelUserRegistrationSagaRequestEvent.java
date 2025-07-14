@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -15,12 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class UserCreationSagaRequestEvent {
-    private String verificationCode;
-
+public class CancelUserRegistrationSagaRequestEvent {
     private UUID userId;
-
-    private String email;
-
-    private String name;
 }

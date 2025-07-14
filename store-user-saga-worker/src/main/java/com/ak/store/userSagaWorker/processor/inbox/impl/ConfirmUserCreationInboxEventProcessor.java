@@ -3,6 +3,7 @@ package com.ak.store.userSagaWorker.processor.inbox.impl;
 import com.ak.store.userSagaWorker.model.dto.ConfirmUserCreationSagaRequestEvent;
 import com.ak.store.userSagaWorker.model.entity.InboxEvent;
 import com.ak.store.userSagaWorker.model.entity.InboxEventType;
+import com.ak.store.userSagaWorker.model.entity.UserStatus;
 import com.ak.store.userSagaWorker.processor.inbox.InboxEventProcessor;
 import com.ak.store.userSagaWorker.service.UserService;
 import com.google.gson.Gson;
@@ -18,7 +19,7 @@ public class ConfirmUserCreationInboxEventProcessor implements InboxEventProcess
     @Override
     public void process(InboxEvent event) {
         var confirmUserCreationRequest = gson.fromJson(event.getPayload(), ConfirmUserCreationSagaRequestEvent.class);
-        userService.confirmOne(confirmUserCreationRequest.getUserId());
+        userService.setStatus(confirmUserCreationRequest.getUserId(), UserStatus.PENDING_VERIFICATION);
     }
 
     @Override
