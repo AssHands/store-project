@@ -6,8 +6,7 @@ import com.ak.store.user.model.dto.UserDTO;
 import com.ak.store.user.model.dto.write.UserWriteDTO;
 import com.ak.store.user.outbox.OutboxEventService;
 import com.ak.store.user.outbox.OutboxEventType;
-import com.ak.store.user.service.UserKeycloakService;
-import com.ak.store.user.service.UserRegistrationService;
+import com.ak.store.user.service.UserAuthService;
 import com.ak.store.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +18,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserFacade {
     private final UserService userService;
-    private final UserKeycloakService userKeycloakService;
     private final OutboxEventService outboxEventService;
-    private final UserRegistrationService userRegistrationService;
+    private final UserAuthService userAuthService;
 
     public UserDTO findOne(UUID id) {
         return userService.findOne(id);
@@ -29,14 +27,7 @@ public class UserFacade {
 
     @Transactional
     public UserDTO updateOne(UUID id, UserWriteDTO request) {
-        userKeycloakService.updateOne(id, request);
         return userService.updateOne(id, request);
-    }
-
-    @Transactional
-    public void deleteOne(UUID id) {
-        userKeycloakService.deleteOne(id);
-        userService.deleteOne(id);
     }
 
     public Boolean isExistOne(UUID id) {
@@ -46,7 +37,7 @@ public class UserFacade {
     @Transactional
     public UserDTO verifyOne(String code) {
         var user = userService.verifyOne(code);
-        userKeycloakService.verifyOne(user.getId(), user.getEmail());
+        userAuthService.verifyOne(user.getId(), user.getEmail());
 
         return user;
     }
@@ -65,7 +56,7 @@ public class UserFacade {
     }
 
     public void registerOne(UserWriteDTO request) {
-        UUID id = userRegistrationService.registerOne(request);
+        UUID id = userAuthService.registerOne(request);
 
         var snapshot = UserCreationSnapshot.builder()
                 .verificationCode(UUID.randomUUID().toString())

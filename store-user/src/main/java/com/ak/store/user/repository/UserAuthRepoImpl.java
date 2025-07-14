@@ -1,5 +1,6 @@
 package com.ak.store.user.repository;
 
+import jakarta.ws.rs.ClientErrorException;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
@@ -19,20 +20,19 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Repository
-public class UserRegistrationRepoImpl implements UserRegistrationRepo {
+public class UserAuthRepoImpl implements UserAuthRepo {
     private final Keycloak keycloak;
 
     @Value("${keycloak.realm}")
     private String realm;
 
     @Override
-    public UUID registerOne(String name, String email, String password) {
+    public UUID registerOne(String email, String password) {
         CredentialRepresentation credential = createPasswordCredentials(password);
 
         UserRepresentation user = new UserRepresentation();
         user.setEmail(email);
         user.setCredentials(Collections.singletonList(credential));
-        user.setFirstName(name);
         user.setEnabled(true);
 
         UsersResource userResource = getUsersResource();
@@ -46,6 +46,21 @@ public class UserRegistrationRepoImpl implements UserRegistrationRepo {
         addRealmRoleToUser(userId, List.of("ROLE_CONSUMER"));
 
         return userId;
+    }
+
+    @Override
+    public void verifyOne(UUID id, String email) {
+        UserRepresentation user = new UserRepresentation();
+
+        user.setEmailVerified(true);
+        user.setEmail(email);
+
+        UserResource userResource = getUsersResource().get(id.toString());
+        try {
+            userResource.update(user);
+        } catch (ClientErrorException e) {
+            throw new RuntimeException("error while verifying email kc");
+        }
     }
 
     private CredentialRepresentation createPasswordCredentials(String password) {

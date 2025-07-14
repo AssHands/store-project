@@ -46,11 +46,6 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteOne(UUID id) {
-        userRepo.deleteById(id);
-    }
-
-    @Transactional
     public String makeVerificationCode(UUID id, String email) {
         var user = findOneWithVerificationCodeById(id);
         String code = UUID.randomUUID().toString();

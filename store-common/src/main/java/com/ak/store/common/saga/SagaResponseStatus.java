@@ -9,5 +9,5 @@ public enum SagaResponseStatus {
     SUCCESS("SUCCESS"),
     FAILURE("FAILURE");
 
-    private String value;
+    private final String value;
 }
