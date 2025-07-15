@@ -1,4 +1,4 @@
-package com.ak.store.order.model.view.catalogue;
+package com.ak.store.catalogueSagaWorker.model.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductView {
+public class ProductRequest {
     private Long id;
 
     private String title;
@@ -27,11 +27,5 @@ public class ProductView {
 
     private Long categoryId;
 
-    private Float rating;
-
-    private Integer reviewAmount;
-
     private Boolean isAvailable;
-
-    private Boolean isDeleted;
 }

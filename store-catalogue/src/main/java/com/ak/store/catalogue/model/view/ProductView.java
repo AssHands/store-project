@@ -33,5 +33,5 @@ public class ProductView {
 
     private Boolean isAvailable;
 
-    private Boolean isDeleted;
+    private String status;
 }

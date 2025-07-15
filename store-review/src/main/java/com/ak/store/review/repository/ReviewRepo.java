@@ -1,6 +1,7 @@
 package com.ak.store.review.repository;
 
 import com.ak.store.review.model.document.Review;
+import com.ak.store.review.model.document.ReviewStatus;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -12,7 +13,7 @@ import java.util.UUID;
 
 @Repository
 public interface ReviewRepo extends ReviewRepoCustom, MongoRepository<Review, ObjectId> {
-    List<Review> findAllByProductId(Long productId, Pageable pageable);
+    List<Review> findAllByProductIdAndStatus(Long productId, ReviewStatus status, Pageable pageable);
 
     Optional<Review> findOneByUserIdAndProductId(UUID userId, Long productId);
 }

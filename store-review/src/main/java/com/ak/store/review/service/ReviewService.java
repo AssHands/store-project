@@ -35,7 +35,9 @@ public class ReviewService {
 
     public List<ReviewDTO> findAllByProductId(Long productId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return reviewMapper.toReviewDTO(reviewRepo.findAllByProductId(productId, pageable));
+        return reviewMapper.toReviewDTO(
+                reviewRepo.findAllByProductIdAndStatus(productId, ReviewStatus.COMPLETED, pageable)
+        );
     }
 
     public ReviewDTO createOne(UUID userId, ReviewWriteDTO request) {

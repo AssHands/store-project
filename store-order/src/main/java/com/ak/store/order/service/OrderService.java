@@ -1,14 +1,13 @@
 package com.ak.store.order.service;
 
-import com.ak.store.order.feign.CatalogueFeign;
+import com.ak.store.order.mapper.OrderMapper;
 import com.ak.store.order.model.dto.OrderDTOPayload;
-import com.ak.store.order.model.dto.write.OrderWriteDTO;
 import com.ak.store.order.model.entity.Order;
 import com.ak.store.order.model.entity.OrderProduct;
 import com.ak.store.order.model.entity.OrderStatus;
-import com.ak.store.order.model.view.catalogue.ProductView;
+import com.ak.store.order.model.view.feign.ProductView;
 import com.ak.store.order.repository.OrderRepo;
-import com.ak.store.order.mapper.OrderMapper;
+import com.ak.store.order.repository.ProductRepo;
 import com.ak.store.order.validator.service.OrderServiceValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +25,8 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepo orderRepo;
     private final OrderServiceValidator orderServiceValidator;
-    private final CatalogueFeign catalogueFeign;
     private final OrderMapper orderMapper;
+    private final ProductRepo productRepo;
 
     public List<OrderDTOPayload> findAllByUserId(UUID userId) {
         return orderMapper.toOrderDTOPayload(orderRepo.findAllWithProductsByUserId(userId));
@@ -35,7 +34,7 @@ public class OrderService {
 
     @Transactional
     public OrderDTOPayload createOne(UUID userId, Map<Long, Integer> productMap) {
-        var productPriceMap = catalogueFeign.findAllProduct(new ArrayList<>(productMap.keySet())).stream()
+        var productPriceMap = productRepo.findAllByIds(new ArrayList<>(productMap.keySet())).stream()
                 .collect(Collectors.toMap(ProductView::getId, ProductView::getCurrentPrice));
 
         var order = Order.builder()
@@ -61,7 +60,7 @@ public class OrderService {
             }
         }
 
-        //orderServiceValidator.validateCreating(productMap, totalPrice);
+        orderServiceValidator.validateCreating(productMap, userId, totalPrice);
 
         order.setTotalPrice(totalPrice);
         order.setProducts(orderProductList);

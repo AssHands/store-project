@@ -1,26 +1,28 @@
 package com.ak.store.order.validator.service;
 
 
-import com.ak.store.order.feign.CatalogueFeign;
-import com.ak.store.order.feign.WarehouseFeign;
-import com.ak.store.order.model.dto.write.OrderWriteDTO;
 import com.ak.store.order.model.form.werehouse.AvailableInventoryForm;
+import com.ak.store.order.repository.ProductRepo;
+import com.ak.store.order.repository.InventoryRepo;
+import com.ak.store.order.repository.UserBalanceRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Component
 public class OrderServiceValidator {
-    private final CatalogueFeign catalogueFeign;
-    private final WarehouseFeign warehouseFeign;
+    private final ProductRepo productRepo;
+    private final InventoryRepo inventoryRepo;
+    private final UserBalanceRepo userBalanceRepo;
 
-    public void validateCreating(Map<Long, Integer> productMap, Integer totalPrice) {
+    public void validateCreating(Map<Long, Integer> productMap, UUID userId, Integer totalPrice) {
         List<Long> productIds = new ArrayList<>(productMap.keySet());
-        if (!catalogueFeign.isAvailableAllProduct(productIds)) {
+        if (!productRepo.isAvailableAllProduct(productIds)) {
             throw new RuntimeException("some of the product are not available");
         }
 
@@ -32,10 +34,12 @@ public class OrderServiceValidator {
                     .build());
         }
 
-        if (!warehouseFeign.isAvailableAll(availableForm)) {
+        if (!inventoryRepo.isAvailableAll(availableForm)) {
             throw new RuntimeException("some of the product are not exist on warehouse");
         }
 
-        //todo add payment validation
+        if(userBalanceRepo.findOneByUserId(userId).getBalance() < totalPrice) {
+            throw new RuntimeException("not enough money");
+        }
     }
 }

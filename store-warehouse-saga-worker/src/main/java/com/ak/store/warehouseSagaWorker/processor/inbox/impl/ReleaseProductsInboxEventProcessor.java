@@ -1,6 +1,6 @@
 package com.ak.store.warehouseSagaWorker.processor.inbox.impl;
 
-import com.ak.store.warehouseSagaWorker.model.dto.ReserveProductsSagaRequestEvent;
+import com.ak.store.warehouseSagaWorker.model.dto.ReleaseProductsRequest;
 import com.ak.store.warehouseSagaWorker.model.entity.InboxEvent;
 import com.ak.store.warehouseSagaWorker.model.entity.InboxEventType;
 import com.ak.store.warehouseSagaWorker.processor.inbox.InboxEventProcessor;
@@ -17,8 +17,8 @@ public class ReleaseProductsInboxEventProcessor implements InboxEventProcessor {
 
     @Override
     public void process(InboxEvent event) {
-        var reserveProductsEvent = gson.fromJson(event.getPayload(), ReserveProductsSagaRequestEvent.class);
-        inventoryService.releaseAll(reserveProductsEvent.getProductAmount());
+        var request = gson.fromJson(event.getPayload(), ReleaseProductsRequest.class);
+        inventoryService.releaseAll(request.getProductAmount());
     }
 
     @Override

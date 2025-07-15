@@ -18,11 +18,11 @@ public class CategoryUpdatedOutboxEventProcessor implements OutboxEventProcessor
 
     @Override
     public void process(OutboxEvent event) {
-        var categoryUpdatedEvent = new CategoryUpdatedEvent(event.getId(),
+        var message = new CategoryUpdatedEvent(event.getId(),
                 gson.fromJson(event.getPayload(), CategorySnapshotPayload.class));
 
-        String categoryId = categoryUpdatedEvent.getPayload().getCategory().getId().toString();
-        eventProducerKafka.send(categoryUpdatedEvent, getType(), categoryId);
+        String categoryId = message.getPayload().getCategory().getId().toString();
+        eventProducerKafka.send(message, getType(), categoryId);
     }
 
     @Override

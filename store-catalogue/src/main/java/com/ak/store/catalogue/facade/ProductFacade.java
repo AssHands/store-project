@@ -1,7 +1,9 @@
 package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.integration.S3Service;
-import com.ak.store.catalogue.model.dto.ImageDTO;
+import com.ak.store.catalogue.mapper.ImageMapper;
+import com.ak.store.catalogue.mapper.ProductCharacteristicMapper;
+import com.ak.store.catalogue.mapper.ProductMapper;
 import com.ak.store.catalogue.model.dto.ProductDTO;
 import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
 import com.ak.store.catalogue.model.dto.write.ProductWritePayload;
@@ -10,9 +12,7 @@ import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.ImageService;
 import com.ak.store.catalogue.service.ProductCharacteristicService;
 import com.ak.store.catalogue.service.ProductService;
-import com.ak.store.catalogue.mapper.ImageMapper;
-import com.ak.store.catalogue.mapper.ProductCharacteristicMapper;
-import com.ak.store.catalogue.mapper.ProductMapper;
+import com.ak.store.common.snapshot.catalogue.ProductCreationSnapshot;
 import com.ak.store.common.snapshot.catalogue.ProductSnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -55,12 +55,14 @@ public class ProductFacade {
         var productCharacteristics =
                 productCharacteristicService.createAll(product.getId(), request.getCreateCharacteristics());
 
-        var snapshot = ProductSnapshotPayload.builder()
-                .product(productMapper.toProductSnapshot(product))
-                .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
+        var snapshot = ProductCreationSnapshot.builder()
+                .payload(ProductSnapshotPayload.builder()
+                        .product(productMapper.toProductSnapshot(product))
+                        .characteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
+                        .build())
                 .build();
 
-        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_CREATED);
+        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_CREATION);
         return product.getId();
     }
 
@@ -77,7 +79,7 @@ public class ProductFacade {
 
         var snapshot = ProductSnapshotPayload.builder()
                 .product(productMapper.toProductSnapshot(product))
-                .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
+                .characteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
                 .images(imageMapper.toImageSnapshot(images))
                 .build();
 
@@ -105,7 +107,7 @@ public class ProductFacade {
 
         var snapshot = ProductSnapshotPayload.builder()
                 .product(productMapper.toProductSnapshot(product))
-                .productCharacteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
+                .characteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
                 .images(imageMapper.toImageSnapshot(images))
                 .build();
 

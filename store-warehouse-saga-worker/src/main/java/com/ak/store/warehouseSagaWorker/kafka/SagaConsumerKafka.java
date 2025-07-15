@@ -52,4 +52,44 @@ public class SagaConsumerKafka {
 
         ack.acknowledge();
     }
+
+    //-------------------------------------------------------------
+
+    @KafkaListener(
+            topics = "inventory-creation-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleInventoryCreation(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.INVENTORY_CREATION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.INVENTORY_CREATION);
+            }
+        }
+
+        ack.acknowledge();
+    }
+
+    @KafkaListener(
+            topics = "cancel-inventory-creation-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleCancelInventoryCreation(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CANCEL_INVENTORY_CREATION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_INVENTORY_CREATION);
+            }
+        }
+
+        ack.acknowledge();
+    }
 }

@@ -128,6 +128,41 @@ saga:
 
     #------------------------------------------------------------
 
+    product-creation:
+      name: product-creation
+      request-topic: product-creation-request
+      compensation-request-topic: cancel-product-creation-request
+      compensation-response-topic: cancel-product-creation-response
+      steps:
+        product-synchronization:
+          name: product-synchronization
+          timeout: 500
+          topics:
+            request: product-synchronization-request
+            response: product-synchronization-response
+            compensation-request: cancel-product-synchronization-request
+            compensation-response: cancel-product-synchronization-response
+
+        inventory-creation:
+          name: inventory-creation
+          timeout: 500
+          topics:
+            request: inventory-creation-request
+            response: inventory-creation-response
+            compensation-request: cancel-inventory-creation-request
+            compensation-response: cancel-inventory-creation-response
+
+        confirm-product-creation:
+          name: confirm-product-creation
+          timeout: 500
+          topics:
+            request: confirm-product-creation-request
+            response: confirm-product-creation-response
+            compensation-request: cancel-product-creation-request
+            compensation-response: cancel-product-creation-response
+
+    #------------------------------------------------------------
+
     review-creation:
       name: review-creation
       request-topic: review-creation-request

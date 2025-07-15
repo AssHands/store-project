@@ -6,7 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum  OutboxEventType {
-    PRODUCT_CREATED("PRODUCT_CREATED"),
+    PRODUCT_CREATION("PRODUCT_CREATION"),
+
     PRODUCT_UPDATED("PRODUCT_UPDATED"),
     PRODUCT_DELETED("PRODUCT_DELETED"),
     CATEGORY_CREATED("CATEGORY_CREATED"),
@@ -16,5 +17,5 @@ public enum  OutboxEventType {
     CHARACTERISTIC_UPDATED("CHARACTERISTIC_UPDATED"),
     CHARACTERISTIC_DELETED("CHARACTERISTIC_DELETED");
 
-    private String value;
+    private final String value;
 }

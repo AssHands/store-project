@@ -17,11 +17,11 @@ public class CharacteristicDeletedOutboxEventProcessor implements OutboxEventPro
 
     @Override
     public void process(OutboxEvent event) {
-        var characteristicDeletedEvent = new CharacteristicDeletedEvent(event.getId(),
+        var message = new CharacteristicDeletedEvent(event.getId(),
                 gson.fromJson(event.getPayload(), Long.class));
 
-        String characteristicId = characteristicDeletedEvent.getCharacteristicId().toString();
-        eventProducerKafka.send(characteristicDeletedEvent, getType(), characteristicId);
+        String characteristicId = message.getCharacteristicId().toString();
+        eventProducerKafka.send(message, getType(), characteristicId);
     }
 
     @Override

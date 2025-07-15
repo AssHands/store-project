@@ -18,11 +18,11 @@ public class CharacteristicCreatedOutboxEventProcessor implements OutboxEventPro
 
     @Override
     public void process(OutboxEvent event) {
-        var characteristicCreatedEvent = new CharacteristicCreatedEvent(event.getId(),
+        var message = new CharacteristicCreatedEvent(event.getId(),
                 gson.fromJson(event.getPayload(), CharacteristicSnapshotPayload.class));
 
-        String characteristicId = characteristicCreatedEvent.getPayload().getCharacteristic().getId().toString();
-        eventProducerKafka.send(characteristicCreatedEvent, getType(), characteristicId);
+        String characteristicId = message.getPayload().getCharacteristic().getId().toString();
+        eventProducerKafka.send(message, getType(), characteristicId);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.ak.store.order.model.view.werehouse;
+package com.ak.store.SynchronizationSagaWorker.model.dto.write;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -7,13 +7,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class InventoryView {
-    private Long productId;
+public class ProductWriteDTOPayload {
+    private ProductWriteDTO product;
 
-    private Integer amount;
+    private List<ProductCharacteristicWriteDTO> characteristics;
+
+    private List<ImageWriteDTO> images;
 }

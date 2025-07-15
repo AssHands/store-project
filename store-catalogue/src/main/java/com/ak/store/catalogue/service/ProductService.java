@@ -4,6 +4,7 @@ import com.ak.store.catalogue.model.dto.ProductDTO;
 import com.ak.store.catalogue.model.dto.write.ProductWriteDTO;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Product;
+import com.ak.store.catalogue.model.entity.ProductStatus;
 import com.ak.store.catalogue.model.entity.RatingSummary;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.service.product.PriceCalculator;
@@ -53,7 +54,7 @@ public class ProductService {
         var product = productMapper.toProduct(request);
 
         PriceCalculator.setPrice(product, request);
-        product.setIsDeleted(false);
+        product.setStatus(ProductStatus.IN_PROGRESS);
         product.setReviewAmount(0);
         product.setRating(0f);
         product.setRatingSummary(RatingSummary.builder()
@@ -80,7 +81,7 @@ public class ProductService {
         var product = findOneById(id);
 
         product.setIsAvailable(false);
-        product.setIsDeleted(true);
+        product.setStatus(ProductStatus.DELETED);
 
         return productMapper.toProductDTO(productRepo.save(product));
     }

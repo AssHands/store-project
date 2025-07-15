@@ -33,5 +33,5 @@ public class ProductDTO {
 
     private Boolean isAvailable;
 
-    private Boolean isDeleted;
+    private String status;
 }

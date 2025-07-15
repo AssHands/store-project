@@ -17,8 +17,8 @@ public class UpdateProductGradeOutboxEventProcessor implements OutboxEventProces
 
     @Override
     public void process(OutboxEvent event) {
-        var response = gson.fromJson(event.getPayload(), SagaResponseEvent.class);
-        eventProducerKafka.send(response, getType(), event.getId().toString());
+        var message = gson.fromJson(event.getPayload(), SagaResponseEvent.class);
+        eventProducerKafka.send(message, getType(), event.getId().toString());
     }
 
     @Override

@@ -16,6 +16,6 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
     //Можно читать, Нельзя писать
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @EntityGraph(attributePaths = "ratingSummary")
-    @Query("SELECT p FROM Product p WHERE p.id = :id AND p.isDeleted = false")
+    @Query("SELECT p FROM Product p WHERE p.id = :id AND p.status = 'ACTIVE'")
     Optional<Product> findOneWithRatingSummaryById(Long id);
 }

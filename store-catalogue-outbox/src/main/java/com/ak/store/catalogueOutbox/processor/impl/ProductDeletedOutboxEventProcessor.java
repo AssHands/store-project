@@ -17,11 +17,11 @@ public class ProductDeletedOutboxEventProcessor implements OutboxEventProcessor 
 
     @Override
     public void process(OutboxEvent event) {
-        var productDeletedEvent = new ProductDeletedEvent(event.getId(),
+        var message = new ProductDeletedEvent(event.getId(),
                 gson.fromJson(event.getPayload(), Long.class));
 
-        String productId = productDeletedEvent.getProductId().toString();
-        eventProducerKafka.send(productDeletedEvent, getType(), productId);
+        String productId = message.getProductId().toString();
+        eventProducerKafka.send(message, getType(), productId);
     }
 
     @Override

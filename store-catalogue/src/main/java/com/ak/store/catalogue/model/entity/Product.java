@@ -50,7 +50,8 @@ public class Product {
 
     private Boolean isAvailable;
 
-    private Boolean isDeleted;
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private RatingSummary ratingSummary;

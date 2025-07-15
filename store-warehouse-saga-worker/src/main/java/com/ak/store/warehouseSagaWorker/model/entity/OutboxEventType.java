@@ -7,7 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum  OutboxEventType {
     RESERVE_PRODUCTS("RESERVE_PRODUCTS"),
-    RELEASE_PRODUCTS("RELEASE_PRODUCTS");
+    RELEASE_PRODUCTS("RELEASE_PRODUCTS"),
 
-    private String value;
+    INVENTORY_CREATION("INVENTORY_CREATION"),
+    CANCEL_INVENTORY_CREATION("CANCEL_INVENTORY_CREATION");
+
+    private final String value;
 }

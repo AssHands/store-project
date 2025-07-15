@@ -42,5 +42,7 @@
         <module>store-user-outbox</module>
         <module>store-user-saga-worker</module>
         <module>store-review-saga-worker</module>
+        <module>store-synchronization-outbox</module>
+        <module>store-synchronization-saga-worker</module>
     </modules>
 </project>

@@ -12,9 +12,9 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
     @EntityGraph(attributePaths = {"characteristics", "characteristics.characteristic", "category"})
     Optional<Product> findOneWithCharacteristicsAndCategoryById(Long id);
 
-    @Query("SELECT COUNT(p) = :amount FROM Product p WHERE p.id IN :ids AND p.isDeleted = false")
+    @Query("SELECT COUNT(p) = :amount FROM Product p WHERE p.id IN :ids AND p.status = 'ACTIVE'")
     boolean isExistAllByIds(List<Long> ids, long amount);
 
-    @Query("SELECT COUNT(p) = :amount FROM Product p WHERE p.id IN :ids AND p.isAvailable = true AND p.isDeleted = false")
+    @Query("SELECT COUNT(p) = :amount FROM Product p WHERE p.id IN :ids AND p.isAvailable = true AND p.status = 'ACTIVE'")
     boolean isAvailableAllByIds(List<Long> ids, long amount);
 }

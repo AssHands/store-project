@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,12 @@ public class UserBalanceController {
     private final UserBalanceMapper userBalanceMapper;
 
     @GetMapping
-    public UserBalanceView findOne(@AuthenticationPrincipal Jwt accessToken) {
+    public UserBalanceView findOne(@RequestBody UUID userId) {
+        return userBalanceMapper.toUserBalanceView(userBalanceFacade.findOne(userId));
+    }
+
+    @GetMapping("me")
+    public UserBalanceView findOneMe(@AuthenticationPrincipal Jwt accessToken) {
         UUID id = UUID.fromString(accessToken.getSubject());
         return userBalanceMapper.toUserBalanceView(userBalanceFacade.findOne(id));
     }

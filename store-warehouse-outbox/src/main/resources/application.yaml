@@ -44,3 +44,6 @@ kafka:
   topics:
     reserve-products: warehouse-reserve-products-response
     release-products: warehouse-release-products-response
+
+    inventory-creation: inventory-creation-response
+    cancel-inventory-creation: cancel-inventory-creation-response

@@ -128,4 +128,44 @@ public class SagaConsumerKafka {
 
         ack.acknowledge();
     }
+
+    //-------------------------------------------------------------
+
+    @KafkaListener(
+            topics = "cancel-product-creation-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleCancelProductCreation(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CANCEL_PRODUCT_CREATION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_PRODUCT_CREATION);
+            }
+        }
+
+        ack.acknowledge();
+    }
+
+    @KafkaListener(
+            topics = "confirm-product-creation-request",
+            groupId = "${spring.kafka.consumer.group-id}",
+            batch = "true"
+    )
+    public void handleConfirmProductCreation(List<SagaRequestEvent> events, Acknowledgment ack) {
+        for (var event : events) {
+            try {
+                inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
+                        event.getSagaName(), event.getRequest().toString(), InboxEventType.CONFIRM_PRODUCT_CREATION);
+            } catch (Exception e) {
+                inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_PRODUCT_CREATION);
+            }
+        }
+
+        ack.acknowledge();
+    }
 }

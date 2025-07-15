@@ -18,11 +18,11 @@ public class ProductUpdatedOutboxEventProcessor implements OutboxEventProcessor 
 
     @Override
     public void process(OutboxEvent event) {
-        var productUpdatedEvent = new ProductUpdatedEvent(event.getId(),
+        var message = new ProductUpdatedEvent(event.getId(),
                 gson.fromJson(event.getPayload(), ProductSnapshotPayload.class));
 
-        String productId = productUpdatedEvent.getPayload().getProduct().getId().toString();
-        eventProducerKafka.send(productUpdatedEvent, getType(), productId);
+        String productId = message.getPayload().getProduct().getId().toString();
+        eventProducerKafka.send(message, getType(), productId);
     }
 
     @Override
