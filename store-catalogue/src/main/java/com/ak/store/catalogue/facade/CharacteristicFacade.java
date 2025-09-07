@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.facade;
 
+import com.ak.store.catalogue.mapper.CharacteristicMapper;
 import com.ak.store.catalogue.model.dto.CharacteristicDTO;
 import com.ak.store.catalogue.model.dto.NumericValueDTO;
 import com.ak.store.catalogue.model.dto.write.CharacteristicWriteDTO;
@@ -8,7 +9,6 @@ import com.ak.store.catalogue.model.dto.write.TextValueWriteDTO;
 import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.CharacteristicService;
-import com.ak.store.catalogue.mapper.CharacteristicMapper;
 import com.ak.store.common.snapshot.catalogue.CharacteristicSnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

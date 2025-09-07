@@ -1,7 +1,7 @@
 //package com.ak.store.sagaOrchestrator.config;
 //
 //import com.ak.store.common.saga.SagaResponseEvent;
-//import com.ak.store.sagaOrchestrator.kafka.consumer.SagaConsumerKafka;
+//import com.ak.store.sagaOrchestrator.kafka.SagaConsumerKafka;
 //import com.ak.store.sagaOrchestrator.util.SagaProperties;
 //import jakarta.annotation.PostConstruct;
 //import lombok.RequiredArgsConstructor;

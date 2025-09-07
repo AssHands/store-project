@@ -1,7 +1,7 @@
 package com.ak.store.paymentSagaWorker.processor.inbox;
 
-import com.ak.store.paymentSagaWorker.model.entity.InboxEvent;
-import com.ak.store.paymentSagaWorker.model.entity.InboxEventType;
+import com.ak.store.paymentSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.paymentSagaWorker.model.inbox.InboxEventType;
 
 public interface InboxEventProcessor {
     void process(InboxEvent event);

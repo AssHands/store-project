@@ -1,7 +1,7 @@
 package com.ak.store.sagaOrchestrator.repository;
 
-import com.ak.store.sagaOrchestrator.model.entity.SagaStep;
-import com.ak.store.sagaOrchestrator.model.entity.SagaStepStatus;
+import com.ak.store.sagaOrchestrator.model.SagaStep;
+import com.ak.store.sagaOrchestrator.model.SagaStepStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -42,4 +42,8 @@ public interface SagaStepRepo extends JpaRepository<SagaStep, UUID> {
     @Modifying
     @Query("UPDATE SagaStep ss SET ss.status = :status, ss.retryTime = :retryTime WHERE ss IN :sagaSteps")
     void updateAllStatus(List<SagaStep> sagaSteps, SagaStepStatus status, LocalDateTime retryTime);
+
+    @Modifying
+    @Query("UPDATE SagaStep ss SET ss.status = :status, ss.retryTime = :retryTime WHERE ss = :sagaSteps")
+    void updateOneStatus(SagaStep sagaSteps, SagaStepStatus status, LocalDateTime retryTime);
 }

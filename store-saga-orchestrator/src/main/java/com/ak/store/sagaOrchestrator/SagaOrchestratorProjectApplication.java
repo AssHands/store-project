@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
@@ -13,6 +14,7 @@ import org.springframework.messaging.handler.annotation.support.DefaultMessageHa
 import org.springframework.messaging.handler.annotation.support.MessageHandlerMethodFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@ComponentScan(basePackages = {"com.ak.store.*" })
 @SpringBootApplication
 @EnableScheduling
 public class SagaOrchestratorProjectApplication {

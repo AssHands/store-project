@@ -1,7 +1,7 @@
 package com.ak.store.sagaOrchestrator.facade;
 
-import com.ak.store.sagaOrchestrator.model.entity.SagaStatus;
-import com.ak.store.sagaOrchestrator.model.entity.SagaStepStatus;
+import com.ak.store.sagaOrchestrator.model.SagaStatus;
+import com.ak.store.sagaOrchestrator.model.SagaStepStatus;
 import com.ak.store.sagaOrchestrator.service.SagaService;
 import com.ak.store.sagaOrchestrator.service.SagaStepService;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;

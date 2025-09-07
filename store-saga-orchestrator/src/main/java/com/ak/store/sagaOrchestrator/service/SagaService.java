@@ -1,12 +1,9 @@
 package com.ak.store.sagaOrchestrator.service;
 
-import com.ak.store.sagaOrchestrator.model.entity.Saga;
-import com.ak.store.sagaOrchestrator.model.entity.SagaStatus;
+import com.ak.store.sagaOrchestrator.model.Saga;
+import com.ak.store.sagaOrchestrator.model.SagaStatus;
 import com.ak.store.sagaOrchestrator.repository.SagaRepo;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

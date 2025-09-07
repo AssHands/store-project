@@ -39,4 +39,9 @@ public class OutboxEventService {
     public void markAllAsCompleted(List<OutboxEvent> events) {
         outboxEventRepo.updateAll(events, OutboxEventStatus.COMPLETED);
     }
+
+    @Transactional
+    public void markOneAsCompleted(OutboxEvent event) {
+        outboxEventRepo.updateOne(event, OutboxEventStatus.COMPLETED);
+    }
 }

@@ -1,10 +1,9 @@
 package com.ak.store.paymentSagaWorker.service;
 
-import com.ak.store.paymentSagaWorker.model.entity.InboxEvent;
-import com.ak.store.paymentSagaWorker.model.entity.OutboxEventType;
+import com.ak.store.paymentSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.paymentSagaWorker.repository.InboxEventRepo;
-import com.ak.store.paymentSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.paymentSagaWorker.model.entity.InboxEventType;
+import com.ak.store.paymentSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.paymentSagaWorker.model.inbox.InboxEventType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -56,5 +55,15 @@ public class InboxEventReaderService {
     @Transactional
     public void markAllAs(List<InboxEvent> events, InboxEventStatus status) {
         inboxEventRepo.updateAll(events, status, LocalDateTime.now());
+    }
+
+    @Transactional
+    public void markOneAs(InboxEvent event, InboxEventStatus status) {
+        inboxEventRepo.updateOne(event, status, LocalDateTime.now());
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void markOneAsFailure(InboxEvent event) {
+        inboxEventRepo.updateOne(event, InboxEventStatus.FAILURE, LocalDateTime.now());
     }
 }

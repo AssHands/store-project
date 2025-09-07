@@ -1,13 +1,15 @@
 package com.ak.store.warehouseSagaWorker.processor.outbox.impl;
 
-import com.ak.store.common.saga.SagaResponseEvent;
-import com.ak.store.common.saga.SagaResponseStatus;
-import com.ak.store.warehouseSagaWorker.model.entity.InboxEvent;
-import com.ak.store.warehouseSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.warehouseSagaWorker.model.entity.InboxEventType;
-import com.ak.store.warehouseSagaWorker.model.entity.OutboxEventType;
+import com.ak.store.kafka.storekafkastarter.model.saga.SagaResponseEvent;
+import com.ak.store.kafka.storekafkastarter.model.saga.SagaResponseStatus;
+import com.ak.store.warehouseSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.warehouseSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.warehouseSagaWorker.model.inbox.InboxEventType;
+import com.ak.store.warehouseSagaWorker.model.outbox.OutboxEventType;
 import com.ak.store.warehouseSagaWorker.processor.outbox.OutboxEventProcessor;
+import com.ak.store.warehouseSagaWorker.service.InboxEventReaderService;
 import com.ak.store.warehouseSagaWorker.service.OutboxEventService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReleaseProductsOutboxEventProcessor implements OutboxEventProcessor {
     private final OutboxEventService outboxEventService;
+    private final InboxEventReaderService inboxEventReaderService;
 
+    @Transactional
     @Override
     public void process(InboxEvent event) {
         SagaResponseStatus status;
@@ -34,7 +38,11 @@ public class ReleaseProductsOutboxEventProcessor implements OutboxEventProcessor
                 .status(status)
                 .build();
 
-        outboxEventService.createOne(event.getId(), response, OutboxEventType.RELEASE_PRODUCTS);
+        try {
+            outboxEventService.createOne(event.getId(), response, OutboxEventType.RELEASE_PRODUCTS);
+            inboxEventReaderService.markOneAs(event, InboxEventStatus.COMPLETED);
+        } catch (Exception ignored) {
+        }
     }
 
     @Override

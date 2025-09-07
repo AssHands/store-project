@@ -1,12 +1,12 @@
 package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.CharacteristicFacade;
+import com.ak.store.catalogue.mapper.CharacteristicMapper;
 import com.ak.store.catalogue.model.form.CharacteristicForm;
 import com.ak.store.catalogue.model.form.NumericValueForm;
 import com.ak.store.catalogue.model.form.TextValueForm;
 import com.ak.store.catalogue.model.validationGroup.Update;
 import com.ak.store.catalogue.model.view.CharacteristicView;
-import com.ak.store.catalogue.mapper.CharacteristicMapper;
 import com.ak.store.catalogue.model.validationGroup.Create;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

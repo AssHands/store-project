@@ -1,7 +1,8 @@
 package com.ak.store.warehouseSagaWorker.service;
 
-import com.ak.store.warehouseSagaWorker.model.entity.Inventory;
+import com.ak.store.warehouseSagaWorker.model.inventory.Inventory;
 import com.ak.store.warehouseSagaWorker.repository.InventoryRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 public class InventoryService {
     private final InventoryRepo inventoryRepo;
 
+    @Transactional
     public void releaseAll(Map<Long, Integer> productAmount) {
         var inventories = inventoryRepo.findAllById(productAmount.keySet());
 
@@ -22,6 +24,7 @@ public class InventoryService {
         inventoryRepo.saveAll(inventories);
     }
 
+    @Transactional
     public void reserveAll(Map<Long, Integer> productAmount) {
         var inventories = inventoryRepo.findAllById(productAmount.keySet());
 
@@ -40,6 +43,7 @@ public class InventoryService {
         inventoryRepo.saveAll(inventories);
     }
 
+    @Transactional
     public void createOne(Long productId) {
         var inventory = Inventory.builder()
                 .productId(productId)
@@ -49,6 +53,7 @@ public class InventoryService {
         inventoryRepo.save(inventory);
     }
 
+    @Transactional
     public void deleteOne(Long productId) {
         inventoryRepo.deleteById(productId);
     }

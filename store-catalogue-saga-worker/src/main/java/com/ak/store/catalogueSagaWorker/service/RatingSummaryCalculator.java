@@ -1,28 +1,11 @@
 package com.ak.store.catalogueSagaWorker.service;
 
-
 import com.ak.store.catalogueSagaWorker.model.entity.RatingSummary;
 
-public abstract class RatingSummaryCalculator {
-    public static void calculateCreating(RatingSummary ratingSummary, Integer grade) {
-        ratingSummary.setAmount(ratingSummary.getAmount() + 1);
-        ratingSummary.setSum(ratingSummary.getSum() + grade);
-        ratingSummary.setAverage(defineAvgGrade(ratingSummary.getSum(), ratingSummary.getAmount()));
-    }
+public interface RatingSummaryCalculator {
+    void calculateCreating(RatingSummary ratingSummary, Integer grade);
 
-    public static void calculateUpdating(RatingSummary ratingSummary, Integer newGrade, Integer oldGrade) {
-        ratingSummary.setSum(ratingSummary.getSum() + (newGrade - oldGrade));
-        ratingSummary.setAverage(defineAvgGrade(ratingSummary.getSum(), ratingSummary.getAmount()));
-    }
+    void calculateUpdating(RatingSummary ratingSummary, Integer newGrade, Integer oldGrade);
 
-    public static void calculateDeleting(RatingSummary ratingSummary, Integer grade) {
-        ratingSummary.setSum(ratingSummary.getSum() - grade);
-        ratingSummary.setAmount(ratingSummary.getAmount() - 1);
-        ratingSummary.setAverage(defineAvgGrade(ratingSummary.getSum(), ratingSummary.getAmount()));
-    }
-
-    private static Float defineAvgGrade(Integer gradeSum, Integer gradeAmount) {
-        Float avg = gradeSum.floatValue() / gradeAmount.floatValue();
-        return avg.isNaN() ? 0f : avg;
-    }
+    void calculateDeleting(RatingSummary ratingSummary, Integer grade);
 }

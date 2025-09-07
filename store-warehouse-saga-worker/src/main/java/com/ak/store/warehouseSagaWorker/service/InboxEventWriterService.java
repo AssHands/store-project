@@ -1,7 +1,7 @@
 package com.ak.store.warehouseSagaWorker.service;
 
-import com.ak.store.warehouseSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.warehouseSagaWorker.model.entity.InboxEventType;
+import com.ak.store.warehouseSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.warehouseSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.warehouseSagaWorker.repository.InboxEventRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,13 +1,15 @@
 package com.ak.store.orderSagaWorker.processor.outbox.impl;
 
-import com.ak.store.common.saga.SagaResponseEvent;
-import com.ak.store.common.saga.SagaResponseStatus;
-import com.ak.store.orderSagaWorker.model.entity.InboxEvent;
-import com.ak.store.orderSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.orderSagaWorker.model.entity.InboxEventType;
-import com.ak.store.orderSagaWorker.model.entity.OutboxEventType;
+import com.ak.store.kafka.storekafkastarter.model.saga.SagaResponseEvent;
+import com.ak.store.kafka.storekafkastarter.model.saga.SagaResponseStatus;
+import com.ak.store.orderSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.orderSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.orderSagaWorker.model.inbox.InboxEventType;
+import com.ak.store.orderSagaWorker.model.outbox.OutboxEventType;
 import com.ak.store.orderSagaWorker.processor.outbox.OutboxEventProcessor;
+import com.ak.store.orderSagaWorker.service.InboxEventReaderService;
 import com.ak.store.orderSagaWorker.service.OutboxEventService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConfirmOrderOutboxEventProcessor implements OutboxEventProcessor {
     private final OutboxEventService outboxEventService;
+    private final InboxEventReaderService inboxEventReaderService;
 
+    @Transactional
     @Override
     public void process(InboxEvent event) {
         SagaResponseStatus status;
@@ -34,7 +38,11 @@ public class ConfirmOrderOutboxEventProcessor implements OutboxEventProcessor {
                 .status(status)
                 .build();
 
-        outboxEventService.createOne(event.getId(), response, OutboxEventType.CONFIRM_ORDER);
+        try {
+            outboxEventService.createOne(event.getId(), response, OutboxEventType.CONFIRM_ORDER);
+            inboxEventReaderService.markOneAs(event, InboxEventStatus.COMPLETED);
+        } catch (Exception ignored) {
+        }
     }
 
     @Override

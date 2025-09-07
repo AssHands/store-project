@@ -1,11 +1,13 @@
 package com.ak.store.orderOutbox.processor.impl;
 
-import com.ak.store.common.saga.SagaResponseEvent;
-import com.ak.store.orderOutbox.kafka.EventProducerKafka;
+import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
+import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.saga.SagaResponseEvent;
 import com.ak.store.orderOutbox.model.OutboxEvent;
 import com.ak.store.orderOutbox.model.OutboxEventType;
 import com.ak.store.orderOutbox.processor.OutboxEventProcessor;
-import com.google.gson.Gson;
+import com.ak.store.orderOutbox.service.OutboxEventService;
+import com.ak.store.orderOutbox.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +15,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class CancelOrderOutboxEventProcessor implements OutboxEventProcessor {
     private final EventProducerKafka eventProducerKafka;
-    private final Gson gson;
+    private final JsonMapperKafka jsonMapperKafka;
+    private final KafkaTopicRegistry kafkaTopicRegistry;
+    private final OutboxEventService outboxEventService;
 
     @Override
     public void process(OutboxEvent event) {
-        var response = gson.fromJson(event.getPayload(), SagaResponseEvent.class);
-        eventProducerKafka.send(response, getType(), event.getId().toString());
+        String topic = kafkaTopicRegistry.getTopicByEvent(getType());
+        var response = jsonMapperKafka.fromJson(event.getPayload(), SagaResponseEvent.class);
+
+        eventProducerKafka.sendAsync(response, topic, event.getId().toString())
+                .thenRun(() -> outboxEventService.markOneAsCompleted(event));
     }
 
     @Override

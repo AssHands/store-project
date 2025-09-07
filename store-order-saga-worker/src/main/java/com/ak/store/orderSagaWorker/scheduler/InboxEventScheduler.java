@@ -1,15 +1,12 @@
 package com.ak.store.orderSagaWorker.scheduler;
 
-import com.ak.store.orderSagaWorker.model.entity.InboxEvent;
-import com.ak.store.orderSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.orderSagaWorker.model.entity.InboxEventType;
+import com.ak.store.orderSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.orderSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.orderSagaWorker.processor.inbox.InboxEventProcessor;
 import com.ak.store.orderSagaWorker.service.InboxEventReaderService;
-import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,7 +26,6 @@ public class InboxEventScheduler {
                 ));
     }
 
-    @Transactional
     @Scheduled(fixedRate = 5000)
     public void executeInboxEvents() {
         for (var entry : inboxEventProcessors.entrySet()) {
@@ -40,24 +36,9 @@ public class InboxEventScheduler {
     private void processInboxEventsOfType(InboxEventType type) {
         var processor = inboxEventProcessors.get(type);
         var events = inboxEventReaderService.findAllForProcessing(type);
-        List<InboxEvent> successEvents = new ArrayList<>();
-        List<InboxEvent> failedEvents = new ArrayList<>();
 
         for (var event : events) {
-            try {
-                processor.process(event);
-                successEvents.add(event);
-            } catch (Exception ignored) {
-                //todo сделать логику retry. сейчас в случае неудачи - событие сразу помечается как неудачное
-                failedEvents.add(event);
-            }
-        }
-
-        if (!successEvents.isEmpty()) {
-            inboxEventReaderService.markAllAs(successEvents, InboxEventStatus.SUCCESS);
-        }
-        if (!failedEvents.isEmpty()) {
-            inboxEventReaderService.markAllAs(failedEvents, InboxEventStatus.FAILURE);
+            processor.process(event);
         }
     }
 }

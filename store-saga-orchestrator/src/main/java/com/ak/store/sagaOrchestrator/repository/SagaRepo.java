@@ -1,7 +1,7 @@
 package com.ak.store.sagaOrchestrator.repository;
 
-import com.ak.store.sagaOrchestrator.model.entity.Saga;
-import com.ak.store.sagaOrchestrator.model.entity.SagaStatus;
+import com.ak.store.sagaOrchestrator.model.Saga;
+import com.ak.store.sagaOrchestrator.model.SagaStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -31,4 +31,8 @@ public interface OutboxEventRepo extends JpaRepository<OutboxEvent, UUID> {
     @Modifying
     @Query("UPDATE OutboxEvent e SET e.status = :status WHERE e IN :events")
     void updateAll(List<OutboxEvent> events, OutboxEventStatus status);
+
+    @Modifying
+    @Query("UPDATE OutboxEvent e SET e.status = :status WHERE e = :event")
+    void updateOne(OutboxEvent event, OutboxEventStatus status);
 }

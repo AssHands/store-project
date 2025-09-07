@@ -1,14 +1,11 @@
 package com.ak.store.orderOutbox.scheduler;
 
-import com.ak.store.orderOutbox.model.OutboxEvent;
 import com.ak.store.orderOutbox.model.OutboxEventType;
 import com.ak.store.orderOutbox.processor.OutboxEventProcessor;
 import com.ak.store.orderOutbox.service.OutboxEventService;
-import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +25,6 @@ public class OutboxEventScheduler {
                 ));
     }
 
-    @Transactional
     @Scheduled(fixedRate = 5000)
     public void executeOutboxEvents() {
         for (var entry : eventProcessors.entrySet()) {
@@ -37,17 +33,11 @@ public class OutboxEventScheduler {
     }
 
     private void processOutboxEventsOfType(OutboxEventType type) {
-        var processor = eventProcessors.get(type);
         var events = outboxEventService.findAllForProcessing(type);
-        List<OutboxEvent> completedEvents = new ArrayList<>();
+        var processor = eventProcessors.get(type);
 
         for (var event : events) {
-            try {
-                processor.process(event);
-                completedEvents.add(event);
-            } catch (Exception ignored) {}
+            processor.process(event);
         }
-
-        outboxEventService.markAllAsCompleted(completedEvents);
     }
 }

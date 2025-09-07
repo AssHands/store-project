@@ -1,7 +1,7 @@
 package com.ak.store.warehouseSagaWorker.service;
 
-import com.ak.store.warehouseSagaWorker.model.entity.OutboxEventStatus;
-import com.ak.store.warehouseSagaWorker.model.entity.OutboxEventType;
+import com.ak.store.warehouseSagaWorker.model.outbox.OutboxEventStatus;
+import com.ak.store.warehouseSagaWorker.model.outbox.OutboxEventType;
 import com.ak.store.warehouseSagaWorker.repository.OutboxEventRepo;
 import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
