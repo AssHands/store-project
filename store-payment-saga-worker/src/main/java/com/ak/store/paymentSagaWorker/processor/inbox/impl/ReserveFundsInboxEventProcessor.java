@@ -1,14 +1,13 @@
 package com.ak.store.paymentSagaWorker.processor.inbox.impl;
 
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.order.OrderCreation;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.order.OrderCreation;
 import com.ak.store.paymentSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.paymentSagaWorker.model.inbox.InboxEventStatus;
 import com.ak.store.paymentSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.paymentSagaWorker.processor.inbox.InboxEventProcessor;
 import com.ak.store.paymentSagaWorker.service.InboxEventReaderService;
 import com.ak.store.paymentSagaWorker.service.UserBalanceService;
-import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

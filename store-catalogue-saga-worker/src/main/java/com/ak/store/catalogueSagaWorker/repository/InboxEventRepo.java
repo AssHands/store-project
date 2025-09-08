@@ -1,8 +1,8 @@
 package com.ak.store.catalogueSagaWorker.repository;
 
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEvent;
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEventType;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventType;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -45,8 +45,8 @@ public interface InboxEventRepo extends JpaRepository<InboxEvent, UUID> {
 
     @Modifying
     @Query(nativeQuery = true, value = """
-            INSERT INTO inbox (id, step_name, saga_id, saga_name, type, status, retry_timee)
-            VALUES (:id, :sagaId, :stepName, :type, :status, :retryTime)
+            INSERT INTO inbox (id, step_name, saga_id, saga_name, type, status, retry_time)
+            VALUES (:id, :stepName, :sagaId, :sagaName, :type, :status, :retryTime)
             ON CONFLICT (saga_id, type) DO NOTHING
             """)
     int saveOneIgnoreDuplicate(UUID id,
@@ -60,4 +60,8 @@ public interface InboxEventRepo extends JpaRepository<InboxEvent, UUID> {
     @Modifying
     @Query("UPDATE InboxEvent e SET e.status = :status, e.retryTime = :time WHERE e IN :events")
     void updateAll(List<InboxEvent> events, InboxEventStatus status, LocalDateTime time);
+
+    @Modifying
+    @Query("UPDATE InboxEvent e SET e.status = :status, e.retryTime = :time WHERE e = :event")
+    void updateOne(InboxEvent event, InboxEventStatus status, LocalDateTime time);
 }

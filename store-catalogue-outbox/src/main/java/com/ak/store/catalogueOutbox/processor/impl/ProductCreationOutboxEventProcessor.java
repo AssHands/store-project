@@ -1,17 +1,16 @@
 package com.ak.store.catalogueOutbox.processor.impl;
 
-import com.ak.store.catalogueOutbox.kafka.EventProducerKafka;
-import com.ak.store.catalogueOutbox.mapper.JsonMapper;
+
 import com.ak.store.catalogueOutbox.model.OutboxEvent;
+import com.ak.store.catalogueOutbox.model.OutboxEventStatus;
 import com.ak.store.catalogueOutbox.model.OutboxEventType;
 import com.ak.store.catalogueOutbox.processor.OutboxEventProcessor;
-import com.ak.store.common.kafka.catalogue.ProductCreationEvent;
-import com.ak.store.common.kafka.user.UserCreationEvent;
-import com.ak.store.common.saga.SagaRequestEvent;
-import com.ak.store.common.snapshot.catalogue.ProductCreationSnapshot;
-import com.ak.store.common.snapshot.user.UserCreationSnapshot;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.gson.Gson;
+import com.ak.store.catalogueOutbox.service.OutboxEventService;
+import com.ak.store.catalogueOutbox.util.KafkaTopicRegistry;
+import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
+import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.ProductCreationSnapshot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,21 +18,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProductCreationOutboxEventProcessor implements OutboxEventProcessor {
     private final EventProducerKafka eventProducerKafka;
-    private final Gson gson;
-    private final JsonMapper jsonMapper;
+    private final JsonMapperKafka jsonMapperKafka;
+    private final KafkaTopicRegistry kafkaTopicRegistry;
+    private final OutboxEventService outboxEventService;
 
     @Override
-    public void process(OutboxEvent event) throws JsonProcessingException {
-        var message = new ProductCreationEvent(event.getId(),
-                gson.fromJson(event.getPayload(), ProductCreationSnapshot.class));
+    public void process(OutboxEvent event) {
+        String topic = kafkaTopicRegistry.getTopicByEvent(getType());
+        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), ProductCreationSnapshot.class);
 
-        var request = SagaRequestEvent.builder()
+        var request = SagaRequestEvent.<ProductCreationSnapshot>builder()
                 .sagaId(event.getId())
-                .request(jsonMapper.toJsonNode(message.getRequest()))
+                .request(snapshot)
                 .build();
 
-        String productId = message.getRequest().getPayload().getProduct().getId().toString();
-        eventProducerKafka.send(request, getType(), productId);
+        eventProducerKafka.sendAsync(request, topic, event.getId().toString())
+                .thenRun(() -> outboxEventService.markOneAs(event, OutboxEventStatus.COMPLETED));
     }
 
     @Override

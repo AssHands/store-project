@@ -1,6 +1,5 @@
 package com.ak.store.synchronization.errorHandler;
 
-import com.ak.store.common.kafka.catalogue.*;
 import com.ak.store.synchronization.kafka.producer.DltProducerKafka;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,5 +1,6 @@
 package com.ak.store.paymentSagaWorker.processor.inbox.impl;
 
+import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
 import com.ak.store.paymentSagaWorker.model.dto.CancelUserPaymentCreationSagaRequestEvent;
 import com.ak.store.paymentSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.paymentSagaWorker.model.inbox.InboxEventStatus;
@@ -15,14 +16,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class CancelUserPaymentCreationInboxEventProcessor implements InboxEventProcessor {
-    private final Gson gson;
-    private final UserBalanceService userBalanceService;
+    private final JsonMapperKafka jsonMapperKafka;
     private final InboxEventReaderService inboxEventReaderService;
+    private final UserBalanceService userBalanceService;
 
     @Transactional
     @Override
     public void process(InboxEvent event) {
-        var cancelUserPaymentCreationRequest = gson.fromJson(event.getPayload(), CancelUserPaymentCreationSagaRequestEvent.class);
+        var cancelUserPaymentCreationRequest = jsonMapperKafka.fromJson(event.getPayload(), CancelUserPaymentCreationSagaRequestEvent.class);
 
         try {
             userBalanceService.deleteOne(cancelUserPaymentCreationRequest.getUserId());

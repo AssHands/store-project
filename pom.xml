@@ -44,5 +44,6 @@
         <module>store-review-saga-worker</module>
         <module>store-synchronization-outbox</module>
         <module>store-synchronization-saga-worker</module>
+        <module>store-kafka-starter</module>
     </modules>
 </project>

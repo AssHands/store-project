@@ -1,8 +1,9 @@
 package com.ak.store.catalogueSagaWorker.service;
 
 
-import com.ak.store.catalogueSagaWorker.model.entity.Product;
+import com.ak.store.catalogueSagaWorker.model.product.Product;
 import com.ak.store.catalogueSagaWorker.repository.ProductRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ public class RatingUpdaterService {
                 .orElseThrow(() -> new RuntimeException("not found"));
     }
 
+    @Transactional
     public void createOne(Long productId, Integer grade) {
         var product = findOneById(productId);
         var ratingSummary = product.getRatingSummary();
@@ -29,6 +31,7 @@ public class RatingUpdaterService {
         productRepo.save(product);
     }
 
+    @Transactional
     public void updateOne(Long productId, Integer newGrade, Integer oldGrade) {
         var product = findOneById(productId);
         var ratingSummary = product.getRatingSummary();
@@ -40,6 +43,7 @@ public class RatingUpdaterService {
         productRepo.save(product);
     }
 
+    @Transactional
     public void deleteOne(Long productId, Integer grade) {
         var product = findOneById(productId);
         var ratingSummary = product.getRatingSummary();

@@ -1,13 +1,15 @@
 package com.ak.store.catalogueSagaWorker.processor.outbox.impl;
 
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEvent;
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEventType;
-import com.ak.store.catalogueSagaWorker.model.entity.OutboxEventType;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventType;
+import com.ak.store.catalogueSagaWorker.model.outbox.OutboxEventType;
 import com.ak.store.catalogueSagaWorker.processor.outbox.OutboxEventProcessor;
+import com.ak.store.catalogueSagaWorker.service.InboxEventReaderService;
 import com.ak.store.catalogueSagaWorker.service.OutboxEventService;
-import com.ak.store.common.saga.SagaResponseEvent;
-import com.ak.store.common.saga.SagaResponseStatus;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseStatus;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class DeleteProductGradeOutboxEventProcessor implements OutboxEventProcessor {
     private final OutboxEventService outboxEventService;
+    private final InboxEventReaderService inboxEventReaderService;
 
+    @Transactional
     @Override
     public void process(InboxEvent event) {
         SagaResponseStatus status;
@@ -34,7 +38,11 @@ public class DeleteProductGradeOutboxEventProcessor implements OutboxEventProces
                 .status(status)
                 .build();
 
-        outboxEventService.createOne(event.getId(), response, OutboxEventType.DELETE_PRODUCT_GRADE);
+        try {
+            outboxEventService.createOne(event.getId(), response, OutboxEventType.DELETE_PRODUCT_GRADE);
+            inboxEventReaderService.markOneAs(event, InboxEventStatus.COMPLETED);
+        } catch (Exception ignored) {
+        }
     }
 
     @Override

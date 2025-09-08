@@ -1,15 +1,15 @@
 package com.ak.store.reviewOutbox.processor.impl;
 
-import com.ak.store.common.kafka.review.ReviewCreationEvent;
-import com.ak.store.common.saga.SagaRequestEvent;
-import com.ak.store.common.snapshot.review.ReviewCreationSnapshot;
-import com.ak.store.reviewOutbox.kafka.EventProducerKafka;
-import com.ak.store.reviewOutbox.mapper.JsonMapper;
+import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
+import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewCreationSnapshot;
 import com.ak.store.reviewOutbox.model.OutboxEvent;
+import com.ak.store.reviewOutbox.model.OutboxEventStatus;
 import com.ak.store.reviewOutbox.model.OutboxEventType;
 import com.ak.store.reviewOutbox.processor.OutboxEventProcessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.gson.Gson;
+import com.ak.store.reviewOutbox.service.OutboxEventService;
+import com.ak.store.reviewOutbox.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,21 +17,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReviewCreationOutboxEventProcessor implements OutboxEventProcessor {
     private final EventProducerKafka eventProducerKafka;
-    private final JsonMapper jsonMapper;
-    private final Gson gson;
+    private final JsonMapperKafka jsonMapperKafka;
+    private final KafkaTopicRegistry kafkaTopicRegistry;
+    private final OutboxEventService outboxEventService;
 
     @Override
-    public void process(OutboxEvent event) throws JsonProcessingException {
-        var reviewCreationEvent = new ReviewCreationEvent(event.getId(),
-                gson.fromJson(event.getPayload(), ReviewCreationSnapshot.class));
+    public void process(OutboxEvent event) {
+        String topic = kafkaTopicRegistry.getTopicByEvent(getType());
+        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), ReviewCreationSnapshot.class);
 
-        var request = SagaRequestEvent.builder()
+        var request = SagaRequestEvent.<ReviewCreationSnapshot>builder()
                 .sagaId(event.getId())
-                .request(jsonMapper.toJsonNode(reviewCreationEvent.getRequest()))
+                .request(snapshot)
                 .build();
 
-        String reviewId = reviewCreationEvent.getRequest().getReviewId();
-        eventProducerKafka.send(request, getType(), reviewId);
+        eventProducerKafka.sendAsync(request, topic, event.getId().toString())
+                .thenRun(() -> outboxEventService.markOneAs(event, OutboxEventStatus.COMPLETED));
     }
 
     @Override

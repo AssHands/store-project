@@ -1,9 +1,9 @@
 package com.ak.store.sagaOrchestrator.kafka;
 
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.saga.SagaRequestEvent;
-import com.ak.store.kafka.storekafkastarter.model.saga.SagaResponseEvent;
-import com.ak.store.kafka.storekafkastarter.model.saga.SagaResponseStatus;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseStatus;
 import com.ak.store.sagaOrchestrator.facade.SagaFacade;
 import com.ak.store.sagaOrchestrator.facade.SagaStepFacade;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;

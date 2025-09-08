@@ -1,7 +1,6 @@
 package com.ak.store.synchronization.util;
 
 import com.ak.store.common.kafka.KafkaEvent;
-import com.ak.store.common.kafka.catalogue.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

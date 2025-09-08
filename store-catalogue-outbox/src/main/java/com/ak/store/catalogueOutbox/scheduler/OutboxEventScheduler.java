@@ -28,7 +28,6 @@ public class OutboxEventScheduler {
                 ));
     }
 
-    @Transactional
     @Scheduled(fixedRate = 5000)
     public void executeOutboxEvents() {
         for (var entry : eventProcessors.entrySet()) {
@@ -37,17 +36,11 @@ public class OutboxEventScheduler {
     }
 
     private void processOutboxEventsOfType(OutboxEventType type) {
-        var processor = eventProcessors.get(type);
         var events = outboxEventService.findAllForProcessing(type);
-        List<OutboxEvent> completedEvents = new ArrayList<>();
+        var processor = eventProcessors.get(type);
 
         for (var event : events) {
-            try {
-                processor.process(event);
-                completedEvents.add(event);
-            } catch (Exception ignored) {}
+            processor.process(event);
         }
-
-        outboxEventService.markAllAsCompleted(completedEvents);
     }
 }

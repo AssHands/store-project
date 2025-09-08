@@ -2,8 +2,7 @@ package com.ak.store.warehouseSagaWorker.kafka;
 
 
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.order.OrderCreation;
-import com.ak.store.kafka.storekafkastarter.model.saga.SagaRequestEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
 import com.ak.store.warehouseSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.warehouseSagaWorker.service.InboxEventWriterService;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.ak.store.reviewSagaWorker.service;
 
-import com.ak.store.reviewSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.reviewSagaWorker.model.entity.InboxEventType;
+import com.ak.store.reviewSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.reviewSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.reviewSagaWorker.repository.InboxEventRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.ak.store.catalogueSagaWorker.service;
 
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEventType;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.catalogueSagaWorker.repository.InboxEventRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,6 @@ public class InboxEventWriterService {
 
     @Transactional
     public <T> void createOne(UUID eventId, String stepName, UUID sagaId, String sagaName, String payload, InboxEventType type) {
-
         inboxEventRepo.saveOneIgnoreDuplicate(eventId, stepName, sagaId, sagaName, payload, type.getValue(),
                 InboxEventStatus.IN_PROGRESS.getValue(), LocalDateTime.now());
     }

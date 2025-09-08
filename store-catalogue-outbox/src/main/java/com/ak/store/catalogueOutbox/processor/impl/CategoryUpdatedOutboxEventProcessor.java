@@ -1,12 +1,15 @@
 package com.ak.store.catalogueOutbox.processor.impl;
 
-import com.ak.store.common.kafka.catalogue.CategoryUpdatedEvent;
-import com.ak.store.common.snapshot.catalogue.CategorySnapshotPayload;
-import com.ak.store.catalogueOutbox.kafka.EventProducerKafka;
 import com.ak.store.catalogueOutbox.model.OutboxEvent;
+import com.ak.store.catalogueOutbox.model.OutboxEventStatus;
 import com.ak.store.catalogueOutbox.model.OutboxEventType;
 import com.ak.store.catalogueOutbox.processor.OutboxEventProcessor;
-import com.google.gson.Gson;
+import com.ak.store.catalogueOutbox.service.OutboxEventService;
+import com.ak.store.catalogueOutbox.util.KafkaTopicRegistry;
+import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
+import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.event.catalogue.CategoryUpdatedEvent;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CategorySnapshotPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +17,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class CategoryUpdatedOutboxEventProcessor implements OutboxEventProcessor {
     private final EventProducerKafka eventProducerKafka;
-    private final Gson gson;
+    private final JsonMapperKafka jsonMapperKafka;
+    private final KafkaTopicRegistry kafkaTopicRegistry;
+    private final OutboxEventService outboxEventService;
 
     @Override
     public void process(OutboxEvent event) {
-        var message = new CategoryUpdatedEvent(event.getId(),
-                gson.fromJson(event.getPayload(), CategorySnapshotPayload.class));
+        String topic = kafkaTopicRegistry.getTopicByEvent(getType());
 
-        String categoryId = message.getPayload().getCategory().getId().toString();
-        eventProducerKafka.send(message, getType(), categoryId);
+        var message = new CategoryUpdatedEvent(event.getId(),
+                jsonMapperKafka.fromJson(event.getPayload(), CategorySnapshotPayload.class));
+
+        String key = message.getPayload().getCategory().getId().toString();
+
+        eventProducerKafka.sendAsync(message, topic, key)
+                .thenRun(() -> outboxEventService.markOneAs(event, OutboxEventStatus.COMPLETED));
     }
 
     @Override

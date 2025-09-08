@@ -1,13 +1,15 @@
 package com.ak.store.reviewSagaWorker.processor.outbox.impl;
 
-import com.ak.store.common.saga.SagaResponseEvent;
-import com.ak.store.common.saga.SagaResponseStatus;
-import com.ak.store.reviewSagaWorker.model.entity.InboxEvent;
-import com.ak.store.reviewSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.reviewSagaWorker.model.entity.InboxEventType;
-import com.ak.store.reviewSagaWorker.model.entity.OutboxEventType;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseStatus;
+import com.ak.store.reviewSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.reviewSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.reviewSagaWorker.model.inbox.InboxEventType;
+import com.ak.store.reviewSagaWorker.model.outbox.OutboxEventType;
 import com.ak.store.reviewSagaWorker.processor.outbox.OutboxEventProcessor;
+import com.ak.store.reviewSagaWorker.service.InboxEventReaderService;
 import com.ak.store.reviewSagaWorker.service.OutboxEventService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class CancelReviewDeletionOutboxEventProcessor implements OutboxEventProcessor {
     private final OutboxEventService outboxEventService;
+    private final InboxEventReaderService inboxEventReaderService;
 
+    @Transactional
     @Override
     public void process(InboxEvent event) {
         SagaResponseStatus status;
@@ -34,7 +38,11 @@ public class CancelReviewDeletionOutboxEventProcessor implements OutboxEventProc
                 .status(status)
                 .build();
 
-        outboxEventService.createOne(event.getId(), response, OutboxEventType.CANCEL_REVIEW_DELETION);
+        try {
+            outboxEventService.createOne(event.getId(), response, OutboxEventType.CANCEL_REVIEW_DELETION);
+            inboxEventReaderService.markOneAs(event, InboxEventStatus.COMPLETED);
+        } catch (Exception ignored) {
+        }
     }
 
     @Override

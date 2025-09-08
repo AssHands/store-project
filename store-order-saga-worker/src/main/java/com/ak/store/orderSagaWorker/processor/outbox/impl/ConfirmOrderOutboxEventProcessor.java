@@ -1,7 +1,7 @@
 package com.ak.store.orderSagaWorker.processor.outbox.impl;
 
-import com.ak.store.kafka.storekafkastarter.model.saga.SagaResponseEvent;
-import com.ak.store.kafka.storekafkastarter.model.saga.SagaResponseStatus;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseStatus;
 import com.ak.store.orderSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.orderSagaWorker.model.inbox.InboxEventStatus;
 import com.ak.store.orderSagaWorker.model.inbox.InboxEventType;

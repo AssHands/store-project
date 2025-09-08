@@ -1,6 +1,6 @@
 package com.ak.store.catalogueSagaWorker.repository;
 
-import com.ak.store.catalogueSagaWorker.model.entity.Product;
+import com.ak.store.catalogueSagaWorker.model.product.Product;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;

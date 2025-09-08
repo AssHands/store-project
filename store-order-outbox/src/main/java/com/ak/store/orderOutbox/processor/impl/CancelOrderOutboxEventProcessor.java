@@ -2,8 +2,9 @@ package com.ak.store.orderOutbox.processor.impl;
 
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.saga.SagaResponseEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseEvent;
 import com.ak.store.orderOutbox.model.OutboxEvent;
+import com.ak.store.orderOutbox.model.OutboxEventStatus;
 import com.ak.store.orderOutbox.model.OutboxEventType;
 import com.ak.store.orderOutbox.processor.OutboxEventProcessor;
 import com.ak.store.orderOutbox.service.OutboxEventService;
@@ -25,7 +26,7 @@ public class CancelOrderOutboxEventProcessor implements OutboxEventProcessor {
         var response = jsonMapperKafka.fromJson(event.getPayload(), SagaResponseEvent.class);
 
         eventProducerKafka.sendAsync(response, topic, event.getId().toString())
-                .thenRun(() -> outboxEventService.markOneAsCompleted(event));
+                .thenRun(() -> outboxEventService.markOneAs(event, OutboxEventStatus.COMPLETED));
     }
 
     @Override

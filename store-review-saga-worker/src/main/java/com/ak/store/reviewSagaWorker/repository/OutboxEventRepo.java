@@ -1,6 +1,6 @@
 package com.ak.store.reviewSagaWorker.repository;
 
-import com.ak.store.reviewSagaWorker.model.entity.OutboxEvent;
+import com.ak.store.reviewSagaWorker.model.outbox.OutboxEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

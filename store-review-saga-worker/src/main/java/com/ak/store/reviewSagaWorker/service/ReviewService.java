@@ -2,7 +2,7 @@ package com.ak.store.reviewSagaWorker.service;
 
 import com.ak.store.reviewSagaWorker.model.document.Review;
 import com.ak.store.reviewSagaWorker.model.document.ReviewStatus;
-import com.ak.store.reviewSagaWorker.model.dto.write.ReviewWriteDTO;
+import com.ak.store.reviewSagaWorker.model.dto.ReviewWriteDTO;
 import com.ak.store.reviewSagaWorker.repository.ReviewRepo;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;

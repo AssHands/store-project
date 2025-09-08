@@ -1,7 +1,7 @@
 package com.ak.store.sagaOrchestrator.processor;
 
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
-import com.ak.store.kafka.storekafkastarter.model.saga.SagaRequestEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
 import com.ak.store.sagaOrchestrator.mapper.JsonMapper;
 import com.ak.store.sagaOrchestrator.model.SagaStep;
 import com.ak.store.sagaOrchestrator.util.SagaProperties;

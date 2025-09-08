@@ -15,6 +15,7 @@ import java.util.UUID;
 @Service
 public class OutboxEventService {
     private final OutboxEventRepo outboxEventRepo;
+    //todo заменить на JsonMapperKafka
     private final Gson gson;
 
     @Transactional

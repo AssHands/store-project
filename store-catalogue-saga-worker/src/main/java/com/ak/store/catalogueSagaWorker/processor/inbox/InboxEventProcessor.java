@@ -1,8 +1,8 @@
 package com.ak.store.catalogueSagaWorker.processor.inbox;
 
 
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEvent;
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEventType;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventType;
 
 public interface InboxEventProcessor {
     void process(InboxEvent event);

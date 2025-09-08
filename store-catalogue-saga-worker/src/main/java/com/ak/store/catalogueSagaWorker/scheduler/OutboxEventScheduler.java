@@ -1,8 +1,8 @@
 package com.ak.store.catalogueSagaWorker.scheduler;
 
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEvent;
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.catalogueSagaWorker.model.entity.InboxEventType;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.catalogueSagaWorker.processor.outbox.OutboxEventProcessor;
 import com.ak.store.catalogueSagaWorker.service.InboxEventReaderService;
 import jakarta.transaction.Transactional;
@@ -28,7 +28,6 @@ public class OutboxEventScheduler {
                 ));
     }
 
-    @Transactional
     @Scheduled(fixedRate = 5000)
     public void executeCompletedInboxEvents() {
         for (var entry : outboxEventProcessors.entrySet()) {
@@ -39,18 +38,9 @@ public class OutboxEventScheduler {
     private void processCompletedInboxEventsOfType(InboxEventType type) {
         var processor = outboxEventProcessors.get(type);
         var events = inboxEventReaderService.findAllCompletedForProcessing(type);
-        List<InboxEvent> completedEvents = new ArrayList<>();
 
         for (var event : events) {
-            try {
-                processor.process(event);
-                completedEvents.add(event);
-            } catch (Exception ignored) {
-            }
-        }
-
-        if (!completedEvents.isEmpty()) {
-            inboxEventReaderService.markAllAs(completedEvents, InboxEventStatus.COMPLETED);
+            processor.process(event);
         }
     }
 }

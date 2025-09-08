@@ -1,7 +1,7 @@
 package com.ak.store.catalogueSagaWorker.service;
 
 
-import com.ak.store.catalogueSagaWorker.model.entity.RatingSummary;
+import com.ak.store.catalogueSagaWorker.model.product.RatingSummary;
 import org.springframework.stereotype.Component;
 
 @Component

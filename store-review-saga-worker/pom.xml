@@ -22,16 +22,18 @@
     <dependencies>
         <!-- INTEGRATION -->
         <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
             <version>3.5.0</version>
         </dependency>
         <!-- INTEGRATION -->
+
+        <dependency>
+            <groupId>com.ak.store</groupId>
+            <artifactId>store-kafka-starter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- DATABASE -->
         <dependency>
