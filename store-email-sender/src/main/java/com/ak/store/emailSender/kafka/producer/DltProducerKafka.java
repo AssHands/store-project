@@ -1,6 +1,5 @@
 package com.ak.store.emailSender.kafka.producer;
 
-import com.ak.store.common.kafka.KafkaEvent;
 import com.ak.store.emailSender.inbox.InboxEventType;
 import com.ak.store.emailSender.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ public class DltProducerKafka {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final KafkaTopicRegistry topicRegistry;
 
-    public <T extends KafkaEvent> void send(T event, InboxEventType eventType, String key) {
+    public <T> void send(T event, InboxEventType eventType, String key) {
         String topic = topicRegistry.getDltTopicByEvent(eventType);
 
         if (topic == null) {
@@ -29,7 +28,7 @@ public class DltProducerKafka {
         }
     }
 
-    public <T extends KafkaEvent> void send(T event, InboxEventType eventType) {
+    public <T> void send(T event, InboxEventType eventType) {
         String topic = topicRegistry.getDltTopicByEvent(eventType);
 
         if (topic == null) {

@@ -1,7 +1,5 @@
 package com.ak.store.search.kafka;
 
-import com.ak.store.common.kafka.KafkaEvent;
-
 import com.ak.store.search.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,7 +13,7 @@ public class EventProducerKafka {
     private final KafkaTemplate<String, KafkaEvent> kafkaTemplate;
     private final KafkaTopicRegistry topicRegistry;
 
-    public <T extends KafkaEvent> void send(T event, String key) {
+    public <T> void send(T event, String key) {
         String topic = topicRegistry.getTopicByEvent(event.getClass());
 
         if (topic == null) {
@@ -29,7 +27,7 @@ public class EventProducerKafka {
         }
     }
 
-    public <T extends KafkaEvent> void send(T event) {
+    public <T> void send(T event) {
         String topic = topicRegistry.getTopicByEvent(event.getClass());
 
         if (topic == null) {

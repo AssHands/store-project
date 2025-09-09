@@ -1,24 +1,35 @@
 package com.ak.store.SynchronizationSagaWorker.processor.inbox.impl;
 
-import com.ak.store.SynchronizationSagaWorker.model.dto.ProductSynchronizationRequest;
-import com.ak.store.SynchronizationSagaWorker.model.entity.InboxEvent;
-import com.ak.store.SynchronizationSagaWorker.model.entity.InboxEventType;
+import com.ak.store.SynchronizationSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.SynchronizationSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.SynchronizationSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.SynchronizationSagaWorker.processor.inbox.InboxEventProcessor;
+import com.ak.store.SynchronizationSagaWorker.service.InboxEventReaderService;
 import com.ak.store.SynchronizationSagaWorker.service.ProductService;
-import com.google.gson.Gson;
+import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.ProductCreationSnapshot;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class CancelProductSynchronizationInboxEventProcessor implements InboxEventProcessor {
-    private final Gson gson;
+    private final JsonMapperKafka jsonMapperKafka;
+    private final InboxEventReaderService inboxEventReaderService;
     private final ProductService productService;
 
+    @Transactional
     @Override
     public void process(InboxEvent event) {
-        var request = gson.fromJson(event.getPayload(), ProductSynchronizationRequest.class);
-        productService.deleteOne(request.getPayload().getProduct().getId());
+        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), ProductCreationSnapshot.class);
+
+        try {
+            productService.deleteOne(snapshot.getPayload().getProduct().getId());
+            inboxEventReaderService.markOneAs(event, InboxEventStatus.SUCCESS);
+        } catch (Exception e) {
+            inboxEventReaderService.markOneAsFailure(event);
+        }
     }
 
     @Override

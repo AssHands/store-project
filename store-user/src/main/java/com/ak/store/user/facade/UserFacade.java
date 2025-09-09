@@ -1,7 +1,5 @@
 package com.ak.store.user.facade;
 
-import com.ak.store.common.snapshot.user.UserCreationSnapshot;
-import com.ak.store.common.snapshot.user.UserVerificationSnapshot;
 import com.ak.store.user.model.dto.UserDTO;
 import com.ak.store.user.model.dto.write.UserWriteDTO;
 import com.ak.store.user.outbox.OutboxEventService;

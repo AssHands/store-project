@@ -1,6 +1,5 @@
 package com.ak.store.common.kafka.search;
 
-import com.ak.store.common.kafka.KafkaEvent;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SearchAllEvent implements KafkaEvent {
+public class SearchAllEvent {
     private UUID userId;
 
     private Long categoryId;

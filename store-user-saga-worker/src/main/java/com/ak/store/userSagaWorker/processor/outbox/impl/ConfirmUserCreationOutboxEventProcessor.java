@@ -1,13 +1,15 @@
 package com.ak.store.userSagaWorker.processor.outbox.impl;
 
-import com.ak.store.common.saga.SagaResponseEvent;
-import com.ak.store.common.saga.SagaResponseStatus;
-import com.ak.store.userSagaWorker.model.entity.InboxEvent;
-import com.ak.store.userSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.userSagaWorker.model.entity.InboxEventType;
-import com.ak.store.userSagaWorker.model.entity.OutboxEventType;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseStatus;
+import com.ak.store.userSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.userSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.userSagaWorker.model.inbox.InboxEventType;
+import com.ak.store.userSagaWorker.model.outbox.OutboxEventType;
 import com.ak.store.userSagaWorker.processor.outbox.OutboxEventProcessor;
+import com.ak.store.userSagaWorker.service.InboxEventReaderService;
 import com.ak.store.userSagaWorker.service.OutboxEventService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConfirmUserCreationOutboxEventProcessor implements OutboxEventProcessor {
     private final OutboxEventService outboxEventService;
+    private final InboxEventReaderService inboxEventReaderService;
 
+    @Transactional
     @Override
     public void process(InboxEvent event) {
         SagaResponseStatus status;
@@ -34,7 +38,11 @@ public class ConfirmUserCreationOutboxEventProcessor implements OutboxEventProce
                 .status(status)
                 .build();
 
-        outboxEventService.createOne(event.getId(), response, OutboxEventType.CONFIRM_USER_CREATION);
+        try {
+            outboxEventService.createOne(event.getId(), response, OutboxEventType.CONFIRM_USER_CREATION);
+            inboxEventReaderService.markOneAs(event, InboxEventStatus.COMPLETED);
+        } catch (Exception ignored) {
+        }
     }
 
     @Override

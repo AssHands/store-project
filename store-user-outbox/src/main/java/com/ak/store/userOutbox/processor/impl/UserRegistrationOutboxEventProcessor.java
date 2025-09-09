@@ -1,15 +1,15 @@
 package com.ak.store.userOutbox.processor.impl;
 
-import com.ak.store.common.kafka.user.UserCreationEvent;
-import com.ak.store.common.saga.SagaRequestEvent;
-import com.ak.store.common.snapshot.user.UserCreationSnapshot;
-import com.ak.store.userOutbox.kafka.EventProducerKafka;
-import com.ak.store.userOutbox.mapper.JsonMapper;
+import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
+import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.user.UserCreationSnapshot;
 import com.ak.store.userOutbox.model.OutboxEvent;
+import com.ak.store.userOutbox.model.OutboxEventStatus;
 import com.ak.store.userOutbox.model.OutboxEventType;
 import com.ak.store.userOutbox.processor.OutboxEventProcessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.gson.Gson;
+import com.ak.store.userOutbox.service.OutboxEventService;
+import com.ak.store.userOutbox.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,21 +17,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserRegistrationOutboxEventProcessor implements OutboxEventProcessor {
     private final EventProducerKafka eventProducerKafka;
-    private final Gson gson;
-    private final JsonMapper jsonMapper;
+    private final JsonMapperKafka jsonMapperKafka;
+    private final KafkaTopicRegistry kafkaTopicRegistry;
+    private final OutboxEventService outboxEventService;
 
     @Override
-    public void process(OutboxEvent event) throws JsonProcessingException {
-        var userRegistrationEvent = new UserCreationEvent(event.getId(),
-                gson.fromJson(event.getPayload(), UserCreationSnapshot.class));
+    public void process(OutboxEvent event) {
+        String topic = kafkaTopicRegistry.getTopicByEvent(getType());
+        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), UserCreationSnapshot.class);
 
-        var request = SagaRequestEvent.builder()
+        var request = SagaRequestEvent.<UserCreationSnapshot>builder()
                 .sagaId(event.getId())
-                .request(jsonMapper.toJsonNode(userRegistrationEvent.getRequest()))
+                .request(snapshot)
                 .build();
 
-        String userId = userRegistrationEvent.getRequest().getUserId().toString();
-        eventProducerKafka.send(request, getType(), userId);
+        eventProducerKafka.sendAsync(request, topic, event.getId().toString())
+                .thenRun(() -> outboxEventService.markOneAs(event, OutboxEventStatus.COMPLETED));
     }
 
     @Override

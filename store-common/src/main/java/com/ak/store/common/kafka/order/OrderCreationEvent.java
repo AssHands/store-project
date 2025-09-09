@@ -1,7 +1,5 @@
 package com.ak.store.common.kafka.order;
 
-import com.ak.store.common.kafka.KafkaEvent;
-import com.ak.store.common.snapshot.order.OrderCreationSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -16,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrderCreationEvent implements KafkaEvent {
+public class OrderCreationEvent {
     private UUID eventId;
 
     private OrderCreationSnapshot request;

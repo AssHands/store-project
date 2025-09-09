@@ -1,8 +1,8 @@
 package com.ak.store.SynchronizationSagaWorker.service;
 
-import com.ak.store.SynchronizationSagaWorker.model.entity.InboxEvent;
-import com.ak.store.SynchronizationSagaWorker.model.entity.InboxEventStatus;
-import com.ak.store.SynchronizationSagaWorker.model.entity.InboxEventType;
+import com.ak.store.SynchronizationSagaWorker.model.inbox.InboxEvent;
+import com.ak.store.SynchronizationSagaWorker.model.inbox.InboxEventStatus;
+import com.ak.store.SynchronizationSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.SynchronizationSagaWorker.repository.InboxEventRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -55,5 +55,15 @@ public class InboxEventReaderService {
     @Transactional
     public void markAllAs(List<InboxEvent> events, InboxEventStatus status) {
         inboxEventRepo.updateAll(events, status, LocalDateTime.now());
+    }
+
+    @Transactional
+    public void markOneAs(InboxEvent event, InboxEventStatus status) {
+        inboxEventRepo.updateOne(event, status, LocalDateTime.now());
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void markOneAsFailure(InboxEvent event) {
+        inboxEventRepo.updateOne(event, InboxEventStatus.FAILURE, LocalDateTime.now());
     }
 }

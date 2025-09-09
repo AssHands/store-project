@@ -1,7 +1,7 @@
 package com.ak.store.SynchronizationSagaWorker.service;
 
-import com.ak.store.SynchronizationSagaWorker.model.entity.OutboxEventStatus;
-import com.ak.store.SynchronizationSagaWorker.model.entity.OutboxEventType;
+import com.ak.store.SynchronizationSagaWorker.model.outbox.OutboxEventStatus;
+import com.ak.store.SynchronizationSagaWorker.model.outbox.OutboxEventType;
 import com.ak.store.SynchronizationSagaWorker.repository.OutboxEventRepo;
 import com.google.gson.Gson;
 import jakarta.transaction.Transactional;

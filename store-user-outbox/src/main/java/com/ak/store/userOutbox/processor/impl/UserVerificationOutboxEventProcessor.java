@@ -1,12 +1,15 @@
 package com.ak.store.userOutbox.processor.impl;
 
-import com.ak.store.common.kafka.user.UserVerificationEvent;
-import com.ak.store.common.snapshot.user.UserVerificationSnapshot;
-import com.ak.store.userOutbox.kafka.EventProducerKafka;
+import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
+import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.event.user.UserVerificationEvent;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.user.UserVerificationSnapshot;
 import com.ak.store.userOutbox.model.OutboxEvent;
+import com.ak.store.userOutbox.model.OutboxEventStatus;
 import com.ak.store.userOutbox.model.OutboxEventType;
 import com.ak.store.userOutbox.processor.OutboxEventProcessor;
-import com.google.gson.Gson;
+import com.ak.store.userOutbox.service.OutboxEventService;
+import com.ak.store.userOutbox.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +17,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserVerificationOutboxEventProcessor implements OutboxEventProcessor {
     private final EventProducerKafka eventProducerKafka;
-    private final Gson gson;
+    private final JsonMapperKafka jsonMapperKafka;
+    private final KafkaTopicRegistry kafkaTopicRegistry;
+    private final OutboxEventService outboxEventService;
 
     @Override
     public void process(OutboxEvent event) {
-        var message = new UserVerificationEvent(event.getId(),
-                gson.fromJson(event.getPayload(), UserVerificationSnapshot.class));
+        String topic = kafkaTopicRegistry.getTopicByEvent(getType());
 
-        eventProducerKafka.send(message, getType(), message.getRequest().getUserId().toString());
+        var message = new UserVerificationEvent(event.getId(),
+                jsonMapperKafka.fromJson(event.getPayload(), UserVerificationSnapshot.class));
+
+        eventProducerKafka.sendAsync(message, topic, event.getId().toString())
+                .thenRun(() -> outboxEventService.markOneAs(event, OutboxEventStatus.COMPLETED));
     }
 
     @Override

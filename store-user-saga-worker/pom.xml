@@ -20,12 +20,12 @@
     </properties>
 
     <dependencies>
-        <!-- INTEGRATION -->
         <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
+            <groupId>com.ak.store</groupId>
+            <artifactId>store-kafka-starter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
-        <!-- INTEGRATION -->
 
         <!-- DATABASE -->
         <dependency>

@@ -1,6 +1,5 @@
 package com.ak.store.synchronization.kafka.producer;
 
-import com.ak.store.common.kafka.KafkaEvent;
 import com.ak.store.synchronization.util.KafkaTopicRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,7 +13,7 @@ public class DltProducerKafka {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final KafkaTopicRegistry topicRegistry;
 
-    public <T extends KafkaEvent> void send(T event, String key) {
+    public <T> void send(T event, String key) {
         String topic = topicRegistry.getDltTopicByEvent(event.getClass());
 
         if (topic == null) {
@@ -28,7 +27,7 @@ public class DltProducerKafka {
         }
     }
 
-    public <T extends KafkaEvent> void send(T event) {
+    public <T> void send(T event) {
         String topic = topicRegistry.getDltTopicByEvent(event.getClass());
 
         if (topic == null) {

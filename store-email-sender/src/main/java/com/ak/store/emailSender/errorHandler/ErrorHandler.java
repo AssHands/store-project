@@ -1,6 +1,5 @@
 package com.ak.store.emailSender.errorHandler;
 
-import com.ak.store.common.kafka.user.UserVerificationEvent;
 import com.ak.store.emailSender.inbox.InboxEventType;
 import com.ak.store.emailSender.kafka.producer.DltProducerKafka;
 import lombok.RequiredArgsConstructor;

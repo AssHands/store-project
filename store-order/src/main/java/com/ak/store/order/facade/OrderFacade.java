@@ -1,6 +1,5 @@
 package com.ak.store.order.facade;
 
-import com.ak.store.common.snapshot.order.OrderCreationSnapshot;
 import com.ak.store.order.model.dto.OrderDTOPayload;
 import com.ak.store.order.model.dto.UserAuthContext;
 import com.ak.store.order.outbox.OutboxEventService;

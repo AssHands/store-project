@@ -1,8 +1,8 @@
 package com.ak.store.userSagaWorker.service;
 
-import com.ak.store.userSagaWorker.model.entity.User;
-import com.ak.store.userSagaWorker.model.entity.UserStatus;
-import com.ak.store.userSagaWorker.model.entity.VerificationCode;
+import com.ak.store.userSagaWorker.model.user.User;
+import com.ak.store.userSagaWorker.model.user.UserStatus;
+import com.ak.store.userSagaWorker.model.user.VerificationCode;
 import com.ak.store.userSagaWorker.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,5 @@
 package com.ak.store.synchronization.util;
 
-import com.ak.store.common.kafka.KafkaEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +19,6 @@ public class KafkaTopicRegistry {
                 CategoryCreatedEvent.class, "category-created",
                 CategoryUpdatedEvent.class, "category-updated",
                 CategoryDeletedEvent.class, "category-deleted",
-
-                ProductCreatedEvent.class, "product-created",
-                ProductUpdatedEvent.class, "product-updated",
-                ProductDeletedEvent.class, "product-deleted",
 
                 CharacteristicCreatedEvent.class, "characteristic-created",
                 CharacteristicUpdatedEvent.class, "characteristic-updated",

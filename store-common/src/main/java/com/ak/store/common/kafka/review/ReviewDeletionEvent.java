@@ -1,6 +1,5 @@
 package com.ak.store.common.kafka.review;
 
-import com.ak.store.common.kafka.KafkaEvent;
 import com.ak.store.common.snapshot.review.ReviewDeletionSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ReviewDeletionEvent implements KafkaEvent {
+public class ReviewDeletionEvent {
     private UUID eventId;
 
     private ReviewDeletionSnapshot request;
