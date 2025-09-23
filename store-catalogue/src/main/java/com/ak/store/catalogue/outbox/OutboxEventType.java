@@ -1,0 +1,21 @@
+package com.ak.store.catalogue.outbox;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public enum  OutboxEventType {
+    PRODUCT_CREATION("PRODUCT_CREATION"),
+
+    PRODUCT_UPDATED("PRODUCT_UPDATED"),
+    PRODUCT_DELETED("PRODUCT_DELETED"),
+    CATEGORY_CREATED("CATEGORY_CREATED"),
+    CATEGORY_UPDATED("CATEGORY_UPDATED"),
+    CATEGORY_DELETED("CATEGORY_DELETED"),
+    CHARACTERISTIC_CREATED("CHARACTERISTIC_CREATED"),
+    CHARACTERISTIC_UPDATED("CHARACTERISTIC_UPDATED"),
+    CHARACTERISTIC_DELETED("CHARACTERISTIC_DELETED");
+
+    private final String value;
+}
