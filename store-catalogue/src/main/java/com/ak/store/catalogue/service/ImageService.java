@@ -2,7 +2,7 @@ package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.mapper.ImageMapper;
 import com.ak.store.catalogue.model.dto.ImageDTO;
-import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
+import com.ak.store.catalogue.model.command.WriteImageCommand;
 import com.ak.store.catalogue.model.entity.Image;
 import com.ak.store.catalogue.model.pojo.ProcessedImages;
 import com.ak.store.catalogue.repository.ImageRepo;
@@ -27,7 +27,9 @@ public class ImageService {
     }
 
     public List<ImageDTO> findAll(Long productId) {
-        return imageMapper.toImageDTOnew(findAllByProductId(productId));
+        return findAllByProductId(productId).stream()
+                .map(imageMapper::toDTO)
+                .toList();
     }
 
     @Transactional
@@ -38,13 +40,20 @@ public class ImageService {
     }
 
     @Transactional
-    public ProcessedImages saveOrUpdateAllImage(ImageWriteDTO request) {
-        List<ImageDTO> images = findAll(request.getProductId());
-        imageValidator.validate(request, images);
-        ProcessedImages processedImages = imageProcessor.process(request, images);
+    public ProcessedImages saveOrUpdateAllImage(WriteImageCommand command) {
+        List<ImageDTO> images = findAll(command.getProductId());
+        imageValidator.validate(command, images);
+        ProcessedImages processedImages = imageProcessor.process(command, images);
 
-        deleteAll(request.getProductId());
-        imageRepo.saveAll(imageMapper.toImage(processedImages.getAllImages(), request.getProductId()));
+        deleteAll(command.getProductId());
+
+        imageRepo.saveAll(
+                processedImages.getAllImages()
+                        .stream()
+                        .map(dto -> imageMapper.toEntity(dto, command.getProductId()))
+                        .toList()
+        );
+
         return processedImages;
     }
 }

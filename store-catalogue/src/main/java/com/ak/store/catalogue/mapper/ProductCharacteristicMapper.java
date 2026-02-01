@@ -1,9 +1,8 @@
 package com.ak.store.catalogue.mapper;
 
 import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
-import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
+import com.ak.store.catalogue.model.command.WriteProductCharacteristicCommand;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
-import com.ak.store.common.snapshot.catalogue.ProductCharacteristicSnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -15,25 +14,12 @@ import java.util.List;
 public interface ProductCharacteristicMapper {
     @Mapping(target = "characteristicId", source = "characteristic.id")
     @Mapping(target = "productId", source = "product.id")
-    ProductCharacteristicDTO toProductCharacteristicDTO(ProductCharacteristic pc);
-
-    List<ProductCharacteristicDTO> toProductCharacteristicDTO(List<ProductCharacteristic> pc);
+    ProductCharacteristicDTO toDTO(ProductCharacteristic entity);
 
     @Mapping(target = "characteristic.id", source = "pc.characteristicId")
     @Mapping(target = "product.id", source = "productId")
-    ProductCharacteristic toProductCharacteristic(ProductCharacteristicWriteDTO pc, Long productId);
-
-    default List<ProductCharacteristic> toProductCharacteristic(List<ProductCharacteristicWriteDTO> pc, Long productId) {
-        if (pc == null) {
-            return null;
-        }
-        return pc.stream()
-                .map(v -> toProductCharacteristic(v, productId))
-                .toList();
-    }
+    ProductCharacteristic toEntity(WriteProductCharacteristicCommand command, Long productId);
 
     @Mapping(target = "id", source = "characteristicId")
-    ProductCharacteristicSnapshot toProductCharacteristicSnapshot(ProductCharacteristicDTO pc);
-
-    List<ProductCharacteristicSnapshot> toProductCharacteristicSnapshot(List<ProductCharacteristicDTO> pc);
+    ProductCharacteristicSnapshot toSnapshot(ProductCharacteristicDTO dto);
 }

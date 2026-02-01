@@ -2,7 +2,7 @@ package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.mapper.ProductCharacteristicMapper;
 import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
-import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
+import com.ak.store.catalogue.model.command.WriteProductCharacteristicCommand;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.catalogue.repository.ProductCharacteristicRepo;
 import com.ak.store.catalogue.validator.service.ProductCharacteristicServiceValidator;
@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -24,17 +27,19 @@ public class ProductCharacteristicService {
     }
 
     public List<ProductCharacteristicDTO> findAll(Long productId) {
-        return productCharacteristicMapper.toProductCharacteristicDTO(findAllByProductId(productId));
+        return findAllByProductId(productId).stream()
+                .map(productCharacteristicMapper::toDTO)
+                .toList();
     }
 
     @Transactional
     public List<ProductCharacteristicDTO> createAll(Long productId,
-                                                    List<ProductCharacteristicWriteDTO> productCharacteristics) {
+                                                    List<WriteProductCharacteristicCommand> productCharacteristics) {
         if (productCharacteristics.isEmpty()) return findAll(productId);
-        productCharacteristicServiceValidator.validateCreating(productId, productCharacteristics);
+        productCharacteristicServiceValidator.validateCreate(productId, productCharacteristics);
 
         List<ProductCharacteristic> existingProductCharacteristics =
-                productCharacteristicMapper.toProductCharacteristic(productCharacteristics, productId);
+                productCharacteristicMapper.toEntity(productCharacteristics, productId);
 
         productCharacteristicRepo.saveAllAndFlush(existingProductCharacteristics);
         return findAll(productId);
@@ -42,18 +47,26 @@ public class ProductCharacteristicService {
 
     @Transactional
     public List<ProductCharacteristicDTO> updateAll(Long productId,
-                                                    List<ProductCharacteristicWriteDTO> productCharacteristics) {
+                                                    List<WriteProductCharacteristicCommand> productCharacteristics) {
         if (productCharacteristics.isEmpty()) return findAll(productId);
-        productCharacteristicServiceValidator.validateUpdating(productId, productCharacteristics);
+        productCharacteristicServiceValidator.validateUpdate(productId, productCharacteristics);
 
-        List<ProductCharacteristic> existingProductCharacteristics = findAllByProductId(productId);
-        for(var pc : productCharacteristics) {
-            int index = findCharacteristicIndexById(existingProductCharacteristics, pc.getCharacteristicId());
-            existingProductCharacteristics.get(index).setNumericValue(pc.getNumericValue());
-            existingProductCharacteristics.get(index).setTextValue(pc.getTextValue());
+        List<ProductCharacteristic> existing = findAllByProductId(productId);
+        Map<Long, ProductCharacteristic> existingByCharacteristicId =
+                existing.stream()
+                        .collect(Collectors.toMap(
+                                pc -> pc.getCharacteristic().getId(),
+                                Function.identity()
+                        ));
+
+        for (var cmd : productCharacteristics) {
+            ProductCharacteristic pc = existingByCharacteristicId.get(cmd.getCharacteristicId());
+
+            pc.setNumericValue(cmd.getNumericValue());
+            pc.setTextValue(cmd.getTextValue());
         }
 
-        productCharacteristicRepo.saveAllAndFlush(existingProductCharacteristics);
+        productCharacteristicRepo.saveAllAndFlush(existing);
         return findAll(productId);
     }
 
@@ -70,17 +83,5 @@ public class ProductCharacteristicService {
         var productCharacteristics = findAll(productId);
         productCharacteristicRepo.deleteAllByProductId(productId);
         return productCharacteristics;
-    }
-
-    private int findCharacteristicIndexById(List<ProductCharacteristic> productCharacteristics, Long id) {
-        int index = 0;
-        for (var pc : productCharacteristics) {
-            if (pc.getCharacteristic().getId().equals(id))
-                return index;
-            index++;
-        }
-
-        //todo перенести в слой валидации
-        throw new RuntimeException("characteristic with id=%s didn't find in your product".formatted(id));
     }
 }

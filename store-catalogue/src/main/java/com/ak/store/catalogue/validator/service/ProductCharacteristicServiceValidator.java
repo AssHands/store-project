@@ -1,7 +1,6 @@
 package com.ak.store.catalogue.validator.service;
 
-import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
-import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
+import com.ak.store.catalogue.model.command.WriteProductCharacteristicCommand;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
@@ -22,7 +21,20 @@ public class ProductCharacteristicServiceValidator {
     private final CharacteristicRepo characteristicRepo;
     private final ProductRepo productRepo;
 
-    private void validateExistingProductCharacteristics(List<ProductCharacteristicWriteDTO> creatingProductCharacteristics,
+    public void validateCreate(Long productId, List<WriteProductCharacteristicCommand> creatingProductCharacteristics) {
+        var product = findOneProductWithCharacteristicsAndCategory(productId);
+
+        validateNewProductCharacteristics(creatingProductCharacteristics, product.getCategory().getId());
+        validateExistingProductCharacteristics(creatingProductCharacteristics, product.getCharacteristics());
+    }
+
+    public void validateUpdate(Long productId, List<WriteProductCharacteristicCommand> creatingProductCharacteristics) {
+        Long categoryId = findOneProductWithCharacteristicsAndCategory(productId).getCategory().getId();
+
+        validateNewProductCharacteristics(creatingProductCharacteristics, categoryId);
+    }
+
+    private void validateExistingProductCharacteristics(List<WriteProductCharacteristicCommand> creatingProductCharacteristics,
                                                         List<ProductCharacteristic> existingProductCharacteristics) {
         List<Long> existingCharacteristicIds = existingProductCharacteristics.stream()
                 .map(ProductCharacteristic::getCharacteristic)
@@ -31,7 +43,7 @@ public class ProductCharacteristicServiceValidator {
 
         if (!existingCharacteristicIds.isEmpty()) {
             List<Long> creatingCharacteristicIds = creatingProductCharacteristics.stream()
-                    .map(ProductCharacteristicWriteDTO::getCharacteristicId)
+                    .map(WriteProductCharacteristicCommand::getCharacteristicId)
                     .toList();
 
             Optional<Long> notUniqCharacteristicId = creatingCharacteristicIds.stream()
@@ -45,8 +57,8 @@ public class ProductCharacteristicServiceValidator {
         }
     }
 
-    private void validateNewProductCharacteristics(List<ProductCharacteristicWriteDTO> productCharacteristics, Long categoryId) {
-        var textValueMap = characteristicRepo.findAllWithTextValuesByCategoryId(categoryId).stream()
+    private void validateNewProductCharacteristics(List<WriteProductCharacteristicCommand> productCharacteristics, Long categoryId) {
+        var textValueMap = characteristicRepo.findAllWithValuesByCategoryId(categoryId).stream()
                 .collect(Collectors.toMap(
                         Characteristic::getId,
                         characteristic -> characteristic.getTextValues().stream().map(TextValue::getTextValue).toList())
@@ -84,19 +96,6 @@ public class ProductCharacteristicServiceValidator {
                 }
             }
         }
-    }
-
-    public void validateCreating(Long productId, List<ProductCharacteristicWriteDTO> creatingProductCharacteristics) {
-        var product = findOneProductWithCharacteristicsAndCategory(productId);
-
-        validateNewProductCharacteristics(creatingProductCharacteristics, product.getCategory().getId());
-        validateExistingProductCharacteristics(creatingProductCharacteristics, product.getCharacteristics());
-    }
-
-    public void validateUpdating(Long productId, List<ProductCharacteristicWriteDTO> creatingProductCharacteristics) {
-        Long categoryId = findOneProductWithCharacteristicsAndCategory(productId).getCategory().getId();
-
-        validateNewProductCharacteristics(creatingProductCharacteristics, categoryId);
     }
 
     private Product findOneProductWithCharacteristicsAndCategory(Long id) {

@@ -1,19 +1,18 @@
 package com.ak.store.catalogue.facade;
 
-import com.ak.store.catalogue.integration.S3Service;
+import com.ak.store.catalogue.repository.ImageFileRepo;
+import com.ak.store.catalogue.repository.S3ImageFileRepo;
 import com.ak.store.catalogue.mapper.ImageMapper;
 import com.ak.store.catalogue.mapper.ProductCharacteristicMapper;
 import com.ak.store.catalogue.mapper.ProductMapper;
+import com.ak.store.catalogue.model.command.WriteProductCommand;
 import com.ak.store.catalogue.model.dto.ProductDTO;
-import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
-import com.ak.store.catalogue.model.dto.write.ProductWritePayload;
+import com.ak.store.catalogue.model.command.WriteImageCommand;
 import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.ImageService;
 import com.ak.store.catalogue.service.ProductCharacteristicService;
 import com.ak.store.catalogue.service.ProductService;
-import com.ak.store.common.snapshot.catalogue.ProductCreationSnapshot;
-import com.ak.store.common.snapshot.catalogue.ProductSnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class ProductFacade {
     private final ImageService imageService;
     private final ProductCharacteristicService productCharacteristicService;
     private final OutboxEventService productOutboxEventService;
-    private final S3Service s3Service;
+    private final ImageFileRepo imageFileRepo;
 
     private final ProductMapper productMapper;
     private final ImageMapper imageMapper;
@@ -50,40 +49,32 @@ public class ProductFacade {
     }
 
     @Transactional
-    public Long createOne(ProductWritePayload request) {
-        var product = productService.createOne(request.getProduct());
-        var productCharacteristics =
-                productCharacteristicService.createAll(product.getId(), request.getCreateCharacteristics());
+    public Long createOne(WriteProductCommand command) {
+        var product = productService.createOne(command);
 
-        var snapshot = ProductCreationSnapshot.builder()
-                .payload(ProductSnapshotPayload.builder()
-                        .product(productMapper.toProductSnapshot(product))
-                        .characteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
-                        .build())
-                .build();
-
-        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_CREATION);
+//        var snapshot = ProductCreationSnapshot.builder()
+//                .payload(ProductSnapshotPayload.builder()
+//                        .product(productMapper.toSnapshot(product))
+//                        .build())
+//                .build();
+//
+//        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_CREATION);
         return product.getId();
     }
 
     @Transactional
-    public Long updateOne(Long id, ProductWritePayload request) {
-        var product = productService.updateOne(id, request.getProduct());
+    public Long updateOne(WriteProductCommand command) {
+        var product = productService.updateOne(command);
 
-        productCharacteristicService.createAll(id, request.getCreateCharacteristics());
-        productCharacteristicService.updateAll(id, request.getUpdateCharacteristics());
-        var productCharacteristics =
-                productCharacteristicService.deleteAllByCharacteristicIds(id, request.getDeleteCharacteristicIds());
-
-        var images = imageService.findAll(product.getId());
-
-        var snapshot = ProductSnapshotPayload.builder()
-                .product(productMapper.toProductSnapshot(product))
-                .characteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
-                .images(imageMapper.toImageSnapshot(images))
-                .build();
-
-        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_UPDATED);
+//        var images = imageService.findAll(product.getId());
+//
+//        var snapshot = ProductSnapshotPayload.builder()
+//                .product(productMapper.toSnapshot(product))
+//                .characteristics(productCharacteristicMapper.toSnapshot(productCharacteristics))
+//                .images(imageMapper.toImageSnapshot(images))
+//                .build();
+//
+//        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_UPDATED);
         return product.getId();
     }
 
@@ -98,27 +89,27 @@ public class ProductFacade {
     }
 
     @Transactional
-    public Long saveOrUpdateAllImage(ImageWriteDTO request) {
+    public Long saveOrUpdateAllImage(WriteImageCommand request) {
         var processedProductImages = imageService.saveOrUpdateAllImage(request);
 
         var productCharacteristics = productCharacteristicService.findAll(request.getProductId());
         var images = imageService.findAll(request.getProductId());
         var product = productService.findOne(request.getProductId());
 
-        var snapshot = ProductSnapshotPayload.builder()
-                .product(productMapper.toProductSnapshot(product))
-                .characteristics(productCharacteristicMapper.toProductCharacteristicSnapshot(productCharacteristics))
-                .images(imageMapper.toImageSnapshot(images))
-                .build();
-
-        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_UPDATED);
+//        var snapshot = ProductSnapshotPayload.builder()
+//                .product(productMapper.toSnapshot(product))
+//                .characteristics(productCharacteristicMapper.toSnapshot(productCharacteristics))
+//                .images(imageMapper.toImageSnapshot(images))
+//                .build();
+//
+//        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_UPDATED);
 
         try {
-            s3Service.putAllImage(processedProductImages.getImagesForAdd());
-            s3Service.deleteAllImage(processedProductImages.getImageKeysForDelete());
+            imageFileRepo.addAllImage(processedProductImages.getImagesForAdd());
+            imageFileRepo.deleteAllImage(processedProductImages.getImageKeysForDelete());
         } catch (Exception e) {
-            s3Service.compensatePutAllImage(processedProductImages.getImagesForAdd().keySet());
-            s3Service.compensateDeleteAllImage(processedProductImages.getImageKeysForDelete());
+            imageFileRepo.compensateAddAllImage(processedProductImages.getImagesForAdd().keySet());
+            imageFileRepo.compensateDeleteAllImage(processedProductImages.getImageKeysForDelete());
             throw e;
         }
 

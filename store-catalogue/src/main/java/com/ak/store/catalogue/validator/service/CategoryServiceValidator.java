@@ -1,6 +1,6 @@
 package com.ak.store.catalogue.validator.service;
 
-import com.ak.store.catalogue.model.dto.write.CategoryWriteDTO;
+import com.ak.store.catalogue.model.command.WriteCategoryCommand;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
 import com.ak.store.catalogue.model.entity.Characteristic;
@@ -8,89 +8,64 @@ import com.ak.store.catalogue.repository.CategoryRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 @RequiredArgsConstructor
 @Component
 public class CategoryServiceValidator {
     private final CategoryRepo categoryRepo;
 
-    public void validateCreating(CategoryWriteDTO request) {
-        checkUniqName(request.getName());
-
-        if (request.getParentId() != null) {
-            findOne(request.getParentId());
-        }
+    public void validateCreate(WriteCategoryCommand command) {
+        validateName(command.getName());
+        validateParent(command.getId(), command.getParentId());
     }
 
-    public void validateUpdating(Long id, CategoryWriteDTO request) {
-        var category = findOne(id);
-
-        if (request.getParentId() != null && Objects.equals(category.getId(), request.getParentId())) {
-            throw new RuntimeException("must category_id != parent_id");
-        }
-
-        checkUniqName(request.getName());
-
-        if (request.getParentId() != null && !Objects.equals(category.getParentId(), request.getParentId())) {
-            findOne(request.getParentId());
-        }
+    public void validateUpdate(WriteCategoryCommand command) {
+        validateName(command.getName());
+        validateParent(command.getId(), command.getParentId());
     }
 
-    public void validateDeleting(Long id) {
-        if (categoryRepo.existsByParentId(id)) {
-            throw new RuntimeException("this category has children. delete children first");
-        }
+    //todo сделать проверку, что продуктов с этой категорией не существует
+    public void validateDelete(Long id) {
+        validateChildren(id);
     }
 
-    public void validateRemovingCharacteristic(Long id, Long characteristicId) {
-        var category = findOneWithCharacteristics(id);
+    public void validateRemoveCharacteristic(Long id, Long characteristicId) {
+        var category = findOneFullById(id);
 
         if (!isCategoryContainsCharacteristic(category, characteristicId)) {
             throw new RuntimeException("characteristic is not bound to category");
         }
     }
 
-    public void validateAddingCharacteristic(Long id, Long characteristicId) {
-        var category = findOneWithCharacteristics(id);
+    //todo проверять, что характеристика с таким id существует в бд
+    public void validateAddCharacteristic(Long id, Long characteristicId) {
+        var category = findOneFullById(id);
 
         if (isCategoryContainsCharacteristic(category, characteristicId)) {
             throw new RuntimeException("characteristic is already bound to category");
         }
     }
 
-    public void validateRemovingRelatedCategory(Long id, Long relatedId) {
-        var category = findOneWithRelatedCategories(id);
-        boolean isRelatedExist = isCategoryContainsRelatedCategory(category, relatedId);
-
-        if (!isRelatedExist) {
-            throw new RuntimeException("related with id=%d is not bound to category".formatted(relatedId));
-        }
-    }
-
-    public void validateAddingRelatedCategory(Long id, Long relatedId) {
-        if (id.equals(relatedId)) {
-            throw new RuntimeException("id and related id must not be equal");
-        }
-
-        var category = findOneWithRelatedCategories(id);
-        boolean isRelatedExist = isCategoryContainsRelatedCategory(category, relatedId);
-
-        if (isRelatedExist) {
-            throw new RuntimeException("this related is already bound to category");
-        }
-    }
-
-    private void checkUniqName(String name) {
+    private void validateName(String name) {
         if (categoryRepo.existsByNameEqualsIgnoreCase(name)) {
             throw new RuntimeException("not uniq name");
         }
     }
 
-    private boolean isCategoryContainsRelatedCategory(Category category, Long relatedId) {
-        return category.getRelatedCategories().stream()
-                .map(Category::getId)
-                .anyMatch(v -> v.equals(relatedId));
+    private void validateParent(Long id, Long parentId) {
+        if(parentId == null) return;
+
+        categoryRepo.findById(parentId)
+                .orElseThrow(() -> new RuntimeException("parent does not exist"));
+
+        if (id.equals(parentId)) {
+            throw new RuntimeException("incorrect parentId");
+        }
+    }
+
+    private void validateChildren(Long id) {
+        if (categoryRepo.existsByParentId(id)) {
+            throw new RuntimeException("this category has children. delete children first");
+        }
     }
 
     private boolean isCategoryContainsCharacteristic(Category category, Long characteristicId) {
@@ -100,18 +75,8 @@ public class CategoryServiceValidator {
                 .anyMatch(v -> v.equals(characteristicId));
     }
 
-    private Category findOne(Long id) {
-        return categoryRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("not found"));
-    }
-
-    private Category findOneWithRelatedCategories(Long id) {
-        return categoryRepo.findOneWithRelatedCategoriesById(id)
-                .orElseThrow(() -> new RuntimeException("not found"));
-    }
-
-    private Category findOneWithCharacteristics(Long id) {
-        return categoryRepo.findOneWithCharacteristicsById(id)
+    private Category findOneFullById(Long id) {
+        return categoryRepo.findOneFullById(id)
                 .orElseThrow(() -> new RuntimeException("not found"));
     }
 }

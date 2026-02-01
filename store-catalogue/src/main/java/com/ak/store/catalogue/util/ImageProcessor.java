@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.util;
 
 import com.ak.store.catalogue.model.dto.ImageDTO;
-import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
+import com.ak.store.catalogue.model.command.WriteImageCommand;
 import com.ak.store.catalogue.model.pojo.ProcessedImages;
 import com.ak.store.catalogue.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +11,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.regex.Pattern;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ImageProcessor {
     private final ProductService productService;
 
-    public ProcessedImages process(ImageWriteDTO request, List<ImageDTO> images) {
+    public ProcessedImages process(WriteImageCommand request, List<ImageDTO> images) {
         ProcessedImages processedImages = new ProcessedImages();
 
         processedImages.setImageKeysForDelete(

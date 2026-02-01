@@ -16,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Builder
-@ToString(exclude = { "characteristics", "relatedCategories" })
+@ToString(exclude = { "characteristics" })
 @EqualsAndHashCode(of = { "id" })
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "static-data")
 public class Category {
@@ -32,17 +32,4 @@ public class Category {
     @Builder.Default
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryCharacteristic> characteristics = new ArrayList<>();
-
-    @Builder.Default
-    @ManyToMany
-    @JoinTable(
-            name = "related_category",
-            joinColumns = @JoinColumn(name = "category_id"),
-            inverseJoinColumns = @JoinColumn(name = "related_id")
-    )
-    private Set<Category> relatedCategories = new HashSet<>();
-
-    public Category(Long id) {
-        this.id = id;
-    }
 }

@@ -1,10 +1,10 @@
 package com.ak.store.catalogue.service.product;
 
-import com.ak.store.catalogue.model.dto.write.ProductWriteDTO;
+import com.ak.store.catalogue.model.command.WriteProductCommand;
 import com.ak.store.catalogue.model.entity.Product;
 
 public abstract class PriceCalculator {
-     static public void setPrice(Product product, ProductWriteDTO productDTO) {
+     static public void setPrice(Product product, WriteProductCommand productDTO) {
          if(productDTO.getFullPrice() != null) {
              product.setFullPrice(productDTO.getFullPrice());
          }

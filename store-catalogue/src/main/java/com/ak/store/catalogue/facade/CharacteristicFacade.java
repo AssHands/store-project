@@ -1,21 +1,17 @@
 package com.ak.store.catalogue.facade;
 
 import com.ak.store.catalogue.mapper.CharacteristicMapper;
+import com.ak.store.catalogue.model.command.WriteCharacteristicCommand;
+import com.ak.store.catalogue.model.command.WriteNumericValueCommand;
+import com.ak.store.catalogue.model.command.WriteTextValueCommand;
 import com.ak.store.catalogue.model.dto.CharacteristicDTO;
-import com.ak.store.catalogue.model.dto.NumericValueDTO;
-import com.ak.store.catalogue.model.dto.write.CharacteristicWriteDTO;
-import com.ak.store.catalogue.model.dto.write.NumericValueWriteDTO;
-import com.ak.store.catalogue.model.dto.write.TextValueWriteDTO;
 import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.CharacteristicService;
-import com.ak.store.common.snapshot.catalogue.CharacteristicSnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -30,38 +26,38 @@ public class CharacteristicFacade {
     }
 
     @Transactional
-    public Long createOne(CharacteristicWriteDTO request) {
-        var characteristic = characteristicService.createOne(request);
+    public Long createOne(WriteCharacteristicCommand command) {
+        var characteristic = characteristicService.createOne(command);
 
-        var snapshot = CharacteristicSnapshotPayload.builder()
-                .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
-                .numericValues(Collections.emptyList())
-                .textValues(Collections.emptyList())
-                .build();
-
-        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_CREATED);
+//        var snapshot = CharacteristicSnapshotPayload.builder()
+//                .characteristic(characteristicMapper.toSnapshot(characteristic))
+//                .numericValues(Collections.emptyList())
+//                .textValues(Collections.emptyList())
+//                .build();
+//
+//        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_CREATED);
         return characteristic.getId();
     }
 
     @Transactional
-    public Long updateOne(Long id, CharacteristicWriteDTO request) {
-        var characteristic = characteristicService.updateOne(id, request);
-        List<String> textValues = new ArrayList<>();
-        List<NumericValueDTO> numericValues = new ArrayList<>();
-
-        if(characteristic.getIsText()) {
-            textValues = characteristicService.findAllTextValue(characteristic.getId());
-        } else {
-            numericValues = characteristicService.findAllNumericValue(characteristic.getId());
-        }
-
-        var snapshot = CharacteristicSnapshotPayload.builder()
-                .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
-                .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
-                .textValues(textValues)
-                .build();
-
-        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
+    public Long updateOne(WriteCharacteristicCommand command) {
+        var characteristic = characteristicService.updateOne(command);
+//        List<String> textValues = new ArrayList<>();
+//        List<NumericValueDTO> numericValues = new ArrayList<>();
+//
+//        if(characteristic.getIsText()) {
+//            textValues = characteristicService.findAllTextValue(characteristic.getId());
+//        } else {
+//            numericValues = characteristicService.findAllNumericValue(characteristic.getId());
+//        }
+//
+//        var snapshot = CharacteristicSnapshotPayload.builder()
+//                .characteristic(characteristicMapper.toSnapshot(characteristic))
+//                .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
+//                .textValues(textValues)
+//                .build();
+//
+//        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
         return characteristic.getId();
     }
 
@@ -75,58 +71,58 @@ public class CharacteristicFacade {
     }
 
     @Transactional
-    public Long addOneNumericValue(Long id, NumericValueWriteDTO request) {
-        var characteristic = characteristicService.addOneNumericValue(id, request);
-        List<NumericValueDTO> numericValues = characteristicService.findAllNumericValue(characteristic.getId());
-
-        var snapshot = CharacteristicSnapshotPayload.builder()
-                .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
-                .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
-                .build();
-
-        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
+    public Long addOneNumericValue(WriteNumericValueCommand command) {
+        var characteristic = characteristicService.addOneNumericValue(command);
+//        List<NumericValueDTO> numericValues = characteristicService.findAllNumericValue(characteristic.getId());
+//
+//        var snapshot = CharacteristicSnapshotPayload.builder()
+//                .characteristic(characteristicMapper.toSnapshot(characteristic))
+//                .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
+//                .build();
+//
+//        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
         return characteristic.getId();
     }
 
     @Transactional
-    public Long removeOneNumericValue(Long id, NumericValueWriteDTO request) {
-        var characteristic = characteristicService.removeOneNumericValue(id, request);
-        List<NumericValueDTO> numericValues = characteristicService.findAllNumericValue(characteristic.getId());
-
-        var snapshot = CharacteristicSnapshotPayload.builder()
-                .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
-                .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
-                .build();
-
-        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
+    public Long removeOneNumericValue(WriteNumericValueCommand command) {
+        var characteristic = characteristicService.removeOneNumericValue(command);
+//        List<NumericValueDTO> numericValues = characteristicService.findAllNumericValue(characteristic.getId());
+//
+//        var snapshot = CharacteristicSnapshotPayload.builder()
+//                .characteristic(characteristicMapper.toSnapshot(characteristic))
+//                .numericValues(characteristicMapper.toNumericValueSnapshot(numericValues))
+//                .build();
+//
+//        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
         return characteristic.getId();
     }
 
     @Transactional
-    public Long addOneTextValue(Long id, TextValueWriteDTO request) {
-        var characteristic = characteristicService.addOneTextValue(id, request);
-        List<String> textValues = characteristicService.findAllTextValue(characteristic.getId());
-
-        var snapshot = CharacteristicSnapshotPayload.builder()
-                .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
-                .textValues(textValues)
-                .build();
-
-        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
+    public Long addOneTextValue(WriteTextValueCommand command) {
+        var characteristic = characteristicService.addOneTextValue(command);
+//        List<String> textValues = characteristicService.findAllTextValue(characteristic.getId());
+//
+//        var snapshot = CharacteristicSnapshotPayload.builder()
+//                .characteristic(characteristicMapper.toSnapshot(characteristic))
+//                .textValues(textValues)
+//                .build();
+//
+//        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
         return characteristic.getId();
     }
 
     @Transactional
-    public Long removeOneTextValue(Long id, TextValueWriteDTO request) {
-        var characteristic = characteristicService.removeOneTextValue(id, request);
-        List<String> textValues = characteristicService.findAllTextValue(characteristic.getId());
-
-        var snapshot = CharacteristicSnapshotPayload.builder()
-                .characteristic(characteristicMapper.toCharacteristicSnapshot(characteristic))
-                .textValues(textValues)
-                .build();
-
-        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
+    public Long removeOneTextValue(WriteTextValueCommand command) {
+        var characteristic = characteristicService.removeOneTextValue(command);
+//        List<String> textValues = characteristicService.findAllTextValue(characteristic.getId());
+//
+//        var snapshot = CharacteristicSnapshotPayload.builder()
+//                .characteristic(characteristicMapper.toSnapshot(characteristic))
+//                .textValues(textValues)
+//                .build();
+//
+//        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_UPDATED);
         return characteristic.getId();
     }
 }

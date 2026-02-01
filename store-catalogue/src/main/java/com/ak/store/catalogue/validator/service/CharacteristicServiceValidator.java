@@ -2,9 +2,9 @@ package com.ak.store.catalogue.validator.service;
 
 import com.ak.store.catalogue.model.dto.CharacteristicDTO;
 import com.ak.store.catalogue.model.dto.NumericValueDTO;
-import com.ak.store.catalogue.model.dto.write.CharacteristicWriteDTO;
-import com.ak.store.catalogue.model.dto.write.NumericValueWriteDTO;
-import com.ak.store.catalogue.model.dto.write.TextValueWriteDTO;
+import com.ak.store.catalogue.model.command.WriteCharacteristicCommand;
+import com.ak.store.catalogue.model.command.WriteNumericValueCommand;
+import com.ak.store.catalogue.model.command.WriteTextValueCommand;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,17 +17,16 @@ public class CharacteristicServiceValidator {
     private final CharacteristicRepo characteristicRepo;
 
     //todo добавить валидацию чтобы toValue было всегда больше или равно, чем fromValue
-
-    public void validateCreating(CharacteristicWriteDTO characteristic) {
+    public void validateCreate(WriteCharacteristicCommand characteristic) {
         checkUniqName(characteristic.getName());
     }
 
-    public void validateUpdating(CharacteristicWriteDTO characteristic) {
+    public void validateUpdate(WriteCharacteristicCommand characteristic) {
         checkUniqName(characteristic.getName());
     }
 
-    public void validateAddingNumericValue(CharacteristicDTO characteristic, List<NumericValueDTO> existingNumericValues,
-                                           NumericValueWriteDTO addingNumericValue) {
+    public void validateAddNumericValue(CharacteristicDTO characteristic, List<NumericValueDTO> existingNumericValues,
+                                        WriteNumericValueCommand addingNumericValue) {
         if (characteristic.getIsText()) {
             throw new RuntimeException("can't add range value to text characteristic");
         }
@@ -40,8 +39,8 @@ public class CharacteristicServiceValidator {
         }
     }
 
-    public void validateCreatingTextValue(CharacteristicDTO characteristic, List<String> existingTextValues,
-                                          TextValueWriteDTO addingTextValue) {
+    public void validateCreateTextValue(CharacteristicDTO characteristic, List<String> existingTextValues,
+                                        WriteTextValueCommand addingTextValue) {
         if (!characteristic.getIsText()) {
             throw new RuntimeException("can't add text value to numeric characteristic");
         }

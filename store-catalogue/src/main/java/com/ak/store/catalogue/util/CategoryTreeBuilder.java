@@ -23,8 +23,10 @@ public abstract class CategoryTreeBuilder {
                 rootCategories.add(category);
             } else {
                 CategoryTreeView parent = categoryMap.get(category.getParentId());
+
                 if (parent != null) {
                     parent.getChildCategories().add(category);
+
                 } else {
                     throw new RuntimeException("no parent with id " + category.getParentId());
                 }

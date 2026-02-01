@@ -2,11 +2,11 @@ package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.ProductFacade;
 import com.ak.store.catalogue.mapper.ProductMapper;
-import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
-import com.ak.store.catalogue.model.form.ProductFormPayload;
-import com.ak.store.catalogue.model.view.ProductView;
+import com.ak.store.catalogue.model.command.WriteImageCommand;
+import com.ak.store.catalogue.model.form.WriteProductForm;
 import com.ak.store.catalogue.model.validationGroup.Create;
 import com.ak.store.catalogue.model.validationGroup.Update;
+import com.ak.store.catalogue.model.view.ProductView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -25,12 +25,14 @@ public class ProductController {
 
     @GetMapping("{id}")
     public ProductView findOne(@PathVariable Long id) {
-        return productMapper.toProductView(productFacade.findOne(id));
+        return productMapper.toView(productFacade.findOne(id));
     }
 
     @PostMapping("find")
     public List<ProductView> findAll(@RequestBody List<Long> ids) {
-        return productMapper.toProductView(productFacade.findAll(ids));
+        return productFacade.findAll(ids).stream()
+                .map(productMapper::toView)
+                .toList();
     }
 
     @PostMapping("available")
@@ -44,14 +46,13 @@ public class ProductController {
     }
 
     @PostMapping
-    public Long createOne(@RequestBody @Validated(Create.class) ProductFormPayload request) {
-        return productFacade.createOne(productMapper.toProductWritePayload(request));
+    public Long createOne(@RequestBody @Validated(Create.class) WriteProductForm form) {
+        return productFacade.createOne(productMapper.toWriteCommand(form));
     }
 
-    @PatchMapping("{id}")
-    public Long updateOne(@PathVariable("id") Long productId,
-                          @RequestBody @Validated(Update.class) ProductFormPayload request) {
-        return productFacade.updateOne(productId, productMapper.toProductWritePayload(request));
+    @PatchMapping("update")
+    public Long updateOne(@RequestBody @Validated(Update.class) WriteProductForm form) {
+        return productFacade.updateOne(productMapper.toWriteCommand(form));
     }
 
     @DeleteMapping("{id}")
@@ -83,7 +84,7 @@ public class ProductController {
      * c[0] <br>
      * a[1] <br>
      * b[2] <br>
-     *<br>
+     * <br>
      * При удалении изображения мы указываем индекс изображения: <br>
      * delete_images -> 1, 2 <br>
      * add_images -> d, e <br>
@@ -104,13 +105,12 @@ public class ProductController {
      * a[1] <br>
      * e[2] <br>
      */
-    //todo: validate data in controller
-    @PatchMapping(value = "{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "update/images/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Long updateAllProductImage(@PathVariable("id") Long productId,
                                       @RequestParam Map<String, String> allImageIndexes,
                                       @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,
                                       @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
-        var request = new ImageWriteDTO(productId, allImageIndexes, addImages, deleteImageIndexes);
+        var request = new WriteImageCommand(productId, allImageIndexes, addImages, deleteImageIndexes);
         return productFacade.saveOrUpdateAllImage(request);
     }
 }
