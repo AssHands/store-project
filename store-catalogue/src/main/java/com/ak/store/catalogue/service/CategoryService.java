@@ -8,7 +8,7 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.repository.CategoryRepo;
-import com.ak.store.catalogue.validator.service.CategoryServiceValidator;
+import com.ak.store.catalogue.validator.CategoryValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import java.util.List;
 public class CategoryService {
     private final CategoryMapper categoryMapper;
     private final CategoryRepo categoryRepo;
-    private final CategoryServiceValidator categoryServiceValidator;
+    private final CategoryValidator categoryValidator;
 
     private Category findOneById(Long id) {
         return categoryRepo.findById(id)
@@ -40,33 +40,38 @@ public class CategoryService {
 
     @Transactional
     public CategoryDTO createOne(WriteCategoryCommand command) {
-        categoryServiceValidator.validateCreate(command);
+        categoryValidator.validateCreate(command);
+
         var category = categoryRepo.save(categoryMapper.toEntity(command));
+
         return categoryMapper.toDTO(category);
     }
 
     @Transactional
     public CategoryDTO updateOne(WriteCategoryCommand command) {
-        var category = findOneById(command.getId());
-        categoryServiceValidator.validateUpdate(command);
+        categoryValidator.validateUpdate(command);
 
+        var category = findOneById(command.getId());
         categoryMapper.updateEntity(command, category);
+
         return categoryMapper.toDTO(categoryRepo.save(category));
     }
 
     @Transactional
     public CategoryDTO deleteOne(Long id) {
-        var category = findOneById(id);
-        categoryServiceValidator.validateDelete(id);
+        categoryValidator.validateDelete(id);
 
+        var category = findOneById(id);
         categoryRepo.delete(category);
+
         return categoryMapper.toDTO(category);
     }
 
     @Transactional
     public CategoryDTO addOneCharacteristic(WriteCategoryCharacteristicCommand command) {
+        categoryValidator.validateAddOneCharacteristic(command);
+
         var category = findOneFullById(command.getCategoryId());
-        categoryServiceValidator.validateAddCharacteristic(command.getCategoryId(), command.getCharacteristicId());
 
         category.getCharacteristics().add(
                 CategoryCharacteristic.builder()
@@ -82,8 +87,9 @@ public class CategoryService {
 
     @Transactional
     public CategoryDTO removeOneCharacteristic(WriteCategoryCharacteristicCommand command) {
+        categoryValidator.validateRemoveOneCharacteristic(command);
+
         var category = findOneFullById(command.getCategoryId());
-        categoryServiceValidator.validateRemoveCharacteristic(command.getCategoryId(), command.getCharacteristicId());
 
         category.getCharacteristics().removeIf(cc ->
                 cc.getCharacteristic().getId().equals(command.getCharacteristicId())

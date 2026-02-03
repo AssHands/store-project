@@ -9,7 +9,7 @@ import com.ak.store.catalogue.model.dto.NumericValueDTO;
 import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
-import com.ak.store.catalogue.validator.service.CharacteristicServiceValidator;
+import com.ak.store.catalogue.validator.CharacteristicValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.List;
 public class CharacteristicService {
     private final CharacteristicMapper characteristicMapper;
     private final CharacteristicRepo characteristicRepo;
-    private final CharacteristicServiceValidator characteristicServiceValidator;
+    private final CharacteristicValidator characteristicValidator;
 
     private Characteristic findOneById(Long id) {
         return characteristicRepo.findById(id)
@@ -53,17 +53,20 @@ public class CharacteristicService {
 
     @Transactional
     public CharacteristicDTO createOne(WriteCharacteristicCommand command) {
-        characteristicServiceValidator.validateCreate(command);
+        characteristicValidator.validateCreate(command);
+
         var characteristic = characteristicMapper.toEntity(command);
+
         return characteristicMapper.toDTO(characteristicRepo.save(characteristic));
     }
 
     @Transactional
     public CharacteristicDTO updateOne(WriteCharacteristicCommand command) {
-        var characteristic = findOneById(command.getId());
-        characteristicServiceValidator.validateUpdate(command);
+        characteristicValidator.validateUpdate(command);
 
+        var characteristic = findOneById(command.getId());
         characteristicMapper.updateEntity(command, characteristic);
+
         return characteristicMapper.toDTO(characteristicRepo.save(characteristic));
     }
 
@@ -71,27 +74,25 @@ public class CharacteristicService {
     @Transactional
     public CharacteristicDTO deleteOne(Long id) {
         var characteristic = findOneById(id);
+
         characteristicRepo.delete(characteristic);
+
         return characteristicMapper.toDTO(characteristic);
     }
 
     @Transactional
     public CharacteristicDTO addOneNumericValue(WriteNumericValueCommand command) {
-        long id = command.getCharacteristicId();
+        characteristicValidator.validateAddOneNumericValue(command);
 
-        var characteristic = findOneWithValuesById(id);
-        characteristicServiceValidator.validateAddNumericValue(
-                characteristicMapper.toDTO(characteristic), findAllNumericValue(id), command);
-
+        var characteristic = findOneWithValuesById(command.getCharacteristicId());
         characteristic.getNumericValues().add(characteristicMapper.toNumericValue(command, characteristic.getId()));
+
         return characteristicMapper.toDTO(characteristicRepo.save(characteristic));
     }
 
     @Transactional
     public CharacteristicDTO removeOneNumericValue(WriteNumericValueCommand command) {
-        long id = command.getCharacteristicId();
-
-        var characteristic = findOneWithValuesById(id);
+        var characteristic = findOneWithValuesById(command.getCharacteristicId());
         int index = findRangeValueIndex(characteristic, command);
 
         characteristic.getNumericValues().remove(index);
@@ -100,21 +101,17 @@ public class CharacteristicService {
 
     @Transactional
     public CharacteristicDTO addOneTextValue(WriteTextValueCommand command) {
-        long id = command.getCharacteristicId();
+        characteristicValidator.validateAddOneTextValue(command);
 
-        var characteristic = findOneWithValuesById(id);
-        characteristicServiceValidator.validateCreateTextValue(
-                characteristicMapper.toDTO(characteristic), findAllTextValue(id), command);
-
+        var characteristic = findOneWithValuesById(command.getCharacteristicId());
         characteristic.getTextValues().add(characteristicMapper.toTextValue(command, characteristic.getId()));
+
         return characteristicMapper.toDTO(characteristicRepo.save(characteristic));
     }
 
     @Transactional
     public CharacteristicDTO removeOneTextValue(WriteTextValueCommand command) {
-        long id = command.getCharacteristicId();
-
-        var characteristic = findOneWithValuesById(id);
+        var characteristic = findOneWithValuesById(command.getCharacteristicId());
         int index = findTextValueIndex(characteristic, command);
 
         characteristic.getTextValues().remove(index);

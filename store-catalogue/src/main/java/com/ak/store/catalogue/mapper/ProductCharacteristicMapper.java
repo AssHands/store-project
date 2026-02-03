@@ -1,8 +1,12 @@
 package com.ak.store.catalogue.mapper;
 
+import com.ak.store.catalogue.model.command.WriteProductCharacteristicPayloadCommand;
 import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
 import com.ak.store.catalogue.model.command.WriteProductCharacteristicCommand;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
+import com.ak.store.catalogue.model.form.WriteProductCharacteristicForm;
+import com.ak.store.catalogue.model.form.WriteProductCharacteristicPayloadForm;
+import com.ak.store.catalogue.model.view.ProductCharacteristicView;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -19,6 +23,12 @@ public interface ProductCharacteristicMapper {
     @Mapping(target = "characteristic.id", source = "pc.characteristicId")
     @Mapping(target = "product.id", source = "productId")
     ProductCharacteristic toEntity(WriteProductCharacteristicCommand command, Long productId);
+
+    ProductCharacteristicView toView(ProductCharacteristicDTO dto);
+
+    WriteProductCharacteristicCommand toWriteCommand(WriteProductCharacteristicForm form);
+
+    WriteProductCharacteristicPayloadCommand toWritePayloadCommand(WriteProductCharacteristicPayloadForm payloadForm);
 
     @Mapping(target = "id", source = "characteristicId")
     ProductCharacteristicSnapshot toSnapshot(ProductCharacteristicDTO dto);

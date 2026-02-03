@@ -13,13 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductCharacteristicDTO {
-    private Long id;
-
     private Long characteristicId;
-
     private Long productId;
-
     private String textValue;
-
     private Integer numericValue;
 }

@@ -17,8 +17,6 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CategoryDTO {
     private Long id;
-
     private String name;
-
     private Long parentId;
 }

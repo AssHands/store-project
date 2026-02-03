@@ -1,12 +1,9 @@
 package com.ak.store.catalogue.facade;
 
-import com.ak.store.catalogue.mapper.CharacteristicMapper;
 import com.ak.store.catalogue.model.command.WriteCharacteristicCommand;
 import com.ak.store.catalogue.model.command.WriteNumericValueCommand;
 import com.ak.store.catalogue.model.command.WriteTextValueCommand;
 import com.ak.store.catalogue.model.dto.CharacteristicDTO;
-import com.ak.store.catalogue.outbox.OutboxEventService;
-import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.CharacteristicService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +15,6 @@ import java.util.List;
 @Service
 public class CharacteristicFacade {
     private final CharacteristicService characteristicService;
-    private final CharacteristicMapper characteristicMapper;
-    private final OutboxEventService outboxEventService;
 
     public List<CharacteristicDTO> findAllByCategoryId(Long categoryId) {
         return characteristicService.findAllByCategoryId(categoryId);
@@ -65,9 +60,8 @@ public class CharacteristicFacade {
     public void deleteOne(Long id) {
         var characteristic = characteristicService.deleteOne(id);
 
-        var snapshot = characteristic.getId().toString();
-
-        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_DELETED);
+//        var snapshot = characteristic.getId().toString();
+//        outboxEventService.createOne(snapshot, OutboxEventType.CHARACTERISTIC_DELETED);
     }
 
     @Transactional

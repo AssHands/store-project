@@ -14,6 +14,5 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class NumericValueDTO {
     private Integer fromValue;
-
     private Integer toValue;
 }

@@ -1,5 +1,6 @@
-package com.ak.store.catalogue.model.command;
+package com.ak.store.catalogue.model.view;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -11,8 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class WriteCategoryCharacteristicCommand {
-    private Long categoryId;
+public class ProductCharacteristicView {
+    private Long productId;
     private Long characteristicId;
+    private String textValue;
+    private Integer numericValue;
 }

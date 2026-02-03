@@ -14,16 +14,10 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WriteProductCommand {
     private Long id;
-
     private String title;
-
     private String description;
-
     private Integer fullPrice;
-
     private Integer discountPercentage;
-
     private Boolean isAvailable;
-
     private Long categoryId;
 }

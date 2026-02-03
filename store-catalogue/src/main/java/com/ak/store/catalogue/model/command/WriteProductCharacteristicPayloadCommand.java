@@ -7,12 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class WriteCategoryCharacteristicCommand {
-    private Long categoryId;
-    private Long characteristicId;
+public class WriteProductCharacteristicPayloadCommand {
+    private Long productId;
+    private List<WriteProductCharacteristicCommand> addCharacteristics;
+    private List<WriteProductCharacteristicCommand> removeCharacteristics;
 }

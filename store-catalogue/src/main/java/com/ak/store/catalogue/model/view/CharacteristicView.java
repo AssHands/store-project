@@ -19,8 +19,6 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CharacteristicView {
     private Long id;
-
     private String name;
-
     private Boolean isText;
 }

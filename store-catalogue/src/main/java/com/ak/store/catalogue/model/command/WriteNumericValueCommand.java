@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WriteNumericValueCommand {
     private Long characteristicId;
-
     private Integer fromValue;
-
     private Integer toValue;
 }

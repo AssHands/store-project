@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CharacteristicDTO {
     private Long id;
-
     private String name;
-
     private Boolean isText;
 }

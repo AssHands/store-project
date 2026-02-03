@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WriteCategoryCommand {
     private Long id;
-
     private String name;
-
     private Long parentId;
 }

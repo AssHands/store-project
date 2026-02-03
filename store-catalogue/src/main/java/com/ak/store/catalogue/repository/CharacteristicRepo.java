@@ -22,6 +22,11 @@ public interface CharacteristicRepo extends JpaRepository<Characteristic, Long> 
     List<Characteristic> findAllWithValuesByCategoryId(Long categoryId);
 
     @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
+    @EntityGraph(attributePaths = {"textValues", "numericValues"})
+    @Query("SELECT c FROM Characteristic c WHERE c.id IN :ids")
+    List<Characteristic> findAllWithValuesByIds(List<Long> ids);
+
+    @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
     @Query("""
             SELECT c FROM Characteristic c
             JOIN c.categories cc

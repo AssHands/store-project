@@ -9,7 +9,6 @@ import com.ak.store.catalogue.model.entity.ProductStatus;
 import com.ak.store.catalogue.model.entity.RatingSummary;
 import com.ak.store.catalogue.repository.ProductRepo;
 import com.ak.store.catalogue.service.product.PriceCalculator;
-import com.ak.store.catalogue.validator.service.ProductServiceValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import java.util.List;
 public class ProductService {
     private final ProductRepo productRepo;
     private final ProductMapper productMapper;
-    private final ProductServiceValidator productServiceValidator;
 
     private Product findOneById(Long id) {
         return productRepo.findById(id).orElseThrow(() -> new RuntimeException("not found"));
@@ -52,7 +50,6 @@ public class ProductService {
 
     @Transactional
     public ProductDTO createOne(WriteProductCommand command) {
-        productServiceValidator.validateCreate(command);
         var product = productMapper.toEntity(command);
 
         PriceCalculator.setPrice(product, command);
