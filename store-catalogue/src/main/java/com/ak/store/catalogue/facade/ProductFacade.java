@@ -5,6 +5,7 @@ import com.ak.store.catalogue.model.dto.ProductDTO;
 import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.service.ProductService;
+import com.ak.store.catalogue.service.outbox.ProductOutboxService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import java.util.List;
 @Service
 public class ProductFacade {
     private final ProductService productService;
-    private final OutboxEventService productOutboxEventService;
+    private final ProductOutboxService productOutboxService;
 
     public ProductDTO findOne(Long id) {
         return productService.findOne(id);
@@ -36,40 +37,21 @@ public class ProductFacade {
     @Transactional
     public Long createOne(WriteProductCommand command) {
         var product = productService.createOne(command);
-
-//        var snapshot = ProductCreationSnapshot.builder()
-//                .payload(ProductSnapshotPayload.builder()
-//                        .product(productMapper.toSnapshot(product))
-//                        .build())
-//                .build();
-//
-//        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_CREATION);
+        productOutboxService.saveCreatedEvent(product.getId());
         return product.getId();
     }
 
     @Transactional
     public Long updateOne(WriteProductCommand command) {
         var product = productService.updateOne(command);
-
-//        var images = imageService.findAll(product.getId());
-//
-//        var snapshot = ProductSnapshotPayload.builder()
-//                .product(productMapper.toSnapshot(product))
-//                .characteristics(productCharacteristicMapper.toSnapshot(productCharacteristics))
-//                .images(imageMapper.toImageSnapshot(images))
-//                .build();
-//
-//        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_UPDATED);
+        productOutboxService.saveUpdatedEvent(product.getId());
         return product.getId();
     }
 
     @Transactional
-    //todo добавить snapshot вместо строки?
-    public void deleteOne(Long id) {
+    public Long deleteOne(Long id) {
         var product = productService.deleteOne(id);
-
-        String snapshot = product.getId().toString();
-
-        productOutboxEventService.createOne(snapshot, OutboxEventType.PRODUCT_DELETED);
+        productOutboxService.saveDeletedEvent(product.getId());
+        return id;
     }
 }

@@ -12,6 +12,9 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
     @EntityGraph(attributePaths = {"category", "category.characteristics"})
     Optional<Product> findOneWithCategoryCharacteristicsById(Long id);
 
+    @EntityGraph(attributePaths = {"category", "category.characteristics", "images"})
+    Optional<Product> findOneFullById(Long id);
+
     @Query("SELECT COUNT(p) = :amount FROM Product p WHERE p.id IN :ids AND p.status = 'ACTIVE'")
     boolean isExistAllByIds(List<Long> ids, long amount);
 

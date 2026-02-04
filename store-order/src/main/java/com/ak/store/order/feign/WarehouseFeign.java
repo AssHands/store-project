@@ -1,8 +1,6 @@
 package com.ak.store.order.feign;
 
 import com.ak.store.order.model.form.werehouse.AvailableInventoryForm;
-import com.ak.store.order.model.form.werehouse.ReserveInventoryForm;
-import com.ak.store.order.model.view.feign.InventoryView;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

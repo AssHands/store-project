@@ -2,7 +2,7 @@ package com.ak.store.orderOutbox.processor.impl;
 
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.order.OrderCreation;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.order.OrderCreationSnapshot;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
 import com.ak.store.orderOutbox.model.OutboxEvent;
 import com.ak.store.orderOutbox.model.OutboxEventStatus;
@@ -24,9 +24,9 @@ public class OrderCreationOutboxEventProcessor implements OutboxEventProcessor {
     @Override
     public void process(OutboxEvent event) {
         String topic = kafkaTopicRegistry.getTopicByEvent(getType());
-        var orderCreation = jsonMapperKafka.fromJson(event.getPayload(), OrderCreation.class);
+        var orderCreation = jsonMapperKafka.fromJson(event.getPayload(), OrderCreationSnapshot.class);
 
-        var request = SagaRequestEvent.<OrderCreation>builder()
+        var request = SagaRequestEvent.<OrderCreationSnapshot>builder()
                 .sagaId(event.getId())
                 .request(orderCreation)
                 .build();

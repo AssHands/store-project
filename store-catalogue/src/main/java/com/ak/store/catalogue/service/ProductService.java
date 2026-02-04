@@ -8,7 +8,7 @@ import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductStatus;
 import com.ak.store.catalogue.model.entity.RatingSummary;
 import com.ak.store.catalogue.repository.ProductRepo;
-import com.ak.store.catalogue.service.product.PriceCalculator;
+import com.ak.store.catalogue.util.ProductPriceCalculator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,7 +52,7 @@ public class ProductService {
     public ProductDTO createOne(WriteProductCommand command) {
         var product = productMapper.toEntity(command);
 
-        PriceCalculator.setPrice(product, command);
+        ProductPriceCalculator.setPrice(product, command);
         product.setStatus(ProductStatus.IN_PROGRESS);
         product.setReviewAmount(0);
         product.setRating(0f);
@@ -86,7 +86,7 @@ public class ProductService {
     }
 
     private void updateOneFromDTO(Product product, WriteProductCommand request) {
-        PriceCalculator.setPrice(product, request);
+        ProductPriceCalculator.setPrice(product, request);
 
         if (request.getTitle() != null) {
             product.setTitle(request.getTitle());

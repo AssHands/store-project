@@ -1,35 +1,32 @@
 package com.ak.store.order.mapper;
 
 import com.ak.store.order.model.dto.OrderDTO;
-import com.ak.store.order.model.dto.OrderDTOPayload;
+import com.ak.store.order.model.dto.OrderPayloadDTO;
 import com.ak.store.order.model.dto.OrderProductDTO;
-import com.ak.store.order.model.dto.write.OrderWriteDTO;
+import com.ak.store.order.model.command.WriteOrderCommand;
 import com.ak.store.order.model.entity.Order;
 import com.ak.store.order.model.entity.OrderProduct;
 import com.ak.store.order.model.form.OrderForm;
-import com.ak.store.order.model.view.OrderView;
-import com.ak.store.order.model.view.OrderViewPayload;
+import com.ak.store.order.model.view.OrderPayloadView;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
-import java.util.List;
+import java.util.UUID;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface OrderMapper {
-    OrderDTO toOrderDTO(Order o);
+    OrderDTO toDTO(Order o);
 
     @Mapping(target = "orderId", source = "order.id")
-    OrderProductDTO toOrderProductDTO(OrderProduct op);
+    OrderProductDTO toOrderProductDTO(OrderProduct entity);
 
-    @Mapping(target = "order", source = "o")
-    @Mapping(target = "products", source = "o.products")
-    OrderDTOPayload toOrderDTOPayload(Order o);
+    @Mapping(target = "order", source = "entity")
+    @Mapping(target = "products", source = "entity.products")
+    OrderPayloadDTO toPayloadDTO(Order entity);
 
-    List<OrderDTOPayload> toOrderDTOPayload(List<Order> o);
+    OrderPayloadView toPayloadView(OrderPayloadDTO dto);
 
-    List<OrderViewPayload> toOrderViewPayload(List<OrderDTOPayload> o);
-
-    OrderWriteDTO toOrderWriteDTO(OrderForm o);
+    WriteOrderCommand toWriteCommand(OrderForm form, UUID userId, String userEmail);
 }

@@ -50,14 +50,13 @@ kafka:
     characteristic-updated: characteristic-updated
     characteristic-deleted: characteristic-deleted
 
-    product-creation: product-creation-request
-    cancel-product-creation: cancel-product-creation-response
-    confirm-product-creation: confirm-product-creation-response
+    product-created: product-created-request
+    cancel-product-created: cancel-product-created-response
+    confirm-product-created: confirm-product-created-response
 
     product-updated: product-updated
     product-deleted: product-deleted
     product-rating-updated: product-rating-updated
-
 
     add-product-grade: add-product-grade-response
     remove-product-grade: remove-product-grade-response

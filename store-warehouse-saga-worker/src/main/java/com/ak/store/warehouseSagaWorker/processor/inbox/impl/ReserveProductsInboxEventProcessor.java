@@ -1,7 +1,7 @@
 package com.ak.store.warehouseSagaWorker.processor.inbox.impl;
 
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.order.OrderCreation;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.order.OrderCreationSnapshot;
 import com.ak.store.warehouseSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.warehouseSagaWorker.model.inbox.InboxEventStatus;
 import com.ak.store.warehouseSagaWorker.model.inbox.InboxEventType;
@@ -22,7 +22,7 @@ public class ReserveProductsInboxEventProcessor implements InboxEventProcessor {
     @Transactional
     @Override
     public void process(InboxEvent event) {
-        var request = jsonMapperKafka.fromJson(event.getPayload(), OrderCreation.class);
+        var request = jsonMapperKafka.fromJson(event.getPayload(), OrderCreationSnapshot.class);
 
         try {
             inventoryService.reserveAll(request.getProductAmount());

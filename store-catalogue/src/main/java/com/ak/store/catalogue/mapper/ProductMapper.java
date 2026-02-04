@@ -5,6 +5,7 @@ import com.ak.store.catalogue.model.command.WriteProductCommand;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.form.WriteProductForm;
 import com.ak.store.catalogue.model.view.ProductView;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.ProductSnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -22,5 +23,6 @@ public interface ProductMapper {
 
     WriteProductCommand toWriteCommand(WriteProductForm form);
 
-    ProductSnapshot toSnapshot(ProductDTO dto);
+    @Mapping(target = "categoryId", source = "category.id")
+    ProductSnapshot toSnapshot(Product entity);
 }

@@ -33,8 +33,8 @@ public class CategoryController {
     }
 
     @DeleteMapping("{id}")
-    public void deleteOne(@PathVariable Long id) {
-        categoryFacade.deleteOne(id);
+    public Long deleteOne(@PathVariable Long id) {
+        return categoryFacade.deleteOne(id);
     }
 
     @PatchMapping("update")

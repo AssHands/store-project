@@ -3,6 +3,7 @@ package com.ak.store.catalogue.facade;
 import com.ak.store.catalogue.model.command.WriteProductCharacteristicPayloadCommand;
 import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
 import com.ak.store.catalogue.service.ProductCharacteristicService;
+import com.ak.store.catalogue.service.outbox.ProductOutboxService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +13,15 @@ import java.util.List;
 @Service
 public class ProductCharacteristicFacade {
     private final ProductCharacteristicService pcService;
+    private final ProductOutboxService productOutboxService;
 
     public List<ProductCharacteristicDTO> findAll(Long id) {
         return pcService.findAll(id);
     }
 
     public Long updateAll(WriteProductCharacteristicPayloadCommand payloadCommand) {
-        var pcList = pcService.updateAll(payloadCommand);
-        //todo записывать в outbox
+        pcService.updateAll(payloadCommand);
+        productOutboxService.saveUpdatedEvent(payloadCommand.getProductId());
         return payloadCommand.getProductId();
     }
 }

@@ -1,6 +1,5 @@
 package com.ak.store.kafka.storekafkastarter.model.event.catalogue;
 
-
 import com.ak.store.kafka.storekafkastarter.KafkaEvent;
 import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CategorySnapshotPayload;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

@@ -25,9 +25,9 @@ public class KafkaTopicRegistry {
                 Map.entry(OutboxEventType.CHARACTERISTIC_UPDATED, "characteristic-updated"),
                 Map.entry(OutboxEventType.CHARACTERISTIC_DELETED, "characteristic-deleted"),
 
-                Map.entry(OutboxEventType.PRODUCT_CREATION, "product-creation"),
-                Map.entry(OutboxEventType.CANCEL_PRODUCT_CREATION, "cancel-product-creation"),
-                Map.entry(OutboxEventType.CONFIRM_PRODUCT_CREATION, "confirm-product-creation"),
+                Map.entry(OutboxEventType.PRODUCT_CREATED, "product-created"),
+                Map.entry(OutboxEventType.CANCEL_PRODUCT_CREATED, "cancel-product-created"),
+                Map.entry(OutboxEventType.CONFIRM_PRODUCT_CREATED, "confirm-product-created"),
 
                 Map.entry(OutboxEventType.PRODUCT_UPDATED, "product-updated"),
                 Map.entry(OutboxEventType.PRODUCT_DELETED, "product-deleted"),

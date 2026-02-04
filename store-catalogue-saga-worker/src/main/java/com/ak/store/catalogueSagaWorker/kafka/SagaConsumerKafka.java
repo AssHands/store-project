@@ -142,10 +142,10 @@ public class SagaConsumerKafka {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
-                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CANCEL_PRODUCT_CREATION);
+                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CANCEL_PRODUCT_CREATED);
             } catch (Exception e) {
                 inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
-                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_PRODUCT_CREATION);
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_PRODUCT_CREATED);
             }
         }
 
@@ -161,10 +161,10 @@ public class SagaConsumerKafka {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
-                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CONFIRM_PRODUCT_CREATION);
+                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CONFIRM_PRODUCT_CREATED);
             } catch (Exception e) {
                 inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
-                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_PRODUCT_CREATION);
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_PRODUCT_CREATED);
             }
         }
 

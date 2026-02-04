@@ -7,6 +7,7 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.form.WriteCategoryCharacteristicForm;
 import com.ak.store.catalogue.model.form.WriteCategoryForm;
 import com.ak.store.catalogue.model.view.CategoryTreeView;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CategorySnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
@@ -26,5 +27,5 @@ public interface CategoryMapper {
 
     WriteCategoryCharacteristicCommand toWriteCharacteristicCommand(WriteCategoryCharacteristicForm form);
 
-    CategorySnapshot toSnapshot(CategoryDTO dto);
+    CategorySnapshot toSnapshot(Category entity);
 }

@@ -1,6 +1,6 @@
 package com.ak.store.order.repository;
 
-import com.ak.store.order.model.view.feign.ProductView;
+import com.ak.store.order.model.feign.ProductView;
 
 import java.util.List;
 

@@ -21,7 +21,4 @@ public class CategorySnapshotPayload {
 
     @Builder.Default
     private List<Long> characteristics = new ArrayList<>();
-
-    @Builder.Default
-    private List<Long> relatedCategories = new ArrayList<>();
 }
