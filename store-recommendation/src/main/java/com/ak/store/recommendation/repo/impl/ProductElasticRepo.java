@@ -1,4 +1,4 @@
-package com.ak.store.recommendation.service;
+package com.ak.store.recommendation.repo.impl;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
@@ -6,44 +6,45 @@ import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import com.ak.store.recommendation.mapper.ProductMapper;
 import com.ak.store.recommendation.model.document.Product;
-import com.ak.store.recommendation.model.view.ProductView;
-import com.ak.store.recommendation.model.view.RecommendationResponse;
+import com.ak.store.recommendation.repo.ProductRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 @RequiredArgsConstructor
-@Service
-
-//todo сервис возвращает view вместо DTO
-public class RecommendationElasticService {
+public class ProductElasticRepo implements ProductRepo {
     private final ElasticsearchClient esClient;
-    private final ProductMapper productMapper;
-    private final int SIZE = 20;
 
-    public RecommendationResponse getRecommendation() {
-        RecommendationResponse recommendationResponse = new RecommendationResponse();
-
-        recommendationResponse.getContent().addAll(
-                getContent(
-                        sendRequest(
-                                buildSearchRequest()
+    @Override
+    public List<Product> findRandomByCategoryIds(List<Long> categoryIds, int size) {
+        return getContent(
+                sendRequest(
+                        buildSearchRequest(
+                                buildBoolQuery(
+                                        buildCategoryFilters(categoryIds)
+                                ), size
                         )
                 )
         );
-
-        return recommendationResponse;
     }
 
-    public RecommendationResponse getRecommendation(List<Long> categoryIds) {
-        RecommendationResponse recommendationResponse = new RecommendationResponse();
+    @Override
+    public List<Product> findRandom(int size) {
+        return getContent(
+                sendRequest(
+                        buildSearchRequest(size)
+                )
+        );
+    }
 
+    private List<Query> buildCategoryFilters(List<Long> categoryIds) {
         List<Query> filters = new ArrayList<>();
+
         List<FieldValue> fieldValues = categoryIds.stream()
                 .map(FieldValue::of)
                 .toList();
@@ -55,17 +56,7 @@ public class RecommendationElasticService {
                 ._toQuery()
         );
 
-        recommendationResponse.getContent().addAll(
-                getContent(
-                        sendRequest(
-                                buildSearchRequest(
-                                        buildBoolQuery(filters)
-                                )
-                        )
-                )
-        );
-
-        return recommendationResponse;
+        return filters;
     }
 
     private BoolQuery buildBoolQuery(List<Query> filters) {
@@ -78,7 +69,7 @@ public class RecommendationElasticService {
         });
     }
 
-    private SearchRequest buildSearchRequest(BoolQuery boolQuery) {
+    private SearchRequest buildSearchRequest(BoolQuery boolQuery, int size) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")
@@ -96,13 +87,13 @@ public class RecommendationElasticService {
                                     )
                             )
                     )
-                    .size(SIZE);
+                    .size(size);
 
             return sr;
         });
     }
 
-    private SearchRequest buildSearchRequest() {
+    private SearchRequest buildSearchRequest(int size) {
         return SearchRequest.of(sr -> {
             sr
                     .index("product")
@@ -118,7 +109,7 @@ public class RecommendationElasticService {
                                     )
                             )
                     )
-                    .size(SIZE);
+                    .size(size);
 
             return sr;
         });
@@ -132,11 +123,10 @@ public class RecommendationElasticService {
         }
     }
 
-    private List<ProductView> getContent(SearchResponse<Product> searchResponse) {
+    private List<Product> getContent(SearchResponse<Product> searchResponse) {
         return searchResponse.hits().hits().stream()
                 .filter(doc -> doc.source() != null)
                 .map(Hit::source)
-                .map(productMapper::toProductView)
                 .toList();
     }
 }

@@ -17,5 +17,5 @@ import java.util.UUID;
 public class OrderCreationEvent {
     private UUID eventId;
 
-    private OrderCreationSnapshot request;
+    //private OrderCreationSnapshot request;
 }

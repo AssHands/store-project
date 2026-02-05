@@ -7,7 +7,7 @@ import com.ak.store.catalogue.model.entity.Characteristic;
 import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.repository.CategoryRepo;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CategorySnapshotPayload;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CategoryPayloadSnapshot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -24,7 +24,7 @@ public class CategoryOutboxService {
     public void saveCreatedEvent(Long id) {
         var category = findOne(id);
 
-        var snapshot = CategorySnapshotPayload.builder()
+        var snapshot = CategoryPayloadSnapshot.builder()
                 .category(categoryMapper.toSnapshot(category))
                 .build();
 
@@ -35,7 +35,7 @@ public class CategoryOutboxService {
     public void saveUpdatedEvent(Long id) {
         var category = findOne(id);
 
-        var snapshot = CategorySnapshotPayload.builder()
+        var snapshot = CategoryPayloadSnapshot.builder()
                 .category(categoryMapper.toSnapshot(category))
                 .characteristics(category.getCharacteristics().stream()
                         .map(CategoryCharacteristic::getCharacteristic)

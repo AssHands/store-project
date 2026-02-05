@@ -1,7 +1,7 @@
 package com.ak.store.kafka.storekafkastarter.model.event.catalogue;
 
 import com.ak.store.kafka.storekafkastarter.KafkaEvent;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CategorySnapshotPayload;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CategoryPayloadSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -19,5 +19,5 @@ import java.util.UUID;
 public class CategoryUpdatedEvent implements KafkaEvent {
     private UUID eventId;
 
-    private CategorySnapshotPayload payload;
+    private CategoryPayloadSnapshot payload;
 }

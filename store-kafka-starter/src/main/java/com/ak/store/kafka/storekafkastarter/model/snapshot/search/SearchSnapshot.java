@@ -1,4 +1,4 @@
-package com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue;
+package com.ak.store.kafka.storekafkastarter.model.snapshot.search;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -7,18 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CategorySnapshotPayload {
-    @Builder.Default
-    private CategorySnapshot category = new CategorySnapshot();
+public class SearchSnapshot {
+    private UUID userId;
 
-    @Builder.Default
-    private List<Long> characteristics = new ArrayList<>();
+    private Long categoryId;
 }

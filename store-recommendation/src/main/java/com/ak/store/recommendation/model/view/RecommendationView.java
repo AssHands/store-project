@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class RecommendationResponse {
+public class RecommendationView {
     @Builder.Default
     private List<ProductView> content = new ArrayList<>();
 }

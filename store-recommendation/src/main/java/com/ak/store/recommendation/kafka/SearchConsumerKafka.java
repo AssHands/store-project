@@ -1,7 +1,8 @@
 package com.ak.store.recommendation.kafka;
 
-import com.ak.store.common.kafka.search.SearchAllEvent;
-import com.ak.store.recommendation.facade.RecommendationFacade;
+import com.ak.store.kafka.storekafkastarter.model.event.search.SearchEvent;
+import com.ak.store.recommendation.mapper.SearchHistoryMapper;
+import com.ak.store.recommendation.service.SearchHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -11,10 +12,13 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class SearchConsumerKafka {
-    private final RecommendationFacade recommendationFacade;
+    private final SearchHistoryService searchHistoryService;
+    private final SearchHistoryMapper searchHistoryMapper;
 
     @KafkaListener(topics = "${kafka.topics.search-all-events}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
-    public void handleCreated(List<SearchAllEvent> searchAllEvents) {
-        recommendationFacade.putInSearchHistory(searchAllEvents);
+    public void handleSearchEvent(List<SearchEvent> searchEvents) {
+        searchHistoryService.putAll(searchEvents.stream()
+                .map(searchHistoryMapper::toWriteCommand)
+                .toList());
     }
 }

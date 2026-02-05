@@ -27,7 +27,6 @@ public class ReserveFundsOutboxEventProcessor implements OutboxEventProcessor {
 
         eventProducerKafka.sendAsync(response, topic, event.getId().toString())
                 .thenRun(() -> outboxEventService.markOneAs(event, OutboxEventStatus.COMPLETED));
-
     }
 
     @Override

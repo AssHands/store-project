@@ -6,7 +6,7 @@ import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CharacteristicSnapshotPayload;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CharacteristicPayloadSnapshot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,7 +25,7 @@ public class CharacteristicOutboxService {
     public void saveCreatedEvent(Long id) {
         var characteristic = findOne(id);
 
-        var snapshot = CharacteristicSnapshotPayload.builder()
+        var snapshot = CharacteristicPayloadSnapshot.builder()
                 .characteristic(characteristicMapper.toSnapshot(characteristic))
                 .numericValues(Collections.emptyList())
                 .textValues(Collections.emptyList())
@@ -38,7 +38,7 @@ public class CharacteristicOutboxService {
     public void saveUpdatedEvent(Long id) {
         var characteristic = findOne(id);
 
-        var snapshot = CharacteristicSnapshotPayload.builder()
+        var snapshot = CharacteristicPayloadSnapshot.builder()
                 .characteristic(characteristicMapper.toSnapshot(characteristic))
                 .numericValues(characteristic.getNumericValues().stream()
                         .map(characteristicMapper::toNumericValueSnapshot)

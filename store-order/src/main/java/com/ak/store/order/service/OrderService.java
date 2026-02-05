@@ -23,8 +23,8 @@ import java.util.UUID;
 public class OrderService {
     private final OrderRepo orderRepo;
     private final OrderValidator orderValidator;
-    private final ProductService productService;
     private final OrderMapper orderMapper;
+    private final ProductService productService;
 
     public List<OrderPayloadDTO> findAllByUserId(UUID userId) {
         return orderRepo.findAllFullByUserId(userId).stream()

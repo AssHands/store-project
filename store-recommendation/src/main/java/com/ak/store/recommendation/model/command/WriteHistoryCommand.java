@@ -1,15 +1,16 @@
-package com.ak.store.catalogue.model.command;
+package com.ak.store.recommendation.model.command;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WriteCategoryCharacteristicCommand {
+public class WriteHistoryCommand {
+    private UUID userId;
+
     private Long categoryId;
-    private Long characteristicId;
 }

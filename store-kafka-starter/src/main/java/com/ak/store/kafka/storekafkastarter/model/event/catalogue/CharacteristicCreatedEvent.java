@@ -1,7 +1,7 @@
 package com.ak.store.kafka.storekafkastarter.model.event.catalogue;
 
 import com.ak.store.kafka.storekafkastarter.KafkaEvent;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CharacteristicSnapshotPayload;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CharacteristicPayloadSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -19,5 +19,5 @@ import java.util.UUID;
 public class CharacteristicCreatedEvent implements KafkaEvent {
     private UUID eventId;
 
-    private CharacteristicSnapshotPayload payload;
+    private CharacteristicPayloadSnapshot payload;
 }

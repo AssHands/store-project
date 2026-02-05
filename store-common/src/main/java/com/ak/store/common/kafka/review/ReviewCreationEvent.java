@@ -1,6 +1,5 @@
 package com.ak.store.common.kafka.review;
 
-import com.ak.store.common.snapshot.review.ReviewCreationSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -17,5 +16,5 @@ import java.util.UUID;
 public class ReviewCreationEvent {
     private UUID eventId;
 
-    private ReviewCreationSnapshot request;
+    //private ReviewCreationSnapshot request;
 }

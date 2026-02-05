@@ -9,7 +9,7 @@ import com.ak.store.catalogueOutbox.util.KafkaTopicRegistry;
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.catalogue.CharacteristicCreatedEvent;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CharacteristicSnapshotPayload;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CharacteristicPayloadSnapshot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class CharacteristicCreatedOutboxEventProcessor implements OutboxEventPro
         String topic = kafkaTopicRegistry.getTopicByEvent(getType());
 
         var message = new CharacteristicCreatedEvent(event.getId(),
-                jsonMapperKafka.fromJson(event.getPayload(), CharacteristicSnapshotPayload.class));
+                jsonMapperKafka.fromJson(event.getPayload(), CharacteristicPayloadSnapshot.class));
 
         String key = message.getPayload().getCharacteristic().getId().toString();
 

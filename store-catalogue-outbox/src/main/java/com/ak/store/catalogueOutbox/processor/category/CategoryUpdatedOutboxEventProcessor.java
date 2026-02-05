@@ -9,7 +9,7 @@ import com.ak.store.catalogueOutbox.util.KafkaTopicRegistry;
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.catalogue.CategoryUpdatedEvent;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CategorySnapshotPayload;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CategoryPayloadSnapshot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class CategoryUpdatedOutboxEventProcessor implements OutboxEventProcessor
         String topic = kafkaTopicRegistry.getTopicByEvent(getType());
 
         var message = new CategoryUpdatedEvent(event.getId(),
-                jsonMapperKafka.fromJson(event.getPayload(), CategorySnapshotPayload.class));
+                jsonMapperKafka.fromJson(event.getPayload(), CategoryPayloadSnapshot.class));
 
         String key = message.getPayload().getCategory().getId().toString();
 

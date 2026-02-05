@@ -15,12 +15,10 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CharacteristicSnapshotPayload {
-    private CharacteristicSnapshot characteristic;
+public class CategoryPayloadSnapshot {
+    @Builder.Default
+    private CategorySnapshot category = new CategorySnapshot();
 
     @Builder.Default
-    private List<String> textValues = new ArrayList<>();
-
-    @Builder.Default
-    private List<NumericValueSnapshot> numericValues = new ArrayList<>();
+    private List<Long> characteristics = new ArrayList<>();
 }
