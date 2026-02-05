@@ -20,7 +20,6 @@ public class CommentController {
     private final CommentFacade commentFacade;
     private final CommentMapper commentMapper;
 
-    //todo добавить сортировку по time
     @GetMapping
     public List<CommentView> findAllByReviewId(@RequestParam ObjectId reviewId,
                                                @RequestParam int page, @RequestParam int size) {
@@ -31,7 +30,6 @@ public class CommentController {
     public String createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody CommentForm request) {
         UUID userId = UUID.fromString(accessToken.getSubject());
         var comment = commentFacade.createOne(userId, commentMapper.toCommentWriteDTO(request));
-
         return comment.getId().toString();
     }
 
