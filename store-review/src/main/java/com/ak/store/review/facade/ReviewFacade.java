@@ -39,6 +39,6 @@ public class ReviewFacade {
     @Transactional
     public void deleteOne(WriteReviewCommand command) {
         reviewService.updateOneStatus(command, ReviewStatus.IN_PROGRESS);
-        reviewOutboxService.saveCreatedEvent(command.getReviewId());
+        reviewOutboxService.saveDeletedEvent(command.getReviewId());
     }
 }
