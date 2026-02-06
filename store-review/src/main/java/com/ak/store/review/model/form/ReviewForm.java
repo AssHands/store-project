@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 
 @Data
 @AllArgsConstructor
@@ -14,6 +15,8 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 //todo add validation
 public class ReviewForm {
+    private ObjectId reviewId;
+
     private Long productId;
 
     private String text;

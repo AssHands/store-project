@@ -2,6 +2,7 @@ package com.ak.store.review.controller;
 
 import com.ak.store.review.facade.ReviewFacade;
 import com.ak.store.review.mapper.ReviewMapper;
+import com.ak.store.review.model.command.WriteReviewCommand;
 import com.ak.store.review.model.form.ReviewForm;
 import com.ak.store.review.model.view.ReviewView;
 import jakarta.validation.Valid;
@@ -22,31 +23,34 @@ public class ReviewController {
     private final ReviewMapper reviewMapper;
 
     //todo добавить удаление всех отзывов при удалении продукта (кафка)
-    //todo добавить сортировку
-    @GetMapping("product/{productId}")
-    public List<ReviewView> findAllByProductId(@PathVariable Long productId,
-                                               @RequestParam int page, @RequestParam int size) {
-        return reviewMapper.toReviewView(reviewFacade.findAllByProductId(productId, page, size));
+    @GetMapping("find/{productId}")
+    public List<ReviewView> findAllByProductId(@PathVariable Long productId) {
+        return reviewFacade.findAllByProductId(productId).stream()
+                .map(reviewMapper::toView)
+                .toList();
     }
 
     @PostMapping
-    public String createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody @Valid ReviewForm request) {
+    public String createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody @Valid ReviewForm form) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        var review = reviewFacade.createOne(userId, reviewMapper.toReviewWriteDTO(request));
+        var review = reviewFacade.createOne(reviewMapper.toWriteCommand(userId, form));
         return review.getId().toString();
     }
 
-    @PatchMapping("{reviewId}")
-    public String updateOne(@AuthenticationPrincipal Jwt accessToken,
-                            @PathVariable ObjectId reviewId, @RequestBody @Valid ReviewForm request) {
+    @PatchMapping("update")
+    public String updateOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody @Valid ReviewForm form) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        var review = reviewFacade.updateOne(userId, reviewId, reviewMapper.toReviewWriteDTO(request));
+        var review = reviewFacade.updateOne(reviewMapper.toWriteCommand(userId, form));
         return review.getId().toString();
     }
 
     @DeleteMapping("{reviewId}")
     public void deleteOne(@AuthenticationPrincipal Jwt accessToken, @PathVariable ObjectId reviewId) {
-        UUID userId = UUID.fromString(accessToken.getSubject());
-        reviewFacade.deleteOne(userId, reviewId);
+        var command = WriteReviewCommand.builder()
+                .userId(UUID.fromString(accessToken.getSubject()))
+                .reviewId(reviewId)
+                .build();
+
+        reviewFacade.deleteOne(command);
     }
 }

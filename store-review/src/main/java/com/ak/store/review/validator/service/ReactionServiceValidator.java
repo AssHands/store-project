@@ -10,19 +10,17 @@ import org.springframework.stereotype.Component;
 public class ReactionServiceValidator {
     private final ReviewRepo reviewRepo;
 
-    public void validateLikingOneReview(ObjectId reviewId) {
-        if (!isReviewExist(reviewId)) {
-            throw new RuntimeException("review do not exist");
-        }
+    public void validateLike(ObjectId reviewId) {
+        reviewExist(reviewId);
     }
 
-    public void validateDislikingOneReview(ObjectId reviewId) {
-        if (!isReviewExist(reviewId)) {
-            throw new RuntimeException("review do not exist");
-        }
+    public void validateDislike(ObjectId reviewId) {
+        reviewExist(reviewId);
     }
 
-    private boolean isReviewExist(ObjectId reviewId) {
-        return reviewRepo.findById(reviewId).isPresent();
+    private void reviewExist(ObjectId reviewId) {
+        if (reviewRepo.findById(reviewId).isPresent()) {
+            throw new RuntimeException("review do not exist");
+        }
     }
 }

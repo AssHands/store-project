@@ -1,20 +1,17 @@
 package com.ak.store.review.service;
 
 import com.ak.store.review.mapper.CommentMapper;
+import com.ak.store.review.model.command.WriteCommentCommand;
 import com.ak.store.review.model.document.Comment;
 import com.ak.store.review.model.dto.CommentDTO;
-import com.ak.store.review.model.dto.write.CommentWriteDTO;
 import com.ak.store.review.repository.CommentRepo;
 import com.ak.store.review.validator.service.CommentServiceValidator;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -23,47 +20,47 @@ public class CommentService {
     private final CommentRepo commentRepo;
     private final CommentServiceValidator commentValidator;
 
+    private final ReviewService reviewService;
+
     private Comment findOneById(ObjectId id) {
         return commentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("not found"));
     }
 
-    public List<CommentDTO> findAllByReviewId(ObjectId reviewId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return commentMapper.toCommentDTO(commentRepo.findAllByReviewId(reviewId, pageable));
+    public List<CommentDTO> findAllByReviewId(ObjectId reviewId) {
+        return commentRepo.findAllByReviewId(reviewId).stream()
+                .map(commentMapper::toDTO)
+                .toList();
     }
 
     public CommentDTO findOne(ObjectId commentId) {
-        return commentMapper.toCommentDTO(findOneById(commentId));
+        return commentMapper.toDTO(findOneById(commentId));
     }
 
-    public CommentDTO createOne(UUID userId, CommentWriteDTO request) {
-        commentValidator.validateCreating(request);
-        var comment = commentMapper.toComment(request);
+    public CommentDTO createOne(WriteCommentCommand command) {
+        commentValidator.validateCreate(command);
 
+        var comment = commentMapper.toDocument(command);
         comment.setTime(LocalDateTime.now());
-        comment.setUserId(userId);
+        reviewService.incrementCommentAmount(comment.getReviewId());
 
-        return commentMapper.toCommentDTO(commentRepo.save(comment));
+        return commentMapper.toDTO(commentRepo.save(comment));
     }
 
-    public CommentDTO updateOne(UUID userId, ObjectId commentId, CommentWriteDTO request) {
-        commentValidator.validateUpdating(userId, commentId);
-        var comment = findOneById(commentId);
+    public CommentDTO updateOne(WriteCommentCommand command) {
+        commentValidator.validateUpdate(command);
 
-        updateOneFromDTO(comment, request);
+        var comment = findOneById(command.getCommentId());
+        comment.setText(command.getText());
 
-        return commentMapper.toCommentDTO(commentRepo.save(comment));
+        return commentMapper.toDTO(commentRepo.save(comment));
     }
 
-    public void deleteOne(UUID userId, ObjectId commentId) {
-        commentValidator.validateDeleting(userId, commentId);
-        commentRepo.deleteById(commentId);
-    }
+    public void deleteOne(WriteCommentCommand command) {
+        commentValidator.validateDelete(command);
 
-    private void updateOneFromDTO(Comment comment, CommentWriteDTO request) {
-        if (request.getText() != null) {
-            comment.setText(request.getText());
-        }
+        reviewService.decrementCommentAmount(command.getReviewId());
+
+        commentRepo.deleteById(command.getCommentId());
     }
 }

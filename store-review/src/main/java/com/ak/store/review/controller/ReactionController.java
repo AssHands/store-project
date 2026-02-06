@@ -20,15 +20,15 @@ public class ReactionController {
     private final ReactionMapper reactionMapper;
 
     @PostMapping("like")
-    public void likeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam ObjectId reviewId) {
+    public void likeOne(@AuthenticationPrincipal Jwt accessToken, @RequestParam ObjectId reviewId) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        reactionFacade.likeOneReview(userId, reviewId);
+        reactionFacade.likeOne(userId, reviewId);
     }
 
     @PostMapping("dislike")
-    public void dislikeOneReview(@AuthenticationPrincipal Jwt accessToken, @RequestParam ObjectId reviewId) {
+    public void dislikeOne(@AuthenticationPrincipal Jwt accessToken, @RequestParam ObjectId reviewId) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        reactionFacade.dislikeOneReview(userId, reviewId);
+        reactionFacade.dislikeOne(userId, reviewId);
     }
 
     @DeleteMapping("remove")
@@ -41,6 +41,8 @@ public class ReactionController {
     public List<ReactionView> findAllByReviewIds(@AuthenticationPrincipal Jwt accessToken,
                                                  @RequestBody List<ObjectId> reviewIds) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        return reactionMapper.toReactionView(reactionFacade.findAllByReviewIds(userId, reviewIds));
+        return reactionFacade.findAllByReviewIds(userId, reviewIds)
+                .stream().map(reactionMapper::toView)
+                .toList();
     }
 }

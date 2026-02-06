@@ -1,8 +1,9 @@
-package com.ak.store.review.repository;
+package com.ak.store.review.repository.impl;
 
 import com.ak.store.review.model.document.Reaction;
 import com.ak.store.review.model.dto.ReactionRemoveStatus;
 import com.ak.store.review.model.dto.ReactionSaveStatus;
+import com.ak.store.review.repository.ReactionRepoCustom;
 import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -12,7 +13,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -21,7 +21,7 @@ public class ReactionRepoCustomImpl implements ReactionRepoCustom {
     private final MongoTemplate mongoTemplate;
 
     @Override
-    public ReactionSaveStatus likeOneReview(UUID userId, ObjectId reviewId) {
+    public ReactionSaveStatus likeOne(UUID userId, ObjectId reviewId) {
         var query = new Query(
                 Criteria.where("reviewId").is(reviewId)
                         .and("userId").is(userId)
@@ -37,7 +37,7 @@ public class ReactionRepoCustomImpl implements ReactionRepoCustom {
     }
 
     @Override
-    public ReactionSaveStatus dislikeOneReview(UUID userId, ObjectId reviewId) {
+    public ReactionSaveStatus dislikeOne(UUID userId, ObjectId reviewId) {
         var query = new Query(
                 Criteria.where("reviewId").is(reviewId)
                         .and("userId").is(userId)

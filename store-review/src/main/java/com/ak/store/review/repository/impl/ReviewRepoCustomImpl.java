@@ -1,6 +1,7 @@
-package com.ak.store.review.repository;
+package com.ak.store.review.repository.impl;
 
 import com.ak.store.review.model.document.Review;
+import com.ak.store.review.repository.ReviewRepoCustom;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,7 +16,7 @@ public class ReviewRepoCustomImpl implements ReviewRepoCustom {
     private final MongoTemplate mongoTemplate;
 
     @Override
-    public void incrementOneCommentAmount(ObjectId reviewId) {
+    public void incrementCommentAmount(ObjectId reviewId) {
         var query = new Query(Criteria.where("_id").is(reviewId));
 
         var update = new Update().inc("commentAmount", 1);
@@ -24,7 +25,7 @@ public class ReviewRepoCustomImpl implements ReviewRepoCustom {
     }
 
     @Override
-    public void decrementOneCommentAmount(ObjectId reviewId) {
+    public void decrementCommentAmount(ObjectId reviewId) {
         var query = new Query(
                 Criteria.where("_id").is(reviewId)
                         .and("commentAmount").gt(0)
@@ -36,7 +37,7 @@ public class ReviewRepoCustomImpl implements ReviewRepoCustom {
     }
 
     @Override
-    public void incrementOneLikeAmount(ObjectId reviewId) {
+    public void incrementLikeAmount(ObjectId reviewId) {
         var query = new Query(Criteria.where("_id").is(reviewId));
 
         var update = new Update().inc("likeAmount", 1);
@@ -45,7 +46,7 @@ public class ReviewRepoCustomImpl implements ReviewRepoCustom {
     }
 
     @Override
-    public void decrementOneLikeAmount(ObjectId reviewId) {
+    public void decrementLikeAmount(ObjectId reviewId) {
         var query = new Query(
                 Criteria.where("_id").is(reviewId)
                         .and("likeAmount").gt(0)
@@ -57,7 +58,7 @@ public class ReviewRepoCustomImpl implements ReviewRepoCustom {
     }
 
     @Override
-    public void incrementOneDislikeAmount(ObjectId reviewId) {
+    public void incrementDislikeAmount(ObjectId reviewId) {
         var query = new Query(Criteria.where("_id").is(reviewId));
 
         var update = new Update().inc("dislikeAmount", 1);
@@ -66,7 +67,7 @@ public class ReviewRepoCustomImpl implements ReviewRepoCustom {
     }
 
     @Override
-    public void decrementOneDislikeAmount(ObjectId reviewId) {
+    public void decrementDislikeAmount(ObjectId reviewId) {
         var query = new Query(
                 Criteria.where("_id").is(reviewId)
                         .and("dislikeAmount").gt(0)
@@ -78,7 +79,7 @@ public class ReviewRepoCustomImpl implements ReviewRepoCustom {
     }
 
     @Override
-    public void incrementOneLikeAmountAndDecrementDislikeAmount(ObjectId reviewId) {
+    public void incrementLikeAmountAndDecrementDislikeAmount(ObjectId reviewId) {
         var query = new Query(
                 Criteria.where("_id").is(reviewId)
                         .and("dislikeAmount").gt(0)
@@ -92,7 +93,7 @@ public class ReviewRepoCustomImpl implements ReviewRepoCustom {
     }
 
     @Override
-    public void decrementOneLikeAmountAndIncrementDislikeAmount(ObjectId reviewId) {
+    public void decrementLikeAmountAndIncrementDislikeAmount(ObjectId reviewId) {
         var query = new Query(
                 Criteria.where("_id").is(reviewId)
                         .and("likeAmount").gt(0)

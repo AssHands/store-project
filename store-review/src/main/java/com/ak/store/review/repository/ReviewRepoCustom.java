@@ -3,19 +3,19 @@ package com.ak.store.review.repository;
 import org.bson.types.ObjectId;
 
 public interface ReviewRepoCustom {
-    void incrementOneCommentAmount(ObjectId reviewId);
+    void incrementCommentAmount(ObjectId reviewId);
 
-    void decrementOneCommentAmount(ObjectId reviewId);
+    void decrementCommentAmount(ObjectId reviewId);
 
-    void incrementOneLikeAmount(ObjectId reviewId);
+    void incrementLikeAmount(ObjectId reviewId);
 
-    void decrementOneLikeAmount(ObjectId reviewId);
+    void decrementLikeAmount(ObjectId reviewId);
 
-    void incrementOneDislikeAmount(ObjectId reviewId);
+    void incrementDislikeAmount(ObjectId reviewId);
 
-    void decrementOneDislikeAmount(ObjectId reviewId);
+    void decrementDislikeAmount(ObjectId reviewId);
 
-    void incrementOneLikeAmountAndDecrementDislikeAmount(ObjectId reviewId);
+    void incrementLikeAmountAndDecrementDislikeAmount(ObjectId reviewId);
 
-    void decrementOneLikeAmountAndIncrementDislikeAmount(ObjectId reviewId);
+    void decrementLikeAmountAndIncrementDislikeAmount(ObjectId reviewId);
 }
