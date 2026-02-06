@@ -5,7 +5,7 @@ import com.ak.store.review.model.command.WriteCommentCommand;
 import com.ak.store.review.model.document.Comment;
 import com.ak.store.review.model.dto.CommentDTO;
 import com.ak.store.review.repository.CommentRepo;
-import com.ak.store.review.validator.service.CommentServiceValidator;
+import com.ak.store.review.validator.CommentValidator;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.List;
 public class CommentService {
     private final CommentMapper commentMapper;
     private final CommentRepo commentRepo;
-    private final CommentServiceValidator commentValidator;
+    private final CommentValidator commentValidator;
 
     private final ReviewService reviewService;
 

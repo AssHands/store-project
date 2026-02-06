@@ -26,10 +26,7 @@ public class CommentFacade {
         return commentService.updateOne(command).getId();
     }
 
-    public ObjectId deleteOne(WriteCommentCommand command) {
-        //todo возвращать комментарий в методе deleteOne
-        var comment = commentService.findOne(command.getCommentId());
+    public void deleteOne(WriteCommentCommand command) {
         commentService.deleteOne(command);
-        return comment.getId();
     }
 }

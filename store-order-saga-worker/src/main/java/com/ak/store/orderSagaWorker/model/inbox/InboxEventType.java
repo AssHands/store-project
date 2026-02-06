@@ -9,5 +9,5 @@ public enum InboxEventType {
     CONFIRM_ORDER("CONFIRM_ORDER"),
     CANCEL_ORDER("CANCEL_ORDER");
 
-    private String value;
+    private final String value;
 }

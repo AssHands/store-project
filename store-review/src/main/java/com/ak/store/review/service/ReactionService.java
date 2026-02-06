@@ -4,7 +4,7 @@ import com.ak.store.review.mapper.ReactionMapper;
 import com.ak.store.review.model.document.Reaction;
 import com.ak.store.review.model.dto.ReactionDTO;
 import com.ak.store.review.repository.ReactionRepo;
-import com.ak.store.review.validator.service.ReactionServiceValidator;
+import com.ak.store.review.validator.ReactionValidator;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class ReactionService {
-    private final ReactionServiceValidator reactionValidator;
+    private final ReactionValidator reactionValidator;
     private final ReactionRepo reactionRepo;
     private final ReactionMapper reactionMapper;
 

@@ -16,7 +16,7 @@ import java.util.UUID;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WriteReviewCommand {
-    UUID userId;
+    private UUID userId;
 
     private ObjectId reviewId;
 

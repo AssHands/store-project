@@ -1,6 +1,6 @@
 package com.ak.store.order.service.outbox;
 
-import com.ak.store.kafka.storekafkastarter.model.snapshot.order.OrderCreationSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.order.OrderCreatedSnapshot;
 import com.ak.store.order.model.entity.Order;
 import com.ak.store.order.outbox.OutboxEventService;
 import com.ak.store.order.outbox.OutboxEventType;
@@ -25,14 +25,14 @@ public class OrderOutboxService {
             productAmount.merge(product.getProductId(), 1, Integer::sum);
         }
 
-        var snapshot = OrderCreationSnapshot.builder()
+        var snapshot = OrderCreatedSnapshot.builder()
                 .userId(order.getUserId())
                 .orderId(order.getId())
                 .totalPrice(order.getTotalPrice())
                 .productAmount(productAmount)
                 .build();
 
-        outboxEventService.createOne(snapshot, OutboxEventType.ORDER_CREATION);
+        outboxEventService.createOne(snapshot, OutboxEventType.ORDER_CREATED);
     }
 
     private Order findOne(Long id) {

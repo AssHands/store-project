@@ -6,11 +6,9 @@ import com.ak.store.review.model.document.ReviewStatus;
 import com.ak.store.review.model.dto.ReviewDTO;
 import com.ak.store.review.model.command.WriteReviewCommand;
 import com.ak.store.review.repository.ReviewRepo;
-import com.ak.store.review.validator.service.ReviewServiceValidator;
+import com.ak.store.review.validator.ReviewValidator;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,7 +19,7 @@ import java.util.List;
 public class ReviewService {
     private final ReviewRepo reviewRepo;
     private final ReviewMapper reviewMapper;
-    private final ReviewServiceValidator reviewValidator;
+    private final ReviewValidator reviewValidator;
 
     private Review findOneById(ObjectId reviewId) {
         return reviewRepo.findById(reviewId)
@@ -33,10 +31,9 @@ public class ReviewService {
     }
 
     public List<ReviewDTO> findAllByProductId(Long productId) {
-        Pageable pageable = PageRequest.of(page, size);
-        return reviewMapper.toDTO(
-                reviewRepo.findAllByProductIdAndStatus(productId, ReviewStatus.COMPLETED, pageable)
-        );
+        return reviewRepo.findAllByProductIdAndStatus(productId, ReviewStatus.COMPLETED).stream()
+                .map(reviewMapper::toDTO)
+                .toList();
     }
 
     public ReviewDTO createOne(WriteReviewCommand command) {

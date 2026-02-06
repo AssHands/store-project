@@ -1,9 +1,9 @@
 package com.ak.store.review.mapper;
 
-import com.ak.store.common.snapshot.review.ReviewSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewSnapshot;
+import com.ak.store.review.model.command.WriteReviewCommand;
 import com.ak.store.review.model.document.Review;
 import com.ak.store.review.model.dto.ReviewDTO;
-import com.ak.store.review.model.command.WriteReviewCommand;
 import com.ak.store.review.model.form.ReviewForm;
 import com.ak.store.review.model.view.ReviewView;
 import org.bson.types.ObjectId;
@@ -18,7 +18,7 @@ public interface ReviewMapper {
     ReviewDTO toDTO(Review document);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
-    ReviewSnapshot toSnapshot(ReviewDTO dto);
+    ReviewSnapshot toSnapshot(Review document);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
     ReviewView toView(ReviewDTO dto);

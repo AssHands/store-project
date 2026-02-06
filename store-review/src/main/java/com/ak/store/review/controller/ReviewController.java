@@ -33,15 +33,13 @@ public class ReviewController {
     @PostMapping
     public String createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody @Valid ReviewForm form) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        var review = reviewFacade.createOne(reviewMapper.toWriteCommand(userId, form));
-        return review.getId().toString();
+        return reviewFacade.createOne(reviewMapper.toWriteCommand(userId, form)).toString();
     }
 
     @PatchMapping("update")
     public String updateOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody @Valid ReviewForm form) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        var review = reviewFacade.updateOne(reviewMapper.toWriteCommand(userId, form));
-        return review.getId().toString();
+        return reviewFacade.updateOne(reviewMapper.toWriteCommand(userId, form)).toString();
     }
 
     @DeleteMapping("{reviewId}")

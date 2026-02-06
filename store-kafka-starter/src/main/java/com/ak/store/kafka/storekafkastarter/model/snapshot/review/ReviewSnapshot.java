@@ -28,13 +28,7 @@ public class ReviewSnapshot {
 
     private String disadvantages;
 
-    private Integer commentAmount;
-
     private Integer grade;
-
-    private Integer likeAmount;
-
-    private Integer dislikeAmount;
 
     private LocalDateTime time;
 }

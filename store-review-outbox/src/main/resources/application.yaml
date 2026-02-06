@@ -42,14 +42,14 @@ spring:
 kafka:
   dlt-prefix: .dlt
   topics:
-    review-creation: review-creation-request
-    confirm-review-creation: confirm-review-creation-response
-    cancel-review-creation: cancel-review-creation-response
+    review-created: review-created-request
+    confirm-review-created: confirm-review-created-response
+    cancel-review-created: cancel-review-created-response
 
-    review-update: review-update-request
-    confirm-review-update: confirm-review-update-response
-    cancel-review-update: cancel-review-update-response
+    review-updated: review-updated-request
+    confirm-review-updated: confirm-review-updated-response
+    cancel-review-updated: cancel-review-updated-response
 
-    review-deletion: review-deletion-request
-    confirm-review-deletion: confirm-review-deletion-response
-    cancel-review-deletion: cancel-review-deletion-response
+    review-deleted: review-deleted-request
+    confirm-review-deleted: confirm-review-deleted-response
+    cancel-review-deleted: cancel-review-deleted-response
