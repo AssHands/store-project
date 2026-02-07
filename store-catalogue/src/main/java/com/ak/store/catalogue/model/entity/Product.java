@@ -3,6 +3,8 @@ package com.ak.store.catalogue.model.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.List;
 public class Product {
     @Id
     @GeneratedValue(generator = "p_gen", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "p_gen",sequenceName = "product_id_seq", allocationSize = 1)
+    @SequenceGenerator(name = "p_gen",sequenceName = "product_id_seq", allocationSize = 50)
     private Long id;
 
     @NotNull
@@ -57,10 +59,12 @@ public class Product {
     private RatingSummary ratingSummary;
 
     @Builder.Default
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductCharacteristic> characteristics = new ArrayList<>();
 
     @Builder.Default
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 }

@@ -1,7 +1,7 @@
 package com.ak.store.synchronization.errorHandler;
 
 import com.ak.store.kafka.storekafkastarter.DltEventProducerKafka;
-import com.ak.store.kafka.storekafkastarter.KafkaEvent;
+import com.ak.store.kafka.storekafkastarter.model.KafkaEvent;
 import com.ak.store.kafka.storekafkastarter.model.event.catalogue.characteristic.CharacteristicCreatedEvent;
 import com.ak.store.kafka.storekafkastarter.model.event.catalogue.characteristic.CharacteristicDeletedEvent;
 import com.ak.store.kafka.storekafkastarter.model.event.catalogue.characteristic.CharacteristicUpdatedEvent;

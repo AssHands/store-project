@@ -2,7 +2,7 @@ package com.ak.store.catalogueSagaWorker.kafka;
 
 import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.catalogueSagaWorker.service.InboxEventWriterService;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -134,7 +134,7 @@ public class SagaConsumerKafka {
     //-------------------------------------------------------------
 
     @KafkaListener(
-            topics = "cancel-product-creation-request",
+            topics = "cancel-product-created-request",
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"
     )
@@ -153,7 +153,7 @@ public class SagaConsumerKafka {
     }
 
     @KafkaListener(
-            topics = "confirm-product-creation-request",
+            topics = "confirm-product-created-request",
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"
     )

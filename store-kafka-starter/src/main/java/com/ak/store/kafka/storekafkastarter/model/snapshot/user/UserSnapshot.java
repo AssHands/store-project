@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class UserCreationSnapshot {
+public class UserSnapshot {
     private String verificationCode;
 
     private UUID userId;

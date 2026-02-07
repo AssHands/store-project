@@ -13,7 +13,7 @@ public class ProductService {
     private final ProductMapper productMapper;
 
     public void createOne(WriteProductPayloadCommand request) {
-        productRepo.createOne(productMapper.toEntity(request));
+        productRepo.createOne(productMapper.toDocument(request));
     }
 
     public void deleteOne(Long id) {

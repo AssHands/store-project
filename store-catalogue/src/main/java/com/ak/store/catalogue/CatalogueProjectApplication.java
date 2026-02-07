@@ -34,11 +34,7 @@ import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.endpoints.S3EndpointParams;
 import software.amazon.awssdk.services.s3.endpoints.S3EndpointProvider;
 
-
-@EnableJpaRepositories("com.ak.store.*")
-@ComponentScan(basePackages = {"com.ak.store.*"})
-@EntityScan("com.ak.store.*")
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class CatalogueProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(CatalogueProjectApplication.class, args);
@@ -85,8 +81,8 @@ public class CatalogueProjectApplication {
 
     @Bean
     public S3Client S3Client() {
-        AwsCredentials credentials = AwsBasicCredentials.create("m50GIYQsqE3ndcCiLESi",
-                "GKcCNJ7RiEEZak8uuMkKhkLMaupZOTGQlQ4Cj81h");
+        AwsCredentials credentials = AwsBasicCredentials.create("5SFh9vPm0zGHYhUA1FoW",
+                "DXfienbtBaVwRJSTrw4XfxlAnXAkgXmC3h3iCNbr");
         AwsCredentialsProvider provider = StaticCredentialsProvider.create(credentials);
 
         S3EndpointParams endpointParams = S3EndpointParams.builder()

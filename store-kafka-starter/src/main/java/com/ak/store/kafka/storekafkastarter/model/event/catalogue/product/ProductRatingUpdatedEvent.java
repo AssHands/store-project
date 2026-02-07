@@ -1,6 +1,6 @@
 package com.ak.store.kafka.storekafkastarter.model.event.catalogue.product;
 
-import com.ak.store.kafka.storekafkastarter.KafkaEvent;
+import com.ak.store.kafka.storekafkastarter.model.KafkaEvent;
 import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.product.ProductRatingUpdatedSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

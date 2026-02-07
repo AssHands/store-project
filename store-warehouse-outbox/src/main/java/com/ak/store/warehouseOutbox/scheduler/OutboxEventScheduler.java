@@ -1,5 +1,6 @@
 package com.ak.store.warehouseOutbox.scheduler;
 
+import com.ak.store.warehouseOutbox.model.OutboxEventStatus;
 import com.ak.store.warehouseOutbox.model.OutboxEventType;
 import com.ak.store.warehouseOutbox.processor.OutboxEventProcessor;
 import com.ak.store.warehouseOutbox.service.OutboxEventService;
@@ -38,7 +39,6 @@ public class OutboxEventScheduler {
 
         for (var event : events) {
             processor.process(event);
-            outboxEventService.markOneAsCompleted(event);
         }
     }
 }

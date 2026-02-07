@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import java.time.LocalDateTime;
 
 @EnableFeignClients
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class ReviewProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(ReviewProjectApplication.class, args);

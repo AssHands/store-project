@@ -1,6 +1,6 @@
 package com.ak.store.kafka.storekafkastarter.model.event.search;
 
-import com.ak.store.kafka.storekafkastarter.KafkaEvent;
+import com.ak.store.kafka.storekafkastarter.model.KafkaEvent;
 import com.ak.store.kafka.storekafkastarter.model.snapshot.search.SearchSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

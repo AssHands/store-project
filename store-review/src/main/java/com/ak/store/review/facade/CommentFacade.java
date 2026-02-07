@@ -26,7 +26,8 @@ public class CommentFacade {
         return commentService.updateOne(command).getId();
     }
 
-    public void deleteOne(WriteCommentCommand command) {
+    public String deleteOne(WriteCommentCommand command) {
         commentService.deleteOne(command);
+        return command.getCommentId().toString();
     }
 }

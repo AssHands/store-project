@@ -1,6 +1,6 @@
 package com.ak.store.reviewSagaWorker.processor.inbox.created;
 
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewSnapshot;
 import com.ak.store.reviewSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.reviewSagaWorker.model.inbox.InboxEventStatus;

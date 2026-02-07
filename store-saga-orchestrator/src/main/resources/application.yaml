@@ -156,10 +156,10 @@ saga:
           name: confirm-product-creation
           timeout: 500
           topics:
-            request: confirm-product-creation-request
-            response: confirm-product-creation-response
-            compensation-request: cancel-product-creation-request
-            compensation-response: cancel-product-creation-response
+            request: confirm-product-created-request
+            response: confirm-product-created-response
+            compensation-request: cancel-product-created-request
+            compensation-response: cancel-product-created-response
 
     #------------------------------------------------------------
 
@@ -177,9 +177,6 @@ saga:
             response: add-product-grade-response
             compensation-request: remove-product-grade-request
             compensation-response: remove-product-grade-response
-
-
-#       todo добавить шаг для обновления review_amount в elastic search
 
         confirm-review-creation:
           name: confirm-review-creation

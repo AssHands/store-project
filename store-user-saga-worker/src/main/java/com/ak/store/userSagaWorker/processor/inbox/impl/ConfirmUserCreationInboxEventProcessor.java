@@ -1,7 +1,7 @@
 package com.ak.store.userSagaWorker.processor.inbox.impl;
 
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.user.UserCreationSnapshot;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.user.UserSnapshot;
 import com.ak.store.userSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.userSagaWorker.model.inbox.InboxEventStatus;
 import com.ak.store.userSagaWorker.model.inbox.InboxEventType;
@@ -23,7 +23,7 @@ public class ConfirmUserCreationInboxEventProcessor implements InboxEventProcess
     @Transactional
     @Override
     public void process(InboxEvent event) {
-        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), UserCreationSnapshot.class);
+        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), UserSnapshot.class);
 
         try {
             userService.setStatus(snapshot.getUserId(), UserStatus.PENDING_VERIFICATION);

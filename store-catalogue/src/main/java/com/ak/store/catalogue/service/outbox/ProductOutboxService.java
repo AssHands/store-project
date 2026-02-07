@@ -61,7 +61,11 @@ public class ProductOutboxService {
     }
 
     private Product findOne(Long id) {
-        return productRepo.findOneFullById(id)
+        var product = productRepo.findOneWithCharacteristicsById(id)
                 .orElseThrow(() -> new RuntimeException("product not found"));
+
+        product.getImages().size();
+
+        return product;
     }
 }

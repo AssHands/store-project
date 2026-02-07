@@ -49,6 +49,6 @@ public class CommentController {
                 .userId(UUID.fromString(accessToken.getSubject()))
                 .build();
 
-        return commentFacade.deleteOne(command).toString();
+        return commentFacade.deleteOne(command);
     }
 }

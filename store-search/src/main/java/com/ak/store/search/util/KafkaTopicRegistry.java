@@ -1,6 +1,6 @@
 package com.ak.store.search.util;
 
-import com.ak.store.kafka.storekafkastarter.KafkaEvent;
+import com.ak.store.kafka.storekafkastarter.model.KafkaEvent;
 import com.ak.store.kafka.storekafkastarter.model.event.search.SearchEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

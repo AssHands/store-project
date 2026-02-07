@@ -1,6 +1,6 @@
 package com.ak.store.warehouseSagaWorker.processor.inbox.impl;
 
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.snapshot.order.OrderCreatedSnapshot;
 import com.ak.store.warehouseSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.warehouseSagaWorker.model.inbox.InboxEventStatus;

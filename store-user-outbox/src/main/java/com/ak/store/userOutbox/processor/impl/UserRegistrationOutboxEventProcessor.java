@@ -1,9 +1,9 @@
 package com.ak.store.userOutbox.processor.impl;
 
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.user.UserCreationSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.user.UserSnapshot;
 import com.ak.store.userOutbox.model.OutboxEvent;
 import com.ak.store.userOutbox.model.OutboxEventStatus;
 import com.ak.store.userOutbox.model.OutboxEventType;
@@ -24,9 +24,9 @@ public class UserRegistrationOutboxEventProcessor implements OutboxEventProcesso
     @Override
     public void process(OutboxEvent event) {
         String topic = kafkaTopicRegistry.getTopicByEvent(getType());
-        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), UserCreationSnapshot.class);
+        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), UserSnapshot.class);
 
-        var request = SagaRequestEvent.<UserCreationSnapshot>builder()
+        var request = SagaRequestEvent.<UserSnapshot>builder()
                 .sagaId(event.getId())
                 .request(snapshot)
                 .build();

@@ -1,4 +1,4 @@
-package com.ak.store.kafka.storekafkastarter;
+package com.ak.store.kafka.storekafkastarter.util;
 
 import com.ak.store.kafka.storekafkastarter.util.LocalDateTimeAdapter;
 import com.google.gson.FieldNamingPolicy;

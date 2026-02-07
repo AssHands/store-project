@@ -70,9 +70,9 @@ spring:
             readTimeout: 7000
 
 kafka:
-  dlt-prefix: .dlt
   topics:
     user-verification: user-verification
+    user-registration: user-registration
 
 email:
   verification:

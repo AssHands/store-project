@@ -1,6 +1,6 @@
 package com.ak.store.synchronization.util;
 
-import com.ak.store.kafka.storekafkastarter.KafkaEvent;
+import com.ak.store.kafka.storekafkastarter.model.KafkaEvent;
 import com.ak.store.kafka.storekafkastarter.model.event.catalogue.category.CategoryCreatedEvent;
 import com.ak.store.kafka.storekafkastarter.model.event.catalogue.category.CategoryDeletedEvent;
 import com.ak.store.kafka.storekafkastarter.model.event.catalogue.category.CategoryUpdatedEvent;

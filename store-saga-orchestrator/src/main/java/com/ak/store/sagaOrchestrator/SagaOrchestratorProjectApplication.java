@@ -14,9 +14,8 @@ import org.springframework.messaging.handler.annotation.support.DefaultMessageHa
 import org.springframework.messaging.handler.annotation.support.MessageHandlerMethodFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@ComponentScan(basePackages = {"com.ak.store.*" })
-@SpringBootApplication
 @EnableScheduling
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class SagaOrchestratorProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(SagaOrchestratorProjectApplication.class, args);

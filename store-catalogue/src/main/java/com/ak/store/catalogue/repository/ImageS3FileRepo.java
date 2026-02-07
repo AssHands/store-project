@@ -15,10 +15,10 @@ import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
-public class S3ImageFileRepo implements ImageFileRepo {
+public class ImageS3FileRepo implements ImageFileRepo {
     private final S3Client s3Client;
 
-    private final String BUCKET_NAME = "products-photos";
+    private final String BUCKET_NAME = "products-images";
     private final String DELETED_BUCKET_NAME = "deleted-products-images";
 
     @Override

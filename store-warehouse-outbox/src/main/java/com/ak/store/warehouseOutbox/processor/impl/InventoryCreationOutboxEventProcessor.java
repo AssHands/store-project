@@ -1,7 +1,7 @@
 package com.ak.store.warehouseOutbox.processor.impl;
 
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseEvent;
 import com.ak.store.warehouseOutbox.model.OutboxEvent;
 import com.ak.store.warehouseOutbox.model.OutboxEventStatus;

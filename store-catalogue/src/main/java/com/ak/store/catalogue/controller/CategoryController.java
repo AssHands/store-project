@@ -4,10 +4,13 @@ import com.ak.store.catalogue.facade.CategoryFacade;
 import com.ak.store.catalogue.mapper.CategoryMapper;
 import com.ak.store.catalogue.model.form.WriteCategoryCharacteristicForm;
 import com.ak.store.catalogue.model.form.WriteCategoryForm;
+import com.ak.store.catalogue.model.validationGroup.Create;
+import com.ak.store.catalogue.model.validationGroup.Update;
 import com.ak.store.catalogue.model.view.CategoryTreeView;
 import com.ak.store.catalogue.util.CategoryTreeBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +31,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Long createOne(@RequestBody @Valid WriteCategoryForm form) {
+    public Long createOne(@RequestBody @Validated(Create.class) WriteCategoryForm form) {
         return categoryFacade.createOne(categoryMapper.toWriteCommand(form));
     }
 
@@ -38,7 +41,7 @@ public class CategoryController {
     }
 
     @PatchMapping("update")
-    public Long updateOne(@RequestBody @Valid WriteCategoryForm form) {
+    public Long updateOne(@RequestBody @Validated(Update.class) WriteCategoryForm form) {
         return categoryFacade.updateOne(categoryMapper.toWriteCommand(form));
     }
 

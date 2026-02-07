@@ -7,6 +7,7 @@ import com.ak.store.synchronization.model.command.product.WriteProductPayloadCom
 import com.ak.store.synchronization.model.command.product.WriteProductRatingCommand;
 import com.ak.store.synchronization.model.document.Product;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
@@ -14,6 +15,9 @@ import org.mapstruct.ReportingPolicy;
 public interface ProductMapper {
     WriteProductPayloadCommand toWritePayloadCommand(ProductSnapshotPayload snapshot);
 
+    @Mapping(target = ".", source = "product")
+    @Mapping(target = "characteristics", source = "characteristics")
+    @Mapping(target = "images", source = "images")
     Product toDocument(WriteProductPayloadCommand command);
 
     Product toDocument(WriteProductRatingCommand command);

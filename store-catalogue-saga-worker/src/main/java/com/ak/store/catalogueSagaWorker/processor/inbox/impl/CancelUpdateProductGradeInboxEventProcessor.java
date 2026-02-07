@@ -6,7 +6,7 @@ import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.catalogueSagaWorker.processor.inbox.InboxEventProcessor;
 import com.ak.store.catalogueSagaWorker.service.InboxEventReaderService;
 import com.ak.store.catalogueSagaWorker.service.RatingUpdaterService;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewUpdatedSnapshot;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

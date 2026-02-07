@@ -1,5 +1,6 @@
 package com.ak.store.kafka.storekafkastarter;
 
+import com.ak.store.kafka.storekafkastarter.model.KafkaEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;

@@ -1,5 +1,6 @@
 package com.ak.store.userSagaWorker.service;
 
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.userSagaWorker.model.outbox.OutboxEventStatus;
 import com.ak.store.userSagaWorker.model.outbox.OutboxEventType;
 import com.ak.store.userSagaWorker.repository.OutboxEventRepo;
@@ -15,11 +16,11 @@ import java.util.UUID;
 @Service
 public class OutboxEventService {
     private final OutboxEventRepo outboxEventRepo;
-    private final Gson gson;
+    private final JsonMapperKafka jsonMapperKafka;
 
     @Transactional
     public <T> void createOne(UUID id, T payload, OutboxEventType type) {
-        outboxEventRepo.saveOneIgnoreDuplicate(id, gson.toJson(payload), type.getValue(),
+        outboxEventRepo.saveOneIgnoreDuplicate(id, jsonMapperKafka.toJson(payload), type.getValue(),
                 OutboxEventStatus.IN_PROGRESS.getStatus(), LocalDateTime.now());
     }
 }

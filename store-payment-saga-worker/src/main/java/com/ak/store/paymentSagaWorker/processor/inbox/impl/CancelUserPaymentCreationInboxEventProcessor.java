@@ -1,6 +1,6 @@
 package com.ak.store.paymentSagaWorker.processor.inbox.impl;
 
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.paymentSagaWorker.model.dto.CancelUserPaymentCreationSagaRequestEvent;
 import com.ak.store.paymentSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.paymentSagaWorker.model.inbox.InboxEventStatus;

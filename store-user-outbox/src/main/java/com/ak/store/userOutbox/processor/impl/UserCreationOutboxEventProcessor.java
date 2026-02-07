@@ -1,7 +1,7 @@
 package com.ak.store.userOutbox.processor.impl;
 
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseEvent;
 import com.ak.store.userOutbox.model.OutboxEvent;
 import com.ak.store.userOutbox.model.OutboxEventStatus;
@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class UserCreationOutboxEventProcessor implements OutboxEventProcessor {
-    private final EventProducerKafka eventProducerKafka;
     private final JsonMapperKafka jsonMapperKafka;
+    private final EventProducerKafka eventProducerKafka;
     private final KafkaTopicRegistry kafkaTopicRegistry;
     private final OutboxEventService outboxEventService;
 

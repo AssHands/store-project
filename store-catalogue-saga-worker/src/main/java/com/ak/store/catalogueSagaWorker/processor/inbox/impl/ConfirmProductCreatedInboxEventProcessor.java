@@ -7,7 +7,7 @@ import com.ak.store.catalogueSagaWorker.model.product.ProductStatus;
 import com.ak.store.catalogueSagaWorker.processor.inbox.InboxEventProcessor;
 import com.ak.store.catalogueSagaWorker.service.InboxEventReaderService;
 import com.ak.store.catalogueSagaWorker.service.ProductService;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.product.ProductSnapshotPayload;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

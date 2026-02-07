@@ -1,8 +1,9 @@
-package com.ak.store.emailSender.kafka.consumer;
+package com.ak.store.emailSender.kafka;
 
 import com.ak.store.emailSender.errorHandler.ErrorHandler;
 import com.ak.store.emailSender.inbox.InboxEventType;
 import com.ak.store.emailSender.service.InboxEventWriterService;
+import com.ak.store.kafka.storekafkastarter.model.event.user.UserVerificationEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -20,9 +21,9 @@ public class UserConsumerKafka {
     public void handleVerifyUser(List<UserVerificationEvent> userVerificationEvents, Acknowledgment ack) {
         for (var event : userVerificationEvents) {
             try {
-                inboxEventWriterService.createOne(event.getEventId(), event.getRequest(), InboxEventType.USER_VERIFICATION);
+                inboxEventWriterService.createOne(event.getEventId(), event.getPayload(), InboxEventType.USER_VERIFICATION);
             } catch (Exception e) {
-                errorHandler.handleError(event, InboxEventType.USER_VERIFICATION, e);
+                errorHandler.handleVerificationError(event, e);
             }
         }
 

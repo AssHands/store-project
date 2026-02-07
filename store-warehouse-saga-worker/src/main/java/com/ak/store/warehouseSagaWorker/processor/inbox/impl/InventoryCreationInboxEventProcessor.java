@@ -1,6 +1,7 @@
 package com.ak.store.warehouseSagaWorker.processor.inbox.impl;
 
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.product.ProductSnapshotPayload;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.catalogue.product.ProductCreatedEvent;
 import com.ak.store.warehouseSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.warehouseSagaWorker.model.inbox.InboxEventStatus;
@@ -22,10 +23,10 @@ public class InventoryCreationInboxEventProcessor implements InboxEventProcessor
     @Transactional
     @Override
     public void process(InboxEvent event) {
-        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), ProductCreatedEvent.class);
+        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), ProductSnapshotPayload.class);
 
         try {
-            inventoryService.createOne(snapshot.getPayload().getProduct().getId());
+            inventoryService.createOne(snapshot.getProduct().getId());
             inboxEventReaderService.markOneAs(event, InboxEventStatus.SUCCESS);
         } catch (Exception e) {
             inboxEventReaderService.markOneAsFailure(event);
