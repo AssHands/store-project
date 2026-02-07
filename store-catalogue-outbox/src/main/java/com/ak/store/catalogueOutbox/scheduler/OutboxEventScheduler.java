@@ -1,14 +1,11 @@
 package com.ak.store.catalogueOutbox.scheduler;
 
-import com.ak.store.catalogueOutbox.model.OutboxEvent;
 import com.ak.store.catalogueOutbox.model.OutboxEventType;
 import com.ak.store.catalogueOutbox.processor.OutboxEventProcessor;
 import com.ak.store.catalogueOutbox.service.OutboxEventService;
-import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

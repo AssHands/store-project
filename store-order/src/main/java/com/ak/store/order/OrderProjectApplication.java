@@ -15,11 +15,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@EnableJpaRepositories("com.ak.store.*")
-@ComponentScan(basePackages = {"com.ak.store.*"})
-@EntityScan("com.ak.store.*")
 @EnableFeignClients
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class OrderProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(OrderProjectApplication.class, args);

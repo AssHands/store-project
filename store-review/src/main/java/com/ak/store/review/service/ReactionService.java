@@ -3,10 +3,8 @@ package com.ak.store.review.service;
 import com.ak.store.review.mapper.ReactionMapper;
 import com.ak.store.review.model.document.Reaction;
 import com.ak.store.review.model.dto.ReactionDTO;
-import com.ak.store.review.model.dto.ReactionRemoveStatus;
-import com.ak.store.review.model.dto.ReactionSaveStatus;
 import com.ak.store.review.repository.ReactionRepo;
-import com.ak.store.review.validator.service.ReactionServiceValidator;
+import com.ak.store.review.validator.ReactionValidator;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -17,9 +15,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class ReactionService {
-    private final ReactionServiceValidator reactionValidator;
+    private final ReactionValidator reactionValidator;
     private final ReactionRepo reactionRepo;
     private final ReactionMapper reactionMapper;
+
+    private final ReviewService reviewService;
 
     public Boolean findOneByUserIdAndReviewId(UUID userId, ObjectId reviewId) {
         return reactionRepo.findOneByUserIdAndReviewId(userId, reviewId)
@@ -27,21 +27,38 @@ public class ReactionService {
                 .orElse(null);
     }
 
-    public ReactionSaveStatus likeOneReview(UUID userId, ObjectId reviewId) {
-        reactionValidator.validateLikingOneReview(reviewId);
-        return reactionRepo.likeOneReview(userId, reviewId);
+    public void likeOne(UUID userId, ObjectId reviewId) {
+        reactionValidator.validateLike(reviewId);
+        var saveStatus = reactionRepo.likeOne(userId, reviewId);
+
+        switch (saveStatus) {
+            case CREATED -> reviewService.updateReactionCounter(reviewId, +1, 0);
+            case UPDATED ->  reviewService.updateReactionCounter(reviewId, +1, -1);
+        }
     }
 
-    public ReactionSaveStatus dislikeOneReview(UUID userId, ObjectId reviewId) {
-        reactionValidator.validateDislikingOneReview(reviewId);
-        return reactionRepo.dislikeOneReview(userId, reviewId);
+    public void dislikeOne(UUID userId, ObjectId reviewId) {
+        reactionValidator.validateDislike(reviewId);
+        var saveStatus = reactionRepo.dislikeOne(userId, reviewId);
+
+        switch (saveStatus) {
+            case CREATED -> reviewService.updateReactionCounter(reviewId, 0, +1);
+            case UPDATED -> reviewService.updateReactionCounter(reviewId, -1, +1);
+        }
     }
 
-    public ReactionRemoveStatus removeOne(UUID userId, ObjectId reviewId) {
-        return reactionRepo.findOneAndRemove(userId, reviewId);
+    public void removeOne(UUID userId, ObjectId reviewId) {
+        var removeStatus = reactionRepo.findOneAndRemove(userId, reviewId);
+
+        switch (removeStatus) {
+            case LIKE_REMOVED -> reviewService.updateReactionCounter(reviewId, -1, 0);
+            case DISLIKE_REMOVED -> reviewService.updateReactionCounter(reviewId, 0, -1);
+        }
     }
 
     public List<ReactionDTO> findAllByReviewIds(UUID userId, List<ObjectId> reviewIds) {
-        return reactionMapper.toReactionDTO(reactionRepo.findAllByUserIdAndReviewIdIn(userId, reviewIds));
+        return reactionRepo.findAllByUserIdAndReviewIdIn(userId, reviewIds).stream()
+                .map(reactionMapper::toDTO)
+                .toList();
     }
 }

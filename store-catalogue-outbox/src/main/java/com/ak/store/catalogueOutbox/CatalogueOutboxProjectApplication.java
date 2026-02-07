@@ -13,8 +13,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.time.LocalDateTime;
+
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class CatalogueOutboxProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(CatalogueOutboxProjectApplication.class, args);

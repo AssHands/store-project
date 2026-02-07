@@ -1,28 +1,30 @@
 package com.ak.store.search.mapper;
 
+import com.ak.store.search.model.command.SearchFilterCommand;
+import com.ak.store.search.model.command.SearchProductCommand;
 import com.ak.store.search.model.document.Product;
 import com.ak.store.search.model.dto.ProductDTO;
-import com.ak.store.search.model.dto.request.FilterSearchRequestDTO;
-import com.ak.store.search.model.dto.request.ProductSearchRequestDTO;
-import com.ak.store.search.model.dto.response.FilterSearchResponseDTO;
-import com.ak.store.search.model.dto.response.ProductSearchResponseDTO;
-import com.ak.store.search.model.form.request.FilterSearchRequestForm;
-import com.ak.store.search.model.form.request.ProductSearchRequestForm;
-import com.ak.store.search.model.view.response.FilterSearchResponseView;
-import com.ak.store.search.model.view.response.ProductSearchResponseView;
+import com.ak.store.search.model.dto.response.SearchFilterDTO;
+import com.ak.store.search.model.dto.response.SearchProductDTO;
+import com.ak.store.search.model.form.SearchFilterForm;
+import com.ak.store.search.model.form.SearchProductForm;
+import com.ak.store.search.model.view.response.SearchFilterView;
+import com.ak.store.search.model.view.response.SearchProductView;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.UUID;
+
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface SearchMapper {
-    ProductDTO toProductDTO(Product productDocument);
+    ProductDTO toProductDTO(Product document);
 
-    ProductSearchRequestDTO toProductSearchRequestDTO(ProductSearchRequestForm psr);
+    SearchProductCommand toSearchProductCommand(SearchProductForm form);
 
-    FilterSearchRequestDTO FilterSearchRequestDTO(FilterSearchRequestForm fsr);
+    SearchFilterCommand toSearchFilterCommand(UUID userId, SearchFilterForm form);
 
-    ProductSearchResponseView toProductSearchResponseView(ProductSearchResponseDTO psr);
+    SearchProductView toSearchProductView(SearchProductDTO dto);
 
-    FilterSearchResponseView toFilterSearchResponseView(FilterSearchResponseDTO response);
+    SearchFilterView toSearchFilterView(SearchFilterDTO dto);
 }

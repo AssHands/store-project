@@ -11,10 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
-@EnableJpaRepositories("com.ak.store.*")
-@ComponentScan(basePackages = {"com.ak.store.*"})
-@EntityScan("com.ak.store.*")
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class WarehouseProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(WarehouseProjectApplication.class, args);

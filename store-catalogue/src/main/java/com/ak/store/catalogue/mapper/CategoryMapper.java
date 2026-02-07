@@ -1,27 +1,31 @@
 package com.ak.store.catalogue.mapper;
 
+import com.ak.store.catalogue.model.command.WriteCategoryCharacteristicCommand;
+import com.ak.store.catalogue.model.command.WriteCategoryCommand;
 import com.ak.store.catalogue.model.dto.CategoryDTO;
-import com.ak.store.catalogue.model.dto.write.CategoryWriteDTO;
 import com.ak.store.catalogue.model.entity.Category;
-import com.ak.store.catalogue.model.form.CategoryForm;
+import com.ak.store.catalogue.model.form.WriteCategoryCharacteristicForm;
+import com.ak.store.catalogue.model.form.WriteCategoryForm;
 import com.ak.store.catalogue.model.view.CategoryTreeView;
-import com.ak.store.common.snapshot.catalogue.CategorySnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.category.CategorySnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
-
-import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface CategoryMapper {
-    Category toCategory(CategoryWriteDTO c);
+    Category toEntity(WriteCategoryCommand command);
 
-    CategoryTreeView toCategoryTreeView(CategoryDTO c);
+    void updateEntity(WriteCategoryCommand command, @MappingTarget Category entity);
 
-    CategoryDTO toCategoryDTO(Category c);
-    List<CategoryDTO> toCategoryDTO(List<Category> c);
+    CategoryTreeView toTreeView(CategoryDTO dto);
 
-    CategoryWriteDTO toCategoryWriteDTO(CategoryForm c);
+    CategoryDTO toDTO(Category entity);
 
-    CategorySnapshot toCategorySnapshot(CategoryDTO category);
+    WriteCategoryCommand toWriteCommand(WriteCategoryForm form);
+
+    WriteCategoryCharacteristicCommand toWriteCharacteristicCommand(WriteCategoryCharacteristicForm form);
+
+    CategorySnapshot toSnapshot(Category entity);
 }

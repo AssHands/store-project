@@ -40,7 +40,6 @@ spring:
         linger.ms: 3000
 
 kafka:
-  dlt-prefix: .dlt
   topics:
     product-synchronization: product-synchronization-response
     cancel-product-synchronization: cancel-product-synchronization-response

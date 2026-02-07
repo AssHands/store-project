@@ -17,5 +17,7 @@ import org.bson.types.ObjectId;
 public class CommentForm {
     private ObjectId reviewId;
 
+    private ObjectId commentId;
+
     private String text;
 }

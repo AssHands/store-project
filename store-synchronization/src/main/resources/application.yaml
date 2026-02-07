@@ -54,7 +54,6 @@ spring:
         max.in.flight.requests.per.connection: 5
 
 kafka:
-  dlt-prefix: .dlt
   topics:
     category-created: category-created
     category-updated: category-updated
@@ -64,7 +63,6 @@ kafka:
     characteristic-updated: characteristic-updated
     characteristic-deleted: characteristic-deleted
 
-    product-created: product-created
     product-updated: product-updated
     product-deleted: product-deleted
     product-rating-updated: product-rating-updated

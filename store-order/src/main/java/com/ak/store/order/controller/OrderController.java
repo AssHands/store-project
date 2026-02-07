@@ -1,10 +1,9 @@
 package com.ak.store.order.controller;
 
 import com.ak.store.order.facade.OrderFacade;
-import com.ak.store.order.model.dto.UserAuthContext;
-import com.ak.store.order.model.form.OrderForm;
-import com.ak.store.order.model.view.OrderViewPayload;
 import com.ak.store.order.mapper.OrderMapper;
+import com.ak.store.order.model.form.OrderForm;
+import com.ak.store.order.model.view.OrderPayloadView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -21,24 +20,28 @@ public class OrderController {
     private final OrderMapper orderMapper;
 
     @GetMapping
-    //todo сделать пагинацию
-    public List<OrderViewPayload> findAll(@RequestParam UUID userId) {
-        return orderMapper.toOrderViewPayload(orderFacade.findAllByUserId(userId));
+    public List<OrderPayloadView> findAll(@RequestParam UUID userId) {
+        return orderFacade.findAllByUserId(userId).stream()
+                .map(orderMapper::toPayloadView)
+                .toList();
     }
 
     @GetMapping("me")
-    public List<OrderViewPayload> findMyAll(@AuthenticationPrincipal Jwt accessToken) {
+    public List<OrderPayloadView> findMyAll(@AuthenticationPrincipal Jwt accessToken) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        return orderMapper.toOrderViewPayload(orderFacade.findAllByUserId(userId));
+        return orderFacade.findAllByUserId(userId).stream()
+                .map(orderMapper::toPayloadView)
+                .toList();
     }
 
     @PostMapping
-    public void createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody OrderForm request) {
-        var authContext = new UserAuthContext(
+    public void createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody OrderForm form) {
+        var command = orderMapper.toWriteCommand(
+                form,
                 UUID.fromString(accessToken.getSubject()),
                 accessToken.getClaimAsString("email")
         );
 
-        orderFacade.createOne(authContext, request.getProductAmount());
+        orderFacade.createOne(command);
     }
 }

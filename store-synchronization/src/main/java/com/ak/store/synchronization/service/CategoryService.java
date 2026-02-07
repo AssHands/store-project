@@ -1,8 +1,8 @@
 package com.ak.store.synchronization.service;
 
-import com.ak.store.common.snapshot.catalogue.CategorySnapshotPayload;
 import com.ak.store.synchronization.mapper.CategoryMapper;
-import com.ak.store.synchronization.repository.postgres.CategoryRepo;
+import com.ak.store.synchronization.model.command.category.WriteCategoryPayloadCommand;
+import com.ak.store.synchronization.repository.CategoryRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,15 +14,13 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Transactional
-    public void createOne(CategorySnapshotPayload request) {
-        var category = categoryMapper.toCategory(request);
-        categoryRepo.save(category);
+    public void createOne(WriteCategoryPayloadCommand command) {
+        categoryRepo.save(categoryMapper.toEntity(command));
     }
 
     @Transactional
-    public void updateOne(CategorySnapshotPayload request) {
-        var category = categoryMapper.toCategory(request);
-        categoryRepo.save(category);
+    public void updateOne(WriteCategoryPayloadCommand command) {
+        categoryRepo.save(categoryMapper.toEntity(command));
     }
 
     @Transactional

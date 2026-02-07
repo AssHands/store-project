@@ -9,9 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@ComponentScan(basePackages = {"com.ak.store.*" })
-@SpringBootApplication
 @EnableScheduling
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class PaymentSagaWorkerProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(PaymentSagaWorkerProjectApplication.class, args);

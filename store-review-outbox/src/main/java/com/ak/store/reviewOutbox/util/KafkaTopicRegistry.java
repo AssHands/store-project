@@ -17,17 +17,17 @@ public class KafkaTopicRegistry {
     @PostConstruct
     public void init() {
         Map<OutboxEventType, String> eventKeyMap = Map.ofEntries(
-                Map.entry(OutboxEventType.REVIEW_CREATION, "review-creation"),
-                Map.entry(OutboxEventType.CONFIRM_REVIEW_CREATION, "confirm-review-creation"),
-                Map.entry(OutboxEventType.CANCEL_REVIEW_CREATION, "cancel-review-creation"),
+                Map.entry(OutboxEventType.REVIEW_CREATED, "review-created"),
+                Map.entry(OutboxEventType.CONFIRM_REVIEW_CREATED, "confirm-review-created"),
+                Map.entry(OutboxEventType.CANCEL_REVIEW_CREATED, "cancel-review-created"),
 
-                Map.entry(OutboxEventType.REVIEW_UPDATE, "review-update"),
-                Map.entry(OutboxEventType.CONFIRM_REVIEW_UPDATE, "confirm-review-update"),
-                Map.entry(OutboxEventType.CANCEL_REVIEW_UPDATE, "cancel-review-update"),
+                Map.entry(OutboxEventType.REVIEW_UPDATED, "review-updated"),
+                Map.entry(OutboxEventType.CONFIRM_REVIEW_UPDATED, "confirm-review-updated"),
+                Map.entry(OutboxEventType.CANCEL_REVIEW_UPDATED, "cancel-review-updated"),
 
-                Map.entry(OutboxEventType.REVIEW_DELETION, "review-deletion"),
-                Map.entry(OutboxEventType.CONFIRM_REVIEW_DELETION, "confirm-review-deletion"),
-                Map.entry(OutboxEventType.CANCEL_REVIEW_DELETION, "cancel-review-deletion")
+                Map.entry(OutboxEventType.REVIEW_DELETED, "review-deleted"),
+                Map.entry(OutboxEventType.CONFIRM_REVIEW_DELETED, "confirm-review-deleted"),
+                Map.entry(OutboxEventType.CANCEL_REVIEW_DELETED, "cancel-review-deleted")
         );
 
         for (var entry : eventKeyMap.entrySet()) {

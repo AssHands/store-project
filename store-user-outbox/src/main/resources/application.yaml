@@ -1,5 +1,5 @@
 server:
-  port: 8099
+  port: 8909
 
 spring:
   datasource:
@@ -40,7 +40,6 @@ spring:
         linger.ms: 3000
 
 kafka:
-  dlt-prefix: .dlt
   topics:
     user-registration: user-registration-request
     cancel-user-registration: cancel-user-registration-response

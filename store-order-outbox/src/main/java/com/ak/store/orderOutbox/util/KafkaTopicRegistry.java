@@ -17,7 +17,7 @@ public class KafkaTopicRegistry {
     @PostConstruct
     public void init() {
         Map<OutboxEventType, String> eventKeyMap = Map.of(
-                OutboxEventType.ORDER_CREATION, "order-creation",
+                OutboxEventType.ORDER_CREATED, "order-creation",
                 OutboxEventType.CONFIRM_ORDER, "confirm-order",
                 OutboxEventType.CANCEL_ORDER, "cancel-order"
         );

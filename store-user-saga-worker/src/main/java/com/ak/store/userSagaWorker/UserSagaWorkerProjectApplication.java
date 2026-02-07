@@ -9,16 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class UserSagaWorkerProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserSagaWorkerProjectApplication.class, args);
-    }
-
-    @Bean
-    public Gson gson() {
-        return new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create();
     }
 }

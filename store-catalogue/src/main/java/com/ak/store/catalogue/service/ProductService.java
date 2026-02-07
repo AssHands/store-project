@@ -1,15 +1,14 @@
 package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.mapper.ProductMapper;
+import com.ak.store.catalogue.model.command.WriteProductCommand;
 import com.ak.store.catalogue.model.dto.ProductDTO;
-import com.ak.store.catalogue.model.dto.write.ProductWriteDTO;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductStatus;
 import com.ak.store.catalogue.model.entity.RatingSummary;
 import com.ak.store.catalogue.repository.ProductRepo;
-import com.ak.store.catalogue.service.product.PriceCalculator;
-import com.ak.store.catalogue.validator.service.ProductServiceValidator;
+import com.ak.store.catalogue.util.ProductPriceCalculator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import java.util.List;
 public class ProductService {
     private final ProductRepo productRepo;
     private final ProductMapper productMapper;
-    private final ProductServiceValidator productServiceValidator;
 
     private Product findOneById(Long id) {
         return productRepo.findById(id).orElseThrow(() -> new RuntimeException("not found"));
@@ -33,11 +31,13 @@ public class ProductService {
     }
 
     public ProductDTO findOne(Long id) {
-        return productMapper.toProductDTO(findOneById(id));
+        return productMapper.toDTO(findOneById(id));
     }
 
     public List<ProductDTO> findAll(List<Long> ids) {
-        return productMapper.toProductDTO(findAllById(ids));
+        return findAllById(ids).stream()
+                .map(productMapper::toDTO)
+                .toList();
     }
 
     public Boolean isExistAll(List<Long> ids) {
@@ -49,11 +49,10 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDTO createOne(ProductWriteDTO request) {
-        productServiceValidator.validateCreating(request);
-        var product = productMapper.toProduct(request);
+    public ProductDTO createOne(WriteProductCommand command) {
+        var product = productMapper.toEntity(command);
 
-        PriceCalculator.setPrice(product, request);
+        ProductPriceCalculator.setPrice(product, command);
         product.setStatus(ProductStatus.IN_PROGRESS);
         product.setReviewAmount(0);
         product.setRating(0f);
@@ -63,17 +62,17 @@ public class ProductService {
 
         //flush for immediate validation
         productRepo.saveAndFlush(product);
-        return productMapper.toProductDTO(product);
+        return productMapper.toDTO(product);
     }
 
     @Transactional
-    public ProductDTO updateOne(Long id, ProductWriteDTO request) {
-        var product = findOneById(id);
+    public ProductDTO updateOne(WriteProductCommand command) {
+        var product = findOneById(command.getId());
 
-        updateOneFromDTO(product, request);
+        updateOneFromDTO(product, command);
 
         //flush for immediate validation
-        return productMapper.toProductDTO(productRepo.saveAndFlush(product));
+        return productMapper.toDTO(productRepo.saveAndFlush(product));
     }
 
     @Transactional
@@ -83,11 +82,11 @@ public class ProductService {
         product.setIsAvailable(false);
         product.setStatus(ProductStatus.DELETED);
 
-        return productMapper.toProductDTO(productRepo.save(product));
+        return productMapper.toDTO(productRepo.save(product));
     }
 
-    private void updateOneFromDTO(Product product, ProductWriteDTO request) {
-        PriceCalculator.setPrice(product, request);
+    private void updateOneFromDTO(Product product, WriteProductCommand request) {
+        ProductPriceCalculator.setPrice(product, request);
 
         if (request.getTitle() != null) {
             product.setTitle(request.getTitle());

@@ -1,6 +1,6 @@
 package com.ak.store.userSagaWorker.kafka;
 
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
 import com.ak.store.userSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.userSagaWorker.service.InboxEventWriterService;

@@ -2,11 +2,11 @@ package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.ProductFacade;
 import com.ak.store.catalogue.mapper.ProductMapper;
-import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
-import com.ak.store.catalogue.model.form.ProductFormPayload;
-import com.ak.store.catalogue.model.view.ProductView;
+import com.ak.store.catalogue.model.command.WriteImageCommand;
+import com.ak.store.catalogue.model.form.WriteProductForm;
 import com.ak.store.catalogue.model.validationGroup.Create;
 import com.ak.store.catalogue.model.validationGroup.Update;
+import com.ak.store.catalogue.model.view.ProductView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -25,12 +25,14 @@ public class ProductController {
 
     @GetMapping("{id}")
     public ProductView findOne(@PathVariable Long id) {
-        return productMapper.toProductView(productFacade.findOne(id));
+        return productMapper.toView(productFacade.findOne(id));
     }
 
     @PostMapping("find")
     public List<ProductView> findAll(@RequestBody List<Long> ids) {
-        return productMapper.toProductView(productFacade.findAll(ids));
+        return productFacade.findAll(ids).stream()
+                .map(productMapper::toView)
+                .toList();
     }
 
     @PostMapping("available")
@@ -44,73 +46,17 @@ public class ProductController {
     }
 
     @PostMapping
-    public Long createOne(@RequestBody @Validated(Create.class) ProductFormPayload request) {
-        return productFacade.createOne(productMapper.toProductWritePayload(request));
+    public Long createOne(@RequestBody @Validated(Create.class) WriteProductForm form) {
+        return productFacade.createOne(productMapper.toWriteCommand(form));
     }
 
-    @PatchMapping("{id}")
-    public Long updateOne(@PathVariable("id") Long productId,
-                          @RequestBody @Validated(Update.class) ProductFormPayload request) {
-        return productFacade.updateOne(productId, productMapper.toProductWritePayload(request));
+    @PatchMapping("update")
+    public Long updateOne(@RequestBody @Validated(Update.class) WriteProductForm form) {
+        return productFacade.updateOne(productMapper.toWriteCommand(form));
     }
 
     @DeleteMapping("{id}")
-    public void deleteOne(@PathVariable Long id) {
-        productFacade.deleteOne(id);
-    }
-
-    /**
-     * Индекс является самой последовательностью изображений. <br>
-     * <br>
-     * Все новые изображения добавляются под следующем индексом последнего индекса. <br>
-     * <br>
-     * Удаление изображений происходит по указанному индексу. <br>
-     * <br>
-     * При обращении к endpoint'у требуется указывать индекс для каждого изображения,
-     * индексы удалённых изображений указывать не надо. <br>
-     * -------------------------------------------------------------- <br>
-     * Например: есть пустой список изображений, к нему добавляем фотографии a, b, c. <br>
-     * Им присваиваются индексы в порядке добавления: <br>
-     * a[0] <br>
-     * b[1] <br>
-     * c[2] <br>
-     * <br>
-     * Обязательно надо указать их новую или текущую последовательность. <br>
-     * image[0] -> 1 <br>
-     * image[1] -> 2 <br>
-     * image[2] -> 0 <br>
-     * В таком случае их последовательность будет равна: <br>
-     * c[0] <br>
-     * a[1] <br>
-     * b[2] <br>
-     *<br>
-     * При удалении изображения мы указываем индекс изображения: <br>
-     * delete_images -> 1, 2 <br>
-     * add_images -> d, e <br>
-     * В таком случае текущая последовательность будет выглядеть так: <br>
-     * a[0] <br>
-     * null[1] <br>
-     * null[2] <br>
-     * d[3] <br>
-     * e[4] <br>
-     * <br>
-     * Также требуется указать новую последовательность: <br>
-     * image[0] -> 1 <br>
-     * image[3] -> 0 <br>
-     * image[4] -> 2 <br>
-     * <br>
-     * В итоге будет данная последовательность изображений: <br>
-     * d[0] <br>
-     * a[1] <br>
-     * e[2] <br>
-     */
-    //todo: validate data in controller
-    @PatchMapping(value = "{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Long updateAllProductImage(@PathVariable("id") Long productId,
-                                      @RequestParam Map<String, String> allImageIndexes,
-                                      @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,
-                                      @RequestParam(value = "delete_images", required = false) List<String> deleteImageIndexes) {
-        var request = new ImageWriteDTO(productId, allImageIndexes, addImages, deleteImageIndexes);
-        return productFacade.saveOrUpdateAllImage(request);
+    public Long deleteOne(@PathVariable Long id) {
+        return productFacade.deleteOne(id);
     }
 }

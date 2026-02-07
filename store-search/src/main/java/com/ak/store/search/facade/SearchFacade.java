@@ -1,41 +1,32 @@
 package com.ak.store.search.facade;
 
-import com.ak.store.common.kafka.search.SearchAllEvent;
-import com.ak.store.search.kafka.EventProducerKafka;
-import com.ak.store.search.model.dto.request.FilterSearchRequestDTO;
-import com.ak.store.search.model.dto.request.ProductSearchRequestDTO;
-import com.ak.store.search.model.dto.response.FilterSearchResponseDTO;
-import com.ak.store.search.model.dto.response.ProductSearchResponseDTO;
-import com.ak.store.search.service.SearchElasticService;
+import com.ak.store.search.kafka.KafkaProducer;
+import com.ak.store.search.model.command.SearchFilterCommand;
+import com.ak.store.search.model.command.SearchProductCommand;
+import com.ak.store.search.model.dto.response.SearchFilterDTO;
+import com.ak.store.search.model.dto.response.SearchProductDTO;
+import com.ak.store.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class SearchFacade {
-    private final SearchElasticService searchElasticService;
-    private final EventProducerKafka eventProducerKafka;
+    private final SearchService searchService;
+    private final KafkaProducer kafkaProducer;
 
-    public ProductSearchResponseDTO searchAllProduct(ProductSearchRequestDTO request) {
-        return searchElasticService.searchAllProduct(request);
+    public SearchProductDTO searchAllProduct(SearchProductCommand command) {
+        return searchService.searchAllProduct(command);
     }
 
-    public FilterSearchResponseDTO searchAllFilter(UUID userId, FilterSearchRequestDTO request) {
-        var response = searchElasticService.searchAllFilter(request);
+    public SearchFilterDTO searchAllFilter(SearchFilterCommand command) {
+        var response = searchService.searchAllFilter(command);
 
-        if (userId == null) {
+        if (command.getUserId() == null) {
             return response;
         }
 
-        var event = SearchAllEvent.builder()
-                .userId(userId)
-                .categoryId(response.getCategoryId())
-                .build();
-
-        //todo: make async
-        eventProducerKafka.send(event);
+        kafkaProducer.produceSearchEvent(command.getUserId(), response.getCategoryId());
 
         return response;
     }

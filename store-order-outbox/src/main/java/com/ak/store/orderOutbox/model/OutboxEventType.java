@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum OutboxEventType {
-    ORDER_CREATION("ORDER_CREATION"),
+    ORDER_CREATED("ORDER_CREATED"),
     CONFIRM_ORDER("CONFIRM_ORDER"),
     CANCEL_ORDER("CANCEL_ORDER");
 

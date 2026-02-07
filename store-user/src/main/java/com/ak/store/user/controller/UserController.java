@@ -23,7 +23,7 @@ public class UserController {
 
     @GetMapping("{id}")
     public UserView findOne(@PathVariable UUID id) {
-        return userMapper.toUserView(userFacade.findOne(id));
+        return userMapper.toView(userFacade.findOne(id));
     }
 
     @PostMapping("verify")
@@ -38,7 +38,7 @@ public class UserController {
 
     @PostMapping("register")
     public void registerOne(@RequestBody UserForm request) {
-        userFacade.registerOne(userMapper.toUserWriteDTO(request));
+        userFacade.registerOne(userMapper.toWriteCommand(null, request));
     }
 
     //--- AUTH ---
@@ -46,19 +46,15 @@ public class UserController {
     @GetMapping("me")
     public UserView getMe(@AuthenticationPrincipal Jwt accessToken) {
         var user = userFacade.findOne(UUID.fromString(accessToken.getSubject()));
-        return userMapper.toUserView(user);
+        return userMapper.toView(user);
     }
 
     @PatchMapping("me")
     public UUID updateMe(@AuthenticationPrincipal Jwt accessToken,
                            @RequestBody @Validated(Update.class) UserForm request) {
-        var user = userFacade.updateOne(UUID.fromString(accessToken.getSubject()), userMapper.toUserWriteDTO(request));
+        var userId = UUID.fromString(accessToken.getSubject());
+        var user = userFacade.updateOne(userMapper.toWriteCommand(userId, request));
         return user.getId();
-    }
-
-    @DeleteMapping("me")
-    public void deleteMe(@AuthenticationPrincipal Jwt accessToken) {
-        userFacade.deleteOne(UUID.fromString(accessToken.getSubject()));
     }
 
     @PatchMapping("me/email")

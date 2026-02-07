@@ -2,6 +2,7 @@ package com.ak.store.review.controller;
 
 import com.ak.store.review.facade.CommentFacade;
 import com.ak.store.review.mapper.CommentMapper;
+import com.ak.store.review.model.command.WriteCommentCommand;
 import com.ak.store.review.model.form.CommentForm;
 import com.ak.store.review.model.view.CommentView;
 import lombok.RequiredArgsConstructor;
@@ -20,32 +21,34 @@ public class CommentController {
     private final CommentFacade commentFacade;
     private final CommentMapper commentMapper;
 
-    //todo добавить сортировку по time
     @GetMapping
-    public List<CommentView> findAllByReviewId(@RequestParam ObjectId reviewId,
-                                               @RequestParam int page, @RequestParam int size) {
-        return commentMapper.toCommentView(commentFacade.findAllByReviewId(reviewId, page, size));
+    public List<CommentView> findAllByReviewId(@RequestParam ObjectId reviewId) {
+        return commentFacade.findAllByReviewId(reviewId).stream()
+                .map(commentMapper::toView)
+                .toList();
     }
 
     @PostMapping
-    public String createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody CommentForm request) {
+    public String createOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody CommentForm form) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        var comment = commentFacade.createOne(userId, commentMapper.toCommentWriteDTO(request));
-
-        return comment.getId().toString();
+        var command = commentMapper.toWriteCommand(null, userId, form);
+        return commentFacade.createOne(command).toString();
     }
 
-    @PatchMapping("{commentId}")
-    public String updateOne(@AuthenticationPrincipal Jwt accessToken,
-                            @PathVariable ObjectId commentId, @RequestBody CommentForm request) {
+    @PatchMapping("update")
+    public String updateOne(@AuthenticationPrincipal Jwt accessToken, @RequestBody CommentForm form) {
         UUID userId = UUID.fromString(accessToken.getSubject());
-        var comment = commentFacade.updateOne(userId, commentId, commentMapper.toCommentWriteDTO(request));
-        return comment.getId().toString();
+        var command = commentMapper.toWriteCommand(form.getCommentId(), userId, form);
+        return commentFacade.updateOne(command).toString();
     }
 
     @DeleteMapping("{commentId}")
-    public void deleteOne(@AuthenticationPrincipal Jwt accessToken, @PathVariable ObjectId commentId) {
-        UUID userId = UUID.fromString(accessToken.getSubject());
-        commentFacade.deleteOne(userId, commentId);
+    public String deleteOne(@AuthenticationPrincipal Jwt accessToken, @PathVariable ObjectId commentId) {
+        var command = WriteCommentCommand.builder()
+                .commentId(commentId)
+                .userId(UUID.fromString(accessToken.getSubject()))
+                .build();
+
+        return commentFacade.deleteOne(command);
     }
 }

@@ -17,7 +17,6 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<modules>
-		<module>store-common</module>
         <module>store-catalogue</module>
         <module>store-user</module>
         <module>store-order</module>
@@ -31,7 +30,6 @@
         <module>store-order-outbox</module>
         <module>store-review-outbox</module>
         <module>store-catalogue-saga-worker</module>
-        <module>store-cart</module>
         <module>store-payment</module>
         <module>store-saga-orchestrator</module>
         <module>store-payment-saga-worker</module>

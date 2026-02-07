@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import java.time.LocalDateTime;
 
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class CatalogueSagaWorkerProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(CatalogueSagaWorkerProjectApplication.class, args);

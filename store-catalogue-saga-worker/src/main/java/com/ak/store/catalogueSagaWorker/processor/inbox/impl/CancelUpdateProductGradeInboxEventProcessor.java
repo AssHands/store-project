@@ -6,8 +6,8 @@ import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.catalogueSagaWorker.processor.inbox.InboxEventProcessor;
 import com.ak.store.catalogueSagaWorker.service.InboxEventReaderService;
 import com.ak.store.catalogueSagaWorker.service.RatingUpdaterService;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewUpdateSnapshot;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewUpdatedSnapshot;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,10 +22,13 @@ public class CancelUpdateProductGradeInboxEventProcessor implements InboxEventPr
     @Transactional
     @Override
     public void process(InboxEvent event) {
-        var request = jsonMapperKafka.fromJson(event.getPayload(), ReviewUpdateSnapshot.class);
+        var request = jsonMapperKafka.fromJson(event.getPayload(), ReviewUpdatedSnapshot.class);
+
+        var oldGrade = request.getOldReview().getGrade();
+        var newGrade = request.getNewReview().getGrade();
 
         try {
-            ratingUpdaterService.updateOne(request.getProductId(), request.getOldGrade(), request.getNewGrade());
+            ratingUpdaterService.updateOne(request.getNewReview().getProductId(), oldGrade, newGrade);
             inboxEventReaderService.markOneAs(event, InboxEventStatus.SUCCESS);
         } catch (Exception e) {
             inboxEventReaderService.markOneAsFailure(event);

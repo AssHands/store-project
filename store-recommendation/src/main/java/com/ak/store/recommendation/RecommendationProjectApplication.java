@@ -7,8 +7,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan(basePackages = {"com.ak.store.*"})
-@SpringBootApplication(exclude = RedisAutoConfiguration.class)
+@SpringBootApplication(exclude = RedisAutoConfiguration.class, scanBasePackages = "com.ak.store.*")
 public class RecommendationProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(RecommendationProjectApplication.class, args);

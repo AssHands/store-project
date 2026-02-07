@@ -2,9 +2,9 @@ package com.ak.store.catalogue.controller;
 
 import com.ak.store.catalogue.facade.CharacteristicFacade;
 import com.ak.store.catalogue.mapper.CharacteristicMapper;
-import com.ak.store.catalogue.model.form.CharacteristicForm;
-import com.ak.store.catalogue.model.form.NumericValueForm;
-import com.ak.store.catalogue.model.form.TextValueForm;
+import com.ak.store.catalogue.model.form.WriteCharacteristicForm;
+import com.ak.store.catalogue.model.form.WriteNumericValueForm;
+import com.ak.store.catalogue.model.form.WriteTextValueForm;
 import com.ak.store.catalogue.model.validationGroup.Update;
 import com.ak.store.catalogue.model.view.CharacteristicView;
 import com.ak.store.catalogue.model.validationGroup.Create;
@@ -24,20 +24,19 @@ public class CharacteristicController {
 
     @GetMapping
     public List<CharacteristicView> findAllByCategoryId(@RequestParam Long categoryId) {
-        return characteristicMapper.toCharacteristicView(
-                characteristicFacade.findAllByCategoryId(categoryId)
-        );
+        return characteristicFacade.findAllByCategoryId(categoryId).stream()
+                .map(characteristicMapper::toView)
+                .toList();
     }
 
     @PostMapping
-    public Long createOne(@RequestBody @Validated(Create.class) CharacteristicForm request) {
-        return characteristicFacade.createOne(characteristicMapper.toCharacteristicWriteDTO(request));
+    public Long createOne(@RequestBody @Validated(Create.class) WriteCharacteristicForm form) {
+        return characteristicFacade.createOne(characteristicMapper.toWriteCommand(form));
     }
 
-    @PatchMapping("{id}")
-    public Long updateOne(@PathVariable Long id,
-                          @RequestBody @Validated(Update.class) CharacteristicForm request) {
-        return characteristicFacade.updateOne(id, characteristicMapper.toCharacteristicWriteDTO(request));
+    @PatchMapping("update")
+    public Long updateOne(@RequestBody @Validated(Update.class) WriteCharacteristicForm form) {
+        return characteristicFacade.updateOne(characteristicMapper.toWriteCommand(form));
     }
 
     @DeleteMapping("{id}")
@@ -45,23 +44,23 @@ public class CharacteristicController {
         characteristicFacade.deleteOne(id);
     }
 
-    @PostMapping("{id}/numeric")
-    public Long addOneNumericValue(@PathVariable Long id, @RequestBody @Valid NumericValueForm request) {
-        return characteristicFacade.addOneNumericValue(id, characteristicMapper.toNumericValueWriteDTO(request));
+    @PostMapping("update/numeric/add")
+    public Long addOneNumericValue(@RequestBody @Valid WriteNumericValueForm form) {
+        return characteristicFacade.addOneNumericValue(characteristicMapper.toWriteNumericValueCommand(form));
     }
 
-    @DeleteMapping("{id}/numeric")
-    public Long removeOneNumericValue(@PathVariable Long id, @RequestBody @Valid NumericValueForm request) {
-        return characteristicFacade.removeOneNumericValue(id, characteristicMapper.toNumericValueWriteDTO(request));
+    @DeleteMapping("update/numeric/remove")
+    public Long removeOneNumericValue(@RequestBody @Valid WriteNumericValueForm form) {
+        return characteristicFacade.removeOneNumericValue(characteristicMapper.toWriteNumericValueCommand(form));
     }
 
-    @PostMapping("{id}/text")
-    public Long addOneTextValue(@PathVariable Long id, @RequestBody @Valid TextValueForm request) {
-        return characteristicFacade.addOneTextValue(id, characteristicMapper.toTextValueWriteDTO(request));
+    @PostMapping("update/text/add")
+    public Long addOneTextValue(@RequestBody @Valid WriteTextValueForm form) {
+        return characteristicFacade.addOneTextValue(characteristicMapper.toWriteTextValueCommand(form));
     }
 
-    @DeleteMapping("{id}/text")
-    public Long removeOneTextValue(@PathVariable Long id, @RequestBody @Valid TextValueForm request) {
-        return characteristicFacade.removeOneTextValue(id, characteristicMapper.toTextValueWriteDTO(request));
+    @PostMapping("update/text/remove")
+    public Long removeOneTextValue(@RequestBody @Valid WriteTextValueForm form) {
+        return characteristicFacade.removeOneTextValue(characteristicMapper.toWriteTextValueCommand(form));
     }
 }

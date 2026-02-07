@@ -1,7 +1,8 @@
 package com.ak.store.recommendation.controller;
 
-import com.ak.store.recommendation.facade.RecommendationFacade;
-import com.ak.store.recommendation.model.view.RecommendationResponse;
+import com.ak.store.recommendation.mapper.RecommendationMapper;
+import com.ak.store.recommendation.model.view.RecommendationView;
+import com.ak.store.recommendation.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -15,11 +16,15 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/recommendation")
 public class RecommendationController {
-    private final RecommendationFacade recommendationFacade;
+    private final RecommendationService recommendationService;
+    private final RecommendationMapper recommendationMapper;
 
     @GetMapping
-    public RecommendationResponse getRecommendation(@AuthenticationPrincipal Jwt accessToken) {
-        var userId = UUID.fromString(accessToken.getSubject());
-        return recommendationFacade.getRecommendation(userId);
+    public RecommendationView getRecommendation(@AuthenticationPrincipal Jwt accessToken) {
+        return recommendationMapper.toView(
+                accessToken == null ?
+                        recommendationService.getRecommendation() :
+                        recommendationService.getRecommendation(UUID.fromString(accessToken.getSubject()))
+        );
     }
 }

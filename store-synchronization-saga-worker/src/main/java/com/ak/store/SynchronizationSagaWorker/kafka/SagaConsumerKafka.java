@@ -2,7 +2,7 @@ package com.ak.store.SynchronizationSagaWorker.kafka;
 
 import com.ak.store.SynchronizationSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.SynchronizationSagaWorker.service.InboxEventWriterService;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;

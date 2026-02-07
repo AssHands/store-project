@@ -1,7 +1,7 @@
 package com.ak.store.order.repository;
 
 import com.ak.store.order.feign.PaymentFeign;
-import com.ak.store.order.model.view.feign.UserBalanceView;
+import com.ak.store.order.model.feign.UserBalanceView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

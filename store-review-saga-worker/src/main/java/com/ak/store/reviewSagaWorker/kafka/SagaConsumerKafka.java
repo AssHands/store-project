@@ -1,6 +1,6 @@
 package com.ak.store.reviewSagaWorker.kafka;
 
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
 import com.ak.store.reviewSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.reviewSagaWorker.service.InboxEventWriterService;
@@ -26,10 +26,10 @@ public class SagaConsumerKafka {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
-                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CONFIRM_REVIEW_CREATION);
+                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CONFIRM_REVIEW_CREATED);
             } catch (Exception e) {
                 inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
-                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_REVIEW_CREATION);
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_REVIEW_CREATED);
             }
         }
 
@@ -45,10 +45,10 @@ public class SagaConsumerKafka {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
-                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CANCEL_REVIEW_CREATION);
+                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CANCEL_REVIEW_CREATED);
             } catch (Exception e) {
                 inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
-                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_REVIEW_CREATION);
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_REVIEW_CREATED);
             }
         }
 
@@ -64,10 +64,10 @@ public class SagaConsumerKafka {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
-                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CONFIRM_REVIEW_UPDATE);
+                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CONFIRM_REVIEW_UPDATED);
             } catch (Exception e) {
                 inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
-                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_REVIEW_UPDATE);
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_REVIEW_UPDATED);
             }
         }
 
@@ -83,10 +83,10 @@ public class SagaConsumerKafka {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
-                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CANCEL_REVIEW_UPDATE);
+                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CANCEL_REVIEW_UPDATED);
             } catch (Exception e) {
                 inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
-                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_REVIEW_UPDATE);
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_REVIEW_UPDATED);
             }
         }
 
@@ -102,10 +102,10 @@ public class SagaConsumerKafka {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
-                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CONFIRM_REVIEW_DELETION);
+                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CONFIRM_REVIEW_DELETED);
             } catch (Exception e) {
                 inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
-                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_REVIEW_DELETION);
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_REVIEW_DELETED);
             }
         }
 
@@ -121,10 +121,10 @@ public class SagaConsumerKafka {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
-                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CANCEL_REVIEW_DELETION);
+                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CANCEL_REVIEW_DELETED);
             } catch (Exception e) {
                 inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
-                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_REVIEW_DELETION);
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_REVIEW_DELETED);
             }
         }
 

@@ -6,8 +6,8 @@ import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.catalogueSagaWorker.processor.inbox.InboxEventProcessor;
 import com.ak.store.catalogueSagaWorker.service.InboxEventReaderService;
 import com.ak.store.catalogueSagaWorker.service.RatingUpdaterService;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewDeletionSnapshot;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewSnapshot;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class DeleteProductGradeInboxEventProcessor implements InboxEventProcesso
     @Transactional
     @Override
     public void process(InboxEvent event) {
-        var request = jsonMapperKafka.fromJson(event.getPayload(), ReviewDeletionSnapshot.class);
+        var request = jsonMapperKafka.fromJson(event.getPayload(), ReviewSnapshot.class);
 
         try {
             ratingUpdaterService.deleteOne(request.getProductId(), request.getGrade());

@@ -22,11 +22,7 @@ public interface CategoryRepo extends JpaRepository<Category, Long> {
 
     @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
     @EntityGraph(attributePaths = {"characteristics"})
-    Optional<Category> findOneWithCharacteristicsById(Long id);
-
-    @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
-    @EntityGraph(attributePaths = {"relatedCategories"})
-    Optional<Category> findOneWithRelatedCategoriesById(Long id);
+    Optional<Category> findOneFullById(Long id);
 
     Boolean existsByNameEqualsIgnoreCase(String name);
 

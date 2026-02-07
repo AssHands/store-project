@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.validator;
 
 import com.ak.store.catalogue.model.dto.ImageDTO;
-import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
+import com.ak.store.catalogue.model.command.WriteImageCommand;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class ImageValidator {
-    public void validate(ImageWriteDTO request, List<ImageDTO> images) {
+    public void validate(WriteImageCommand request, List<ImageDTO> images) {
         int expectedSize = images.size();
         if(request.getAddImages() != null)
             expectedSize += request.getAddImages().size();

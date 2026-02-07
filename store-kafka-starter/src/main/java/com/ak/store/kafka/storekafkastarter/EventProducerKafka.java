@@ -1,5 +1,6 @@
 package com.ak.store.kafka.storekafkastarter;
 
+import com.ak.store.kafka.storekafkastarter.model.KafkaEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -16,7 +17,7 @@ public class EventProducerKafka {
         return kafkaTemplate.send(topic, key, event);
     }
 
-    public <T extends KafkaEvent> CompletableFuture<SendResult<String, KafkaEvent>> sendAsync(T event, String topic) {
+    public CompletableFuture<SendResult<String, KafkaEvent>> sendAsync(KafkaEvent event, String topic) {
         return kafkaTemplate.send(topic, event);
     }
 }

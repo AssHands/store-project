@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class ReviewOutboxProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(ReviewOutboxProjectApplication.class, args);

@@ -14,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+//todo что за классы тут? надо перенести в kafka starter?
 public class CancelUserPaymentCreationSagaRequestEvent {
     private UUID userId;
 }

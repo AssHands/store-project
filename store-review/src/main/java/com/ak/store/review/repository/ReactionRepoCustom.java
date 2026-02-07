@@ -7,9 +7,9 @@ import org.bson.types.ObjectId;
 import java.util.UUID;
 
 public interface ReactionRepoCustom {
-    ReactionSaveStatus likeOneReview(UUID userId, ObjectId reviewId);
+    ReactionSaveStatus likeOne(UUID userId, ObjectId reviewId);
 
-    ReactionSaveStatus dislikeOneReview(UUID userId, ObjectId reviewId);
+    ReactionSaveStatus dislikeOne(UUID userId, ObjectId reviewId);
 
     ReactionRemoveStatus findOneAndRemove(UUID userId, ObjectId reviewId);
 }

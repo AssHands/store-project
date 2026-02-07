@@ -1,33 +1,32 @@
 package com.ak.store.review.mapper;
 
-import com.ak.store.common.snapshot.review.ReviewSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewSnapshot;
+import com.ak.store.review.model.command.WriteReviewCommand;
 import com.ak.store.review.model.document.Review;
 import com.ak.store.review.model.dto.ReviewDTO;
-import com.ak.store.review.model.dto.write.ReviewWriteDTO;
 import com.ak.store.review.model.form.ReviewForm;
 import com.ak.store.review.model.view.ReviewView;
 import org.bson.types.ObjectId;
 import org.mapstruct.*;
 
-import java.util.List;
+import java.util.UUID;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ReviewMapper {
-    Review toReview(ReviewDTO r);
+    Review toDocument(WriteReviewCommand command);
 
-    Review toReview(ReviewWriteDTO rw);
-
-    ReviewDTO toReviewDTO(Review r);
-    List<ReviewDTO> toReviewDTO(List<Review> r);
+    ReviewDTO toDTO(Review document);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
-    ReviewSnapshot toReviewSnapshot(ReviewDTO r);
+    ReviewSnapshot toSnapshot(Review document);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
-    ReviewView toReviewView(ReviewDTO r);
-    List<ReviewView> toReviewView(List<ReviewDTO> r);
+    ReviewSnapshot toSnapshot(ReviewDTO dto);
 
-    ReviewWriteDTO toReviewWriteDTO(ReviewForm rf);
+    @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
+    ReviewView toView(ReviewDTO dto);
+
+    WriteReviewCommand toWriteCommand(UUID userId, ReviewForm form);
 
     @Named("objectIdToString")
     static String objectIdToString(ObjectId id) {
@@ -38,4 +37,7 @@ public interface ReviewMapper {
     static ObjectId stringToObjectId(String id) {
         return id != null ? new ObjectId(id) : null;
     }
+
+
+    void updateDocument(WriteReviewCommand command, @MappingTarget Review document);
 }

@@ -1,6 +1,6 @@
 package com.ak.store.order.feign;
 
-import com.ak.store.order.model.view.feign.ProductView;
+import com.ak.store.order.model.feign.ProductView;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

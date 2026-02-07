@@ -1,86 +1,78 @@
 package com.ak.store.catalogue.service;
 
 import com.ak.store.catalogue.mapper.ProductCharacteristicMapper;
+import com.ak.store.catalogue.model.command.WriteProductCharacteristicCommand;
+import com.ak.store.catalogue.model.command.WriteProductCharacteristicPayloadCommand;
 import com.ak.store.catalogue.model.dto.ProductCharacteristicDTO;
-import com.ak.store.catalogue.model.dto.write.ProductCharacteristicWriteDTO;
+import com.ak.store.catalogue.model.entity.Characteristic;
+import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.catalogue.repository.ProductCharacteristicRepo;
-import com.ak.store.catalogue.validator.service.ProductCharacteristicServiceValidator;
+import com.ak.store.catalogue.validator.ProductCharacteristicValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class ProductCharacteristicService {
-    private final ProductCharacteristicMapper productCharacteristicMapper;
-    private final ProductCharacteristicServiceValidator productCharacteristicServiceValidator;
-    private final ProductCharacteristicRepo productCharacteristicRepo;
+    private final ProductCharacteristicMapper pcMapper;
+    private final ProductCharacteristicValidator pcValidator;
+    private final ProductCharacteristicRepo pcRepo;
 
     private List<ProductCharacteristic> findAllByProductId(Long productId) {
-        return productCharacteristicRepo.findAllByProductId(productId);
+        return pcRepo.findAllByProductId(productId);
     }
 
     public List<ProductCharacteristicDTO> findAll(Long productId) {
-        return productCharacteristicMapper.toProductCharacteristicDTO(findAllByProductId(productId));
+        return findAllByProductId(productId).stream()
+                .map(pcMapper::toDTO)
+                .toList();
     }
 
     @Transactional
-    public List<ProductCharacteristicDTO> createAll(Long productId,
-                                                    List<ProductCharacteristicWriteDTO> productCharacteristics) {
-        if (productCharacteristics.isEmpty()) return findAll(productId);
-        productCharacteristicServiceValidator.validateCreating(productId, productCharacteristics);
+    public List<ProductCharacteristicDTO> updateAll(WriteProductCharacteristicPayloadCommand payloadCommand) {
+        pcValidator.validateUpdate(payloadCommand);
 
-        List<ProductCharacteristic> existingProductCharacteristics =
-                productCharacteristicMapper.toProductCharacteristic(productCharacteristics, productId);
+        addAll(payloadCommand);
+        deleteAll(payloadCommand);
 
-        productCharacteristicRepo.saveAllAndFlush(existingProductCharacteristics);
-        return findAll(productId);
+        return findAll(payloadCommand.getProductId());
     }
 
-    @Transactional
-    public List<ProductCharacteristicDTO> updateAll(Long productId,
-                                                    List<ProductCharacteristicWriteDTO> productCharacteristics) {
-        if (productCharacteristics.isEmpty()) return findAll(productId);
-        productCharacteristicServiceValidator.validateUpdating(productId, productCharacteristics);
+    private void addAll(WriteProductCharacteristicPayloadCommand payloadCommand) {
+        if (payloadCommand.getAddCharacteristics().isEmpty()) return;
 
-        List<ProductCharacteristic> existingProductCharacteristics = findAllByProductId(productId);
-        for(var pc : productCharacteristics) {
-            int index = findCharacteristicIndexById(existingProductCharacteristics, pc.getCharacteristicId());
-            existingProductCharacteristics.get(index).setNumericValue(pc.getNumericValue());
-            existingProductCharacteristics.get(index).setTextValue(pc.getTextValue());
+        var addingPc = new ArrayList<ProductCharacteristic>();
+        for (var command : payloadCommand.getAddCharacteristics()) {
+            addingPc.add(
+                    ProductCharacteristic.builder()
+                            .characteristic(Characteristic.builder()
+                                    .id(command.getCharacteristicId())
+                                    .build())
+                            .product(Product.builder()
+                                    .id(payloadCommand.getProductId())
+                                    .build())
+                            .numericValue(command.getNumericValue())
+                            .textValue(command.getTextValue())
+                            .build()
+            );
         }
 
-        productCharacteristicRepo.saveAllAndFlush(existingProductCharacteristics);
-        return findAll(productId);
+        pcRepo.saveAllAndFlush(addingPc);
     }
 
-    @Transactional
-    public List<ProductCharacteristicDTO> deleteAllByCharacteristicIds(Long productId, List<Long> characteristicIds) {
-        if (characteristicIds.isEmpty()) return findAll(productId);
+    private void deleteAll(WriteProductCharacteristicPayloadCommand payloadCommand) {
+        if (payloadCommand.getRemoveCharacteristics().isEmpty()) return;
 
-        productCharacteristicRepo.deleteAllByProductIdAndCharacteristicIdIn(productId, characteristicIds);
-        return findAll(productId);
-    }
-
-    @Transactional
-    public List<ProductCharacteristicDTO> deleteAll(Long productId) {
-        var productCharacteristics = findAll(productId);
-        productCharacteristicRepo.deleteAllByProductId(productId);
-        return productCharacteristics;
-    }
-
-    private int findCharacteristicIndexById(List<ProductCharacteristic> productCharacteristics, Long id) {
-        int index = 0;
-        for (var pc : productCharacteristics) {
-            if (pc.getCharacteristic().getId().equals(id))
-                return index;
-            index++;
-        }
-
-        //todo перенести в слой валидации
-        throw new RuntimeException("characteristic with id=%s didn't find in your product".formatted(id));
+        pcRepo.deleteAllByProductIdAndCharacteristicIdIn(
+                payloadCommand.getProductId(),
+                payloadCommand.getRemoveCharacteristics().stream()
+                        .map(WriteProductCharacteristicCommand::getCharacteristicId)
+                        .toList()
+        );
     }
 }

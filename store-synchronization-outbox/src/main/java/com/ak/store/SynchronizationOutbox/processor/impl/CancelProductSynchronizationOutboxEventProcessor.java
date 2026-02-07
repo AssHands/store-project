@@ -7,7 +7,7 @@ import com.ak.store.SynchronizationOutbox.processor.OutboxEventProcessor;
 import com.ak.store.SynchronizationOutbox.service.OutboxEventService;
 import com.ak.store.SynchronizationOutbox.util.KafkaTopicRegistry;
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaResponseEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

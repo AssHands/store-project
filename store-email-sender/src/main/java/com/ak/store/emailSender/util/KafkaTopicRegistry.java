@@ -1,6 +1,8 @@
 package com.ak.store.emailSender.util;
 
 import com.ak.store.emailSender.inbox.InboxEventType;
+import com.ak.store.kafka.storekafkastarter.model.KafkaEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.user.UserVerificationEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -12,12 +14,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KafkaTopicRegistry {
     private final KafkaProperties kafkaProperties;
-    private final Map<InboxEventType, String> eventTopicMap = new HashMap<>();
+    private final Map<Class<? extends KafkaEvent>, String> eventTopicMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        Map<InboxEventType, String> eventKeyMap = Map.of(
-                InboxEventType.USER_VERIFICATION, "user-verification"
+        Map<Class<? extends KafkaEvent>, String> eventKeyMap = Map.of(
+                UserVerificationEvent.class ,"user-verification"
         );
 
         for (var entry : eventKeyMap.entrySet()) {
@@ -29,20 +31,11 @@ public class KafkaTopicRegistry {
         }
     }
 
-    public String getTopicByEvent(InboxEventType eventType) {
-        String topic = eventTopicMap.get(eventType);
-        if (topic == null) {
-            throw new IllegalArgumentException("No topic configured for event: " + eventType.getValue());
-        }
-        return topic;
-    }
-
-    public String getDltTopicByEvent(InboxEventType eventClass) {
+    public String getTopicByEvent(Class<? extends KafkaEvent> eventClass) {
         String topic = eventTopicMap.get(eventClass);
         if (topic == null) {
-            throw new IllegalArgumentException("No topic configured for event: " + eventClass.getValue());
+            throw new IllegalArgumentException("No topic configured for event: " + eventClass.getName());
         }
-
-        return topic + kafkaProperties.getDltPrefix();
+        return topic;
     }
 }

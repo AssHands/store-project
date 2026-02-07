@@ -9,5 +9,5 @@ public enum SagaStatus {
     IN_PROGRESS("IN_PROGRESS"),
     COMPLETED("COMPLETED");
 
-    private String value;
+    private final String value;
 }

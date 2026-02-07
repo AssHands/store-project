@@ -39,4 +39,4 @@ spring:
 kafka:
   dlt-prefix: .dlt
   topics:
-    search-all-events: search-all-events
+    search-events: search-events

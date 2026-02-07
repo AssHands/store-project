@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class UserForm {
     private String name;
 
+    //todo null for update, not null for create
     private String email;
 
     //todo null for update, not null for create

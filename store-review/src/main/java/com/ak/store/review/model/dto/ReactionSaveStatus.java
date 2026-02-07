@@ -6,5 +6,5 @@ import lombok.AllArgsConstructor;
 public enum ReactionSaveStatus {
     CREATED,
     UPDATED,
-    UNCHANGED
+    UNCHANGED //ничего не произошло. лайк уже стоял и при вызове метода likeOne ничего не измеилось
 }

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ak.store.*")
 public class SynchronizationOutboxProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(SynchronizationOutboxProjectApplication.class, args);

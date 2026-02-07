@@ -1,78 +1,45 @@
 package com.ak.store.review.facade;
 
-import com.ak.store.common.snapshot.review.ReviewCreationSnapshot;
-import com.ak.store.common.snapshot.review.ReviewDeletionSnapshot;
-import com.ak.store.common.snapshot.review.ReviewUpdateSnapshotPayload;
-import com.ak.store.review.mapper.ReviewMapper;
+import com.ak.store.review.model.command.WriteReviewCommand;
 import com.ak.store.review.model.document.ReviewStatus;
 import com.ak.store.review.model.dto.ReviewDTO;
-import com.ak.store.review.model.dto.write.ReviewWriteDTO;
-import com.ak.store.review.outbox.OutboxEventService;
-import com.ak.store.review.outbox.OutboxEventType;
-import com.ak.store.review.service.CommentService;
+import com.ak.store.review.service.ReviewOutboxService;
 import com.ak.store.review.service.ReviewService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class ReviewFacade {
     private final ReviewService reviewService;
-    private final OutboxEventService outboxEventService;
-    private final ReviewMapper reviewMapper;
+    private final ReviewOutboxService reviewOutboxService;
 
-    //todo add sorting
-    //todo ДОБАВИТЬ, ЧТОБЫ ИСКАЛО ТОЛЬКО ОТЗЫВЫ С COMPLETED СТАТУСОМ
-    public List<ReviewDTO> findAllByProductId(Long productId, int page, int size) {
-        return reviewService.findAllByProductId(productId, page, size);
+    public List<ReviewDTO> findAllByProductId(Long productId) {
+        return reviewService.findAllByProductId(productId);
     }
 
     @Transactional
-    public ReviewDTO createOne(UUID userId, ReviewWriteDTO request) {
-        var review = reviewService.createOne(userId, request);
-
-        var snapshot = ReviewCreationSnapshot.builder()
-                .reviewId(review.getId().toString())
-                .productId(review.getProductId())
-                .grade(review.getGrade())
-                .build();
-
-        outboxEventService.createOne(snapshot, OutboxEventType.REVIEW_CREATION);
-        return review;
+    public ObjectId createOne(WriteReviewCommand command) {
+        var review = reviewService.createOne(command);
+        reviewOutboxService.saveCreatedEvent(review.getId());
+        return review.getId();
     }
 
     @Transactional
-    public ReviewDTO updateOne(UUID userId, ObjectId reviewId, ReviewWriteDTO request) {
-        //todo добавить метод findAndUpdate, чтобы уменьшить кол-во запросов
-        var oldReview = reviewService.findOne(reviewId);
-        var newReview = reviewService.updateOne(userId, reviewId, request);
-
-        var snapshot = ReviewUpdateSnapshotPayload.builder()
-                .review(reviewMapper.toReviewSnapshot(oldReview))
-                .newGrade(newReview.getGrade())
-                .build();
-
-        outboxEventService.createOne(snapshot, OutboxEventType.REVIEW_UPDATE);
-        return newReview;
+    public ObjectId updateOne(WriteReviewCommand command) {
+        var oldReview = reviewService.findOne(command.getReviewId());
+        var review = reviewService.updateOne(command);
+        reviewOutboxService.saveUpdatedEvent(review.getId(), oldReview);
+        return review.getId();
     }
 
     @Transactional
-    public void deleteOne(UUID userId, ObjectId reviewId) {
-        //todo добавить метод findAndUpdate, чтобы уменьшить кол-во запросов
-        var review = reviewService.findOne(reviewId);
-        reviewService.updateOneStatus(userId, reviewId, ReviewStatus.IN_PROGRESS);
-
-        var snapshot = ReviewDeletionSnapshot.builder()
-                .reviewId(review.getId().toString())
-                .productId(review.getProductId())
-                .grade(review.getGrade())
-                .build();
-
-        outboxEventService.createOne(snapshot, OutboxEventType.REVIEW_DELETION);
+    public void deleteOne(WriteReviewCommand command) {
+        reviewService.updateOneStatus(command, ReviewStatus.IN_PROGRESS);
+        reviewOutboxService.saveDeletedEvent(command.getReviewId());
     }
 }

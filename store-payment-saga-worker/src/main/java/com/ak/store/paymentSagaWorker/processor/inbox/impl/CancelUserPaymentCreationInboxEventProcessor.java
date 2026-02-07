@@ -1,6 +1,6 @@
 package com.ak.store.paymentSagaWorker.processor.inbox.impl;
 
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.paymentSagaWorker.model.dto.CancelUserPaymentCreationSagaRequestEvent;
 import com.ak.store.paymentSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.paymentSagaWorker.model.inbox.InboxEventStatus;
@@ -8,7 +8,6 @@ import com.ak.store.paymentSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.paymentSagaWorker.processor.inbox.InboxEventProcessor;
 import com.ak.store.paymentSagaWorker.service.InboxEventReaderService;
 import com.ak.store.paymentSagaWorker.service.UserBalanceService;
-import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ public class CancelUserPaymentCreationInboxEventProcessor implements InboxEventP
             userBalanceService.deleteOne(cancelUserPaymentCreationRequest.getUserId());
             inboxEventReaderService.markOneAs(event, InboxEventStatus.SUCCESS);
         } catch (Exception e) {
-            //todo сделать логику retry. сейчас в случае неудачи - событие сразу помечается как неудачное
             inboxEventReaderService.markOneAsFailure(event);
         }
     }

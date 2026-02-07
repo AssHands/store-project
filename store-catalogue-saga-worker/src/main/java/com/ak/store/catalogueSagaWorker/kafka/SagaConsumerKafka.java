@@ -2,7 +2,7 @@ package com.ak.store.catalogueSagaWorker.kafka;
 
 import com.ak.store.catalogueSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.catalogueSagaWorker.service.InboxEventWriterService;
-import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
+import com.ak.store.kafka.storekafkastarter.util.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -134,7 +134,7 @@ public class SagaConsumerKafka {
     //-------------------------------------------------------------
 
     @KafkaListener(
-            topics = "cancel-product-creation-request",
+            topics = "cancel-product-created-request",
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"
     )
@@ -142,10 +142,10 @@ public class SagaConsumerKafka {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
-                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CANCEL_PRODUCT_CREATION);
+                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CANCEL_PRODUCT_CREATED);
             } catch (Exception e) {
                 inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
-                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_PRODUCT_CREATION);
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CANCEL_PRODUCT_CREATED);
             }
         }
 
@@ -153,7 +153,7 @@ public class SagaConsumerKafka {
     }
 
     @KafkaListener(
-            topics = "confirm-product-creation-request",
+            topics = "confirm-product-created-request",
             groupId = "${spring.kafka.consumer.group-id}",
             batch = "true"
     )
@@ -161,10 +161,10 @@ public class SagaConsumerKafka {
         for (var event : events) {
             try {
                 inboxEventWriterService.createOne(event.getStepId(), event.getStepName(), event.getSagaId(),
-                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CONFIRM_PRODUCT_CREATION);
+                        event.getSagaName(), jsonMapperKafka.toJson(event.getRequest()), InboxEventType.CONFIRM_PRODUCT_CREATED);
             } catch (Exception e) {
                 inboxEventWriterService.createOneFailure(event.getStepId(), event.getStepName(),
-                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_PRODUCT_CREATION);
+                        event.getSagaId(), event.getSagaName(), InboxEventType.CONFIRM_PRODUCT_CREATED);
             }
         }
 

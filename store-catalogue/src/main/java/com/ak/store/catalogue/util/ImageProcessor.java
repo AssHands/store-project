@@ -1,7 +1,7 @@
 package com.ak.store.catalogue.util;
 
 import com.ak.store.catalogue.model.dto.ImageDTO;
-import com.ak.store.catalogue.model.dto.write.ImageWriteDTO;
+import com.ak.store.catalogue.model.command.WriteImageCommand;
 import com.ak.store.catalogue.model.pojo.ProcessedImages;
 import com.ak.store.catalogue.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +11,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.regex.Pattern;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ImageProcessor {
     private final ProductService productService;
 
-    public ProcessedImages process(ImageWriteDTO request, List<ImageDTO> images) {
+    public ProcessedImages process(WriteImageCommand request, List<ImageDTO> images) {
         ProcessedImages processedImages = new ProcessedImages();
 
         processedImages.setImageKeysForDelete(
@@ -57,7 +57,7 @@ public class ImageProcessor {
     }
 
     private LinkedHashMap<String, MultipartFile> prepareImagesForAdd(Long productId, List<MultipartFile> addImages) {
-        //LinkedHashMap for save order
+        //LinkedHashMap для сохранения порядка
         LinkedHashMap<String, MultipartFile> imagesForAdd = new LinkedHashMap<>();
         if (addImages != null && !addImages.isEmpty()) {
             imagesForAdd = generateImageKeys(productId, addImages);
@@ -65,7 +65,7 @@ public class ImageProcessor {
         return imagesForAdd;
     }
 
-    //LinkedHashMap for save order
+    //LinkedHashMap для сохранения порядка
     private LinkedHashMap<String, MultipartFile> generateImageKeys(Long productId, List<MultipartFile> images) {
         LinkedHashMap<String, MultipartFile> imageKeys = new LinkedHashMap<>();
         var product = productService.findOne(productId);
