@@ -1,7 +1,7 @@
 package com.ak.store.user.service;
 
 import com.ak.store.user.model.dto.UserDTO;
-import com.ak.store.user.model.dto.write.UserWriteDTO;
+import com.ak.store.user.model.command.WriteUserCommand;
 import com.ak.store.user.model.entity.User;
 import com.ak.store.user.model.entity.UserStatus;
 import com.ak.store.user.model.entity.VerificationCode;
@@ -36,13 +36,15 @@ public class UserService {
     }
 
     public UserDTO findOne(UUID id) {
-        return userMapper.toUserDTO(findOneById(id));
+        return userMapper.toDTO(findOneById(id));
     }
 
-    public UserDTO updateOne(UUID id, UserWriteDTO request) {
-        var user = findOneById(id);
-        updateOneFromDTO(user, request);
-        return userMapper.toUserDTO(userRepo.save(user));
+    public UserDTO updateOne(WriteUserCommand command) {
+        var user = findOneById(command.getUserId());
+
+        user.setName(command.getName());
+
+        return userMapper.toDTO(userRepo.save(user));
     }
 
     @Transactional
@@ -79,16 +81,10 @@ public class UserService {
         user.setStatus(UserStatus.ACTIVE);
         user.setVerificationCode(null);
 
-        return userMapper.toUserDTO(userRepo.save(user));
+        return userMapper.toDTO(userRepo.save(user));
     }
 
     public Boolean isExistOne(UUID id) {
         return userRepo.existsOneById(id);
-    }
-
-    private void updateOneFromDTO(User user, UserWriteDTO request) {
-        if (request.getName() != null) {
-            user.setName(request.getName());
-        }
     }
 }

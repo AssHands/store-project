@@ -42,7 +42,7 @@ public class CommentService {
 
         var comment = commentMapper.toDocument(command);
         comment.setTime(LocalDateTime.now());
-        reviewService.incrementCommentAmount(comment.getReviewId());
+        reviewService.updateCommentCounter(command.getReviewId(), +1);
 
         return commentMapper.toDTO(commentRepo.save(comment));
     }
@@ -59,7 +59,7 @@ public class CommentService {
     public void deleteOne(WriteCommentCommand command) {
         commentValidator.validateDelete(command);
 
-        reviewService.decrementCommentAmount(command.getReviewId());
+        reviewService.updateCommentCounter(command.getReviewId(), -1);
 
         commentRepo.deleteById(command.getCommentId());
     }

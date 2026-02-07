@@ -15,7 +15,7 @@ public class SearchConsumerKafka {
     private final SearchHistoryService searchHistoryService;
     private final SearchHistoryMapper searchHistoryMapper;
 
-    @KafkaListener(topics = "${kafka.topics.search-all-events}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
+    @KafkaListener(topics = "${kafka.topics.search-events}", groupId = "${spring.kafka.consumer.group-id}", batch = "true")
     public void handleSearchEvent(List<SearchEvent> searchEvents) {
         searchHistoryService.putAll(searchEvents.stream()
                 .map(searchHistoryMapper::toWriteCommand)

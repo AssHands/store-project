@@ -1,9 +1,9 @@
 package com.ak.store.warehouse.serivce;
 
 import com.ak.store.warehouse.mapper.InventoryMapper;
-import com.ak.store.warehouse.model.dto.AvailableInventoryDTO;
+import com.ak.store.warehouse.model.command.ReserveInventoryCommand;
+import com.ak.store.warehouse.model.command.AvailableInventoryCommand;
 import com.ak.store.warehouse.model.dto.InventoryDTO;
-import com.ak.store.warehouse.model.dto.ReserveInventoryDTO;
 import com.ak.store.warehouse.model.entity.Inventory;
 import com.ak.store.warehouse.repostitory.InventoryRepo;
 import jakarta.transaction.Transactional;
@@ -30,13 +30,15 @@ public class InventoryService {
     }
 
     public List<InventoryDTO> findAllByProductIds(List<Long> productIds) {
-        return inventoryMapper.toInventoryDTO(inventoryRepo.findAllByProductIdIn(productIds));
+        return inventoryRepo.findAllByProductIdIn(productIds).stream()
+                .map(inventoryMapper::toDTO)
+                .toList();
     }
 
     @Transactional
-    public void reserveAll(List<ReserveInventoryDTO> request) {
-        var reserveMap = request.stream().collect(Collectors.toMap(
-                ReserveInventoryDTO::getProductId, ReserveInventoryDTO::getAmount));
+    public void reserveAll(List<ReserveInventoryCommand> commands) {
+        var reserveMap = commands.stream().collect(Collectors.toMap(
+                ReserveInventoryCommand::getProductId, ReserveInventoryCommand::getAmount));
 
         List<Inventory> inventories = findAllWithWriteLockByProductIds(new ArrayList<>(reserveMap.keySet()));
 
@@ -64,7 +66,7 @@ public class InventoryService {
                 .amount(0)
                 .build());
 
-        return inventoryMapper.toInventoryDTO(inventory);
+        return inventoryMapper.toDTO(inventory);
     }
 
     @Transactional
@@ -75,7 +77,7 @@ public class InventoryService {
         newAmount += amount;
         inventory.setAmount(newAmount);
 
-        return inventoryMapper.toInventoryDTO(inventoryRepo.save(inventory));
+        return inventoryMapper.toDTO(inventoryRepo.save(inventory));
     }
 
     @Transactional
@@ -87,22 +89,22 @@ public class InventoryService {
 
         //todo мб перенести в валидатор?
         if (newAmount < 0) {
-            throw new RuntimeException("amount below zero");
+            throw new RuntimeException("amount can't be below zero");
         }
 
         inventory.setAmount(newAmount);
-        return inventoryMapper.toInventoryDTO(inventoryRepo.save(inventory));
+        return inventoryMapper.toDTO(inventoryRepo.save(inventory));
     }
 
-    public Boolean isAvailableAll(List<AvailableInventoryDTO> request) {
-        List<Long> ids = request.stream()
-                .map(AvailableInventoryDTO::getProductId)
+    public Boolean isAvailableAll(List<AvailableInventoryCommand> commands) {
+        List<Long> ids = commands.stream()
+                .map(AvailableInventoryCommand::getProductId)
                 .toList();
 
         var inventoryMap = inventoryRepo.findAllByProductIdIn(ids).stream()
                 .collect(Collectors.toMap(Inventory::getProductId, Inventory::getAmount));
 
-        for (var inventoryRequest : request) {
+        for (var inventoryRequest : commands) {
             Long productId = inventoryRequest.getProductId();
             Integer requestAmount = inventoryRequest.getAmount();
             Integer amount = inventoryMap.get(productId);

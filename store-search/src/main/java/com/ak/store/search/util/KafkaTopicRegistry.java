@@ -1,6 +1,7 @@
 package com.ak.store.search.util;
 
-import com.ak.store.common.kafka.search.SearchAllEvent;
+import com.ak.store.kafka.storekafkastarter.KafkaEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.search.SearchEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,7 @@ public class KafkaTopicRegistry {
     @PostConstruct
     public void init() {
         Map<Class<? extends KafkaEvent>, String> eventKeyMap = Map.of(
-                SearchAllEvent.class, "search-all-events"
+                SearchEvent.class, "search-events"
         );
 
         for (var entry : eventKeyMap.entrySet()) {

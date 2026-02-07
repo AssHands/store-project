@@ -2,10 +2,10 @@ package com.ak.store.search.controller;
 
 import com.ak.store.search.facade.SearchFacade;
 import com.ak.store.search.mapper.SearchMapper;
-import com.ak.store.search.model.form.request.FilterSearchRequestForm;
-import com.ak.store.search.model.form.request.ProductSearchRequestForm;
-import com.ak.store.search.model.view.response.FilterSearchResponseView;
-import com.ak.store.search.model.view.response.ProductSearchResponseView;
+import com.ak.store.search.model.form.SearchFilterForm;
+import com.ak.store.search.model.form.SearchProductForm;
+import com.ak.store.search.model.view.response.SearchFilterView;
+import com.ak.store.search.model.view.response.SearchProductView;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,17 +25,19 @@ public class SearchController {
     private final SearchMapper searchMapper;
 
     @PostMapping("products")
-    public ProductSearchResponseView searchAllProduct(@RequestBody @Valid ProductSearchRequestForm request) {
-        var response = searchFacade.searchAllProduct(searchMapper.toProductSearchRequestDTO(request));
-        return searchMapper.toProductSearchResponseView(response);
+    public SearchProductView searchAllProduct(@RequestBody @Valid SearchProductForm form) {
+        var response = searchFacade.searchAllProduct(searchMapper.toSearchProductCommand(form));
+        return searchMapper.toSearchProductView(response);
     }
 
     @PostMapping("filters")
     //todo заменить на view
-    public FilterSearchResponseView searchAllAvailableFilters(@AuthenticationPrincipal Jwt accessToken,
-                                                              @RequestBody @Valid FilterSearchRequestForm request) {
-        var userId = UUID.fromString(accessToken.getSubject());
-        var response = searchFacade.searchAllFilter(userId, searchMapper.FilterSearchRequestDTO(request));
-        return searchMapper.toFilterSearchResponseView(response);
+    public SearchFilterView searchAllFilter(@AuthenticationPrincipal Jwt accessToken,
+                                            @RequestBody @Valid SearchFilterForm form) {
+        UUID userId = accessToken == null ? null : UUID.fromString(accessToken.getSubject());
+        var command = searchMapper.toSearchFilterCommand(userId, form);
+
+        var response = searchFacade.searchAllFilter(command);
+        return searchMapper.toSearchFilterView(response);
     }
 }

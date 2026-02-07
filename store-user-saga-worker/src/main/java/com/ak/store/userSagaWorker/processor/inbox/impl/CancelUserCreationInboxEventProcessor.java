@@ -2,14 +2,12 @@ package com.ak.store.userSagaWorker.processor.inbox.impl;
 
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.snapshot.user.UserCreationSnapshot;
-import com.ak.store.userSagaWorker.model.dto.CancelUserCreationSagaRequestEvent;
 import com.ak.store.userSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.userSagaWorker.model.inbox.InboxEventStatus;
 import com.ak.store.userSagaWorker.model.inbox.InboxEventType;
 import com.ak.store.userSagaWorker.processor.inbox.InboxEventProcessor;
 import com.ak.store.userSagaWorker.service.InboxEventReaderService;
 import com.ak.store.userSagaWorker.service.UserService;
-import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

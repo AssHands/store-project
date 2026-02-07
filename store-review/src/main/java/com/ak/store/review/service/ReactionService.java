@@ -32,8 +32,8 @@ public class ReactionService {
         var saveStatus = reactionRepo.likeOne(userId, reviewId);
 
         switch (saveStatus) {
-            case CREATED -> reviewService.incrementLikeAmount(reviewId);
-            case UPDATED -> reviewService.incrementLikeAmountAndDecrementDislikeAmount(reviewId);
+            case CREATED -> reviewService.updateReactionCounter(reviewId, +1, 0);
+            case UPDATED ->  reviewService.updateReactionCounter(reviewId, +1, -1);
         }
     }
 
@@ -42,8 +42,8 @@ public class ReactionService {
         var saveStatus = reactionRepo.dislikeOne(userId, reviewId);
 
         switch (saveStatus) {
-            case CREATED -> reviewService.incrementDislikeAmount(reviewId);
-            case UPDATED -> reviewService.decrementLikeAmountAndIncrementDislikeAmount(reviewId);
+            case CREATED -> reviewService.updateReactionCounter(reviewId, 0, +1);
+            case UPDATED -> reviewService.updateReactionCounter(reviewId, -1, +1);
         }
     }
 
@@ -51,8 +51,8 @@ public class ReactionService {
         var removeStatus = reactionRepo.findOneAndRemove(userId, reviewId);
 
         switch (removeStatus) {
-            case LIKE_REMOVED -> reviewService.decrementLikeAmount(reviewId);
-            case DISLIKE_REMOVED -> reviewService.decrementDislikeAmount(reviewId);
+            case LIKE_REMOVED -> reviewService.updateReactionCounter(reviewId, -1, 0);
+            case DISLIKE_REMOVED -> reviewService.updateReactionCounter(reviewId, 0, -1);
         }
     }
 

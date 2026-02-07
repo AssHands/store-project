@@ -2,7 +2,7 @@ package com.ak.store.catalogue.mapper;
 
 import com.ak.store.catalogue.model.dto.ImageDTO;
 import com.ak.store.catalogue.model.entity.Image;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.ImageSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.product.ImageSnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

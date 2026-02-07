@@ -15,8 +15,6 @@ import java.util.UUID;
 public class SagaService {
     private final SagaRepo sagaRepo;
 
-    private Integer batchSize = 100;
-
     public <T> void createOne(UUID sagaId, String sagaName, String payload) {
         sagaRepo.saveOneIgnoreDuplicate(sagaId, sagaName, payload, SagaStatus.IN_PROGRESS.getValue(), LocalDateTime.now());
     }

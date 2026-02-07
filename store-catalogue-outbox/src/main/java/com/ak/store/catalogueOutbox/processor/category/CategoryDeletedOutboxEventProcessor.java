@@ -9,7 +9,7 @@ import com.ak.store.catalogueOutbox.service.OutboxEventService;
 import com.ak.store.catalogueOutbox.util.KafkaTopicRegistry;
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.event.catalogue.CategoryDeletedEvent;
+import com.ak.store.kafka.storekafkastarter.model.event.catalogue.category.CategoryDeletedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

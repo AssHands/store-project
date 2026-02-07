@@ -7,7 +7,7 @@ import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.form.WriteCategoryCharacteristicForm;
 import com.ak.store.catalogue.model.form.WriteCategoryForm;
 import com.ak.store.catalogue.model.view.CategoryTreeView;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CategorySnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.category.CategorySnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;

@@ -31,8 +31,6 @@ public class Product {
 
     private Long categoryId;
 
-    private Integer saleAmount;
-
     private Integer reviewAmount;
 
     private Float rating;

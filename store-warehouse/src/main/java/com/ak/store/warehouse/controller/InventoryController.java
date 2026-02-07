@@ -21,17 +21,27 @@ public class InventoryController {
 
     @PostMapping
     public List<InventoryView> findAll(@RequestBody List<Long> productIds) {
-        return inventoryMapper.toInventoryView(inventoryFacade.findAll(productIds));
+        return inventoryFacade.findAll(productIds).stream()
+                .map(inventoryMapper::toView)
+                .toList();
     }
 
     @PostMapping("available")
-    public Boolean isAvailableAll(@RequestBody @Valid List<AvailableInventoryForm> request) {
-        return inventoryFacade.isAvailableAll(inventoryMapper.toAvailableInventoryDTO(request));
+    public Boolean isAvailableAll(@RequestBody @Valid List<AvailableInventoryForm> forms) {
+        return inventoryFacade.isAvailableAll(
+                forms.stream()
+                        .map(inventoryMapper::toAvailableInventoryCommand)
+                        .toList()
+        );
     }
 
     @PostMapping("reserve")
-    public void reserveAll(@RequestBody @Valid List<ReserveInventoryForm> request) {
-        inventoryFacade.reserveAll(inventoryMapper.toReserveInventoryDTO(request));
+    public void reserveAll(@RequestBody @Valid List<ReserveInventoryForm> forms) {
+        inventoryFacade.reserveAll(
+                forms.stream()
+                        .map(inventoryMapper::toReserveInventoryCommand)
+                        .toList()
+        );
     }
 
     @PatchMapping("{productId}/amount/increase")

@@ -1,8 +1,8 @@
 package com.ak.store.warehouse.facade;
 
-import com.ak.store.warehouse.model.dto.AvailableInventoryDTO;
+import com.ak.store.warehouse.model.command.ReserveInventoryCommand;
+import com.ak.store.warehouse.model.command.AvailableInventoryCommand;
 import com.ak.store.warehouse.model.dto.InventoryDTO;
-import com.ak.store.warehouse.model.dto.ReserveInventoryDTO;
 import com.ak.store.warehouse.serivce.InventoryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class InventoryFacade {
     }
 
     @Transactional
-    public void reserveAll(List<ReserveInventoryDTO> request) {
-        inventoryService.reserveAll(request);
+    public void reserveAll(List<ReserveInventoryCommand> commands) {
+        inventoryService.reserveAll(commands);
     }
 
     @Transactional
@@ -39,7 +39,7 @@ public class InventoryFacade {
         return inventoryService.reduceAmount(productId, amount).getProductId();
     }
 
-    public Boolean isAvailableAll(List<AvailableInventoryDTO> request) {
-        return inventoryService.isAvailableAll(request);
+    public Boolean isAvailableAll(List<AvailableInventoryCommand> commands) {
+        return inventoryService.isAvailableAll(commands);
     }
 }

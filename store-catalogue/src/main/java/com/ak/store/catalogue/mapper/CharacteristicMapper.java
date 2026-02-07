@@ -10,8 +10,8 @@ import com.ak.store.catalogue.model.form.WriteCharacteristicForm;
 import com.ak.store.catalogue.model.form.WriteNumericValueForm;
 import com.ak.store.catalogue.model.form.WriteTextValueForm;
 import com.ak.store.catalogue.model.view.CharacteristicView;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CharacteristicSnapshot;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.NumericValueSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.characteristic.CharacteristicSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.characteristic.NumericValueSnapshot;
 import org.mapstruct.*;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)

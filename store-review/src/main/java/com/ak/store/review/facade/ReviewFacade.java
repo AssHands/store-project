@@ -5,10 +5,10 @@ import com.ak.store.review.model.document.ReviewStatus;
 import com.ak.store.review.model.dto.ReviewDTO;
 import com.ak.store.review.service.ReviewOutboxService;
 import com.ak.store.review.service.ReviewService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,8 +31,9 @@ public class ReviewFacade {
 
     @Transactional
     public ObjectId updateOne(WriteReviewCommand command) {
+        var oldReview = reviewService.findOne(command.getReviewId());
         var review = reviewService.updateOne(command);
-        reviewOutboxService.saveUpdatedEvent(review.getId());
+        reviewOutboxService.saveUpdatedEvent(review.getId(), oldReview);
         return review.getId();
     }
 

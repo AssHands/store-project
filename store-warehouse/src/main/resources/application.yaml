@@ -27,7 +27,3 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8070/realms/store-realm/protocol/openid-connect/certs
-
-kafka:
-  topics:
-    product-created: product-created

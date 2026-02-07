@@ -8,8 +8,8 @@ import com.ak.store.catalogueOutbox.service.OutboxEventService;
 import com.ak.store.catalogueOutbox.util.KafkaTopicRegistry;
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.event.catalogue.ProductUpdatedEvent;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.ProductSnapshotPayload;
+import com.ak.store.kafka.storekafkastarter.model.event.catalogue.product.ProductUpdatedEvent;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.product.ProductSnapshotPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

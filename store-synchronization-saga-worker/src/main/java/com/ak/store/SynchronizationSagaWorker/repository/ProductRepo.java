@@ -3,7 +3,7 @@ package com.ak.store.SynchronizationSagaWorker.repository;
 import com.ak.store.SynchronizationSagaWorker.model.document.Product;
 
 public interface ProductRepo {
-    void save(Product product);
+    void createOne(Product product);
 
-    void deleteById(Long id);
+    void deleteOneById(Long id);
 }

@@ -40,7 +40,6 @@ spring:
         linger.ms: 3000
 
 kafka:
-  dlt-prefix: .dlt
   topics:
     reserve-products: warehouse-reserve-products-response
     release-products: warehouse-release-products-response

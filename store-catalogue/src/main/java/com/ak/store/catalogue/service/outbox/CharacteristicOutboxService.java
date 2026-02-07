@@ -6,7 +6,7 @@ import com.ak.store.catalogue.model.entity.TextValue;
 import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.repository.CharacteristicRepo;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.CharacteristicPayloadSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.characteristic.CharacteristicPayloadSnapshot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

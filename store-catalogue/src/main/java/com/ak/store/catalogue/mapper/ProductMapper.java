@@ -5,7 +5,7 @@ import com.ak.store.catalogue.model.command.WriteProductCommand;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.model.form.WriteProductForm;
 import com.ak.store.catalogue.model.view.ProductView;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.ProductSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.product.ProductSnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

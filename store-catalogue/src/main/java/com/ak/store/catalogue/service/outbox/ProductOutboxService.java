@@ -7,7 +7,7 @@ import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
 import com.ak.store.catalogue.repository.ProductRepo;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.ProductSnapshotPayload;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.product.ProductSnapshotPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

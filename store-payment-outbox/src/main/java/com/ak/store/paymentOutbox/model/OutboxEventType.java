@@ -11,5 +11,5 @@ public enum OutboxEventType {
     USER_PAYMENT_CREATION("USER_PAYMENT_CREATION"),
     CANCEL_USER_PAYMENT_CREATION("CANCEL_USER_PAYMENT_CREATION");
 
-    private String value;
+    private final String value;
 }

@@ -60,7 +60,7 @@ saga:
   definitions:
     order-creation:
       name: order-creation
-      request-topic: order-creation-request
+      request-topic: order-created-request
       compensation-request-topic: cancel-order-request
       compensation-response-topic: cancel-order-response
       steps:
@@ -130,9 +130,9 @@ saga:
 
     product-creation:
       name: product-creation
-      request-topic: product-creation-request
-      compensation-request-topic: cancel-product-creation-request
-      compensation-response-topic: cancel-product-creation-response
+      request-topic: product-created-request
+      compensation-request-topic: cancel-product-created-request
+      compensation-response-topic: cancel-product-created-response
       steps:
         product-synchronization:
           name: product-synchronization
@@ -165,9 +165,9 @@ saga:
 
     review-creation:
       name: review-creation
-      request-topic: review-creation-request
-      compensation-request-topic: cancel-review-creation-request
-      compensation-response-topic: cancel-review-creation-response
+      request-topic: review-created-request
+      compensation-request-topic: cancel-review-created-request
+      compensation-response-topic: cancel-review-created-response
       steps:
         update-product-rating:
           name: update-product-rating
@@ -178,22 +178,25 @@ saga:
             compensation-request: remove-product-grade-request
             compensation-response: remove-product-grade-response
 
+
+#       todo добавить шаг для обновления review_amount в elastic search
+
         confirm-review-creation:
           name: confirm-review-creation
           timeout: 500
           topics:
-            request: confirm-review-creation-request
-            response: confirm-review-creation-response
-            compensation-request: cancel-review-creation-request
-            compensation-response: cancel-review-creation-response
+            request: confirm-review-created-request
+            response: confirm-review-created-response
+            compensation-request: cancel-review-created-request
+            compensation-response: cancel-review-created-response
 
     #------------------------------------------------------------
 
     review-update:
       name: review-update
-      request-topic: review-update-request
-      compensation-request-topic: cancel-review-update-request
-      compensation-response-topic: cancel-review-update-response
+      request-topic: review-updated-request
+      compensation-request-topic: cancel-review-updated-request
+      compensation-response-topic: cancel-review-updated-response
       steps:
         update-product-rating:
           name: update-product-rating
@@ -205,21 +208,21 @@ saga:
             compensation-response: cancel-update-product-grade-response
 
         confirm-review-update:
-          name: confirm-review-update
+          name: confirm-review-updated
           timeout: 500
           topics:
-            request: confirm-review-update-request
-            response: confirm-review-update-response
-            compensation-request: cancel-review-update-request
-            compensation-response: cancel-review-update-response
+            request: confirm-review-updated-request
+            response: confirm-review-updated-response
+            compensation-request: cancel-review-updated-request
+            compensation-response: cancel-review-updated-response
 
     #------------------------------------------------------------
 
     review-deletion:
       name: review-deletion
-      request-topic: review-deletion-request
-      compensation-request-topic: cancel-review-deletion-request
-      compensation-response-topic: cancel-review-deletion-response
+      request-topic: review-deleted-request
+      compensation-request-topic: cancel-review-deleted-request
+      compensation-response-topic: cancel-review-deleted-response
       steps:
         update-product-rating:
           name: update-product-rating
@@ -234,7 +237,7 @@ saga:
           name: confirm-review-deletion
           timeout: 500
           topics:
-            request: confirm-review-deletion-request
-            response: confirm-review-deletion-response
-            compensation-request: cancel-review-deletion-request
-            compensation-response: cancel-review-deletion-response
+            request: confirm-review-deleted-request
+            response: confirm-review-deleted-response
+            compensation-request: cancel-review-deleted-request
+            compensation-response: cancel-review-deleted-response

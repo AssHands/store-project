@@ -3,7 +3,7 @@ package com.ak.store.reviewOutbox.processor.updated;
 import com.ak.store.kafka.storekafkastarter.EventProducerKafka;
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
 import com.ak.store.kafka.storekafkastarter.model.event.saga.SagaRequestEvent;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewUpdatedSnapshot;
 import com.ak.store.reviewOutbox.model.OutboxEvent;
 import com.ak.store.reviewOutbox.model.OutboxEventStatus;
 import com.ak.store.reviewOutbox.model.OutboxEventType;
@@ -23,9 +23,9 @@ public class ReviewUpdatedOutboxEventProcessor implements OutboxEventProcessor {
     @Override
     public void process(OutboxEvent event) {
         String topic = kafkaTopicRegistry.getTopicByEvent(getType());
-        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), ReviewSnapshot.class);
+        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), ReviewUpdatedSnapshot.class);
 
-        var request = SagaRequestEvent.<ReviewSnapshot>builder()
+        var request = SagaRequestEvent.<ReviewUpdatedSnapshot>builder()
                 .sagaId(event.getId())
                 .request(snapshot)
                 .build();

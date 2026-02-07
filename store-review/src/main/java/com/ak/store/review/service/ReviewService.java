@@ -68,43 +68,11 @@ public class ReviewService {
         reviewRepo.save(review);
     }
 
-    public void updateCommentCounter(ObjectId reviewId) {
-
+    public void updateReactionCounter(ObjectId reviewId, int likeDelta, int dislikeDelta)  {
+        reviewRepo.updateReactionCounter(reviewId, likeDelta, dislikeDelta);
     }
 
-    public void updateReactionCounter(ObjectId reviewId, boolean isLike, boolean isIncrement, boolean needTo)  {
-
-    }
-
-    public void incrementCommentAmount(ObjectId reviewId) {
-        reviewRepo.incrementCommentAmount(reviewId);
-    }
-
-    public void decrementCommentAmount(ObjectId reviewId) {
-        reviewRepo.decrementCommentAmount(reviewId);
-    }
-
-    public void incrementLikeAmount(ObjectId reviewId) {
-        reviewRepo.incrementLikeAmount(reviewId);
-    }
-
-    public void decrementLikeAmount(ObjectId reviewId) {
-        reviewRepo.decrementLikeAmount(reviewId);
-    }
-
-    public void incrementDislikeAmount(ObjectId reviewId) {
-        reviewRepo.incrementDislikeAmount(reviewId);
-    }
-
-    public void decrementDislikeAmount(ObjectId reviewId) {
-        reviewRepo.decrementDislikeAmount(reviewId);
-    }
-
-    public void incrementLikeAmountAndDecrementDislikeAmount(ObjectId reviewId) {
-        reviewRepo.incrementLikeAmountAndDecrementDislikeAmount(reviewId);
-    }
-
-    public void decrementLikeAmountAndIncrementDislikeAmount(ObjectId reviewId) {
-        reviewRepo.decrementLikeAmountAndIncrementDislikeAmount(reviewId);
+    public void updateCommentCounter(ObjectId reviewId, int commentDelta)  {
+        reviewRepo.updateCommentCounter(reviewId, commentDelta);
     }
 }

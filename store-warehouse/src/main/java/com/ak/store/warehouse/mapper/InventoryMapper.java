@@ -1,8 +1,8 @@
 package com.ak.store.warehouse.mapper;
 
-import com.ak.store.warehouse.model.dto.AvailableInventoryDTO;
+import com.ak.store.warehouse.model.command.AvailableInventoryCommand;
 import com.ak.store.warehouse.model.dto.InventoryDTO;
-import com.ak.store.warehouse.model.dto.ReserveInventoryDTO;
+import com.ak.store.warehouse.model.command.ReserveInventoryCommand;
 import com.ak.store.warehouse.model.entity.Inventory;
 import com.ak.store.warehouse.model.form.AvailableInventoryForm;
 import com.ak.store.warehouse.model.form.ReserveInventoryForm;
@@ -15,12 +15,11 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface InventoryMapper {
-    InventoryDTO toInventoryDTO(Inventory i);
-    List<InventoryDTO> toInventoryDTO(List<Inventory> i);
+    InventoryDTO toDTO(Inventory entity);
 
-    List<InventoryView> toInventoryView(List<InventoryDTO> i);
+    InventoryView toView(InventoryDTO dto);
 
-    List<ReserveInventoryDTO> toReserveInventoryDTO(List<ReserveInventoryForm> ri);
+    ReserveInventoryCommand toReserveInventoryCommand(ReserveInventoryForm form);
 
-    List<AvailableInventoryDTO> toAvailableInventoryDTO(List<AvailableInventoryForm> ai);
+    AvailableInventoryCommand toAvailableInventoryCommand(AvailableInventoryForm form);
 }

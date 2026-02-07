@@ -21,6 +21,9 @@ public interface ReviewMapper {
     ReviewSnapshot toSnapshot(Review document);
 
     @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
+    ReviewSnapshot toSnapshot(ReviewDTO dto);
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "objectIdToString")
     ReviewView toView(ReviewDTO dto);
 
     WriteReviewCommand toWriteCommand(UUID userId, ReviewForm form);

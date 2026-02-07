@@ -1,5 +1,6 @@
 package com.ak.store.kafka.storekafkastarter.model.event.search;
 
+import com.ak.store.kafka.storekafkastarter.KafkaEvent;
 import com.ak.store.kafka.storekafkastarter.model.snapshot.search.SearchSnapshot;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -15,9 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SearchEvent {
+public class SearchEvent implements KafkaEvent {
     private UUID eventId;
 
-    @Builder.Default
-    private final SearchSnapshot snapshot = new SearchSnapshot();
+    private SearchSnapshot searchData;
 }

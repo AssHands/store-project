@@ -1,7 +1,7 @@
 package com.ak.store.reviewSagaWorker.processor.inbox.updated;
 
 import com.ak.store.kafka.storekafkastarter.JsonMapperKafka;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.review.ReviewUpdatedSnapshot;
 import com.ak.store.reviewSagaWorker.model.document.ReviewStatus;
 import com.ak.store.reviewSagaWorker.model.inbox.InboxEvent;
 import com.ak.store.reviewSagaWorker.model.inbox.InboxEventStatus;
@@ -24,10 +24,10 @@ public class ConfirmReviewUpdatedInboxEventProcessor implements InboxEventProces
     @Transactional
     @Override
     public void process(InboxEvent event) {
-        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), ReviewSnapshot.class);
+        var snapshot = jsonMapperKafka.fromJson(event.getPayload(), ReviewUpdatedSnapshot.class);
 
         try {
-            reviewService.updateOneStatus(new ObjectId(snapshot.getId()), ReviewStatus.COMPLETED);
+            reviewService.updateOneStatus(new ObjectId(snapshot.getNewReview().getId()), ReviewStatus.COMPLETED);
             inboxEventReaderService.markOneAs(event, InboxEventStatus.SUCCESS);
         } catch (Exception e) {
             inboxEventReaderService.markOneAsFailure(event);

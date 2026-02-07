@@ -16,7 +16,7 @@ public class EventProducerKafka {
         return kafkaTemplate.send(topic, key, event);
     }
 
-    public <T extends KafkaEvent> CompletableFuture<SendResult<String, KafkaEvent>> sendAsync(T event, String topic) {
+    public CompletableFuture<SendResult<String, KafkaEvent>> sendAsync(KafkaEvent event, String topic) {
         return kafkaTemplate.send(topic, event);
     }
 }

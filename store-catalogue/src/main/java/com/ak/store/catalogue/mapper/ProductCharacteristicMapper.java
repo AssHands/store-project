@@ -7,7 +7,7 @@ import com.ak.store.catalogue.model.entity.ProductCharacteristic;
 import com.ak.store.catalogue.model.form.WriteProductCharacteristicForm;
 import com.ak.store.catalogue.model.form.WriteProductCharacteristicPayloadForm;
 import com.ak.store.catalogue.model.view.ProductCharacteristicView;
-import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.ProductCharacteristicSnapshot;
+import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.product.ProductCharacteristicSnapshot;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

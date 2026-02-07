@@ -16,11 +16,4 @@ public class WarehouseSagaWorkerProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(WarehouseSagaWorkerProjectApplication.class, args);
     }
-
-    @Bean
-    public Gson gson() {
-        return new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create();
-    }
 }
