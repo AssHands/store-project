@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/catalogue/products/images")
+@RequestMapping("api/v1/catalogue/products")
 public class ImageController {
     private final ImageFacade imageFacade;
 
@@ -61,7 +61,7 @@ public class ImageController {
      * a[1] <br>
      * e[2] <br>
      */
-    @PatchMapping(value = "images/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Long updateAllImage(@PathVariable("id") Long productId,
                                @RequestParam Map<String, String> allImageIndexes,
                                @RequestParam(value = "add_images", required = false) List<MultipartFile> addImages,

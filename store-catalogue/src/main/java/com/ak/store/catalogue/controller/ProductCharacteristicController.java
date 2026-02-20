@@ -12,20 +12,22 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/catalogue/products/characteristics")
+@RequestMapping("api/v1/catalogue/products/{productId}/characteristics")
 public class ProductCharacteristicController {
     private final ProductCharacteristicFacade pcFacade;
     private final ProductCharacteristicMapper pcMapper;
 
-    @GetMapping("{id}")
-    public List<ProductCharacteristicView> findAll(@PathVariable Long id) {
-        return pcFacade.findAll(id).stream()
+    @GetMapping
+    public List<ProductCharacteristicView> findAll(@PathVariable Long productId) {
+        return pcFacade.findAll(productId).stream()
                 .map(pcMapper::toView)
                 .toList();
     }
 
-    @PostMapping("update")
-    public Long updateAll(@RequestBody @Valid WriteProductCharacteristicPayloadForm payloadForm) {
+    @PatchMapping
+    public Long updateAll(@PathVariable Long productId,
+                          @RequestBody @Valid WriteProductCharacteristicPayloadForm payloadForm) {
+        payloadForm.setProductId(productId);
         return pcFacade.updateAll(pcMapper.toWritePayloadCommand(payloadForm));
     }
 }

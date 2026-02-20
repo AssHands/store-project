@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.exception.NotFoundException;
 import com.ak.store.catalogue.mapper.ProductMapper;
 import com.ak.store.catalogue.model.command.WriteProductCommand;
 import com.ak.store.catalogue.model.dto.ProductDTO;
@@ -23,7 +24,7 @@ public class ProductService {
     private final ProductMapper productMapper;
 
     private Product findOneById(Long id) {
-        return productRepo.findById(id).orElseThrow(() -> new RuntimeException("not found"));
+        return productRepo.findById(id).orElseThrow(() -> new NotFoundException("Product not found: id=" + id));
     }
 
     private List<Product> findAllById(List<Long> ids) {

@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.service.outbox;
 
+import com.ak.store.catalogue.exception.NotFoundException;
 import com.ak.store.catalogue.mapper.ImageMapper;
 import com.ak.store.catalogue.mapper.ProductCharacteristicMapper;
 import com.ak.store.catalogue.mapper.ProductMapper;
@@ -62,7 +63,7 @@ public class ProductOutboxService {
 
     private Product findOne(Long id) {
         var product = productRepo.findOneWithCharacteristicsById(id)
-                .orElseThrow(() -> new RuntimeException("product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found: id=" + id));
 
         product.getImages().size();
 
