@@ -1,5 +1,6 @@
 package com.ak.store.catalogue.service;
 
+import com.ak.store.catalogue.exception.NotFoundException;
 import com.ak.store.catalogue.mapper.CategoryMapper;
 import com.ak.store.catalogue.model.command.WriteCategoryCharacteristicCommand;
 import com.ak.store.catalogue.model.command.WriteCategoryCommand;
@@ -24,12 +25,12 @@ public class CategoryService {
 
     private Category findOneById(Long id) {
         return categoryRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("not found"));
+                .orElseThrow(() -> new NotFoundException("Category not found: id=" + id));
     }
 
     private Category findOneFullById(Long id) {
         return categoryRepo.findOneFullById(id)
-                .orElseThrow(() -> new RuntimeException("not found"));
+                .orElseThrow(() -> new NotFoundException("Category not found: id=" + id));
     }
 
     public List<CategoryDTO> findAll() {

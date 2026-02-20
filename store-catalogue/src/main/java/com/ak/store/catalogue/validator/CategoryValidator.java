@@ -1,18 +1,20 @@
 package com.ak.store.catalogue.validator;
 
+import com.ak.store.catalogue.exception.ConflictException;
+import com.ak.store.catalogue.exception.ValidationException;
 import com.ak.store.catalogue.model.command.WriteCategoryCharacteristicCommand;
 import com.ak.store.catalogue.model.command.WriteCategoryCommand;
 import com.ak.store.catalogue.model.entity.Category;
 import com.ak.store.catalogue.model.entity.CategoryCharacteristic;
 import com.ak.store.catalogue.model.entity.Characteristic;
-import com.ak.store.catalogue.repository.CategoryRepo;
+import com.ak.store.catalogue.service.CategoryQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
 public class CategoryValidator {
-    private final CategoryRepo categoryRepo;
+    private final CategoryQueryService categoryQueryService;
 
     public void validateCreate(WriteCategoryCommand command) {
         uniqName(command.getName());
@@ -39,8 +41,8 @@ public class CategoryValidator {
     }
 
     private void uniqName(String name) {
-        if (categoryRepo.existsByNameEqualsIgnoreCase(name)) {
-            throw new RuntimeException("not uniq name");
+        if (categoryQueryService.existsByName(name)) {
+            throw new ConflictException("Category name must be unique");
         }
     }
 
@@ -51,12 +53,12 @@ public class CategoryValidator {
             throw new IllegalArgumentException("parentId cannot be equal to id");
         }
 
-        categoryRepo.findById(parentId).orElseThrow(() -> new RuntimeException("parent does not exist"));
+        categoryQueryService.findByIdOrThrow(parentId);
     }
 
     private void notExistChildren(Long id) {
-        if (categoryRepo.existsByParentId(id)) {
-            throw new RuntimeException("this category has children. delete children first");
+        if (categoryQueryService.existsChildren(id)) {
+            throw new ConflictException("Category has child categories. Delete child categories first");
         }
     }
 
@@ -69,7 +71,7 @@ public class CategoryValidator {
                 .anyMatch(v -> v.equals(characteristicId));
 
         if(!isContains) {
-            throw new RuntimeException("category does not contain characteristic");
+            throw new ValidationException("Category does not contain characteristic");
         }
     }
 
@@ -82,12 +84,11 @@ public class CategoryValidator {
                 .anyMatch(v -> v.equals(characteristicId));
 
         if(isContains) {
-            throw new RuntimeException("category contains characteristic");
+            throw new ConflictException("Category already contains this characteristic");
         }
     }
 
     private Category findOneFullById(Long id) {
-        return categoryRepo.findOneFullById(id)
-                .orElseThrow(() -> new RuntimeException("not found"));
+        return categoryQueryService.findOneFullByIdOrThrow(id);
     }
 }
