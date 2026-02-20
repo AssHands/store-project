@@ -1,12 +1,12 @@
 package com.ak.store.catalogue.service.outbox;
 
-import com.ak.store.catalogue.mapper.ImageMapper;
-import com.ak.store.catalogue.mapper.ProductCharacteristicMapper;
-import com.ak.store.catalogue.mapper.ProductMapper;
+import com.ak.store.catalogue.product.mapper.ImageMapper;
+import com.ak.store.catalogue.product.mapper.ProductCharacteristicMapper;
+import com.ak.store.catalogue.product.mapper.ProductMapper;
 import com.ak.store.catalogue.model.entity.Product;
 import com.ak.store.catalogue.outbox.OutboxEventService;
 import com.ak.store.catalogue.outbox.OutboxEventType;
-import com.ak.store.catalogue.repository.ProductRepo;
+import com.ak.store.catalogue.product.service.query.ProductQueryService;
 import com.ak.store.kafka.storekafkastarter.model.snapshot.catalogue.product.ProductSnapshotPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.Collections;
 @Service
 @RequiredArgsConstructor
 public class ProductOutboxService {
-    private final ProductRepo productRepo;
+    private final ProductQueryService productQueryService;
     private final ProductMapper productMapper;
     private final ImageMapper imageMapper;
     private final ProductCharacteristicMapper pcMapper;
@@ -61,8 +61,7 @@ public class ProductOutboxService {
     }
 
     private Product findOne(Long id) {
-        var product = productRepo.findOneWithCharacteristicsById(id)
-                .orElseThrow(() -> new RuntimeException("product not found"));
+        var product = productQueryService.findOneWithCharacteristicsOrThrow(id);
 
         product.getImages().size();
 

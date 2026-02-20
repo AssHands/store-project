@@ -3,7 +3,7 @@ package com.ak.store.catalogue.util;
 import com.ak.store.catalogue.model.dto.ImageDTO;
 import com.ak.store.catalogue.model.command.WriteImageCommand;
 import com.ak.store.catalogue.model.pojo.ProcessedImages;
-import com.ak.store.catalogue.service.ProductService;
+import com.ak.store.catalogue.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
